@@ -1,0 +1,42 @@
+---
+title: "Key technologies used to build the plant package"
+description: "Rich FitzJohn & Daniel Falster on the Rcpp/R6, Git, and continuous-integration stack behind plant. Archived pointer to the original MEE Methods blog post (23 Feb 2016) — opens the original."
+date: 2016-02-23
+author: "Rich FitzJohn & Daniel Falster"
+categories: [announcement, external]
+# Canonical source. This page is a local stub that redirects to it.
+external-url: "https://methodsblog.com/2016/02/23/plant/"
+reading-time: false
+format:
+  html:
+    include-in-header:
+      text: |
+        <link rel="canonical" href="https://methodsblog.com/2016/02/23/plant/">
+        <meta http-equiv="refresh" content="0; url=https://methodsblog.com/2016/02/23/plant/">
+---
+
+::: {.eyebrow}
+from the archive · external
+:::
+
+This post originally appeared on the
+**[MEE Methods blog](https://methodsblog.com/2016/02/23/plant/)**
+(*Methods in Ecology and Evolution*) on 23 February 2016, by
+Rich FitzJohn and Daniel Falster. We keep a pointer to it here rather than
+re-hosting it.
+
+You're being redirected to the original. If that doesn't happen,
+**[read it on the Methods blog →](https://methodsblog.com/2016/02/23/plant/)**
+
+> It walks through the engineering behind `plant` — C++ wrapped with Rcpp
+> and R6 classes, version control with Git/GitHub, and automated testing —
+> the stack that lets the model be both fast and flexible.
+
+It accompanies the package's methods paper, Falster *et al.*,
+*Plant: A package for modelling forest trait ecology & evolution*,
+*Methods in Ecology and Evolution*,
+[doi:10.1111/2041-210X.12525](https://doi.org/10.1111/2041-210X.12525).
+
+```{=html}
+<script>window.location.replace("https://methodsblog.com/2016/02/23/plant/");</script>
+```
