@@ -1,0 +1,52 @@
+name: PR checks
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  freeze-consistency:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+      - uses: r-lib/actions/setup-r@v2
+        with: { use-public-rspm: true }
+      - uses: r-lib/actions/setup-renv@v2
+
+      # Freeze-consistency guard. NOTE: --no-execute-daemon does NOT prevent
+      # execution — it only disables the persistent knitr/jupyter kernel.
+      # The real guard is `freeze: auto` + the git diff below: if a source
+      # changed without a committed _freeze/ update, this render re-executes
+      # it, _freeze/ changes, and the diff fails the build — forcing the
+      # author to run `quarto render` locally and commit the fresh freeze.
+      - name: Check freeze is up to date
+        run: |
+          quarto render --no-execute-daemon || true
+          # After render, _freeze/ should be unchanged vs the committed tree.
+          if ! git diff --quiet -- _freeze/; then
+            echo "::error::_freeze/ is out of date with sources."
+            echo "Run 'quarto render' locally and commit the updated _freeze/."
+            git --no-pager diff --stat -- _freeze/
+            exit 1
+          fi
+          echo "_freeze/ is consistent with sources."
+
+  reproduction-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with: { use-public-rspm: true }
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: any::yaml
+      - name: No unfilled reproductions
+        run: Rscript R/check_reproductions.R

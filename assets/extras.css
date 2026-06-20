@@ -1,0 +1,66 @@
+/* Hero ---------------------------------------------------------- */
+.hero-canopy {
+  margin: 0 -1rem 2.5rem;
+  padding: clamp(2rem, 5vw, 4.5rem) clamp(1rem, 4vw, 3rem);
+  background:
+    radial-gradient(120% 80% at 80% -10%, rgba(244,207,114,0.22), transparent 55%),
+    linear-gradient(180deg, #fbfcfa 0%, #eef5ee 100%);
+  border-bottom: 1px solid rgba(42,98,67,0.18);
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.hero-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: #0b1f17;
+  margin: 0.2rem 0 1rem;
+}
+.hero-lede {
+  font-size: 1.08rem;
+  color: #1c4733;
+  max-width: 46ch;
+  margin-bottom: 1.6rem;
+}
+.hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.btn-sun, .btn-ghost {
+  display: inline-block; padding: 0.6rem 1.15rem; border-radius: 7px;
+  font-weight: 500; text-decoration: none; font-size: 0.96rem;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-sun {
+  background: #e8a317; color: #14241c;
+  box-shadow: 0 2px 0 rgba(122,90,58,0.35);
+}
+.btn-sun:hover { transform: translateY(-1px); color: #14241c; }
+.btn-ghost { border: 1px solid rgba(42,98,67,0.4); color: #1c4733; }
+.btn-ghost:hover { background: rgba(42,98,67,0.07); color: #0b1f17; }
+
+.hero-fig { margin: 0; text-align: center; }
+.canopy-svg { width: 100%; max-width: 240px; height: auto; }
+.hero-fig figcaption {
+  font-size: 0.78rem; color: #5b9c6e; margin-top: 0.4rem;
+}
+.lightline {
+  stroke: #e8a317; stroke-width: 1; stroke-dasharray: 2 5; opacity: 0.45;
+}
+.mono { font-family: "JetBrains Mono", monospace; }
+
+.feature-row { max-width: 1080px; margin: 0 auto 2rem; gap: 1.5rem; }
+.feature-row h3 { font-size: 1.05rem; color: #0b1f17; margin-bottom: 0.4rem; }
+
+@media (max-width: 768px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-fig { order: -1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-sun:hover, .btn-ghost:hover { transform: none; }
+}

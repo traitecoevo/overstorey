@@ -1,0 +1,105 @@
+---
+title: ""
+pagetitle: "plant — a size-structured model of plant ecosystems"
+page-layout: full
+toc: false
+format:
+  html:
+    css: assets/extras.css
+---
+
+::: {.hero-canopy}
+
+```{=html}
+<div class="hero-grid">
+  <div class="hero-copy">
+    <p class="eyebrow">size-structured · trait-based · mechanistic</p>
+    <h1 class="hero-title">Plants competing<br>for light, resolved<br>down the canopy.</h1>
+    <p class="hero-lede">
+      <code>plant</code> integrates the demography of a size-structured
+      population through a light environment its own individuals create —
+      assimilation, growth, and mortality emerging from leaf-level
+      physiology rather than fitted curves.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-sun" href="guides/first-individual.html">Run your first individual →</a>
+      <a class="btn-ghost" href="theory/size-structured-pde.html">Read the theory</a>
+    </div>
+  </div>
+
+  <!-- Signature element: light attenuating through a leaf-area profile.
+       Beer–Lambert decay; bars are canopy layers, opacity ∝ light. -->
+  <figure class="hero-fig" aria-label="Light attenuating through a canopy profile">
+    <svg viewBox="0 0 240 360" role="img" class="canopy-svg">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#f4cf72"/>
+          <stop offset="100%" stop-color="#eef5ee"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="240" height="360" fill="url(#sky)" opacity="0.25"/>
+      <g class="layers"></g>
+      <line class="lightline" x1="120" y1="0" x2="120" y2="360"/>
+    </svg>
+    <figcaption>light fraction <span class="mono">I(z)/I₀ = e<sup>−k·L(z)</sup></span></figcaption>
+  </figure>
+</div>
+
+<script>
+(function () {
+  const g = document.querySelector('.canopy-svg .layers');
+  if (!g) return;
+  const N = 22, k = 0.5, top = 20, bottom = 340, w = 240;
+  let cumLAI = 0;
+  for (let i = 0; i < N; i++) {
+    const y = top + (bottom - top) * (i / N);
+    cumLAI += 0.18;                       // leaf area accumulating downward
+    const light = Math.exp(-k * cumLAI);  // Beer–Lambert
+    const bw = 30 + 70 * light;           // wider where more light reaches
+    const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x', (w/2 - bw/2).toFixed(1));
+    r.setAttribute('y', y.toFixed(1));
+    r.setAttribute('width', bw.toFixed(1));
+    r.setAttribute('height', '8');
+    r.setAttribute('rx', '2');
+    r.setAttribute('fill', '#2a6243');
+    r.setAttribute('opacity', '0');
+    g.appendChild(r);
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { r.setAttribute('opacity', (0.25 + 0.7*light).toFixed(2)); }
+    else {
+      r.animate(
+        [{opacity: 0, transform: 'translateY(-6px)'},
+         {opacity: 0.25 + 0.7*light, transform: 'translateY(0)'}],
+        {duration: 500, delay: 120 + i*55, fill: 'forwards', easing: 'ease-out'}
+      );
+    }
+  }
+})();
+</script>
+```
+
+:::
+
+::: {.grid .feature-row}
+
+::: {.g-col-12 .g-col-md-4}
+### Mechanistic, not fitted
+Growth and mortality fall out of a carbon budget — assimilation minus respiration and turnover — so trait effects propagate the way they do in a plant.
+:::
+
+::: {.g-col-12 .g-col-md-4}
+### Emergent competition
+Each individual shades those below it. The light environment is solved as a fixed point of the community, not imposed.
+:::
+
+::: {.g-col-12 .g-col-md-4}
+### Built to be reproduced
+Every page here is frozen against a pinned `renv` lockfile and a recorded package version. Re-run any result, get the same figure.
+:::
+
+:::
+
+::: {.callout-tip}
+New here? Start with [installation](guides/install.qmd), then [your first individual](guides/first-individual.qmd). Looking for function-level docs? They live in the [reference site](https://traitecoevo.github.io/plant/reference/).
+:::

@@ -1,0 +1,31 @@
+---
+title: "Reproductions"
+subtitle: "Key figures from the plant literature, re-run against the current model. Documentation and regression check in one."
+listing:
+  id: repro
+  contents: "*/index.qmd"
+  type: grid
+  sort: "date desc"
+  categories: false
+  include:
+    categories: [reproduction]
+  fields: [title, description, date, plant-version, plant-ref]
+  grid-columns: 2
+page-layout: full
+toc: false
+---
+
+::: {.eyebrow}
+the literature, re-run
+:::
+
+Each card re-creates a published figure from a `plant` paper and places it
+beside our re-run, with the source parameters shown and a verdict on
+whether it still reproduces. When the model evolves, these are the pages
+that tell us what changed.
+
+To add one: copy `posts/_reproduction-template/`, fill in the `paper:`
+front-matter block and the verified parameters, set `fidelity:`, render.
+
+::: {#repro}
+:::

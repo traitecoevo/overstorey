@@ -1,0 +1,119 @@
+---
+# ── REPRODUCTION TEMPLATE ──────────────────────────────────────────
+# Copy this directory, rename to posts/YYYY-MM-DD-<slug>/, fill in.
+# Every field marked TODO must be set from the actual paper — do not
+# guess parameter values or figure numbers.
+title: "TODO: Reproducing Fig N of <Author Year>"
+description: "TODO: one line on what the figure shows and why it matters."
+date: 2026-01-01
+# Pin to whatever plant state you ran this against:
+plant-version: "2.1.0"        # master/released  …OR delete and use:
+# plant-ref: "develop"
+# plant-sha: "TODO"
+categories: [reproduction, TODO-topic]
+reading-time: true
+# Structured metadata about the source paper (drives the citation box):
+paper:
+  authors: "TODO"
+  year: TODO
+  title: "TODO"
+  journal: "TODO"
+  doi: "TODO"
+  figure: "TODO (e.g. Figure 3b)"
+  fidelity: "pending"          # pending | matches | differs | approximate
+  # ── original paper code (you have these repos) ───────────────────
+  # If set, the post can re-run the paper's OWN figure script rather
+  # than a hand-transcription. Pin to the publication commit/tag.
+  code-repo: "TODO"            # e.g. traitecoevo/<paper-repo> (or "" if none)
+  code-ref: "TODO"            # tag or full SHA used for publication
+  code-entrypoint: "TODO"      # path to the figure script within that repo
+---
+
+```{r setup, include=FALSE}
+source(here::here("R/version-badge.R"))
+source(here::here("R/reproduction.R"))
+```
+
+`r plant_version_badge()` `r repro_fidelity_badge()` `r paper_code_badge()`
+
+`r paper_citation()`
+
+## What the original shows
+
+TODO: 2–3 sentences describing the published figure — the axes, the
+result, and why it's a load-bearing result for the model.
+
+## Parameters from the paper
+
+The values below are taken directly from <Author Year> (and its
+supplement). Keep them in one visible block so the reproduction is
+auditable against the source.
+
+```{r}
+#| label: params
+#| eval: false
+# TODO: transcribe exactly. Cite table/section for each non-default value.
+pars <- list(
+  # lma   = 0.0825,   # <Author Year>, Table S1
+  # rho   = 608,      # ...
+)
+```
+
+## Re-running it
+
+There are two re-runs worth distinguishing:
+
+1. **Paper code, today** — the figure script from the original repo
+   (pinned via `code-ref`), run against current dependencies. Tells you
+   whether the *paper's own code* still executes cleanly.
+2. **Current `plant`** — the same result through today's model API. Tells
+   you whether the *model* still produces the published behaviour.
+
+Divergence between (1) and (2) is the model-drift signal. Divergence
+between the published PNG and (1) means the paper code itself no longer
+reproduces against current deps.
+
+```{r}
+#| label: paper-code-rerun
+#| eval: false
+#| fig-cap: "Paper's own figure script, re-run. See code-ref in front matter for the pinned commit."
+# Submodule checked out at paper-code/<slug>/ (CI: git submodule update --init).
+# source(here::here("paper-code/<slug>", "<code-entrypoint>"))
+```
+
+```{r}
+#| label: reproduce
+#| eval: false
+#| fig-cap: "Current plant. Compare against TODO-figure of the source."
+library(plant)
+# TODO: the minimal current-API path that regenerates the figure.
+```
+
+## Side by side
+
+::: {.repro-compare}
+::: {.repro-pane}
+**Published** — TODO-figure of <Author Year>
+
+> Insert the published panel as an image (assets/papers/<slug>.png) or,
+> if licensing doesn't permit, link to it at the DOI and describe it.
+:::
+::: {.repro-pane}
+**Reproduced** — current `plant`
+
+> The figure rendered above.
+:::
+:::
+
+## Verdict
+
+TODO: state plainly whether it **matches**, **differs**, or is
+**approximate**, and why. Differences are often informative — a changed
+default, a reparameterisation, a bug fixed since publication. Set the
+`fidelity:` field in the front matter to match this verdict.
+
+```{r}
+#| label: session
+#| eval: false
+plant_session_info()
+```

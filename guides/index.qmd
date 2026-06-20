@@ -1,0 +1,17 @@
+---
+title: "Guides"
+toc: false
+---
+::: {.eyebrow}
+task-oriented · start here
+:::
+
+Practical, sequential walkthroughs. For the *why*, read the
+[theory](../theory/index.qmd); for function signatures, the
+[reference site](https://traitecoevo.github.io/plant/reference/).
+
+- [Installation](install.qmd)
+- [Your first individual](first-individual.qmd)
+- [Patch dynamics](patch-dynamics.qmd)
+- [Strategies & traits](strategies.qmd)
+- [Calibration](calibration.qmd)

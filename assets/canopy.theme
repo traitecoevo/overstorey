@@ -1,0 +1,9 @@
+{
+  "text-color": "#123026",
+  "background-color": "#fbfcfa",
+  "keyword": { "text-color": "#1c4733", "bold": true },
+  "function": { "text-color": "#7a5a3a" },
+  "string": { "text-color": "#2a6243" },
+  "comment": { "text-color": "#5b9c6e", "italic": true },
+  "number": { "text-color": "#b97c12" }
+}

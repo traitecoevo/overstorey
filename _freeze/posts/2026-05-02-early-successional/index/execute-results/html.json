@@ -1,0 +1,15 @@
+{
+  "hash": "0b457543bcd4b3717c666dcce88e5805",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Calibrating an early-successional strategy\"\ndescription: \"Fitting a fast-growing, short-lived strategy and checking it against observed height trajectories.\"\ndate: 2026-05-02\nplant-version: \"2.1.0\"\ncategories: [calibration, case-study]\nreading-time: true\n---\n\n\n\n`<span class=\"version-badge\">plant 2.1.0</span>`{=html}\n\nThis post was built against the version badged above. If you're running a\nnewer `plant`, the API may differ — the result here is frozen to what\n2.1.0 produced.\n\n## The strategy\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(plant)\ns <- strategy(FF16_Strategy(\n  lma   = 0.05,   # cheap, short-lived leaves\n  rho   = 350,    # low wood density — fast height gain\n  hmat  = 8\n))\n```\n:::\n\n\n<!-- ... rest of the worked example ... -->\n\n## Reproducibility footer\n\n\n::: {.cell}\n\n```{.r .cell-code}\nplant_session_info()\n```\n:::\n\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

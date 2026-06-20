@@ -1,0 +1,14 @@
+---
+title: "Theory"
+toc: false
+---
+::: {.eyebrow}
+the model, from the ground up
+:::
+
+What `plant` actually solves, and why. Consolidates material currently
+scattered across papers and vignettes.
+
+- [The size-structured PDE](size-structured-pde.qmd)
+- [Assimilation & hydraulics](assimilation-hydraulics.qmd)
+- [Adaptive dynamics](adaptive-dynamics.qmd)

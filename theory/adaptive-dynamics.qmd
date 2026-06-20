@@ -1,0 +1,8 @@
+---
+title: "Adaptive dynamics"
+---
+::: {.eyebrow}
+theory
+:::
+
+> Stub — consolidate the maths here. Use `$$ $$` for display math.

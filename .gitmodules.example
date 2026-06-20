@@ -1,0 +1,6 @@
+# Rename to .gitmodules after adding real submodules, or let
+# `git submodule add` create it. One block per reproduced paper:
+#
+# [submodule "paper-code/2016-ff16-emergence"]
+#     path = paper-code/2016-ff16-emergence
+#     url = https://github.com/traitecoevo/<paper-repo>

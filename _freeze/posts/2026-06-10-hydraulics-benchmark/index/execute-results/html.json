@@ -1,0 +1,15 @@
+{
+  "hash": "93da0dd1bdfee41c47fd7f4c04c21af1",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Hydraulics inner-loop benchmark\"\ndescription: \"Timing the new plant hydraulics path against the FF16 baseline across a leaf-area-index sweep — an expensive run, pinned to its own environment.\"\ndate: 2026-06-10\nplant-ref: \"develop\"\nplant-sha: \"a1b2c3d4e5f6a7b8\"\ncategories: [hydraulics, performance, develop]\nreading-time: true\nexecute:\n  cache: true\n---\n\n\n\n`<span class=\"version-badge version-badge--dev\">plant @develop a1b2c3d</span>`{=html}\n\nThis post is built against an **unreleased** commit on `develop`, so the\nbadge pins to a SHA rather than a version. The simulation below is slow,\nso it's pinned to its own `renv` snapshot as well — a later project-wide\npackage upgrade can't change this result even on a forced re-run.\n\n## Per-post environment\n\nThis directory carries its own lockfile, captured once when the post was\nwritten:\n\n```r\n# run from this post's directory, once:\nrenv::snapshot(lockfile = \"renv.lock.dev\", prompt = FALSE)\n```\n\n`plant_session_info()` (footer) reports `renv.lock.dev` when present, so\nthe page records exactly which environment produced the figures. To\nreproduce: check out `plant` at the SHA above, `renv::restore(lockfile =\n\"renv.lock.dev\")`, delete this post's `_freeze/` entry, re-render.\n\n## The sweep\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(plant)\nlibrary(bench)\n\nlai_grid <- seq(1, 8, by = 0.5)\n\nresults <- lapply(lai_grid, function(L) {\n  bench::mark(\n    baseline  = run_inner_ff16(lai = L),\n    hydraulic = run_inner_hydraulics(lai = L),\n    iterations = 20, check = FALSE\n  )\n})\n```\n:::\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# ... ggplot of median time by method across lai_grid ...\n```\n:::\n\n\n::: {.callout-note}\nNumbers here are frozen to commit `a1b2c3d`. When this work lands on\n`master`, supersede this post with a release-pinned version rather than\nediting it — keeping the develop snapshot as the historical record.\n:::\n\n## Reproducibility footer\n\n\n::: {.cell}\n\n```{.r .cell-code}\nplant_session_info()\n```\n:::\n\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

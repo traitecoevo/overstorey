@@ -1,0 +1,36 @@
+# ─────────────────────────────────────────────────────────────────────
+# Cross-link snippet for the `plant` package's own _pkgdown.yml
+# (lives in the traitecoevo/plant repo, NOT here). Merge these keys into
+# that file so the reference site and this docs site point at each other.
+# ─────────────────────────────────────────────────────────────────────
+
+url: https://traitecoevo.github.io/plant
+
+template:
+  bootstrap: 5
+  # Match the docs site so the two don't feel like different products.
+  bslib:
+    primary: "#2a6243"        # canopy-600
+    base_font: {google: "Inter"}
+    heading_font: {google: "Space Grotesk"}
+    code_font: {google: "JetBrains Mono"}
+
+navbar:
+  structure:
+    left:  [intro, reference, articles]
+    right: [docs, search, github]
+  components:
+    # Send users from the reference site to the rich docs site.
+    docs:
+      text: "Guides & Theory"
+      href: https://traitecoevo.github.io/plant-docs/
+    reference:
+      text: "Reference"
+      href: reference/index.html
+
+# Keep only lightweight, install-discoverable vignettes on pkgdown;
+# the heavy narrative lives on plant-docs. List the survivors here.
+articles:
+  - title: "Get started"
+    contents:
+      - getting-started      # keep 1–2 minimal vignettes for CRAN/discovery

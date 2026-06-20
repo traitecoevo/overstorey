@@ -1,0 +1,108 @@
+---
+title: "Development pipeline"
+subtitle: "How a change to plant becomes a published, reproducible page — and the guards that keep frozen results honest."
+toc: true
+---
+
+::: {.eyebrow}
+for maintainers
+:::
+
+## The spine: freeze
+
+Quarto re-executes a `.qmd` only when its **own source hash** changes
+(`execute: freeze: auto`). `_freeze/` is committed and is the record of
+what each page last computed. Three things can warrant re-execution, and
+the pipeline treats them differently:
+
+| Trigger | What auto-happens | What you do |
+|---|---|---|
+| **Content edit** | freeze invalidates that post; CI re-runs only it | nothing — normal path |
+| **Dependency bump** (`renv.lock`) | *nothing* — freeze keys on source, not packages | deliberate refresh + review diffs |
+| **Model change** (`plant`) | *nothing* automatically | run the refresh job; review which figures move |
+
+The second and third rows are intentional. A transitive dependency or a
+new `plant` must **not** silently rewrite a published figure. Refreshes
+are explicit and reviewed.
+
+## CI topology
+
+Four workflows, each with one job:
+
+**`publish.yml`** — on push to `main`. Plain `quarto render`, honours all
+freezes, deploys. Fast and deterministic. *Never* runs `--cache-refresh`.
+
+**`pr-checks.yml`** — on PR. Two guards:
+
+- *freeze consistency*: renders without allowing new execution; if a
+  source changed but its `_freeze/` wasn't updated, the build fails,
+  forcing the author to `quarto render` locally and commit the freeze.
+- *reproduction lint*: a published reproduction post can't merge while it
+  still has `fidelity: pending`, a `TODO` in its `paper:` block, or no
+  version/commit pin.
+
+**`refresh.yml`** — `workflow_dispatch`. The *only* job allowed to
+invalidate freezes. You pick a target (a category like `reproduction`, or
+a slug glob) and a `plant` ref; it re-runs just those posts against that
+ref and uploads the result as an **artifact**, not to production. You
+review figure diffs, then commit the updated `_freeze/` on a branch.
+
+**`drift-watch.yml`** — weekly schedule. Re-runs all reproductions
+against `plant` master HEAD and reports which figures moved
+(`R/figure_diff.R`). Purely informational; commits nothing. This is the
+early-warning system for the model breaking a published result.
+
+## Branch hygiene (master / develop)
+
+Posts pinned to `develop` (via `plant-ref` + `plant-sha`) are tied to a
+*moving* target. Routine CI must never force-refresh them — re-running
+silently rewrites history against a commit that no longer reflects
+develop. The guards that protect this:
+
+- `freeze: auto` never re-runs a develop post on its own.
+- `refresh.yml` is manual and targeted, never blanket.
+- `drift-watch.yml` runs against **master**, and commits nothing.
+
+A global `quarto render --cache-refresh` in CI is the single footgun that
+would undo the whole design. It exists nowhere in these workflows by
+intent.
+
+## Reproductions and original paper code
+
+Each reproduction can run the paper's **own** figure script, pinned via a
+submodule under `paper-code/<slug>/` (see its README). That gives three
+comparable states:
+
+1. the **published** PNG,
+2. the **paper code re-run today** (tells you the paper's code still runs
+   against current deps),
+3. the **current `plant`** path (tells you the model still behaves).
+
+(2) vs (3) is the model-drift signal; published-PNG vs (2) flags when the
+paper code itself has bit-rotted. The `paper.code-ref` field stamps the
+exact tree behind (2).
+
+## Network note
+
+`refresh.yml` and `drift-watch.yml` fetch `plant` at arbitrary refs and
+clone paper-code submodules, so CI needs outbound access to
+`github.com` / `codeload.github.com` / `api.github.com`. If your runner
+egress is allowlisted, add those before scheduling the drift watch.
+
+## Local loop
+
+```bash
+quarto preview                       # live edit
+quarto render                        # full build, updates _freeze/
+git add _freeze/ && git commit       # ALWAYS commit freeze with content
+```
+
+When bumping packages:
+
+```r
+renv::snapshot()                     # update renv.lock
+```
+```bash
+quarto render --cache-refresh        # locally, then eyeball figure diffs
+git add renv.lock _freeze/ && git commit
+```

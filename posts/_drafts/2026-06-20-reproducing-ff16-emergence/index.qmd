@@ -1,0 +1,94 @@
+---
+title: "Reproducing emergent size structure in the FF16 patch"
+description: "Re-running the emergence of a size-structured stand from the plant model's introductory paper — published figure vs. our re-run."
+date: 2026-06-20
+plant-version: "2.1.0"
+categories: [reproduction, patch-dynamics, ff16]
+reading-time: true
+paper:
+  authors: "Falster, Brännström, Westoby & Dieckmann"   # TODO verify author list/order
+  year: 2016                                            # TODO verify
+  title: "Plant: A package for modelling forest trait ecology and evolution"  # TODO verify exact title
+  journal: "Methods in Ecology and Evolution"           # TODO verify
+  doi: "TODO — fill from the paper"
+  figure: "TODO — the figure showing emergent stand structure"
+  fidelity: "pending"
+---
+
+```{r setup, include=FALSE}
+source(here::here("R/version-badge.R"))
+source(here::here("R/reproduction.R"))
+```
+
+`r plant_version_badge()` `r repro_fidelity_badge()`
+
+`r paper_citation()`
+
+::: {.callout-important}
+**Author of this post:** I've left the paper's exact figure number,
+parameter values, and DOI as `TODO`. Confirm them against the source
+before publishing — the structure below is ready, only the verified
+specifics are missing.
+:::
+
+## What the original shows
+
+TODO: describe the published panel — typically the time-development of a
+patch from establishment, with the size distribution of individuals
+emerging from competition for light. State the axes and the headline
+result.
+
+## Parameters from the paper
+
+```{r}
+#| label: params
+#| eval: false
+# TODO: transcribe the FF16 strategy parameters used in the figure,
+# citing the table/section for each value that differs from defaults.
+library(plant)
+p0 <- scm_base_parameters("FF16")
+# p0$strategy_default$lma <- TODO   # <Author Year>, Table SX
+# ... etc.
+```
+
+## Re-running it
+
+```{r}
+#| label: reproduce
+#| eval: false
+#| fig-cap: "Our re-run of the patch development. Compare against TODO-figure."
+# TODO: minimal path to regenerate. Sketch of the typical call sequence:
+# p1 <- expand_parameters(trait_matrix(TODO, "lma"), p0)
+# result <- run_scm_collect(p1)
+# ... extract the size distribution / state over time and plot ...
+```
+
+## Side by side
+
+::: {.repro-compare}
+::: {.repro-pane}
+**Published** — TODO-figure
+
+> Add the published panel at `assets/papers/ff16-emergence.png`, or if
+> licensing disallows redistribution, link it at the DOI above and
+> describe it here.
+:::
+::: {.repro-pane}
+**Reproduced** — this post
+
+> The figure rendered above.
+:::
+:::
+
+## Verdict
+
+TODO: matches / differs / approximate, with reasoning. If defaults have
+changed since 2016 (units, a reparameterised trait, a corrected
+constant), note it — that's exactly the kind of drift this reproduction
+catches. Then update `fidelity:` in the front matter.
+
+```{r}
+#| label: session
+#| eval: false
+plant_session_info()
+```

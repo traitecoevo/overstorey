@@ -1,0 +1,81 @@
+---
+title: "Notebook"
+subtitle: "Release notes, case studies, and worked problems — each pinned to the plant version or commit it was built against."
+listing:
+  id: notebook
+  contents: "*/index.qmd"
+  type: table
+  sort: "date desc"
+  categories: true
+  fields: [date, title, plant-ref, plant-version, reading-time]
+  field-display-names:
+    plant-ref: "branch"
+    plant-version: "version"
+  table-hover: true
+  feed: true
+page-layout: full
+toc: false
+---
+
+::: {.eyebrow}
+worked against pinned versions
+:::
+
+Posts here are reproducible against a specific state of `plant`. Master
+posts pin to a **release version**; develop posts pin to a **branch and
+commit**, since there's no tag to point at yet. The table shows both — a
+blank *version* with a *branch* of `develop` means the result is tied to
+a commit, not a release.
+
+::: {#notebook}
+:::
+
+## How posts are pinned {#reproducibility}
+
+### From `master` (released)
+
+```yaml
+---
+title: "Calibrating an early-successional strategy"
+date: 2026-05-02
+plant-version: "2.1.0"
+categories: [calibration, case-study]
+---
+```
+
+The badge renders `plant 2.1.0`. Install in CI from the matching tag.
+
+### From `develop` (unreleased)
+
+```yaml
+---
+title: "Hydraulics inner-loop benchmark"
+date: 2026-06-10
+plant-ref: "develop"
+plant-sha: "a1b2c3d4e5f6..."   # full or short; badge truncates to 7
+categories: [hydraulics, performance]
+---
+```
+
+The badge renders `● plant @develop a1b2c3d` in a dashed bark-toned pill,
+so a reader immediately sees it's a moving target. Because results are
+frozen, the figure stays faithful to that commit even after develop moves
+on — and the SHA tells anyone exactly what to check out to reproduce it.
+
+### Why this matters with two branches
+
+`freeze: auto` means a post is only re-executed when **its own source**
+changes. So a develop post built today won't silently re-run (and
+possibly break) when develop advances tomorrow. The version/commit
+stamped on the page is therefore always the one that produced the
+figures. To genuinely re-run an old develop post, check out its
+`plant-sha`, restore its lockfile, and delete its `_freeze/` entry.
+
+## Pinning the environment per post
+
+For light posts the project-level `renv.lock` is enough. For an expensive
+simulation you may want the post pinned to its *own* snapshot so a later
+project-wide upgrade can't change its result even if you do force a
+re-run. See the [hydraulics benchmark](2026-06-10-hydraulics-benchmark/)
+for the pattern: a post-local `renv` profile plus a recorded
+`plant_session_info()` footer.

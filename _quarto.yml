@@ -1,0 +1,97 @@
+project:
+  type: website
+  output-dir: _site
+  preview:
+    port: 4848
+    browser: true
+
+# Only re-execute a .qmd when it (or its deps) change. Essential given
+# plant's run times. Commit _freeze/ so CI never re-runs everything.
+execute:
+  freeze: auto
+  cache: true
+  warning: false
+  message: false
+
+website:
+  title: "plant"
+  description: "A size-structured, trait-based model of plant ecosystems."
+  site-url: "https://traitecoevo.github.io/plant-docs"
+  repo-url: "https://github.com/traitecoevo/plant-docs"
+  repo-actions: [edit, issue]
+  reader-mode: true
+  page-navigation: true
+
+  navbar:
+    background: primary
+    pinned: true
+    logo: assets/leaf-mark.svg
+    left:
+      - text: "Guides"
+        file: guides/index.qmd
+      - text: "Theory"
+        file: theory/index.qmd
+      - text: "Notebook"
+        file: posts/index.qmd
+      - text: "Reproductions"
+        file: posts/reproductions.qmd
+      - text: "Reference"
+        href: "https://traitecoevo.github.io/plant/reference/"
+        target: _blank
+    right:
+      - text: "Pipeline"
+        file: develop.qmd
+      - icon: github
+        href: "https://github.com/traitecoevo/plant"
+        target: _blank
+        aria-label: plant source on GitHub
+
+  sidebar:
+    - title: "Guides"
+      style: floating
+      contents:
+        - guides/index.qmd
+        - section: "Getting started"
+          contents:
+            - guides/install.qmd
+            - guides/first-individual.qmd
+        - section: "Running the model"
+          contents:
+            - guides/patch-dynamics.qmd
+            - guides/strategies.qmd
+            - guides/calibration.qmd
+    - title: "Theory"
+      style: floating
+      contents:
+        - theory/index.qmd
+        - theory/size-structured-pde.qmd
+        - theory/assimilation-hydraulics.qmd
+        - theory/adaptive-dynamics.qmd
+
+  page-footer:
+    left: "Built with Quarto · frozen for reproducibility"
+    right:
+      - text: "License"
+        href: "https://github.com/traitecoevo/plant/blob/master/LICENSE"
+
+format:
+  html:
+    theme:
+      - cosmo
+      - assets/plant.scss
+    css: assets/extras.css
+    toc: true
+    toc-depth: 3
+    toc-title: "On this page"
+    code-link: true
+    code-copy: true
+    code-overflow: wrap
+    highlight-style: assets/canopy.theme
+    fig-responsive: true
+    fig-align: center
+    grid:
+      sidebar-width: 270px
+      body-width: 820px
+      margin-width: 250px
+    include-in-header:
+      - assets/fonts.html

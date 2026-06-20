@@ -1,0 +1,206 @@
+/*-- scss:defaults --*/
+
+// ── plant: a canopy palette ──────────────────────────────────────
+// The model resolves light attenuating down through a leaf-area
+// profile. The palette is that gradient: full sun at the top of the
+// canopy, deepening to understory shade. The accent is assimilation —
+// the gold of carbon captured at the leaf.
+
+$canopy-900: #0b1f17;   // deepest shade / forest floor
+$canopy-800: #123026;   // body text on light
+$canopy-700: #1c4733;
+$canopy-600: #2a6243;   // mid-canopy green — primary
+$canopy-400: #5b9c6e;
+$canopy-200: #b9d9bf;
+$canopy-050: #eef5ee;   // diffuse light
+
+$sun-500:    #e8a317;   // assimilation gold — the one bold accent
+$sun-300:    #f4cf72;
+$bark-500:   #7a5a3a;   // structural / woody, used sparingly
+$shade-ink:  #14241c;
+
+$paper:      #fbfcfa;   // very faintly green-warm, not clinical white
+
+// Bootstrap/Quarto variable overrides
+$primary:        $canopy-600;
+$body-color:     $canopy-800;
+$body-bg:        $paper;
+$link-color:     $canopy-700;
+$link-hover-color: $sun-500;
+$code-color:     $canopy-700;
+$border-color:   rgba($canopy-600, 0.18);
+
+// Typography — computational identity, not a generic serif book.
+// Display: a tight grotesque. Body: a humanist sans that reads long.
+// Mono: carries real weight here since the package IS code.
+$font-family-sans-serif: "Inter", "Inter var", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+$font-family-monospace:  "JetBrains Mono", "SFMono-Regular", ui-monospace, Menlo, monospace;
+$headings-font-family:   "Space Grotesk", $font-family-sans-serif;
+$headings-font-weight:   600;
+$font-size-root:         17px;
+$line-height-base:       1.65;
+
+$navbar-bg: $canopy-900;
+$navbar-fg: $canopy-050;
+
+/*-- scss:rules --*/
+
+// Subtle vertical light-gradient behind the page header band,
+// echoing canopy attenuation. Quiet — the boldness lives in the hero.
+.navbar {
+  background: linear-gradient(180deg, $canopy-900 0%, $canopy-800 100%);
+  border-bottom: 2px solid $sun-500;
+}
+.navbar-title { letter-spacing: -0.01em; font-family: $headings-font-family; }
+
+h1, h2, h3 { letter-spacing: -0.015em; }
+h1 { color: $canopy-900; }
+h2 {
+  margin-top: 2.4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid $border-color;
+}
+
+// Eyebrow label utility (used on section pages) — encodes structure,
+// not decoration: it names the part of the model you're reading about.
+.eyebrow {
+  font-family: $font-family-monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: $sun-500;
+  margin-bottom: 0.35rem;
+}
+
+// Inline code & blocks — give the computational core presence.
+code:not(.sourceCode) { background: rgba($canopy-400, 0.12); padding: 0.1em 0.35em; border-radius: 3px; }
+div.sourceCode {
+  border: 1px solid $border-color;
+  border-left: 3px solid $canopy-400;
+  border-radius: 6px;
+}
+
+// Links get the gold underline on hover — the assimilation accent,
+// spent in exactly one interaction.
+a { text-underline-offset: 0.18em; }
+
+// Callouts retoned to the palette
+.callout.callout-style-default { border-left-color: $canopy-400; }
+
+// Version badge for the notebook (see posts listing)
+.version-badge {
+  display: inline-block;
+  font-family: $font-family-monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.12em 0.55em;
+  border-radius: 999px;
+  background: rgba($sun-500, 0.14);
+  color: darken($sun-500, 18%);
+  border: 1px solid rgba($sun-500, 0.35);
+  white-space: nowrap;
+}
+
+// Develop builds: pinned to a commit, not a release. Cooler bark tone +
+// a leading dot so it reads as "unreleased / moving target" at a glance.
+.version-badge--dev {
+  background: rgba($bark-500, 0.12);
+  color: darken($bark-500, 8%);
+  border: 1px dashed rgba($bark-500, 0.5);
+}
+.version-badge--dev::before {
+  content: "● ";
+  color: $sun-500;
+  font-size: 0.85em;
+}
+
+// Listing cards — quiet, with a thin canopy-green top edge
+.quarto-grid-item {
+  border: 1px solid $border-color;
+  border-top: 3px solid $canopy-400;
+  border-radius: 8px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.quarto-grid-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba($canopy-900, 0.10);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quarto-grid-item { transition: none; }
+}
+
+// ── Reproduction posts ─────────────────────────────────────────────
+// Citation box: a quiet bark-edged card stating the source up front.
+.paper-cite {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 0.9rem;
+  align-items: baseline;
+  margin: 1.2rem 0 1.6rem;
+  padding: 0.9rem 1.1rem;
+  background: rgba($canopy-400, 0.07);
+  border-left: 3px solid $bark-500;
+  border-radius: 0 6px 6px 0;
+}
+.paper-cite__label {
+  grid-row: 1;
+  font-family: $font-family-monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: $bark-500;
+}
+.paper-cite__ref  { grid-column: 2; font-size: 0.95rem; color: $canopy-800; }
+.paper-cite__fig  { grid-column: 2; font-weight: 600; color: $canopy-700; }
+.paper-cite__doi  { grid-column: 2; font-family: $font-family-monospace; font-size: 0.78rem; }
+
+// Fidelity verdict badge — does our re-run match the paper?
+.fidelity-badge {
+  display: inline-block;
+  font-family: $font-family-monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.12em 0.6em;
+  border-radius: 999px;
+  margin-left: 0.3rem;
+}
+.fidelity--match   { background: rgba($canopy-600,0.15); color: darken($canopy-600,10%); border: 1px solid rgba($canopy-600,0.4); }
+.fidelity--differ  { background: rgba(#c0392b,0.12);     color: #a5281b;                  border: 1px solid rgba(#c0392b,0.4); }
+.fidelity--approx  { background: rgba($sun-500,0.14);    color: darken($sun-500,18%);     border: 1px solid rgba($sun-500,0.4); }
+.fidelity--pending { background: rgba($canopy-400,0.12); color: $canopy-700;              border: 1px dashed rgba($canopy-400,0.5); }
+.fidelity--match::before   { content: "✓ "; }
+.fidelity--differ::before  { content: "≠ "; }
+.fidelity--approx::before  { content: "≈ "; }
+
+// Paper-code provenance badge: links to the original repo at its pinned
+// commit. Cool slate tone so it's visually separate from version/fidelity.
+.version-badge--code {
+  text-decoration: none;
+  background: rgba(#3b5566, 0.10);
+  color: #34505f;
+  border: 1px solid rgba(#3b5566, 0.35);
+}
+.version-badge--code::before { content: "⌥ "; opacity: 0.7; }
+.version-badge--code:hover { background: rgba(#3b5566, 0.18); color: #22323b; }
+
+// Published vs reproduced, side by side.
+.repro-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+  margin: 1.4rem 0;
+}
+.repro-pane {
+  border: 1px solid $border-color;
+  border-top: 3px solid $canopy-400;
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+}
+.repro-pane:first-child { border-top-color: $bark-500; }
+.repro-pane img { width: 100%; border-radius: 4px; }
+@media (max-width: 700px) {
+  .repro-compare { grid-template-columns: 1fr; }
+  .paper-cite { grid-template-columns: 1fr; }
+  .paper-cite__ref, .paper-cite__fig, .paper-cite__doi { grid-column: 1; }
+}

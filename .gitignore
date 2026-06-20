@@ -1,0 +1,19 @@
+/.quarto/
+/_site/
+.Rproj.user
+.Rhistory
+.RData
+.DS_Store
+# NOTE: do NOT ignore _freeze/ or renv.lock — they ARE the reproducibility.
+renv/library/
+renv/staging/
+
+# knitr per-chunk caches (cache: true). Local build accelerator only —
+# _freeze/ is the committed reproducibility record, NOT these.
+**/*_cache/
+
+# CI scratch
+targets.txt
+drift-report.md
+
+**/*.quarto_ipynb

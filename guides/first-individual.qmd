@@ -1,0 +1,9 @@
+---
+title: "First individual"
+---
+::: {.eyebrow}
+guide
+:::
+
+> Stub — migrate the matching `.Rmd` vignette here, switch the chunk
+> engine, and let `freeze: auto` cache heavy runs.

@@ -1,0 +1,93 @@
+name: Refresh figures (manual)
+
+# Deliberate, reviewed re-execution of frozen posts against a chosen
+# plant ref. Renders to an ARTIFACT, not production — you review figure
+# diffs before they go live. This is the ONLY job allowed to invalidate
+# freezes; routine publish never does (see publish.yml).
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "What to refresh: a category (e.g. reproduction) or a post slug glob"
+        required: true
+        default: "reproduction"
+      plant-ref:
+        description: "plant git ref to install (tag, branch, or SHA)"
+        required: true
+        default: "master"
+      scope:
+        description: "Interpret target as 'category' or 'glob'"
+        required: true
+        default: "category"
+        type: choice
+        options: [category, glob]
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive      # paper-code/ submodules for re-runs
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+      - uses: r-lib/actions/setup-r@v2
+        with: { use-public-rspm: true }
+      - uses: r-lib/actions/setup-renv@v2
+
+      # Install plant at the requested ref so reproductions run against it.
+      - name: Install plant @ ${{ inputs.plant-ref }}
+        run: |
+          Rscript -e 'renv::install("traitecoevo/plant@${{ inputs.plant-ref }}")'
+
+      # Invalidate freeze ONLY for the targeted posts, then render those.
+      - name: Targeted freeze invalidation
+        run: |
+          Rscript R/select_targets.R \
+            --scope "${{ inputs.scope }}" \
+            --target "${{ inputs.target }}" \
+            > targets.txt
+          echo "Refreshing:"; cat targets.txt
+          while read -r post; do
+            [ -z "$post" ] && continue
+            # drop this post's freeze entry so quarto re-executes it
+            rm -rf "_freeze/${post}" || true
+          done < targets.txt
+
+      - name: Render (targeted)
+        run: |
+          # Render only the targeted .qmd files; freeze covers the rest.
+          while read -r post; do
+            [ -z "$post" ] && continue
+            quarto render "${post}/index.qmd" || quarto render "${post}.qmd"
+          done < targets.txt
+
+      # Publish the refreshed pages + a diff summary as a reviewable artifact.
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: refreshed-figures-${{ inputs.plant-ref }}
+          path: |
+            _site/
+            _freeze/
+          retention-days: 14
+
+      - name: Summary
+        run: |
+          {
+            echo "## Figure refresh"
+            echo "- plant ref: \`${{ inputs.plant-ref }}\`"
+            echo "- target: \`${{ inputs.target }}\` (${{ inputs.scope }})"
+            echo ""
+            echo "Refreshed posts:"
+            sed 's/^/- /' targets.txt
+            echo ""
+            echo "Download the artifact, inspect figure diffs, and if good,"
+            echo "commit the updated _freeze/ entries on a branch + open a PR."
+          } >> "$GITHUB_STEP_SUMMARY"
