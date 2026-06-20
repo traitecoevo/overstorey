@@ -1,6 +1,7 @@
-# CLAUDE.md — plant-docs
+# CLAUDE.md — overstorey
 
-Quarto documentation site for [`plant`](https://github.com/traitecoevo/plant),
+**Overstorey** (repo: `traitecoevo/overstorey`) is the Quarto documentation
+site for [`plant`](https://github.com/traitecoevo/plant),
 an R package for size-structured, trait-based forest modelling. This file is
 persistent context for Claude Code sessions. Read it, plus `develop.qmd` and
 `_quarto.yml`, before changing anything.
@@ -20,7 +21,10 @@ with four parts plus a maintainers page:
 
 - **Guides** (`guides/`) — task walkthroughs, migrated from vignettes.
 - **Theory** (`theory/`) — consolidated maths.
-- **Notebook** (`posts/`, `posts/index.qmd`) — version-pinned blog posts.
+- **Adaptively** (`posts/`, `posts/index.qmd`) — the version-pinned
+  notebook/blog. Display name only; the route stays `posts/`. Not to be
+  confused with the Theory page **Adaptive dynamics**
+  (`theory/adaptive-dynamics.qmd`).
 - **Reproductions** (`posts/reproductions.qmd`) — re-running key figures from
   our papers as living regression checks.
 - **Pipeline** (`develop.qmd`) — documents the CI/reproducibility design.

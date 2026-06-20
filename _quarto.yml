@@ -14,10 +14,10 @@ execute:
   message: false
 
 website:
-  title: "plant"
-  description: "A size-structured, trait-based model of plant ecosystems."
-  site-url: "https://traitecoevo.github.io/plant-docs"
-  repo-url: "https://github.com/traitecoevo/plant-docs"
+  title: "Overstorey"
+  description: "a field guide to the plant model"
+  site-url: "https://traitecoevo.github.io/overstorey"
+  repo-url: "https://github.com/traitecoevo/overstorey"
   repo-actions: [edit, issue]
   reader-mode: true
   page-navigation: true
@@ -31,7 +31,10 @@ website:
         file: guides/index.qmd
       - text: "Theory"
         file: theory/index.qmd
-      - text: "Notebook"
+      # "Adaptively" is the version-pinned notebook/blog (route stays posts/).
+      # Distinct from the Theory section's "Adaptive dynamics" page — the
+      # blog is a navbar section, the theory page lives under Theory.
+      - text: "Adaptively"
         file: posts/index.qmd
       - text: "Reproductions"
         file: posts/reproductions.qmd

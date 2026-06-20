@@ -1,6 +1,6 @@
 ---
 title: ""
-pagetitle: "plant — a size-structured model of plant ecosystems"
+pagetitle: "Overstorey — a field guide to plant"
 page-layout: full
 toc: false
 format:
@@ -13,7 +13,7 @@ format:
 ```{=html}
 <div class="hero-grid">
   <div class="hero-copy">
-    <p class="eyebrow">size-structured · trait-based · mechanistic</p>
+    <p class="eyebrow">Overstorey · a field guide to <code>plant</code></p>
     <h1 class="hero-title">Plants competing<br>for light, resolved<br>down the canopy.</h1>
     <p class="hero-lede">
       <code>plant</code> integrates the demography of a size-structured

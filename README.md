@@ -1,4 +1,4 @@
-# plant-docs
+# Overstorey
 
 Quarto documentation site for [`plant`](https://github.com/traitecoevo/plant):
 user guides, theory, and a version-pinned notebook. The API reference stays
@@ -8,7 +8,7 @@ on the package's pkgdown site; this repo is the narrative layer.
 The vignette set had outgrown its format. This splits docs into:
 - **Guides** — task-oriented walkthroughs (migrated from vignettes)
 - **Theory** — the maths, consolidated from papers
-- **Notebook** — dated posts, each pinned to the `plant` version it was built against
+- **Adaptively** (the notebook) — dated posts, each pinned to the `plant` version it was built against
 - **Reference** — unchanged, links out to pkgdown
 
 ## Reproducibility model

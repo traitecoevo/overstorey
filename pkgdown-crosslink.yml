@@ -23,13 +23,13 @@ navbar:
     # Send users from the reference site to the rich docs site.
     docs:
       text: "Guides & Theory"
-      href: https://traitecoevo.github.io/plant-docs/
+      href: https://traitecoevo.github.io/overstorey/
     reference:
       text: "Reference"
       href: reference/index.html
 
 # Keep only lightweight, install-discoverable vignettes on pkgdown;
-# the heavy narrative lives on plant-docs. List the survivors here.
+# the heavy narrative lives on overstorey. List the survivors here.
 articles:
   - title: "Get started"
     contents:

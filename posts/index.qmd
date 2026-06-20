@@ -1,6 +1,6 @@
 ---
-title: "Notebook"
-subtitle: "Release notes, case studies, and worked problems — each pinned to the plant version or commit it was built against."
+title: "Adaptively"
+subtitle: "The plant notebook — release notes, case studies, and worked problems, each pinned to the version or commit it was built against."
 listing:
   id: notebook
   contents: "*/index.qmd"
