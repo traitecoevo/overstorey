@@ -1,42 +1,56 @@
 ---
 title: "Key technologies used to build the plant package"
-description: "Rich FitzJohn & Daniel Falster on the Rcpp/R6, Git, and continuous-integration stack behind plant. Archived pointer to the original MEE Methods blog post (23 Feb 2016) — opens the original."
+description: "The Rcpp/R6, Git, and continuous-integration stack behind plant — how the package gets to be both fast and flexible. Reposted from the 2016 MEE Methods blog."
 date: 2016-02-23
 author: "Rich FitzJohn & Daniel Falster"
-categories: [announcement, external]
-# Canonical source. This page is a local stub that redirects to it.
-external-url: "https://methodsblog.com/2016/02/23/plant/"
-reading-time: false
-format:
-  html:
-    include-in-header:
-      text: |
-        <link rel="canonical" href="https://methodsblog.com/2016/02/23/plant/">
-        <meta http-equiv="refresh" content="0; url=https://methodsblog.com/2016/02/23/plant/">
+categories: [announcement, engineering]
+reading-time: true
 ---
 
-::: {.eyebrow}
-from the archive · external
+::: {.callout-note appearance="simple"}
+Originally published on the
+[*Methods in Ecology and Evolution* Methods blog](https://methodsblog.com/2016/02/23/plant/)
+on 23 February 2016, by **Rich FitzJohn and Daniel Falster**, and reposted
+here in the Overstorey notebook. It accompanies the package's methods
+paper, Falster *et al.*,
+[doi:10.1111/2041-210X.12525](https://doi.org/10.1111/2041-210X.12525).
 :::
 
-This post originally appeared on the
-**[MEE Methods blog](https://methodsblog.com/2016/02/23/plant/)**
-(*Methods in Ecology and Evolution*) on 23 February 2016, by
-Rich FitzJohn and Daniel Falster. We keep a pointer to it here rather than
-re-hosting it.
+## In brief
 
-You're being redirected to the original. If that doesn't happen,
-**[read it on the Methods blog →](https://methodsblog.com/2016/02/23/plant/)**
+`plant` is an individual-based model of plant growth and competition for
+light. Building it meant resolving a tension that shows up in a lot of
+scientific software: the model needs to be **fast** — many individuals,
+integrated through a shared light environment, over long time horizons —
+while staying **flexible** enough to explore as a researcher, swapping
+strategies and parameters without recompiling your understanding each
+time. A few technology choices made that possible:
 
-> It walks through the engineering behind `plant` — C++ wrapped with Rcpp
-> and R6 classes, version control with Git/GitHub, and automated testing —
-> the stack that lets the model be both fast and flexible.
+- **C++ via [Rcpp](https://www.rcpp.org/)** — the numerical core (the
+  inner growth/assimilation loops) lives in C++ for speed, exposed to R so
+  the model is driven, inspected, and plotted from an interactive session.
+- **[R6](https://r6.r-lib.org/) reference classes** — a mutable,
+  object-oriented API on the R side that mirrors the C++ objects, so a
+  strategy or a patch behaves like a thing you hold and poke, not a bag of
+  function arguments.
+- **Git & GitHub** — version control as the backbone of both development
+  and reproducibility: every result traces to a commit.
+- **Automated testing / continuous integration** — a test suite run on
+  every push, so refactors to the fast C++ core don't silently change the
+  science.
 
-It accompanies the package's methods paper, Falster *et al.*,
-*Plant: A package for modelling forest trait ecology & evolution*,
-*Methods in Ecology and Evolution*,
-[doi:10.1111/2041-210X.12525](https://doi.org/10.1111/2041-210X.12525).
+These are the same foundations the rest of this site is built to respect —
+results pinned to a recorded `plant` state, frozen and reproducible.
 
-```{=html}
-<script>window.location.replace("https://methodsblog.com/2016/02/23/plant/");</script>
-```
+<!-- ─────────────────────────────────────────────────────────────────
+     FULL REPOST BODY GOES HERE.
+     Daniel: paste the original post text below (you co-authored it, so
+     you can repost it here). I left the section above as an original-words
+     summary; replace or keep it as you prefer. Once the body is in,
+     `quarto render` and commit — no version pin needed (no code runs).
+     ───────────────────────────────────────────────────────────────── -->
+
+::: {.callout-tip appearance="simple"}
+Read the original in full on the
+[MEE Methods blog →](https://methodsblog.com/2016/02/23/plant/)
+:::
