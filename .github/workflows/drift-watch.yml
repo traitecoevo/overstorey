@@ -50,7 +50,7 @@ jobs:
           cat drift-report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload drift report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: drift-report
           path: |
