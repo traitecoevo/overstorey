@@ -55,8 +55,8 @@ signal. See `paper-code/README.md`.
 
 ## CI workflows
 
-- `publish.yml` — plain `quarto render` on push to main, honours freezes, deploys.
-- `pr-checks.yml` — freeze-consistency check + reproduction lint.
+- `publish.yml` — plain `quarto render` on push to master, honours freezes, deploys.
+- `pr-checks.yml` — freeze-consistency check + reproduction lint (on PRs to master).
 - `refresh.yml` — manual `workflow_dispatch`; the **only** job allowed to
   invalidate freezes. Renders targeted posts against a chosen `plant` ref to
   an artifact for review, not to production.
