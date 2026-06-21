@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Overstorey – Profiling</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../contributing/implementing-a-strategy.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../assets/extras.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../assets/leaf-mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../assets/leaf-mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Overstorey</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../guides/index.html"> 
+<span class="menu-text">Guides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../theory/index.html"> 
+<span class="menu-text">Theory</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts/index.html"> 
+<span class="menu-text">Adaptively</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts/reproductions.html"> 
+<span class="menu-text">Reproductions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://traitecoevo.github.io/plant/reference/" target="_blank"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../develop.html" aria-current="page"> 
+<span class="menu-text">Pipeline</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant" target="_blank"> <i class="bi bi-github" role="img" aria-label="plant source on GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../contributing/package-organisation.html">Contributing</a></li><li class="breadcrumb-item"><a href="../contributing/profiling.html">Profiling</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../develop.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Development pipeline</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Contributing</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contributing/package-organisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Package organisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contributing/implementing-a-strategy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Implementing a new strategy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contributing/profiling.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Profiling</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-approach" id="toc-the-approach" class="nav-link active" data-scroll-target="#the-approach">The approach</a></li>
+  <li><a href="#quick-timing" id="toc-quick-timing" class="nav-link" data-scroll-target="#quick-timing">Quick timing</a>
+  <ul class="collapse">
+  <li><a href="#system.time" id="toc-system.time" class="nav-link" data-scroll-target="#system.time"><code>system.time</code></a></li>
+  <li><a href="#tictoc" id="toc-tictoc" class="nav-link" data-scroll-target="#tictoc"><code>tictoc</code></a></li>
+  </ul></li>
+  <li><a href="#the-benchmark-harness" id="toc-the-benchmark-harness" class="nav-link" data-scroll-target="#the-benchmark-harness">The benchmark harness</a>
+  <ul class="collapse">
+  <li><a href="#the-two-scenarios" id="toc-the-two-scenarios" class="nav-link" data-scroll-target="#the-two-scenarios">The two scenarios</a></li>
+  <li><a href="#running-it" id="toc-running-it" class="nav-link" data-scroll-target="#running-it">Running it</a></li>
+  <li><a href="#outputs" id="toc-outputs" class="nav-link" data-scroll-target="#outputs">Outputs</a></li>
+  </ul></li>
+  <li><a href="#reading-the-results" id="toc-reading-the-results" class="nav-link" data-scroll-target="#reading-the-results">Reading the results</a></li>
+  <li><a href="#getting-trustworthy-numbers" id="toc-getting-trustworthy-numbers" class="nav-link" data-scroll-target="#getting-trustworthy-numbers">Getting trustworthy numbers</a>
+  <ul class="collapse">
+  <li><a href="#compile-dont-load_all" id="toc-compile-dont-load_all" class="nav-link" data-scroll-target="#compile-dont-load_all">Compile, don’t <code>load_all</code></a></li>
+  <li><a href="#the-sampler-perturbs-the-profile" id="toc-the-sampler-perturbs-the-profile" class="nav-link" data-scroll-target="#the-sampler-perturbs-the-profile">The sampler perturbs the profile</a></li>
+  <li><a href="#defeat-machine-drift-with-same-session-ab" id="toc-defeat-machine-drift-with-same-session-ab" class="nav-link" data-scroll-target="#defeat-machine-drift-with-same-session-ab">Defeat machine drift with same-session A/B</a></li>
+  <li><a href="#know-the-noise-floor" id="toc-know-the-noise-floor" class="nav-link" data-scroll-target="#know-the-noise-floor">Know the noise floor</a></li>
+  <li><a href="#track-bit-identity" id="toc-track-bit-identity" class="nav-link" data-scroll-target="#track-bit-identity">Track bit-identity</a></li>
+  <li><a href="#size-a-hotspot" id="toc-size-a-hotspot" class="nav-link" data-scroll-target="#size-a-hotspot">Size a hotspot before optimising it</a></li>
+  </ul></li>
+  <li><a href="#other-native-profilers" id="toc-other-native-profilers" class="nav-link" data-scroll-target="#other-native-profilers">Other native profilers</a>
+  <ul class="collapse">
+  <li><a href="#xcode-instruments-macos" id="toc-xcode-instruments-macos" class="nav-link" data-scroll-target="#xcode-instruments-macos">Xcode Instruments (macOS)</a></li>
+  <li><a href="#uprof-linux" id="toc-uprof-linux" class="nav-link" data-scroll-target="#uprof-linux">uProf (Linux)</a></li>
+  <li><a href="#google-gperftools" id="toc-google-gperftools" class="nav-link" data-scroll-target="#google-gperftools">Google gperftools</a></li>
+  </ul></li>
+  <li><a href="#working-with-claude-on-profiling" id="toc-working-with-claude-on-profiling" class="nav-link" data-scroll-target="#working-with-claude-on-profiling">Working with Claude on profiling</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/contributing/profiling.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../contributing/package-organisation.html">Contributing</a></li><li class="breadcrumb-item"><a href="../contributing/profiling.html">Profiling</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Profiling</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="eyebrow">
+<p>for contributors</p>
+</div>
+<p>As a complex systems model, speed matters. The <code>plant</code> package is written in C++ using Rcpp, so it is already fast — but there is always room to improve. This page documents how we profile the code to find bottlenecks, the workflow we use to get <em>trustworthy</em> numbers, and how to drive an AI assistant (Claude) through a profiling pass without being misled.</p>
+<p>The code is awkward to profile because the hot C++ is called from R. Traditional R profilers see almost nothing useful: they stop at the <code>.Call</code> boundary and cannot look into the compiled code. In a typical FF16 run, <code>Rprof</code> attributes roughly 97–99% of the time to a single native entry point (<code>SCM::run</code> or <code>SCM::refine_schedule</code>). The useful detail comes from a <em>native</em> sampler.</p>
+<section id="the-approach" class="level1">
+<h1>The approach</h1>
+<p>Profiling is a loop, and the order of the steps matters:</p>
+<ol type="1">
+<li><strong>Quantify the target.</strong> Before changing anything, measure <em>how big the opportunity is</em>. Find the hotspot in the native sample, then put a number on it — ideally an upper bound on what removing it could save (see <a href="#size-a-hotspot">Size a hotspot before optimising it</a>). A change to a path that is 3% of runtime cannot return more than 3%, however clever it is.</li>
+<li><strong>Seek the optimisation.</strong> Only once the target is sized do you look for a way to cut it — and you now know roughly what success looks like, so you can tell a real win from noise.</li>
+<li><strong>Re-measure.</strong> Confirm the change against a same-session baseline, check it against the upper bound from step 1 (“I expected ≤ X%, I measured Y%”), and verify correctness. If the measured gain is far below the bound, the bottleneck moved — go back to step 1 rather than piling on more changes blind.</li>
+</ol>
+<p>The cardinal rule is that <strong>every step is a measurement</strong>. Don’t optimise a path you haven’t sized, and don’t trust a speedup you haven’t re-measured against a fresh baseline. The rest of this page is the tooling (the harness) and the discipline (trustworthy numbers) that make each step of this loop reliable.</p>
+</section>
+<section id="quick-timing" class="level1">
+<h1>Quick timing</h1>
+<p>For a one-off “is this faster?” check, time the call directly. This is fine for order-of-magnitude answers but far too noisy to attribute a few-percent change — for that, use the harness below.</p>
+<section id="system.time" class="level2">
+<h2 class="anchored" data-anchor-id="system.time"><code>system.time</code></h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>({</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  ind <span class="ot">&lt;-</span> <span class="fu">FF16_Individual</span>()</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  env <span class="ot">&lt;-</span> <span class="fu">FF16_fixed_environment</span>(<span class="fl">1.0</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">50</span>, <span class="at">length.out =</span> <span class="dv">101</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">grow_individual_to_time</span>(ind, times, env)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   0.022   0.000   0.022</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="tictoc" class="level2">
+<h2 class="anchored" data-anchor-id="tictoc"><code>tictoc</code></h2>
+<p>For longer blocks, wrapping everything in <code>system.time</code> is awkward. <a href="http://jabiru.github.io/tictoc/"><code>tictoc</code></a> lets you bracket arbitrary code:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ind <span class="ot">&lt;-</span> <span class="fu">FF16_Individual</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">FF16_fixed_environment</span>(<span class="fl">1.0</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">50</span>, <span class="at">length.out =</span> <span class="dv">101</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">grow_individual_to_time</span>(ind, times, env)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 0.049 sec elapsed</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="the-benchmark-harness" class="level1">
+<h1>The benchmark harness</h1>
+<p><code>plant</code> ships a reproducible benchmark + profiling harness. Prefer it over ad hoc timing: it pins two canonical scenarios, records <code>bench::mark</code> timings, an <code>Rprof</code> profile, and (on macOS) a native sample, and writes everything to a timestamped directory so runs are comparable.</p>
+<section id="the-two-scenarios" class="level2">
+<h2 class="anchored" data-anchor-id="the-two-scenarios">The two scenarios</h2>
+<p><code>run_plant_benchmarks()</code> in <a href="https://github.com/traitecoevo/plant/blob/master/R/benchmark.R"><code>R/benchmark.R</code></a> defines the cases everything else builds on:</p>
+<ul>
+<li><strong><code>scm</code></strong> — <code>run_scm()</code> on a one-species FF16 patch. Exercises the steady per-step solve.</li>
+<li><strong><code>build_schedule</code></strong> — <code>run_scm(..., refine_schedule = TRUE)</code>. Exercises adaptive node-schedule refinement, which calls the assimilation quadrature far more often. This is usually the more sensitive case for crown/light work.</li>
+</ul>
+<p>Both run the same dominant native path, so an optimisation that helps one usually helps the other:</p>
+<pre><code>SCM::run → run_next → ode::Solver::step → derivs → Patch::compute_rates
+  → Species::compute_rates → Node::compute_rates → growth_rate_gradient
+  → Individual::growth_rate_given_height → FF16_Strategy::compute_rates
+  → net_mass_production_dt → assimilation</code></pre>
+</section>
+<section id="running-it" class="level2">
+<h2 class="anchored" data-anchor-id="running-it">Running it</h2>
+<p>Compile first, then run the profiling script against one or more strategies:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> compile</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> scripts/profile-benchmarks.R FF16</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>make compile</code> builds the package DLL with the normal optimisation flags (<code>pkgbuild::compile_dll(debug = FALSE)</code>). <code>scripts/profile-benchmarks.R</code> then loads that <em>already-built</em> DLL (<code>pkgload::load_all(compile = FALSE)</code>) rather than recompiling — so the numbers reflect the optimised build, not a debug one. See <a href="#compile-dont-load_all">Compile, don’t <code>load_all</code></a> for why this matters.</p>
+<p>Longer, lower-noise runs and a native sample are controlled by environment variables:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">PLANT_PROFILE_REPEATS</span><span class="op">=</span>20 <span class="va">PLANT_SAMPLE_SECONDS</span><span class="op">=</span>5 <span class="ex">Rscript</span> scripts/profile-benchmarks.R FF16</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Default</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>PLANT_PROFILE_REPEATS</code></td>
+<td><code>1</code></td>
+<td>How many times each case is repeated inside the <code>Rprof</code> window. Higher = lower noise.</td>
+</tr>
+<tr class="even">
+<td><code>PLANT_SAMPLE_SECONDS</code></td>
+<td><code>0</code> (off)</td>
+<td>If &gt; 0, run macOS <code>/usr/bin/sample</code> against the R process for this many seconds, concurrently with <code>Rprof</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>PLANT_BENCHMARK_ITERATIONS</code></td>
+<td><code>1</code></td>
+<td>Iterations passed to <code>bench::mark</code> for the one-iteration summary.</td>
+</tr>
+<tr class="even">
+<td><code>PLANT_RPROF_INTERVAL</code></td>
+<td><code>0.005</code></td>
+<td><code>Rprof</code> sampling interval, in seconds.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="outputs" class="level2">
+<h2 class="anchored" data-anchor-id="outputs">Outputs</h2>
+<p>Everything lands under <code>tmp/profile-benchmarks/&lt;timestamp&gt;/</code> (gitignored):</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>benchmark-summary.csv</code> / <code>.rds</code></td>
+<td><code>bench::mark</code> one-iteration timings (min, median, itr/sec, mem_alloc).</td>
+</tr>
+<tr class="even">
+<td><code>&lt;strategy&gt;-&lt;case&gt;.Rprof</code></td>
+<td>Raw R-level profile.</td>
+</tr>
+<tr class="odd">
+<td><code>&lt;strategy&gt;-&lt;case&gt;-by-self.csv</code> / <code>-by-total.csv</code></td>
+<td><code>summaryRprof()</code> tables.</td>
+</tr>
+<tr class="even">
+<td><code>&lt;strategy&gt;-&lt;case&gt;.sample.txt</code></td>
+<td>Native call graph from <code>/usr/bin/sample</code> (only if sampling succeeded).</td>
+</tr>
+<tr class="odd">
+<td><code>&lt;strategy&gt;-&lt;case&gt;.sample.log</code></td>
+<td>Sampler stdout/stderr — check here when no <code>.sample.txt</code> appears.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="reading-the-results" class="level1">
+<h1>Reading the results</h1>
+<p>Three views, from coarsest to most detailed.</p>
+<p><strong><code>bench::mark</code> (one-iteration).</strong> The headline median per case. Best for the clean A/B of a single change. Watch <code>mem_alloc</code> too — an allocation removed from a hot loop (e.g.&nbsp;a per-call object copy) shows up here.</p>
+<p><strong><code>Rprof</code> (R-level).</strong> Confirms where time sits relative to the <code>.Call</code> boundary — almost all of it, for <code>plant</code>. The <code>by-total</code>/<code>by-self</code> CSVs are mostly useful to confirm you are measuring the boundary you think you are, and to track the 20-repeat total as a less-noisy aggregate than a single <code>bench::mark</code> median.</p>
+<p><strong><code>/usr/bin/sample</code> (native, macOS).</strong> This is where the real signal is: the C++ call graph and the hot symbols. A typical <code>build_schedule</code> sample puts the cost in, roughly in order, <code>FF16_Strategy::compute_competition</code>, the assimilation quadrature integrand (<code>QK::integrate</code> and its callable), <code>Interpolator::eval</code> / <code>tk::spline::operator()</code>, and libm <code>pow</code>/<code>exp</code>. Note that with our <strong>no-LTO</strong> build, small functions defined in a <code>.cpp</code> translation unit appear as their own sampled frames precisely because they can’t be inlined across translation units — which is both a reading hint and, as it turned out, a lever (moving a hot helper into a header to let it inline was one of the largest single wins).</p>
+<p>On macOS, <code>/usr/bin/sample</code> may need permission to inspect the R process. When it fails it writes <code>sample cannot examine process …</code> to the <code>.sample.log</code> and the run continues with <code>Rprof</code> only — see the note on sampler perturbation below.</p>
+</section>
+<section id="getting-trustworthy-numbers" class="level1">
+<h1>Getting trustworthy numbers</h1>
+<p>Short C++ benchmarks are noisy and easy to misread. The discipline below is what separates a real few-percent win from wishful thinking. Most of these lessons were learned the hard way — see <code>notes/profile-ff16-2026-06-16.md</code> in the <code>plant</code> repo for the full worked log.</p>
+<section id="compile-dont-load_all" class="level2">
+<h2 class="anchored" data-anchor-id="compile-dont-load_all">Compile, don’t <code>load_all</code></h2>
+<p>Always <code>make compile</code> before timing. A bare <code>devtools::load_all()</code> compiles <em>without</em> the normal optimisation flags, so its timings are not representative of the shipped package. The harness loads the pre-built DLL for exactly this reason.</p>
+<p>(The exception is <em>symbol-level native profiling</em> with Instruments/gperftools, where a debug build with symbols and no inlining can make the call graph easier to read. For <strong>timing</strong>, always use the optimised build.)</p>
+</section>
+<section id="the-sampler-perturbs-the-profile" class="level2">
+<h2 class="anchored" data-anchor-id="the-sampler-perturbs-the-profile">The sampler perturbs the profile</h2>
+<p>Running <code>/usr/bin/sample</code> concurrently with <code>Rprof</code> can inflate the <code>Rprof</code> totals — in one audit, a successful concurrent sample pushed totals up ~20% versus the same code sampled-off, which masqueraded as a regression. So:</p>
+<ul>
+<li>Use a <strong>sample-on</strong> run to <em>understand</em> where time goes (the native call graph).</li>
+<li>Use <strong>sample-off</strong> runs (<code>PLANT_SAMPLE_SECONDS</code> unset) when <em>comparing</em> two versions of a small source change.</li>
+</ul>
+<p>Don’t compare a sample-on total against a sample-off one.</p>
+</section>
+<section id="defeat-machine-drift-with-same-session-ab" class="level2">
+<h2 class="anchored" data-anchor-id="defeat-machine-drift-with-same-session-ab">Defeat machine drift with same-session A/B</h2>
+<p>Absolute timings drift between sessions (thermal state, background load, OS version). Numbers from last week are <em>not</em> directly comparable to today’s. To attribute a change honestly:</p>
+<ol type="1">
+<li>Measure the change.</li>
+<li>In the <strong>same session</strong>, recompile the parent commit (<code>git stash</code>, a detached <code>git worktree</code>, or a checkout) and measure it the same way.</li>
+<li>Report the <strong>ratio</strong>, not the absolute totals.</li>
+</ol>
+<p>For anything marginal, do A/B/A (baseline, change, baseline again) so you can see how much the baseline itself wandered between the two measurements.</p>
+</section>
+<section id="know-the-noise-floor" class="level2">
+<h2 class="anchored" data-anchor-id="know-the-noise-floor">Know the noise floor</h2>
+<p>These runs have roughly a 10% run-to-run noise floor on the short cases. A change whose effect is smaller than the spread between repeated baseline runs is “within noise” — record it as such rather than claiming a speedup. The 20-repeat <code>Rprof</code> total is steadier than a single <code>bench::mark</code> median; when the two disagree in magnitude, trust neither beyond “within noise”.</p>
+</section>
+<section id="track-bit-identity" class="level2">
+<h2 class="anchored" data-anchor-id="track-bit-identity">Track bit-identity</h2>
+<p>For every change, state whether it is <strong>bit-identical</strong> (same arithmetic, same floating-point operation order → same bits out) or not:</p>
+<ul>
+<li><em>Bit-identical</em> (e.g.&nbsp;hoisting an invariant, deduping a <code>pow()</code>, inlining): existing tests must pass with <strong>no tolerance change</strong>. If a tolerance needs relaxing, the change was <em>not</em> bit-identical and you mislabelled it.</li>
+<li><em>Not bit-identical</em> (e.g.&nbsp;replacing a division by a cached reciprocal): expect small reference-value shifts; decide explicitly whether to update expected values or relax a named tolerance, and document the magnitude.</li>
+</ul>
+<p>After any change, at minimum run the targeted tests for the paths you touched — usually <code>test-interpolator.R</code>, <code>test-strategy-ff16.R</code>, and the relevant TF24/individual tests if shared strategy or environment code changed:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> compile</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'devtools::load_all(compile = FALSE); \</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">  for (f in c("test-interpolator.R","test-strategy-ff16.R","test-individual.R")) \</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">    testthat::test_file(file.path("tests/testthat", f))'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="size-a-hotspot" class="level2">
+<h2 class="anchored" data-anchor-id="size-a-hotspot">Size a hotspot before optimising it</h2>
+<p>A cheap diagnostic: temporarily short-circuit a suspected hotspot to a constant and re-time. If the timing barely moves, the cost was elsewhere. This is how the light-spline query was shown to be ~2/3 of the <code>build_schedule</code> run — which justified the effort spent on the spline lookup. Revert the diagnostic before committing; it is a measurement device, not a change.</p>
+</section>
+</section>
+<section id="other-native-profilers" class="level1">
+<h1>Other native profilers</h1>
+<p>The <code>sample</code>-based harness is the default on macOS, but these are useful alternatives, especially on Linux or when you want a richer UI.</p>
+<section id="xcode-instruments-macos" class="level2">
+<h2 class="anchored" data-anchor-id="xcode-instruments-macos">Xcode Instruments (macOS)</h2>
+<p>Apple’s Xcode ships <strong>Instruments</strong>, which can profile the R process directly:</p>
+<ol type="1">
+<li>Build with debug symbols. <code>devtools::load_all()</code> compiles without optimisation and <em>with</em> debug symbols by default, which aids symbol resolution (at the cost of representative timing — see above).</li>
+<li>Open Instruments.app and pick the <strong>Time Profiler</strong> template.</li>
+<li>Attach to the running R process and start recording.</li>
+<li>Run your R code; Instruments profiles the execution and shows the call tree.</li>
+</ol>
+</section>
+<section id="uprof-linux" class="level2">
+<h2 class="anchored" data-anchor-id="uprof-linux">uProf (Linux)</h2>
+<p>AMD’s <a href="https://www.amd.com/en/developer/uprof.html">uProf</a> has been used successfully on Linux for <code>plant</code>. An earlier uProf run (<a href="https://github.com/traitecoevo/plant/issues/361">issue #361</a>) found roughly 40% of <code>run_plant_benchmarks()</code> time in libm <code>pow</code>, which directly motivated the eta-specialised canopy-shape work in <a href="https://github.com/traitecoevo/plant/issues/465">issue #465</a>.</p>
+</section>
+<section id="google-gperftools" class="level2">
+<h2 class="anchored" data-anchor-id="google-gperftools">Google gperftools</h2>
+<p><a href="https://github.com/gperftools/gperftools">gperftools</a> can profile Rcpp code via the <a href="https://github.com/bnprks/Rgperftools">Rgperftools</a> package, following this <a href="http://minimallysufficient.github.io/r/programming/c++/2018/02/16/profiling-rcpp-packages.html">blog post</a> by Minimally Sufficient. (The <a href="https://github.com/r-prof/jointprof/">jointprof</a> package is an alternative interface, but had macOS compatibility issues when last tried.)</p>
+<p>Both expose <code>start_profiler</code> / <code>stop_profiler</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">start_profiler</span>(<span class="st">"/tmp/profile.out"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">run_your_cpp_stuff</span>()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stop_profiler</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Setup:</p>
+<ol type="1">
+<li><p>Install gperftools, e.g.&nbsp;<code>brew install gperftools</code>.</p></li>
+<li><p>Install the R package: <code>devtools::install_github("bnprks/Rgperftools")</code>.</p></li>
+<li><p>Install <code>pprof</code> for analysis. On macOS in 2024 the Homebrew build errored; installing via Go worked better — install <a href="https://go.dev/dl/">Go</a>, then <code>go install github.com/google/pprof@latest</code>.</p></li>
+<li><p>You may need to set include/library paths in your shell profile:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">CPLUS_INCLUDE_PATH</span><span class="op">=</span><span class="st">"</span><span class="va">$CPLUS_INCLUDE_PATH</span><span class="st">:/usr/local/include:/opt/homebrew/include/"</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">LIBRARY_PATH</span><span class="op">=</span><span class="st">"/opt/homebrew/lib/"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Compile with gperftools: add <code>PKG_LIBS = -lprofiler</code> to <code>src/Makevars</code>, add <code>#include "gperftools/profiler.h"</code>, and <code>devtools::load_all()</code> to rebuild.</p></li>
+<li><p>Run the profiled code:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"Rgperftools"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">start_profiler</span>(<span class="st">"/tmp/profile.out"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"FF16"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">expand_parameters</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), p0)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stop_profiler</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Analyse in the terminal:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="va">$HOME</span><span class="ex">/go/bin/pprof</span> <span class="at">--web</span> src/plant.so /tmp/profile.out   <span class="co"># graphical</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="va">$HOME</span><span class="ex">/go/bin/pprof</span> <span class="at">-top</span> src/plant.so /tmp/profile.out    <span class="co"># text top-N</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ol>
+</section>
+</section>
+<section id="working-with-claude-on-profiling" class="level1">
+<h1>Working with Claude on profiling</h1>
+<p>Profiling is a good fit for an AI assistant — it is iterative, measurement-driven, and benefits from someone tirelessly recording every run. But the same noise that fools a human fools an assistant, and an assistant that <em>wants</em> to report a win will find one in the noise. The discipline below keeps it honest. (The <code>notes/profile-ff16-2026-06-16.md</code> log is a model of it.)</p>
+<p><strong>Keep a running notes file.</strong> Point Claude at one markdown file (e.g. <code>notes/profile-&lt;model&gt;-&lt;date&gt;.md</code>) and have it append to, not overwrite, a “Timing history” table plus a detailed section per change. This gives the next session a baseline and stops it re-discovering dead ends. The log should record, for every change:</p>
+<ul>
+<li>the exact command run and the output directory under <code>tmp/profile-benchmarks/</code>;</li>
+<li>one-iteration timings <em>and</em> the 20-repeat <code>Rprof</code> totals;</li>
+<li>the speedup versus the <em>same-session</em> baseline (not a cross-session number);</li>
+<li>whether the change is bit-identical, and which tests passed;</li>
+<li>an honest verdict — including “within noise” and backed-out experiments.</li>
+</ul>
+<p><strong>Insist on same-session baselines.</strong> The single most common error is comparing a fresh measurement against a stale documented total and reporting machine drift as a speedup. Require a same-session A/B (recompile the parent, measure both now) before any speedup claim is recorded.</p>
+<p><strong>Make it prove bit-identity, don’t take its word.</strong> If it labels a change bit-identical, the targeted tests must pass with no tolerance change. If it relaxed a tolerance, the label is wrong — push back.</p>
+<p><strong>A standing prompt.</strong> Something like the following gives a new session enough context to be useful immediately:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode md code-with-copy"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>We are optimising performance in the <span class="in">`plant`</span> R package, focusing on FF16</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>benchmarks from <span class="in">`run_plant_benchmarks()`</span> in <span class="in">`R/benchmark.R`</span>. Compile via</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="in">`make compile`</span> before timing — <span class="in">`devtools::load_all()`</span> alone is not representative.</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>Profile/time with <span class="in">`scripts/profile-benchmarks.R FF16`</span>, using longer runs via:</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="in">    PLANT_PROFILE_REPEATS=20 PLANT_SAMPLE_SECONDS=5 Rscript scripts/profile-benchmarks.R FF16</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>Use sample-OFF runs when comparing small source changes (the concurrent sampler</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>perturbs Rprof totals). Attribute every change with a same-session A/B, recompiling</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>the baseline between states — cross-session totals are not comparable.</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>Record results and interpretation in notes/profile-<span class="dt">&lt;</span><span class="kw">date</span><span class="dt">&gt;</span>.md: add a compact row to</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>the "Timing history" table, then put detail under the relevant optimisation target.</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>Relevant prior work: issue #361 (libm <span class="in">`pow`</span> hot), #465 (eta-specialised canopy</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>shape), #435 (uniform-grid spline index), #470 (LTO — declined, no measurable gain).</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>For each change report: exact command, output directory, one-iteration timings,</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>20-repeat Rprof totals, speedup vs the same-session baseline, whether the result is</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>bit-identical (and which tests passed). Run at least test-interpolator.R,</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>test-strategy-ff16.R, and any relevant TF24/individual tests for touched paths.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/traitecoevo\.github\.io\/overstorey");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../contributing/implementing-a-strategy.html" class="pagination-link" aria-label="Implementing a new strategy">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Implementing a new strategy</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Built with Quarto · frozen for reproducibility</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/contributing/profiling.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant/blob/master/LICENSE">
+<p>License</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

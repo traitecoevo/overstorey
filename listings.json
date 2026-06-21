@@ -1,0 +1,20 @@
+[
+  {
+    "listing": "/posts/reproductions.html",
+    "items": []
+  },
+  {
+    "listing": "/posts/index.html",
+    "items": [
+      "/posts/2026-06-20-cohort-refining-cpp/index.html",
+      "/posts/2026-06-19-root-water-uptake-performance/index.html",
+      "/posts/2026-06-19-root-water-uptake-prototype/index.html",
+      "/posts/2026-06-19-tf24-leaf-code-review/index.html",
+      "/posts/2026-06-18-ff16-hot-path-optimisation/index.html",
+      "/posts/2026-06-15-awra-soil-water/index.html",
+      "/posts/2026-06-10-hydraulics-benchmark/index.html",
+      "/posts/2024-05-22-water-bucket-model/index.html",
+      "/posts/2016-02-23-plant-key-technologies/index.html"
+    ]
+  }
+]

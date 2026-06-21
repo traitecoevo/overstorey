@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Overstorey – Canopy &amp; light-environment models</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../theory/implementation/node-spacing.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../assets/extras.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Overstorey</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../guides/index.html"> 
+<span class="menu-text">Guides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../theory/index.html" aria-current="page"> 
+<span class="menu-text">Theory</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/index.html"> 
+<span class="menu-text">Adaptively</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/reproductions.html"> 
+<span class="menu-text">Reproductions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://traitecoevo.github.io/plant/reference/" target="_blank"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../develop.html"> 
+<span class="menu-text">Pipeline</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant" target="_blank"> <i class="bi bi-github" role="img" aria-label="plant source on GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">Implementation</a></li><li class="breadcrumb-item"><a href="../../theory/implementation/canopy-models.html">Canopy &amp; light-environment models</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Theory</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Core</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The size-structured PDE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive dynamics</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/ff16.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">FF16</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/k93.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">K93</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/tf24.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Implementation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Implementation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/characteristic-method.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The characteristic method</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/ode-stepping.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODE stepping &amp; control</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/node-spacing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The node-spacing algorithm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/canopy-models.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Canopy &amp; light-environment models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a>
+  <ul class="collapse">
+  <li><a href="#light-interception-and-why-it-matters" id="toc-light-interception-and-why-it-matters" class="nav-link" data-scroll-target="#light-interception-and-why-it-matters">Light interception, and why it matters</a></li>
+  <li><a href="#realism-versus-speed" id="toc-realism-versus-speed" class="nav-link" data-scroll-target="#realism-versus-speed">Realism versus speed</a></li>
+  <li><a href="#the-models" id="toc-the-models" class="nav-link" data-scroll-target="#the-models">The models</a></li>
+  </ul></li>
+  <li><a href="#simulating-a-patch-under-each-model" id="toc-simulating-a-patch-under-each-model" class="nav-link" data-scroll-target="#simulating-a-patch-under-each-model">Simulating a patch under each model</a></li>
+  <li><a href="#stand-dynamics" id="toc-stand-dynamics" class="nav-link" data-scroll-target="#stand-dynamics">Stand dynamics</a>
+  <ul class="collapse">
+  <li><a href="#size-distribution" id="toc-size-distribution" class="nav-link" data-scroll-target="#size-distribution">Size distribution</a></li>
+  <li><a href="#leaf-area-index" id="toc-leaf-area-index" class="nav-link" data-scroll-target="#leaf-area-index">Leaf area index</a></li>
+  <li><a href="#vertical-light-profile" id="toc-vertical-light-profile" class="nav-link" data-scroll-target="#vertical-light-profile">Vertical light profile</a></li>
+  </ul></li>
+  <li><a href="#computational-cost" id="toc-computational-cost" class="nav-link" data-scroll-target="#computational-cost">Computational cost</a>
+  <ul class="collapse">
+  <li><a href="#adaptive-solver-real-world-cost" id="toc-adaptive-solver-real-world-cost" class="nav-link" data-scroll-target="#adaptive-solver-real-world-cost">Adaptive solver (real-world cost)</a></li>
+  <li><a href="#fixed-ode-schedule-per-step-cost" id="toc-fixed-ode-schedule-per-step-cost" class="nav-link" data-scroll-target="#fixed-ode-schedule-per-step-cost">Fixed ODE schedule (per-step cost)</a></li>
+  </ul></li>
+  <li><a href="#why-ppa-needs-smoothing" id="toc-why-ppa-needs-smoothing" class="nav-link" data-scroll-target="#why-ppa-needs-smoothing">Why PPA needs smoothing</a>
+  <ul class="collapse">
+  <li><a href="#adaptive-stepping-cannot-integrate-a-discontinuity" id="toc-adaptive-stepping-cannot-integrate-a-discontinuity" class="nav-link" data-scroll-target="#adaptive-stepping-cannot-integrate-a-discontinuity">Adaptive stepping cannot integrate a discontinuity</a></li>
+  <li><a href="#the-smoothed-profile" id="toc-the-smoothed-profile" class="nav-link" data-scroll-target="#the-smoothed-profile">The smoothed profile</a></li>
+  </ul></li>
+  <li><a href="#the-competition-profile" id="toc-the-competition-profile" class="nav-link" data-scroll-target="#the-competition-profile">The competition profile</a></li>
+  <li><a href="#what-the-comparison-establishes" id="toc-what-the-comparison-establishes" class="nav-link" data-scroll-target="#what-the-comparison-establishes">What the comparison establishes</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/implementation/canopy-models.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">Implementation</a></li><li class="breadcrumb-item"><a href="../../theory/implementation/canopy-models.html">Canopy &amp; light-environment models</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Canopy &amp; light-environment models</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="eyebrow">
+<p>implementation</p>
+</div>
+<p>This page documents the canopy / shading models that <code>plant</code> implements: what the six models are, how each computes the light environment a plant experiences, the realism-versus-speed tradeoff between them, and why the perfect-plasticity approximation (PPA) requires smoothing to run in <code>plant</code>’s adaptive solver. It is an implementation reference for the current code.</p>
+<!-- out-of-scope: the full model comparison — demographic equilibrium, invasion
+     (mutant) fitness, the box-competition fitness comparison, the evolutionary
+     attractor / singular-strategy / selection-gradient analysis from
+     DunFalster 2026 — belongs in the paper reproduction, not this reference
+     page. See the pointer at the foot of this page. -->
+<section id="background" class="level1">
+<h1>Background</h1>
+<section id="light-interception-and-why-it-matters" class="level2">
+<h2 class="anchored" data-anchor-id="light-interception-and-why-it-matters">Light interception, and why it matters</h2>
+<p>Light is the currency of competition in a forest. A plant’s carbon gain depends on the light its leaves intercept, and that light has been filtered twice: by the crowns of taller neighbours above it, and by the plant’s own leaves higher in its crown (self-shading). <code>plant</code> captures this through a single shared object – the patch <strong>light profile</strong> <span class="math inline">\(E(z)\)</span>, the fraction of open-sky light reaching height <span class="math inline">\(z\)</span>. Every plant both <em>reads</em> this profile (to photosynthesise) and <em>contributes</em> to it (the shade its leaves cast lowers <span class="math inline">\(E\)</span> below them).</p>
+<p>Getting the light profile right is not a detail. It sets each plant’s growth rate, which sets the size structure of the stand, which sets the competitive hierarchy, which ultimately decides which strategies persist and which traits selection favours. Errors here propagate all the way up to the ecological and evolutionary predictions the model exists to make.</p>
+</section>
+<section id="realism-versus-speed" class="level2">
+<h2 class="anchored" data-anchor-id="realism-versus-speed">Realism versus speed</h2>
+<p>A fully realistic treatment would resolve the light field through each crown and integrate photosynthesis over it. That is expensive – especially when the leaf-level photosynthesis model is itself costly (as in <code>TF24</code>, whose coupled stomatal/hydraulic optimisation is far heavier than a simple light-response curve). The classic response is to <em>simplify</em>: treat the crown as a single point, or the canopy as a few discrete layers – trading fidelity for speed. <code>plant</code> lets you choose where to sit on that spectrum. The job of this page is to describe <strong>what each simplification does</strong>, because, as the model comparison shows, a model can be perfectly adequate for one question and badly wrong for another.</p>
+</section>
+<section id="the-models" class="level2">
+<h2 class="anchored" data-anchor-id="the-models">The models</h2>
+<p>The <code>FF16</code> strategy offers six shading models, selected with <code>control$shading_model</code>. Four of them share the <em>same</em> per-plant competition – the smooth Yokozawa leaf-area profile – and differ only in how a plant’s own assimilation is computed (and, for PPA, how the light profile is assembled):</p>
+<ul>
+<li><p><strong><code>"deep-crown"</code></strong> (the default) – the original <code>plant</code> behaviour. Leaf area is distributed continuously through the crown following the Yokozawa (1995) foliage profile, and a plant’s gross assimilation is computed by <em>integrating</em> photosynthesis over crown depth against the light profile. The patch light profile is a smooth function of height.</p></li>
+<li><p><strong><code>"crown-centre"</code></strong> – the light profile is built exactly as for <code>"deep-crown"</code>, but a plant’s assimilation is approximated by a <em>single evaluation</em> of the light at its crown centre rather than an integral over depth. This skips the per-plant quadrature, so it is faster, and removes within-crown self-shading.</p></li>
+<li><p><strong><code>"mean-light"</code></strong> – partway between deep-crown and crown-centre. Rather than integrating the <em>photosynthetic rate</em> over depth, it integrates the <em>light</em> over depth (weighted by leaf-area density) to a single leaf-area-weighted mean light, then takes one photosynthesis evaluation of that mean. It therefore still feels the within-crown change in light environment – and how that environment shifts as the canopy develops – but collapses the expensive photosynthesis calculation to a <em>single</em> call per plant rather than one per crown depth. For FF16 that saving is modest (its leaf photosynthesis is a cheap saturating function), but it becomes important for models with an expensive leaf submodel: the <code>TF24</code> strategy’s coupled stomatal/hydraulic optimisation is far more costly to evaluate, so integrating the light and optimising once is the natural choice there. The cost is bias: because photosynthesis saturates with light, evaluating the rate at the mean light overestimates the depth-averaged rate (Jensen’s inequality). So <code>"mean-light"</code> always gives at least as much assimilation as <code>"deep-crown"</code>, the two agreeing only when the within-crown light is uniform.</p></li>
+<li><p><strong><code>"ppa"</code></strong> – the perfect-plasticity approximation, the scheme that underlies large models such as FATES. The patch light profile is discretised into discrete canopy <em>layers</em>: light steps down by a fixed amount of optical depth (<code>control$ppa_layer_optical_depth</code>) per layer. Assimilation is evaluated at the crown centre as in <code>"crown-centre"</code>, but now reads this stepped profile. Because a hard step is not differentiable (and makes the ODE solver fail), the layer boundaries are smoothed with a C<sup>1</sup>-continuous ramp whose width is set by <code>control$ppa_layer_smoothing</code>. This gives two variants of the <em>one</em> <code>"ppa"</code> model, exactly paralleling the Flat Top pair below: <strong>PPA (hard step)</strong> (<code>ppa_layer_smoothing = 0</code>) is the literal field discretisation (e.g.&nbsp;Strigul 2008, FATES) – discontinuous, and it does not run in <code>plant</code>’s adaptive solver – while <strong>PPA (smoothed)</strong> (<code>ppa_layer_smoothing &gt; 0</code>, default <code>0.3</code>) is the runnable version.</p></li>
+</ul>
+<p>Two further models instead change the <em>competition</em> itself – the shade a plant casts – collapsing its leaf area towards a thin crown-centre layer rather than spreading it through the crown. This discrete-layer view is close to how many large vegetation models (e.g.&nbsp;LPJ-GUESS) represent canopy competition, so it is worth taking seriously rather than dismissing:</p>
+<ul>
+<li><strong><code>"flat-top-box"</code></strong> – the shade cast is a hard <em>step</em>: full below the crown centre, none above. Summed over cohorts this makes the patch light profile discontinuous, and in <code>plant</code> the stand then cannot be solved at all.</li>
+<li><strong><code>"flat-top-soft-box"</code></strong> – the same box competition with the step smoothed to a continuous drop, so the light environment can be built. It runs, but the mis-shaped shade biases its predictions.</li>
+</ul>
+<p>The model is resolved once when a strategy is prepared, so there is no per-call cost to having the choice available. The <code>TF24</code> strategy supports <code>"deep-crown"</code>, <code>"mean-light"</code> (its default) and <code>"crown-centre"</code>, but not the PPA or box variants.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="simulating-a-patch-under-each-model" class="level1">
+<h1>Simulating a patch under each model</h1>
+<p>We grow a single <code>FF16</code> species in a patch, and run the same patch under each of the four smooth-competition models. Everything except <code>control$shading_model</code> is held fixed, so any differences are due to the shading model alone.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>params <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"FF16"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>patch  <span class="ot">&lt;-</span> <span class="fu">expand_parameters</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), params)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"deep-crown"</span>, <span class="st">"mean-light"</span>, <span class="st">"crown-centre"</span>, <span class="st">"ppa"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>run_model <span class="ot">&lt;-</span> <span class="cf">function</span>(model) {</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  ctrl<span class="sc">$</span>shading_model <span class="ot">&lt;-</span> model</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scm</span>(patch, <span class="at">ctrl =</span> ctrl, <span class="at">collect =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(models, run_model)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(results) <span class="ot">&lt;-</span> models</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Each run returns the full collected state (<code>run_scm(collect = TRUE)</code>): a tidy <code>species</code> table (one row per node per step) and the light environment (<code>env$light_availability</code>). We tag each run’s <code>species</code> table with its shading model and bind them together so we can use <code>plant</code>’s tidy helpers across all four.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>species_all <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(models, <span class="cf">function</span>(m) dplyr<span class="sc">::</span><span class="fu">mutate</span>(results[[m]]<span class="sc">$</span>species, <span class="at">method =</span> m))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>species_all<span class="sc">$</span>method <span class="ot">&lt;-</span> <span class="fu">factor</span>(species_all<span class="sc">$</span>method, <span class="at">levels =</span> models)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Light-extinction coefficient, used throughout to convert canopy openness to</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># cumulative leaf area: E = exp(-k_I * LAI), so LAI_above = -log(E) / k_I.</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>k_I <span class="ot">&lt;-</span> results[[<span class="dv">1</span>]]<span class="sc">$</span>p<span class="sc">$</span>strategies[[<span class="dv">1</span>]]<span class="sc">$</span>k_I</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="stand-dynamics" class="level1">
+<h1>Stand dynamics</h1>
+<p>The least demanding test of a shading model is whether a stand develops sensibly. We look at three views of the same patch as it grows and self-thins: the size distribution, the leaf area index, and the vertical light profile.</p>
+<section id="size-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="size-distribution">Size distribution</h2>
+<p>The size distribution is the set of node height trajectories: each line is a cohort introduced at a given patch age and followed as it grows, with line opacity scaled by the cohort’s density (faint lines are sparse cohorts). <code>plant</code>’s <code>plot_size_distribution()</code> builds this directly from the tidy <code>species</code> table; faceting by <code>method</code> compares the shading models.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>p_size <span class="ot">&lt;-</span> <span class="fu">plot_size_distribution</span>(species_all) <span class="sc">+</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>method) <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>p_size</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-sizedist" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sizedist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canopy-models_files/figure-html/fig-sizedist-1.png" class="img-fluid figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sizedist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Size-distribution trajectories under each shading model.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The discrete layering in <code>"ppa"</code> produces visibly different growth trajectories: cohorts grow at near-constant light within a layer, then accelerate as they emerge into a brighter layer.</p>
+</section>
+<section id="leaf-area-index" class="level2">
+<h2 class="anchored" data-anchor-id="leaf-area-index">Leaf area index</h2>
+<p>Leaf area index (LAI) – the total one-sided leaf area per unit ground – is the cumulative leaf area above the ground, which is already encoded in the recorded light profile: with Beer’s law <span class="math inline">\(E = \exp(-k_I\,\mathrm{LAI})\)</span>, the patch LAI is just <span class="math inline">\(-\log E(0) / k_I\)</span>, where <span class="math inline">\(E(0)\)</span> is canopy openness at ground level. This reads straight off <code>env$light_availability</code> and needs no integration over the size distribution. (LAI is real leaf area, so the smooth recorded profile gives the true value for all four models – the PPA layering only affects the light plants <em>experience</em>, not the leaf area present.)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>lai_all <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(models, <span class="cf">function</span>(m) {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    results[[m]]<span class="sc">$</span>env<span class="sc">$</span>light_availability <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">group_by</span>(time) <span class="sc">|&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">slice_min</span>(height, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">transmute</span>(<span class="at">method =</span> m, time, <span class="at">lai =</span> <span class="sc">-</span><span class="fu">log</span>(light_availability) <span class="sc">/</span> k_I)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>lai_all<span class="sc">$</span>method <span class="ot">&lt;-</span> <span class="fu">factor</span>(lai_all<span class="sc">$</span>method, <span class="at">levels =</span> models)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>p_lai <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(lai_all, <span class="fu">aes</span>(time, lai, <span class="at">colour =</span> method)) <span class="sc">+</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Patch age (years)"</span>, <span class="at">y =</span> <span class="st">"Leaf area index"</span>, <span class="at">colour =</span> <span class="st">"Shading model"</span>) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>p_lai</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-lai" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lai-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canopy-models_files/figure-html/fig-lai-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lai-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Leaf area index over patch age under each shading model.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><code>"deep-crown"</code>, <code>"mean-light"</code> and <code>"crown-centre"</code> track each other closely and settle to a steady LAI: under a near-uniform light profile, all three ways of summarising within-crown light give similar carbon gain (with <code>"mean-light"</code> and <code>"crown-centre"</code> running slightly richer, since they do not fully resolve self-shading). The <code>"ppa"</code> model instead shows large, sustained oscillations – successive waves of recruitment and self-thinning – because the discrete light layers create sharp thresholds for cohort success (visible as the pulses of emerging cohorts in the size-distribution panel above).</p>
+</section>
+<section id="vertical-light-profile" class="level2">
+<h2 class="anchored" data-anchor-id="vertical-light-profile">Vertical light profile</h2>
+<p>We can also look <em>within</em> the canopy at a few patch ages, at the vertical profile of cumulative leaf area above each height – <span class="math inline">\(\mathrm{LAI}_{above}(z) =
+-\log E(z) / k_I\)</span>, where <span class="math inline">\(E\)</span> is canopy openness. This is the quantity that sets how much each individual is shaded.</p>
+<p>The recorded <code>env$light_availability</code> is the smooth underlying profile shared by all models. The light that plants actually <em>experience</em> under PPA is the stepped version, so for the <code>"ppa"</code> panel we apply the same layering transform used internally (see <code>FF16_Environment::step_light</code>).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Control</span>()<span class="sc">$</span>ppa_layer_optical_depth   <span class="co"># layer thickness (optical depth)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">Control</span>()<span class="sc">$</span>ppa_layer_smoothing       <span class="co"># boundary smoothing fraction</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># C1-smoothed staircase: flat over the lower (1 - w) of each layer, cubic ramp</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># over the top w. Mirrors FF16_Environment::smooth_floor() / step_light().</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>smooth_floor <span class="ot">&lt;-</span> <span class="cf">function</span>(u, w) {</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">floor</span>(u)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  f <span class="ot">&lt;-</span> u <span class="sc">-</span> n</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> <span class="fu">pmax</span>(<span class="dv">0</span>, f <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">-</span> w)) <span class="sc">/</span> w</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  n <span class="sc">+</span> <span class="fu">ifelse</span>(f <span class="sc">&lt;=</span> <span class="dv">1</span> <span class="sc">-</span> w, <span class="dv">0</span>, t<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> (<span class="dv">3</span> <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> t))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>ppa_step_light <span class="ot">&lt;-</span> <span class="cf">function</span>(E, d, w) {</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(E <span class="sc">&gt;=</span> <span class="dv">1</span> <span class="sc">|</span> E <span class="sc">&lt;=</span> <span class="dv">0</span>, E,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>         <span class="fu">exp</span>(<span class="sc">-</span>d <span class="sc">*</span> <span class="fu">smooth_floor</span>(<span class="sc">-</span><span class="fu">log</span>(E) <span class="sc">/</span> d, w)))</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>target_ages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">60</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>profile_all <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(models, <span class="cf">function</span>(m) {</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    light <span class="ot">&lt;-</span> results[[m]]<span class="sc">$</span>env<span class="sc">$</span>light_availability</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (m <span class="sc">==</span> <span class="st">"ppa"</span>) {</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>      light<span class="sc">$</span>light_availability <span class="ot">&lt;-</span> <span class="fu">ppa_step_light</span>(light<span class="sc">$</span>light_availability, d, w)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># nearest recorded step to each target age</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    steps <span class="ot">&lt;-</span> results[[m]]<span class="sc">$</span>steps</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    keep <span class="ot">&lt;-</span> <span class="fu">sapply</span>(target_ages, <span class="cf">function</span>(a) steps<span class="sc">$</span>step[<span class="fu">which.min</span>(<span class="fu">abs</span>(steps<span class="sc">$</span>time <span class="sc">-</span> a))])</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    light <span class="sc">|&gt;</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(step <span class="sc">%in%</span> keep) <span class="sc">|&gt;</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">method =</span> m,</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>                    <span class="at">age =</span> target_ages[<span class="fu">match</span>(step, keep)],</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>                    <span class="at">lai_above =</span> <span class="sc">-</span><span class="fu">log</span>(light_availability) <span class="sc">/</span> k_I)</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>profile_all<span class="sc">$</span>method <span class="ot">&lt;-</span> <span class="fu">factor</span>(profile_all<span class="sc">$</span>method, <span class="at">levels =</span> models)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>p_profile <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(profile_all,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">aes</span>(lai_above, height, <span class="at">colour =</span> <span class="fu">factor</span>(age), <span class="at">group =</span> age)) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>() <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>method) <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(LAI[above]<span class="sc">~</span>(m<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>m<span class="sc">^</span><span class="dv">2</span>)), <span class="at">y =</span> <span class="st">"Height (m)"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">colour =</span> <span class="st">"Patch age</span><span class="sc">\n</span><span class="st">(years)"</span>) <span class="sc">+</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>p_profile</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-vprofile" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-vprofile-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canopy-models_files/figure-html/fig-vprofile-1.png" class="img-fluid figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-vprofile-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Vertical profile of cumulative leaf area above each height, at several patch ages.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><code>"deep-crown"</code>, <code>"mean-light"</code> and <code>"crown-centre"</code> share an identical smooth profile (they build the light environment the same way and differ only in how assimilation is evaluated); <code>"ppa"</code> shows the characteristic staircase, with cumulative leaf area held constant within a layer and jumping at each layer boundary.</p>
+</section>
+</section>
+<section id="computational-cost" class="level1">
+<h1>Computational cost</h1>
+<p>Speed is the whole reason the simpler models exist. A single patch is cheap, but <code>plant</code> is usually run thousands of times over – sweeping traits, fitting to data, or computing fitness landscapes – so the per-run cost compounds, and shaving the most expensive inner calculation is worthwhile. This is the payoff side of the realism-versus-speed trade.</p>
+<p>How much you save depends on two competing effects, and on a feature that is relatively unusual in vegetation models: <code>plant</code> integrates the patch with an <strong>adaptive</strong> ODE solver, which chooses its own step sizes (large where the dynamics are smooth, small only where they are not) to hit a requested accuracy cheaply. So the cost of a model is set both by the work <em>per step</em> and by the <em>number of steps</em> the solver decides to take:</p>
+<ul>
+<li><strong>Per step</strong>, <code>"deep-crown"</code> is the most expensive – it performs a Gauss-Kronrod quadrature over crown depth for every individual – while <code>"crown-centre"</code> and <code>"ppa"</code> replace that with a single light evaluation.</li>
+<li><strong>Number of steps</strong>: a model whose light profile is smooth lets the solver stride; PPA’s near-stepped profile is much stiffer, forcing many more, smaller steps.</li>
+</ul>
+<p>Which effect dominates depends on how the system is stepped, so we report both the adaptive cost (what you actually pay) and the per-step cost on a fixed schedule.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Median wall-clock over a few repeats. `times = NULL` uses the adaptive solver;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># supplying a fixed schedule pins every model to the same steps.</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>time_model <span class="ot">&lt;-</span> <span class="cf">function</span>(model, <span class="at">times =</span> <span class="cn">NULL</span>, <span class="at">reps =</span> <span class="dv">5</span>) {</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> patch</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  use_fixed <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">is.null</span>(times)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (use_fixed) p<span class="sc">$</span>ode_times <span class="ot">&lt;-</span> times</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  ctrl<span class="sc">$</span>shading_model <span class="ot">&lt;-</span> model</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  run1 <span class="ot">&lt;-</span> <span class="cf">function</span>() <span class="fu">run_scm</span>(p, <span class="at">ctrl =</span> ctrl, <span class="at">use_ode_times =</span> use_fixed)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run1</span>()                                   <span class="co"># warm up</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">median</span>(<span class="fu">replicate</span>(reps, <span class="fu">system.time</span>(<span class="fu">run1</span>())[[<span class="st">"elapsed"</span>]]))</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>speed_table <span class="ot">&lt;-</span> <span class="cf">function</span>(timings) {</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> <span class="fu">names</span>(timings),</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">median time (s)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">unname</span>(timings), <span class="dv">4</span>),</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">relative to deep-crown</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">unname</span>(timings <span class="sc">/</span> timings[[<span class="st">"deep-crown"</span>]]), <span class="dv">2</span>),</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">check.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">row.names =</span> <span class="cn">NULL</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="adaptive-solver-real-world-cost" class="level2">
+<h2 class="anchored" data-anchor-id="adaptive-solver-real-world-cost">Adaptive solver (real-world cost)</h2>
+<p>This is how <code>plant</code> runs by default, and the cost you actually pay. The adaptive solver is part of what makes <code>plant</code> efficient: it spends steps only where the dynamics demand them. But it also means a model’s cost is not just its per-step work – a model that makes the dynamics harder to integrate pays for it in extra steps. (Most large vegetation models instead march on a <em>fixed</em> timestep, where this consideration simply does not arise; we return to that below.)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>timings_adaptive <span class="ot">&lt;-</span> <span class="fu">vapply</span>(models, time_model, <span class="fu">numeric</span>(<span class="dv">1</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">speed_table</span>(timings_adaptive))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">model</th>
+<th style="text-align: right;">median time (s)</th>
+<th style="text-align: right;">relative to deep-crown</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">deep-crown</td>
+<td style="text-align: right;">0.063</td>
+<td style="text-align: right;">1.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">mean-light</td>
+<td style="text-align: right;">0.060</td>
+<td style="text-align: right;">0.95</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">crown-centre</td>
+<td style="text-align: right;">0.041</td>
+<td style="text-align: right;">0.65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ppa</td>
+<td style="text-align: right;">0.204</td>
+<td style="text-align: right;">3.24</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><code>"crown-centre"</code> is fastest – it shares deep-crown’s smooth light profile (so the same number of solver steps) but skips the per-plant crown-depth integral. <code>"mean-light"</code> costs about the same as <code>"deep-crown"</code>: it also integrates over crown depth (just the light rather than the rate), so the per-step work and the step count are both similar. <code>"ppa"</code> is <em>slower</em> overall despite the cheaper per-plant assimilation, because its near-stepped profile forces the adaptive solver to take many more steps; finer layers (smaller <code>ppa_layer_optical_depth</code>) or sharper boundaries (smaller <code>ppa_layer_smoothing</code>) make this worse.</p>
+</section>
+<section id="fixed-ode-schedule-per-step-cost" class="level2">
+<h2 class="anchored" data-anchor-id="fixed-ode-schedule-per-step-cost">Fixed ODE schedule (per-step cost)</h2>
+<p>If instead every model is pinned to the <em>same</em> fixed schedule (<code>run_scm(..., use_ode_times = TRUE)</code>), the step-count effect is removed and only the per-step cost remains. Now PPA’s advantage shows: like <code>"crown-centre"</code>, it skips the crown-depth quadrature, so both are markedly faster than <code>"deep-crown"</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, params<span class="sc">$</span>max_patch_lifetime, <span class="at">length.out =</span> <span class="dv">4000</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>timings_fixed <span class="ot">&lt;-</span> <span class="fu">vapply</span>(models, time_model, <span class="fu">numeric</span>(<span class="dv">1</span>), <span class="at">times =</span> times)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">speed_table</span>(timings_fixed))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">model</th>
+<th style="text-align: right;">median time (s)</th>
+<th style="text-align: right;">relative to deep-crown</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">deep-crown</td>
+<td style="text-align: right;">1.581</td>
+<td style="text-align: right;">1.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">mean-light</td>
+<td style="text-align: right;">1.557</td>
+<td style="text-align: right;">0.98</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">crown-centre</td>
+<td style="text-align: right;">0.934</td>
+<td style="text-align: right;">0.59</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ppa</td>
+<td style="text-align: right;">1.062</td>
+<td style="text-align: right;">0.67</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>So PPA is not inherently slow – on a fixed schedule it is <em>faster</em> than <code>"deep-crown"</code>. Its apparent cost under the adaptive solver comes entirely from the extra steps the stiff profile demands. This is also why discrete-layer schemes are unproblematic in the large models that use them: those models march on a fixed timestep, so a stepped, stiff light profile costs nothing extra and the difficulty never surfaces. It is <code>plant</code>’s adaptive solver that makes the stiffness visible – and, as the next section shows, a <em>hard</em> step visible as outright failure. <code>"deep-crown"</code> nonetheless remains the default here: it is the most faithful representation of within-crown light capture and carries no speed penalty relative to earlier versions of <code>plant</code>.</p>
+</section>
+</section>
+<section id="why-ppa-needs-smoothing" class="level1">
+<h1>Why PPA needs smoothing</h1>
+<p>A literal PPA discretisation is a <em>hard</em> step function: as a plant grows and its crown centre crosses a layer boundary, the light it experiences jumps discontinuously, and so does its growth rate. This is what <code>ppa_layer_smoothing</code> exists to tame, and it is worth being explicit about <em>why</em> – because the problem is specifically one of <strong>adaptive ODE stepping</strong>, not of the model itself.</p>
+<section id="adaptive-stepping-cannot-integrate-a-discontinuity" class="level2">
+<h2 class="anchored" data-anchor-id="adaptive-stepping-cannot-integrate-a-discontinuity">Adaptive stepping cannot integrate a discontinuity</h2>
+<p><code>plant</code> solves the patch dynamics with an adaptive, error-controlled solver (an embedded Runge-Kutta scheme). At each step it forms two estimates of the state at different orders, and uses their difference as an estimate of the local truncation error. If that error exceeds the requested tolerance, the step is <em>rejected</em> and retried with a smaller size; the method assumes the solution is smooth, so halving the step should roughly quarter the error.</p>
+<p>Across a discontinuity that assumption breaks. No matter how small the step, a step that straddles the jump carries an O(jump) error that never falls below tolerance, so the solver rejects and shrinks the step indefinitely until it gives up. With a hard step (<code>ppa_layer_smoothing = 0</code>) this is exactly what happens:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ctrl_hard <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ctrl_hard<span class="sc">$</span>shading_model <span class="ot">&lt;-</span> <span class="st">"ppa"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>ctrl_hard<span class="sc">$</span>ppa_layer_smoothing <span class="ot">&lt;-</span> <span class="dv">0</span>      <span class="co"># hard step, no smoothing</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tryCatch</span>(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scm</span>(patch, <span class="at">ctrl =</span> ctrl_hard),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">conditionMessage</span>(e)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Cannot achieve the desired accuracy"</code></pre>
+</div>
+</div>
+<p>A <em>fixed</em> schedule (<code>run_scm(..., use_ode_times = TRUE)</code>) sidesteps the error-control loop – it simply takes the prescribed steps without rejecting any – but then nothing protects against a large explicit step overshooting the jump, which sends growth to non-finite values unless the schedule is very fine. Either way, a hard step is not something the solver can handle robustly.</p>
+<p>Switching the rounding direction (light at the top vs the bottom of a layer) does not help: the difficulty is the discontinuity itself, not where the step sits.</p>
+</section>
+<section id="the-smoothed-profile" class="level2">
+<h2 class="anchored" data-anchor-id="the-smoothed-profile">The smoothed profile</h2>
+<p><code>ppa_layer_smoothing</code> replaces each hard boundary with a C<sup>1</sup>-continuous cubic ramp over the top fraction of the layer (see <code>FF16_Environment::smooth_floor</code>). The light profile – and hence each plant’s growth rate – is now continuous with a continuous first derivative, so the adaptive error estimate behaves as the solver assumes and steps are accepted normally. Even a small amount of smoothing is enough to recover a well-behaved integration, and with the default the adaptive and fixed-step solutions agree.</p>
+<p>Two parameters control the discretisation:</p>
+<ul>
+<li><code>ppa_layer_optical_depth</code> – the optical-depth thickness of one layer (default <code>0.5</code>, i.e.&nbsp;one unit of leaf area index per layer at the default extinction coefficient <code>k_I = 0.5</code>). Smaller values give finer layering.</li>
+<li><code>ppa_layer_smoothing</code> – the fraction of each layer over which the boundary is smoothed (default <code>0.3</code>). Values approaching <code>0</code> recover a hard step (and the instability above); <code>1</code> removes the flat region and approaches the smooth <code>"deep-crown"</code>-style profile. There is a tension here: smaller values are closer to a true PPA step but stiffer (slower, per the speed table above), while larger values integrate faster but blur the layer structure.</li>
+</ul>
+</section>
+</section>
+<section id="the-competition-profile" class="level1">
+<h1>The competition profile</h1>
+<p>The four smooth-competition models above all build the <em>same</em> light environment – they differ only in how a plant summarises its own assimilation. The two box models instead change the shade a plant <em>casts</em>, collapsing its leaf area towards a thin crown-centre layer. This mirrors the discrete-layer competition of large vegetation models (e.g.&nbsp;LPJ-GUESS), so it is worth inspecting directly.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>comp_profile <span class="ot">&lt;-</span> <span class="cf">function</span>(model, <span class="at">height =</span> <span class="dv">10</span>) {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">FF16_Strategy</span>()</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  s<span class="sc">$</span>control<span class="sc">$</span>shading_model <span class="ot">&lt;-</span> model</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  ind <span class="ot">&lt;-</span> <span class="fu">FF16_Individual</span>(s)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  ind<span class="sc">$</span><span class="fu">set_state</span>(<span class="st">"height"</span>, height)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, height, <span class="at">length.out =</span> <span class="dv">400</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">model =</span> model, <span class="at">z =</span> z,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">competition =</span> <span class="fu">sapply</span>(z, <span class="cf">function</span>(zz) ind<span class="sc">$</span><span class="fu">compute_competition</span>(zz)))</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>comp <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">comp_profile</span>(<span class="st">"crown-centre"</span>),</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">comp_profile</span>(<span class="st">"flat-top-box"</span>),</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">comp_profile</span>(<span class="st">"flat-top-soft-box"</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(comp, <span class="fu">aes</span>(competition, z, <span class="at">colour =</span> model)) <span class="sc">+</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>() <span class="sc">+</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Shade cast (competition) by a 10 m plant"</span>, <span class="at">y =</span> <span class="st">"Height (m)"</span>,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">colour =</span> <span class="st">"Model"</span>) <span class="sc">+</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-compbox" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-compbox-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canopy-models_files/figure-html/fig-compbox-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-compbox-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Shade cast (competition profile) by a 10 m plant under the correct crown-centre profile versus the hard and soft box approximations.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The correct profile (crown-centre) tapers continuously to zero through the crown; the box profile is a step, and the soft box a continuous-but-wrong drop concentrated near the crown centre.</p>
+<p><strong>The hard step does not even run.</strong> Summed over a population of discrete cohorts, a step competition makes the patch light profile a discontinuous, piecewise-constant function of height, which the adaptive light-environment spline cannot represent – the model fails before a stand can develop:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ctrl_box <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>ctrl_box<span class="sc">$</span>shading_model <span class="ot">&lt;-</span> <span class="st">"flat-top-box"</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tryCatch</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scm</span>(patch, <span class="at">ctrl =</span> ctrl_box),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">conditionMessage</span>(e)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Interpolated function as refined as currently possible"</code></pre>
+</div>
+</div>
+<p>The soft box runs (its continuous profile lets the light environment build), but the shade is mis-distributed through the canopy, which biases its predictions relative to the deep-crown reference.</p>
+<!-- out-of-scope: the demographic-equilibrium iteration, the invasion (mutant)
+     fitness landscapes, the box-vs-correct fitness comparison, and the
+     evolutionary-attractor / singular-strategy / selection-gradient analysis
+     (DunFalster 2026) were dropped here — they are the substance of the paper
+     reproduction, not the implementation reference. The continuity requirement
+     they establish is summarised below; the full analysis is reproduced in the
+     reproduction post linked at the foot of this page. -->
+</section>
+<section id="what-the-comparison-establishes" class="level1">
+<h1>What the comparison establishes</h1>
+<p>The full model comparison (see the reproduction below) puts these models through a ladder of increasingly demanding tests – stand dynamics, demographic equilibrium, invasion fitness, and the evolutionary endpoint. The recurring finding is that the cheap models are often fine for stand dynamics and acceptable for equilibrium, but invasion fitness is unforgiving. The key requirement it exposes is <strong>continuity of the shade each plant casts as a function of height</strong>: <code>"deep-crown"</code>, <code>"mean-light"</code> and <code>"crown-centre"</code> all build a continuous light profile and behave well; PPA’s stepped profile and the box models’ mis-shaped competition do not. None of this means the large models are wrong to use discrete layers – for stand-level simulation on a fixed timestep the representation is fast, robust, and adequate. The caution is specific to the eco-evolutionary questions <code>plant</code> is built for.</p>
+<p>The full model comparison and evolutionary analysis – demographic equilibrium, invasion-fitness landscapes, and the singular-strategy / work-precision results – is reproduced in the DunFalster 2026 canopy reproduction post. <!-- TODO: link this once the DunFalster 2026 reproduction is published. The
+     draft lives in posts/_drafts/2026-06-20-dunfalster2026-canopy/ and is not
+     rendered, so no link target exists yet. Restore as
+     [DunFalster 2026 canopy reproduction](../../posts/<slug>.qmd) when it moves
+     out of _drafts/. --></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/traitecoevo\.github\.io\/overstorey");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../theory/implementation/node-spacing.html" class="pagination-link" aria-label="The node-spacing algorithm">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The node-spacing algorithm</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Built with Quarto · frozen for reproducibility</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/implementation/canopy-models.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant/blob/master/LICENSE">
+<p>License</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

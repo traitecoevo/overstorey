@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-06-19">
+<meta name="description" content="The standalone R implementation of the soil→root→stem→leaf hydraulic model behind the TF24 strategy, kept as a sanity check for the compiled C++ version.">
+
+<title>Overstorey – A reference prototype for root water uptake</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../../assets/extras.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Overstorey</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../guides/index.html"> 
+<span class="menu-text">Guides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../theory/index.html"> 
+<span class="menu-text">Theory</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/index.html"> 
+<span class="menu-text">Adaptively</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/reproductions.html"> 
+<span class="menu-text">Reproductions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://traitecoevo.github.io/plant/reference/" target="_blank"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../develop.html"> 
+<span class="menu-text">Pipeline</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant" target="_blank"> <i class="bi bi-github" role="img" aria-label="plant source on GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#test" id="toc-test" class="nav-link active" data-scroll-target="#test">Test</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-06-19-root-water-uptake-prototype/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">A reference prototype for root water uptake</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">tf24</div>
+    <div class="quarto-category">hydraulics</div>
+    <div class="quarto-category">prototype</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    The standalone R implementation of the soil→root→stem→leaf hydraulic model behind the TF24 strategy, kept as a sanity check for the compiled C++ version.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 19, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><span class="version-badge version-badge--dev">plant @develop 81cfeab</span></p>
+<p>This post preserves the standalone R <em>prototype</em> of the soil→root→stem→leaf hydraulic model that has since been ported to C++ (<code>src/leaf_model.cpp</code>: <code>E_from_Soil_to_Root_Collar</code>, <code>find_root_collar_psi</code>) and wired into the TF24 strategy. It follows Potkay et al.&nbsp;(2021) and is kept as the reference implementation / sanity check for the compiled model. For the consolidated maths see <a href="../../theory/assimilation-hydraulics.html">assimilation and hydraulics</a>.</p>
+<p>Structure of the prototype:</p>
+<ol type="1">
+<li><strong>Geometry &amp; conductances</strong>: derive stem (<code>k_sw_max</code>) and leaf (<code>k_l</code>) hydraulic conductances from height/diameter allometry.</li>
+<li><strong>Root collar pressure at E = 0</strong>: bisection search for the collar potential (<code>P_x_r</code>) where net soil exchange is zero (the wettest feasible point).</li>
+<li><strong>Critical root collar pressure</strong>: bisection for the collar potential at which the leaf reaches its critical water potential (<code>P_x_l_crit</code>), integrating the pressure drop down the stem and through the leaf in <code>n</code> numerical steps.</li>
+<li><strong>Profit curve</strong>: sweep <code>P_x_r</code> from the E = 0 point to critical, compute assimilation (Farquhar / Cowan-Farquhar marginal cost) vs hydraulic cost, and pick the profit-maximising operating point.</li>
+</ol>
+<p>The <strong>Test</strong> section at the end cross-checks the compiled <code>Leaf</code> object against this prototype.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The whole prototype is preserved as a readable reference. The chunks that load the prototype’s helper functions, run the numerical solves, and validate against the compiled <code>Leaf</code> are set to <code>#| eval: false</code> — they depend on machine-specific <code>source()</code> paths and the compiled object, and would be slow. The code is intact so it can be re-run after fixing those paths and building <code>plant</code>.</p>
+</div>
+</div>
+<p>The prototype sources its helper functions (<code>E_from_Soil_to_Root_Collar</code>, the vulnerability curves <code>VC_l</code>/<code>VC_sw</code>/<code>VC_r</code>) from a working copy of <code>plant</code>. The original paths point at a different machine and must be edited to run, so this chunk is not executed.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span><span class="fu">ls</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"/Users/z3533545/Documents/GitHub/plant/R/leaf.R"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"/Users/z3533545/Documents/GitHub/plant/R/root_uptake.R"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>H <span class="ot">=</span> <span class="fl">5.44</span> <span class="co"># Height (m)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>LA <span class="ot">=</span> <span class="dv">1</span> <span class="co"># Leaf area (m^2)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="dv">20</span> <span class="co"># n steps for numerical integration</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>b2 <span class="ot">=</span> <span class="fl">9.3e-1</span> <span class="co"># Power-law scaling coefficient for stem xylem conductance (mol H2o s^-1 MPa^-1)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>c2 <span class="ot">=</span> <span class="fl">0.93</span> <span class="co"># Exponent for power-law scaling of stem conductance</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>D_ref <span class="ot">=</span> <span class="dv">1</span> <span class="co"># Reference diameter (m)?</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>b0 <span class="ot">=</span> <span class="fl">64.6</span>; <span class="co"># Power-law scaling coefficient for height (m)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>c0 <span class="ot">=</span> <span class="fl">0.6411</span> <span class="co"># Exponent for power-law scaling of height (unitless)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>D <span class="ot">=</span> D_ref <span class="sc">*</span> (H<span class="sc">/</span>b0)<span class="sc">^</span>(<span class="dv">1</span><span class="sc">/</span>c0) <span class="co"># Diameter (m)?</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>D_hw <span class="ot">=</span> D<span class="sc">*</span><span class="fl">0.5</span> <span class="co"># Heartwood diameter (m)?</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># got from supps in Potkay et al. (2021)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>k_sw_max <span class="ot">=</span> b2 <span class="sc">*</span> (D <span class="sc">/</span> D_ref) <span class="sc">^</span> c2 <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> (D_hw <span class="sc">/</span> D) <span class="sc">^</span> (c2<span class="sc">/</span>c0 <span class="sc">+</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Psi soil for layers starting from the top</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>P_soil <span class="ot">=</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.06</span>,<span class="sc">-</span><span class="fl">0.12</span>) <span class="co"># MPa</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Depth of middle of layer</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>z_soil_mid <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.05</span>,<span class="fl">0.15</span>) <span class="co"># m</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the minimum (driest soil layer)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>P_s_min <span class="ot">=</span> <span class="fu">min</span>(P_soil)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the depth of the driest soil layer</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>z_P_s_min <span class="ot">=</span> z_soil_mid[P_soil <span class="sc">==</span> P_s_min]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># If the are multiple layers which are equally driest, define it as the deepest one</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>z_P_s_min <span class="ot">=</span> <span class="fu">max</span>(z_P_s_min)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the depth of the driest soil layer</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>P_s_max <span class="ot">=</span> <span class="fu">max</span>(P_soil)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the depth of the wettest soil layer</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>z_P_s_max <span class="ot">=</span> z_soil_mid[P_soil <span class="sc">==</span> P_s_max]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># If the are multiple layers which are equally wettest, define it as the deepest one</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>z_P_s_max <span class="ot">=</span> <span class="fu">max</span>(z_P_s_max)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start defining the boundary conditions for the bisection search for the optimum root collar pressure (P_x_r)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The upper value (i.e. least negative value) is equal to the wettest soil layer</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>P_x_r_UB_0 <span class="ot">=</span> P_s_max</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Density of water</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>rho <span class="ot">=</span> <span class="fl">1e3</span> <span class="co">#kg m^-3</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Acceleration due to gravity</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>g <span class="ot">=</span> <span class="fl">9.8</span> <span class="co"># m s^-2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The lower boundary value of root collar pressure (i.e most negative) which is equivalent to the driest soil layer minus the gravitational potential</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>P_x_r_LB_0 <span class="ot">=</span> P_s_min <span class="sc">-</span> rho <span class="sc">*</span> g <span class="sc">*</span> z_P_s_min <span class="sc">/</span> <span class="fl">1e6</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If the intial boundary values too narrow (diff &lt; 1), make the difference equal to one</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">abs</span>(P_x_r_LB_0 <span class="sc">-</span> P_x_r_UB_0) <span class="sc">&lt;</span> <span class="dv">1</span>){</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    P_x_r_LB_0 <span class="ot">=</span> P_x_r_UB_0 <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the middle root collar pressure between the two boundaries</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>P_x_r_M_0 <span class="ot">=</span> (P_x_r_UB_0 <span class="sc">+</span> P_x_r_LB_0) <span class="sc">/</span> <span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up a vector of root collar pressure</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>P_x_r_3_0 <span class="ot">=</span> <span class="fu">c</span>(P_x_r_UB_0, P_x_r_M_0, P_x_r_LB_0)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of transpiration values</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>E_3_0 <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>,<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># While loop continues until transpiration vector includes a negative and a positive value</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span>((<span class="fu">length</span>(E_3_0[E_3_0 <span class="sc">&lt;</span> <span class="dv">0</span>]) <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>      (<span class="fu">length</span>(E_3_0[E_3_0 <span class="sc">&gt;</span> <span class="dv">0</span>]) <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">&gt;</span> <span class="dv">0</span>){</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># iterate across the three root collar values</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(P_x_r_3_0)){</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># start with upper boundary first, through to lower</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    P_x_r_i <span class="ot">=</span> P_x_r_3_0[i]</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># calculate soil to root transpiration value for a given root collar psi</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    E_3_0[i] <span class="ot">&lt;-</span> <span class="fu">E_from_Soil_to_Root_Collar</span>(P_x_r_i, <span class="at">P_soil =</span> P_soil, <span class="at">rho =</span> rho, <span class="at">g =</span> g)[[<span class="dv">1</span>]]</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If no negative transpiration values then increase upper boundary root collar psi by an increment</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">length</span>(E_3_0[E_3_0 <span class="sc">&lt;</span><span class="dv">0</span>]) <span class="sc">==</span> <span class="dv">0</span>){</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    P_x_r_3_0[<span class="dv">1</span>] <span class="ot">=</span> P_x_r_3_0[<span class="dv">1</span>] <span class="sc">+</span> <span class="fl">0.1</span>;</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If no postive transpiration values then decrease lower boundary root collar psi by an increment</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">length</span>(E_3_0[E_3_0 <span class="sc">&gt;</span><span class="dv">0</span>]) <span class="sc">==</span> <span class="dv">0</span>){</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    P_x_r_3_0[<span class="dv">3</span>] <span class="ot">=</span> P_x_r_3_0[<span class="dv">3</span>] <span class="sc">-</span> <span class="fl">0.1</span>;</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Define new midsection root collar value</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>  P_x_r_3_0[<span class="dv">2</span>] <span class="ot">=</span> (P_x_r_3_0[<span class="dv">1</span>] <span class="sc">+</span> P_x_r_3_0[<span class="dv">3</span>]) <span class="sc">/</span> <span class="dv">2</span>;</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set i at 0 (iterator for bisection search below)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>i <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Iterate until dP_x_r_3_0 brought within tolerance (1e-3)</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># This bisection is to find the root collar pressure when transpiration equals zero</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span>(<span class="fu">abs</span>(<span class="fu">range</span>(P_x_r_3_0)[<span class="dv">1</span>]<span class="sc">-</span><span class="fu">range</span>(P_x_r_3_0)[<span class="dv">2</span>]) <span class="sc">&gt;</span> <span class="fl">1e-3</span>){</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  i <span class="ot">=</span> i <span class="sc">+</span> <span class="dv">1</span>;</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Stop if iteration goes too long</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(i <span class="sc">&gt;</span> <span class="dv">100</span>){</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="st">"error"</span>)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>()</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Must have a negative and positive value, if not stop</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">length</span>(E_3_0[E_3_0 <span class="sc">&lt;</span> <span class="dv">0</span>]) <span class="sc">==</span> <span class="dv">0</span>){</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stop</span>()</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span>(<span class="fu">length</span>(E_3_0[E_3_0 <span class="sc">&gt;</span> <span class="dv">0</span>]) <span class="sc">==</span> <span class="dv">0</span>){</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stop</span>()</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Find the upper bound of transpiration in iteration, i.e. highest positive value</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>  E_UB_0 <span class="ot">=</span> <span class="fu">max</span>(E_3_0[E_3_0 <span class="sc">&lt;</span> <span class="dv">0</span>]);</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Find the lower bound of transpiration in iteration, i.e. lowest negative value</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>  E_LB_0 <span class="ot">=</span> <span class="fu">min</span>(E_3_0[E_3_0 <span class="sc">&gt;</span> <span class="dv">0</span>]);</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a> <span class="co"># Root collar xylem pressures that correspond to ZERO transpiration rates</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>    P_x_r_UB_0 <span class="ot">=</span> P_x_r_3_0[E_3_0 <span class="sc">==</span> E_UB_0];</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>    P_x_r_UB_0 <span class="ot">=</span> <span class="fu">max</span>(P_x_r_UB_0);</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>    P_x_r_LB_0 <span class="ot">=</span> P_x_r_3_0[E_3_0 <span class="sc">==</span> E_LB_0];</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>    P_x_r_LB_0 <span class="ot">=</span> <span class="fu">min</span>(P_x_r_LB_0);</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Mid-point for bisection</span></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>    P_x_r_M_0 <span class="ot">=</span> (P_x_r_UB_0 <span class="sc">+</span> P_x_r_LB_0) <span class="sc">/</span> <span class="dv">2</span>;</span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Reconstruct range</span></span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a>    P_x_r_3_0_new <span class="ot">=</span> <span class="fu">c</span>(P_x_r_UB_0, P_x_r_M_0, P_x_r_LB_0);</span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If reconstructed range is same as original, stop</span></span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">sum</span>(P_x_r_3_0_new <span class="sc">==</span> P_x_r_3_0) <span class="sc">==</span> <span class="dv">3</span>){</span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>()</span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Find E based on middle of root collar psi range</span></span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a>  P_x_r_3_0 <span class="ot">=</span> P_x_r_3_0_new;</span>
+<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a>  E_3_0 <span class="ot">=</span> <span class="fu">c</span>(E_UB_0, <span class="cn">NA</span>, E_LB_0)</span>
+<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a>  P_x_r_i <span class="ot">=</span> P_x_r_3_0[<span class="dv">2</span>];</span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a>  E_i <span class="ot">=</span> <span class="fu">E_from_Soil_to_Root_Collar</span>(P_x_r_i, <span class="at">P_soil =</span> P_soil, <span class="at">rho =</span> rho, <span class="at">g =</span> g)[[<span class="dv">1</span>]]</span>
+<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a>  E_3_0[<span class="dv">2</span>] <span class="ot">=</span> E_i</span>
+<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a>  }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Numerical soluution means that E_0 may not be perfectly zero, find the smallest postive E value</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>E_0 <span class="ot">=</span> <span class="fu">min</span>(E_3_0[E_3_0 <span class="sc">&gt;</span> <span class="dv">0</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the root collar pressure associated with the smallest positive E value</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>P_x_r_0 <span class="ot">=</span> P_x_r_3_0[E_3_0 <span class="sc">==</span> E_0];</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># If multiple root collar associated with that E, choose the most negative</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>P_x_r_0 <span class="ot">=</span> <span class="fu">min</span>(P_x_r_0);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialise a critical leaf water potential value, it will become more negative by iterating the vulnerarbility curve below</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>P_x_l_crit <span class="ot">=</span> <span class="sc">-</span><span class="dv">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Iterate P_x_l_crit increasingly negative until the fraction of conductance is 0.001, very low fracution</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span>(<span class="fu">VC_l</span>(P_x_l_crit) <span class="sc">&gt;</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.999</span>)){</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    P_x_l_crit <span class="ot">=</span> P_x_l_crit <span class="sc">-</span> <span class="fl">0.1</span>;</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inital guesses for upper and lower bounds of critical root collar pressure for bisection method</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># the upper bound is the value at which transpiration is = 0</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># the lower bound is the critical leaf water potential</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>P_x_r_UB_crit <span class="ot">=</span> P_x_r_0;</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>P_x_r_LB_crit <span class="ot">=</span> P_x_l_crit;</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>P_x_r_M_crit <span class="ot">=</span> (P_x_r_LB_crit <span class="sc">+</span> P_x_r_UB_crit) <span class="sc">/</span> <span class="dv">2</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>P_x_r_3_crit <span class="ot">=</span> <span class="fu">c</span>(P_x_r_UB_crit, P_x_r_M_crit, P_x_r_LB_crit);</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>P_x_l_3_crit <span class="ot">=</span> <span class="fu">rep</span>(<span class="cn">NA</span>,<span class="dv">3</span>);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>k_l <span class="ot">=</span> <span class="fl">1.6e-2</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>){</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  P_x_r_i <span class="ot">=</span> P_x_r_3_crit[i];</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  E_i <span class="ot">=</span> <span class="fu">E_from_Soil_to_Root_Collar</span>(P_x_r_i, <span class="at">P_soil =</span> P_soil, <span class="at">rho =</span> rho, <span class="at">g =</span> g)[[<span class="dv">1</span>]]</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  P_x_l_i <span class="ot">=</span> P_x_r_i;</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    P_x_l_i <span class="ot">=</span> P_x_l_i <span class="sc">-</span> rho <span class="sc">*</span> g <span class="sc">*</span> (H <span class="sc">/</span> n) <span class="sc">/</span> <span class="fl">1e6</span> <span class="sc">-</span> (E_i <span class="sc">*</span> LA) <span class="sc">/</span> (n <span class="sc">*</span> k_sw_max <span class="sc">*</span> <span class="fu">VC_sw</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l_i)));</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    P_x_l_i <span class="ot">=</span> P_x_l_i <span class="sc">-</span> E_i<span class="sc">/</span>(n<span class="sc">*</span>k_l<span class="sc">*</span><span class="fu">VC_l</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l_i)));</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  P_x_l_3_crit[i] <span class="ot">=</span> P_x_l_i</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>  }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>i <span class="ot">=</span> <span class="dv">0</span>;</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span>(<span class="fu">abs</span>(<span class="fu">range</span>(P_x_r_3_crit)[<span class="dv">1</span>]<span class="sc">-</span><span class="fu">range</span>(P_x_r_3_crit)[<span class="dv">2</span>]) <span class="sc">&gt;</span> <span class="fl">1e-3</span>){</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  i <span class="ot">=</span> i <span class="sc">+</span> <span class="dv">1</span>;</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(i <span class="sc">&gt;</span> <span class="dv">100</span>){</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="st">"error"</span>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>()</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  F_value <span class="ot">=</span> P_x_l_crit <span class="sc">-</span> P_x_l_3_crit; <span class="co">#objective function, F -- we seek to find that P_x_r that makes F equal to zero</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    F_UB <span class="ot">=</span> <span class="fu">max</span>(F_value[F_value <span class="sc">&lt;</span> <span class="dv">0</span>]);</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    F_UB <span class="ot">=</span> F_UB[<span class="dv">1</span>];</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>    F_LB <span class="ot">=</span> <span class="fu">min</span>(F_value[F_value <span class="sc">&gt;</span> <span class="dv">0</span>]);</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>    F_LB <span class="ot">=</span> F_LB[<span class="dv">1</span>];</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>  P_x_r_UB_crit <span class="ot">=</span> P_x_r_3_crit[F_value <span class="sc">==</span> F_UB];</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>  P_x_r_UB_crit <span class="ot">=</span> P_x_r_UB_crit[<span class="dv">1</span>];</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>  P_x_r_LB_crit <span class="ot">=</span> P_x_r_3_crit[F_value <span class="sc">==</span> F_LB];</span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>  P_x_r_LB_crit <span class="ot">=</span> P_x_r_LB_crit[<span class="dv">1</span>];</span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>P_x_r_M_crit <span class="ot">=</span> (P_x_r_LB_crit <span class="sc">+</span> P_x_r_UB_crit) <span class="sc">/</span> <span class="dv">2</span>;</span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>P_l_UB_crit <span class="ot">=</span> P_x_l_3_crit[P_x_r_3_crit <span class="sc">==</span> P_x_r_UB_crit];</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>P_l_LB_crit <span class="ot">=</span> P_x_l_3_crit[P_x_r_3_crit <span class="sc">==</span> P_x_r_LB_crit];</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>  P_x_r_3_crit <span class="ot">=</span> <span class="fu">c</span>(P_x_r_UB_crit, P_x_r_M_crit, P_x_r_LB_crit);</span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>    P_x_l_3_crit <span class="ot">=</span> <span class="fu">c</span>(P_l_UB_crit, <span class="cn">NA</span>, P_l_LB_crit);</span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>  P_x_r_i <span class="ot">=</span> P_x_r_3_crit[<span class="dv">2</span>];</span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>    E_i <span class="ot">=</span> <span class="fu">E_from_Soil_to_Root_Collar</span>(P_x_r_i, <span class="at">P_soil =</span> P_soil, <span class="at">rho =</span> rho, <span class="at">g =</span> g)[[<span class="dv">1</span>]]</span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>      P_x_l_i <span class="ot">=</span> P_x_r_i;</span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a>        P_x_l_i <span class="ot">=</span> P_x_l_i <span class="sc">-</span> rho <span class="sc">*</span> g <span class="sc">*</span> (H <span class="sc">/</span> n) <span class="sc">/</span> <span class="fl">1e6</span> <span class="sc">-</span> (E_i <span class="sc">*</span> LA) <span class="sc">/</span> (n <span class="sc">*</span> k_sw_max <span class="sc">*</span> <span class="fu">VC_sw</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l_i)));</span>
+<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a>              P_x_l_i <span class="ot">=</span> P_x_l_i <span class="sc">-</span> E_i <span class="sc">/</span> (n <span class="sc">*</span> k_l <span class="sc">*</span> <span class="fu">VC_l</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l_i)));</span>
+<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-49"><a href="#cb28-49" aria-hidden="true" tabindex="-1"></a>      P_x_l_3_crit[<span class="dv">2</span>] <span class="ot">=</span> P_x_l_i;</span>
+<span id="cb28-50"><a href="#cb28-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-51"><a href="#cb28-51" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>P_x_r_crit <span class="ot">=</span> <span class="fu">min</span>(P_x_r_3_crit[P_x_l_3_crit <span class="sc">&gt;</span> <span class="sc">-</span><span class="cn">Inf</span>]);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>P_x_r <span class="ot">=</span> <span class="fu">seq</span>(P_x_r_0, P_x_r_crit, <span class="at">length.out =</span> <span class="dv">50</span>);</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>P_x_s <span class="ot">=</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="fu">length</span>(P_x_r))</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>P_x_l <span class="ot">=</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="fu">length</span>(P_x_r))</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>E <span class="ot">=</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="fu">length</span>(P_x_r))</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>E_soil <span class="ot">=</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">ncol =</span> <span class="fu">length</span>(P_x_r));</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>r_R_H <span class="ot">=</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">ncol =</span> <span class="fu">length</span>(P_x_r));</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>r_R_V <span class="ot">=</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">ncol =</span> <span class="fu">length</span>(P_x_r));</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>f_r <span class="ot">=</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">ncol =</span> <span class="fu">length</span>(P_x_r));</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(P_x_r)){</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  P_x_r_i <span class="ot">=</span> P_x_r[i];</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> <span class="fu">E_from_Soil_to_Root_Collar</span>(P_x_r_i, <span class="at">P_soil =</span> P_soil, <span class="at">rho =</span> rho, <span class="at">g =</span> g)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  E[i] <span class="ot">=</span> res[[<span class="dv">1</span>]]</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  E_soil[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, i] <span class="ot">=</span> res[[<span class="dv">2</span>]];</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  r_R_H[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, i] <span class="ot">=</span> res[[<span class="dv">3</span>]];</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  r_R_V[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, i] <span class="ot">=</span> res[[<span class="dv">4</span>]];</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  f_r[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, i] <span class="ot">=</span> res[[<span class="dv">5</span>]];</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  P_x_s_i <span class="ot">=</span> P_x_r_i;</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>   <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>        P_x_s_i <span class="ot">=</span> P_x_s_i <span class="sc">-</span> rho <span class="sc">*</span> g <span class="sc">*</span> (H <span class="sc">/</span> n) <span class="sc">/</span> <span class="fl">1e6</span> <span class="sc">-</span> (E_i <span class="sc">*</span> LA) <span class="sc">/</span> (n <span class="sc">*</span> k_sw_max <span class="sc">*</span> <span class="fu">VC_sw</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l_i)));</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>   }</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>  P_x_s[i] <span class="ot">=</span> P_x_s_i;</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>  P_x_l_i <span class="ot">=</span> P_x_s_i;</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>        P_x_l_i <span class="ot">=</span> P_x_l_i <span class="sc">-</span> E_i <span class="sc">/</span> (n <span class="sc">*</span> k_l <span class="sc">*</span> <span class="fu">VC_l</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l_i)));</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>  P_x_l[i] <span class="ot">=</span> P_x_l_i;</span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>T_a <span class="ot">=</span> <span class="dv">25</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>T_l <span class="ot">=</span> T_a <span class="sc">*</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(P_x_l)); <span class="co">#in [C] -- assuming leaf temperature equals air temperature</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>satur_mol_fract_air <span class="ot">=</span> (<span class="sc">-</span><span class="fl">0.0043</span> <span class="sc">+</span> <span class="fl">0.01</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="fl">0.0511</span> <span class="sc">*</span> T_a)); <span class="co">#saturated mole fraction of vapor in air [kPa]</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>satur_mol_fract_leaf <span class="ot">=</span> (<span class="sc">-</span><span class="fl">0.0043</span> <span class="sc">+</span> <span class="fl">0.01</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="fl">0.0511</span> <span class="sc">*</span> T_l)); <span class="co">#saturated mole fraction of vapor in leaf [kPa]</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>RH <span class="ot">=</span> <span class="fu">min</span>(<span class="fl">0.5</span>, <span class="fl">0.99</span>);</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>VPD_air <span class="ot">=</span> (<span class="dv">1</span> <span class="sc">-</span> RH) <span class="sc">*</span> <span class="fl">0.61094</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="fl">17.625</span><span class="sc">*</span> T_a <span class="sc">/</span> (T_a <span class="sc">+</span> <span class="fl">243.04</span>)); <span class="co">#air-to-air vapor pressure deficit [kPa]</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>VPD_l <span class="ot">=</span> satur_mol_fract_leaf <span class="sc">-</span> satur_mol_fract_air <span class="sc">+</span> VPD_air; <span class="co">#leaf-to-air vapor pressure deficit in kPa</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>VPD_l <span class="ot">=</span> <span class="fu">pmax</span>(<span class="dv">0</span>, VPD_l);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>atm_kpa <span class="ot">=</span> <span class="fl">101.3</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Interpreting stomatal conductances, G_w and G_c</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>G_w <span class="ot">=</span> <span class="fu">abs</span>(E<span class="sc">*</span>atm_kpa <span class="sc">/</span> VPD_l); <span class="co">#stomatal conductance to vapor [mol H2O * m^-2 * s^-1]</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>G_w[E <span class="sc">==</span> <span class="dv">0</span>] <span class="ot">=</span> <span class="dv">0</span>;</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>G_w <span class="ot">=</span> <span class="fu">pmax</span>(<span class="dv">0</span>, G_w);</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>G_c <span class="ot">=</span> G_w <span class="sc">/</span> <span class="fl">1.6</span>; <span class="co">#stomatal conductance to CO2 [mol CO2 * m^-2 * s^-1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<!-- dropped: scratch chunk calling solve_ci() was commented out in source -->
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Interpreting stomatal conductances, G_w and G_c</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>G_w <span class="ot">=</span> <span class="fu">abs</span>(E <span class="sc">/</span> VPD_l); <span class="co">#stomatal conductance to vapor [mol H2O * m^-2 * s^-1 * kPa^-1]</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>G_w[E <span class="sc">==</span> <span class="dv">0</span>] <span class="ot">=</span> <span class="dv">0</span>;</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>G_w <span class="ot">=</span> <span class="fu">pmax</span>(<span class="dv">0</span>, G_w);</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>G_c <span class="ot">=</span> G_w <span class="sc">/</span> <span class="fl">1.6</span>; <span class="co">#stomatal conductance to CO2 [mol CO2 * m^-2 * s^-1 * kPa^-1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>V_cmax <span class="ot">=</span> <span class="dv">100</span><span class="sc">*</span><span class="fl">1e-6</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>J_max <span class="ot">=</span> <span class="dv">167</span><span class="sc">*</span><span class="fl">1e-6</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>R_abs <span class="ot">=</span> <span class="dv">1000</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>var_kappa <span class="ot">=</span> <span class="fl">6.9e-7</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>J_phi <span class="ot">=</span> var_kappa <span class="sc">*</span> R_abs; <span class="co">#var_kappa is proportionality constant between J and R_abs in [mol CO2 * J^-1]</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>c_prime2 <span class="ot">=</span> <span class="fl">0.97</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>J <span class="ot">=</span> (J_max <span class="sc">+</span> J_phi <span class="sc">-</span> ((J_max <span class="sc">+</span> J_phi)<span class="sc">^</span> <span class="dv">2</span> <span class="sc">-</span> <span class="dv">4</span> <span class="sc">*</span> c_prime2 <span class="sc">*</span> J_max <span class="sc">*</span> J_phi)<span class="sc">^</span> <span class="fl">0.5</span>) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> c_prime2); <span class="co">#hyperbolic minimum of J_max and J_phi with curvature of 0.9</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>Gamma_star <span class="ot">=</span> <span class="fl">36e-6</span> <span class="sc">*</span> <span class="fl">101.325</span>; <span class="co">#in [kPa]</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>K_c <span class="ot">=</span> <span class="fl">275e-6</span> <span class="sc">*</span> <span class="fl">101.325</span>; <span class="co">#in [kPa]</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>K_o <span class="ot">=</span> <span class="fl">420000e-6</span> <span class="sc">*</span> <span class="fl">101.325</span>; <span class="co">#in [kPa]</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>R_d <span class="ot">=</span> <span class="fl">0.01</span> <span class="sc">*</span> V_cmax; <span class="co">#leaf dark respiration in [mol CO2 * m^-2 * s^-1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Eller et al. (2019; SOX appendix)</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>o_a <span class="ot">=</span> <span class="dv">21</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Gamma_star = 42.75</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>c_a <span class="ot">=</span> <span class="fl">410e-6</span> <span class="sc">*</span> <span class="fl">101.325</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>a_c <span class="ot">=</span> V_cmax;</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>a_j <span class="ot">=</span> J <span class="sc">/</span> <span class="dv">4</span>;</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>b_c <span class="ot">=</span> K_c <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> o_a <span class="sc">/</span> K_o);</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>b_j <span class="ot">=</span> <span class="dv">2</span> <span class="sc">*</span> Gamma_star;</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>beta_c <span class="ot">=</span> (R_d <span class="sc">-</span> a_c) <span class="sc">-</span> G_c <span class="sc">*</span> (c_a <span class="sc">+</span> b_c);</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>beta_j <span class="ot">=</span> (R_d <span class="sc">-</span> a_j) <span class="sc">-</span> G_c <span class="sc">*</span> (c_a <span class="sc">+</span> b_j);</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>gamma_c <span class="ot">=</span> a_c <span class="sc">*</span> (c_a <span class="sc">-</span> Gamma_star) <span class="sc">-</span> R_d <span class="sc">*</span> (c_a <span class="sc">+</span> b_c);</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>gamma_j <span class="ot">=</span> a_j <span class="sc">*</span> (c_a <span class="sc">-</span> Gamma_star) <span class="sc">-</span> R_d <span class="sc">*</span> (c_a <span class="sc">+</span> b_j);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>A_c <span class="ot">=</span> <span class="sc">-</span>beta_c <span class="sc">/</span> <span class="dv">2</span> <span class="sc">-</span> ((beta_c <span class="sc">/</span> <span class="dv">2</span>)<span class="sc">^</span><span class="dv">2</span> <span class="sc">-</span> gamma_c <span class="sc">*</span> G_c)<span class="sc">^</span><span class="fl">0.5</span>;</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>A_j <span class="ot">=</span> <span class="sc">-</span>beta_j <span class="sc">/</span> <span class="dv">2</span> <span class="sc">-</span> ((beta_j <span class="sc">/</span> <span class="dv">2</span>)<span class="sc">^</span><span class="dv">2</span> <span class="sc">-</span> gamma_j <span class="sc">*</span> G_c)<span class="sc">^</span> <span class="fl">0.5</span>;</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co"># A_j = real(A_j);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># correct for if G_c == inf, in which case c_i = c_a</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>A_c[G_c <span class="sc">==</span> <span class="cn">Inf</span>] <span class="ot">=</span> a_c[G_c <span class="sc">==</span> <span class="cn">Inf</span>]<span class="sc">*</span> (c_a <span class="sc">-</span> Gamma_star[G_c <span class="sc">==</span> <span class="cn">Inf</span>]) <span class="sc">/</span> (c_a <span class="sc">+</span> b_c[G_c <span class="sc">==</span> <span class="cn">Inf</span>]) <span class="sc">-</span> R_d[G_c <span class="sc">==</span> <span class="cn">Inf</span>];</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>A_j[G_c <span class="sc">==</span> <span class="cn">Inf</span>] <span class="ot">=</span> a_j[G_c <span class="sc">==</span> <span class="cn">Inf</span>] <span class="sc">*</span> (c_a <span class="sc">-</span> Gamma_star[G_c <span class="sc">==</span> <span class="cn">Inf</span>]) <span class="sc">/</span> (c_a <span class="sc">+</span> b_j[G_c <span class="sc">==</span> <span class="cn">Inf</span>]) <span class="sc">-</span> R_d[G_c <span class="sc">==</span> <span class="cn">Inf</span>];</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate photosynthesis by hyperbolic-minimum</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>c_prime1 <span class="ot">=</span> <span class="fl">0.97</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>A_n <span class="ot">=</span> (A_c <span class="sc">+</span> A_j <span class="sc">-</span> ((A_c <span class="sc">+</span> A_j)<span class="sc">^</span><span class="dv">2</span> <span class="sc">-</span> <span class="dv">4</span> <span class="sc">*</span> c_prime1 <span class="sc">*</span> A_c <span class="sc">*</span> A_j)<span class="sc">^</span> <span class="fl">0.5</span>) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> c_prime1); <span class="co">#net carbon assimilation rate [mol CO2 * m^-2 * s^-1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># determine dA_n/dR_abs by chain-rule, assuming negligle effect of</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co"># electron-transport rate, J, on stomatal conductance, G_c (derrived</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># assuming dG_c/dJ = 0)</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>dA_n_dA_c <span class="ot">=</span> (<span class="dv">1</span> <span class="sc">-</span> ((A_c <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> c_prime1) <span class="sc">*</span> A_j) <span class="sc">/</span> ((A_c <span class="sc">+</span> A_j)<span class="sc">^</span> <span class="dv">2</span> <span class="sc">-</span> <span class="dv">4</span> <span class="sc">*</span> c_prime1 <span class="sc">*</span> A_c <span class="sc">*</span> A_j)<span class="sc">^</span> <span class="fl">0.5</span>)) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> c_prime1);</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>dA_n_dA_j <span class="ot">=</span> (<span class="dv">1</span> <span class="sc">-</span> ((A_j <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> c_prime1) <span class="sc">*</span> A_c) <span class="sc">/</span> ((A_c <span class="sc">+</span> A_j)<span class="sc">^</span> <span class="dv">2</span> <span class="sc">-</span> <span class="dv">4</span> <span class="sc">*</span> c_prime1 <span class="sc">*</span> A_c <span class="sc">*</span> A_j)<span class="sc">^</span> <span class="fl">0.5</span>)) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> c_prime1);</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>var_H <span class="ot">=</span> (J<span class="sc">/</span><span class="dv">4</span> <span class="sc">+</span> G_c <span class="sc">*</span> (c_a <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> Gamma_star) <span class="sc">-</span> R_d) <span class="sc">/</span> <span class="dv">2</span>;</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="co">#inv_Ohm = J/4 .* (c_a - Gamma_star) - R_d .* (c_a + 2 * Gamma_star);</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>dA_j_dJ <span class="ot">=</span> (<span class="dv">1</span> <span class="sc">/</span> <span class="dv">8</span>) <span class="sc">*</span> (G_c <span class="sc">*</span> (c_a <span class="sc">-</span> Gamma_star)) <span class="sc">/</span> (var_H <span class="sc">-</span> A_j);</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>dA_j_dJ[G_c <span class="sc">==</span> <span class="cn">Inf</span>] <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">4</span> <span class="sc">*</span> (c_a <span class="sc">-</span> Gamma_star[G_c <span class="sc">==</span> <span class="cn">Inf</span>]) <span class="sc">/</span> (c_a <span class="sc">+</span> b_j[G_c <span class="sc">==</span> <span class="cn">Inf</span>]);</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>dJ_dJ_phi <span class="ot">=</span> (<span class="dv">1</span> <span class="sc">-</span> ((J_phi <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> c_prime2) <span class="sc">*</span> J_max) <span class="sc">/</span> ((J_max <span class="sc">+</span> J_phi)<span class="sc">^</span> <span class="dv">2</span> <span class="sc">-</span> <span class="dv">4</span> <span class="sc">*</span> c_prime2 <span class="sc">*</span> J_max <span class="sc">*</span> J_phi)<span class="sc">^</span> <span class="fl">0.5</span>)) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> c_prime2);</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>dJ_phi_dR_abs <span class="ot">=</span> var_kappa;</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>dA_n_dR_abs <span class="ot">=</span> dA_n_dA_j <span class="sc">*</span> dA_j_dJ <span class="sc">*</span> dJ_dJ_phi <span class="sc">*</span> dJ_phi_dR_abs;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co">#determine Cowan &amp; Farquhar's (1977) marginal cost (lambda), dA_n/dE, by finite-difference</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>c_i <span class="ot">=</span> c_a <span class="sc">-</span> A_n <span class="sc">/</span> G_c;</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co"># dA_c_dc_i = a_c .* (Gamma_star + b_c) ./ (c_i + b_c).^2;</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co"># dA_j_dc_i = a_j .* (Gamma_star + b_j) ./ (c_i + b_j).^2;</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="co"># x = dA_n_dA_c .* dA_c_dc_i + dA_n_dA_j .* dA_j_dc_i; %%% dA_n_dc_i</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="co"># dA_n_dE = A_n ./ E .* x ./ (x + G_c); %%%Eq. 4 in Buckley et al. (2016) "Optimal Plant Water Economy"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>f_sw <span class="ot">=</span> LA <span class="sc">*</span> E <span class="sc">/</span> (P_x_r <span class="sc">-</span> P_x_s <span class="sc">-</span> rho <span class="sc">*</span> g <span class="sc">*</span> H <span class="sc">/</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>) <span class="sc">/</span> k_sw_max; <span class="co">#%[unitless]</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>f_sw[<span class="dv">1</span>] <span class="ot">=</span> <span class="fu">mean</span>(<span class="fu">pmin</span>(<span class="dv">1</span>, <span class="fu">VC_sw</span>(<span class="fu">seq</span>(P_x_r[<span class="dv">1</span>], P_x_s[<span class="dv">1</span>], <span class="at">length.out =</span> <span class="dv">10</span>)))); <span class="co">#different defintion since first value represents where E = 0</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>f_l <span class="ot">=</span>  E <span class="sc">/</span> (P_x_s <span class="sc">-</span> P_x_l) <span class="sc">/</span> k_l; <span class="co">#[unitless]</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>f_l[<span class="dv">1</span>] <span class="ot">=</span> <span class="fu">min</span>(<span class="dv">1</span>, <span class="fu">VC_l</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_s[<span class="dv">1</span>]))); <span class="co">#different defintion since first value represents where E = 0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>dP <span class="ot">=</span> <span class="fl">1e-2</span>;</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>dVC_r_dP_x_r <span class="ot">=</span> (<span class="fu">VC_r</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_x_r <span class="sc">+</span> dP)) <span class="sc">-</span> <span class="fu">VC_r</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_x_r))) <span class="sc">/</span> dP;</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>dVC_r_dP_soil <span class="ot">=</span> (<span class="fu">VC_r</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_soil <span class="sc">+</span> dP)) <span class="sc">-</span> <span class="fu">VC_r</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_soil))) <span class="sc">/</span> dP;</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>dVC_r_dP_soil <span class="ot">=</span> <span class="fu">matrix</span>(dVC_r_dP_soil, <span class="dv">1</span>, <span class="fu">length</span>(P_x_l)<span class="sc">*</span><span class="fu">length</span>(dVC_r_dP_soil));</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>d2VC_r_dP_soil2 <span class="ot">=</span> (<span class="fu">VC_r</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_soil <span class="sc">+</span> dP)) <span class="sc">+</span> <span class="fu">VC_r</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_soil <span class="sc">-</span> dP)) <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">VC_r</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_soil))) <span class="sc">/</span> dP<span class="sc">^</span><span class="dv">2</span>;</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>d2VC_r_dP_soil2 <span class="ot">=</span> <span class="fu">matrix</span>(d2VC_r_dP_soil2, <span class="dv">1</span>, <span class="fu">length</span>(P_x_l)<span class="sc">*</span><span class="fu">length</span>(d2VC_r_dP_soil2));</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>df_r_dP_x_r <span class="ot">=</span> (f_r <span class="sc">-</span> <span class="fu">VC_r</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_x_r))) <span class="sc">/</span> (P_soil <span class="sc">-</span> P_x_r); <span class="co">#in [MPa^-1]</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>df_r_dP_x_r[<span class="fu">abs</span>(P_x_r <span class="sc">-</span> P_soil) <span class="sc">&lt;</span> <span class="fl">1e-2</span>] <span class="ot">=</span> (<span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>) <span class="sc">*</span> dVC_r_dP_soil[<span class="fu">abs</span>(P_x_r <span class="sc">-</span> P_soil) <span class="sc">&lt;</span> <span class="fl">1e-2</span>]; <span class="co">#needs to be corrected where P_x_r = P_soil</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>d2f_r_dP_x_r2 <span class="ot">=</span> (<span class="dv">2</span><span class="sc">*</span>df_r_dP_x_r <span class="sc">-</span> dVC_r_dP_x_r) <span class="sc">/</span> (P_soil <span class="sc">-</span> P_x_r); <span class="co">#in [MPa^-2]</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>d2f_r_dP_x_r2[<span class="fu">abs</span>(P_x_r <span class="sc">-</span> P_soil) <span class="sc">&lt;</span> <span class="fl">1e-1</span>] <span class="ot">=</span> (<span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>) <span class="sc">*</span> d2VC_r_dP_soil2[<span class="fu">abs</span>(P_x_r <span class="sc">-</span> P_soil) <span class="sc">&lt;</span> <span class="fl">1e-1</span>]; <span class="co">#needs to be corrected where P_x_r = P_soil</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>df_sw_dP_x_s <span class="ot">=</span> (f_sw <span class="sc">-</span> <span class="fu">VC_sw</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_x_s))) <span class="sc">/</span> (P_x_r <span class="sc">-</span> P_x_s); <span class="co">#in [MPa^-1]</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>df_sw_dP_x_r <span class="ot">=</span> (<span class="fu">VC_sw</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_x_r)) <span class="sc">-</span> f_sw) <span class="sc">/</span> (P_x_r <span class="sc">-</span> P_x_s); <span class="co">#in [MPa^-1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>r_R_V_sum <span class="ot">=</span> r_R_V</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(r_R_V)){</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  r_R_V_sum[,i] <span class="ot">=</span> <span class="fu">cumsum</span>(r_R_V[,i])</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>r_R <span class="ot">=</span> r_R_H <span class="sc">+</span> r_R_V_sum;</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>a_var <span class="ot">=</span> <span class="dv">1</span> <span class="sc">-</span> LA <span class="sc">*</span> E <span class="sc">/</span> (f_sw<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> k_sw_max <span class="sc">*</span> df_sw_dP_x_s;</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>b_var <span class="ot">=</span> <span class="dv">1</span> <span class="sc">+</span> LA <span class="sc">*</span> E <span class="sc">/</span> (f_sw<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> k_sw_max <span class="sc">*</span> df_sw_dP_x_r;</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>c_var <span class="ot">=</span> <span class="fu">apply</span>((<span class="dv">1</span><span class="sc">/</span>LA <span class="sc">-</span> E_soil <span class="sc">*</span> r_R_H <span class="sc">/</span> f_r <span class="sc">*</span> df_r_dP_x_r) <span class="sc">/</span> r_R, <span class="at">MARGIN =</span> <span class="dv">2</span>, <span class="at">FUN =</span> sum);</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>d_var <span class="ot">=</span> <span class="fu">VC_l</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_x_s)) <span class="sc">/</span> f_l;</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>e_var <span class="ot">=</span> <span class="fu">VC_l</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_x_l)) <span class="sc">/</span> f_l;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>k_c <span class="ot">=</span> e_var <span class="sc">/</span> (<span class="dv">1</span><span class="sc">/</span>f_l<span class="sc">/</span>k_l <span class="sc">+</span> d_var<span class="sc">/</span>a_var<span class="sc">*</span>(b_var<span class="sc">/</span>c_var <span class="sc">+</span> LA<span class="sc">/</span>f_sw<span class="sc">/</span>k_sw_max));</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>c0 <span class="ot">=</span> c_var[<span class="dv">1</span>];</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>i <span class="ot">=</span> (<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(c_var))[(c_var <span class="sc">-</span> c0) <span class="sc">==</span> <span class="fu">min</span>(<span class="fu">abs</span>(c_var <span class="sc">-</span> c0))]</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>P_x_r0 <span class="ot">=</span> P_x_r[i];</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>f_sw0 <span class="ot">=</span> f_sw[i];</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>f_r0 <span class="ot">=</span> f_r[,i];</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>df_r0_dP_x_r0 <span class="ot">=</span> df_r_dP_x_r[,i];</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>d2f_r0_dP_x_r0 <span class="ot">=</span> d2f_r_dP_x_r2[,i];</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>P_x_l0 <span class="ot">=</span> P_x_r0 <span class="sc">-</span> rho<span class="sc">*</span>g<span class="sc">*</span>H<span class="sc">/</span><span class="fl">1e6</span>;</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>f_l0 <span class="ot">=</span> <span class="fu">VC_l</span>(<span class="fu">pmin</span>(<span class="dv">0</span>, P_x_l0));</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>E_soil0 <span class="ot">=</span> E_soil[,i];</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>r_R0 <span class="ot">=</span> r_R[,i];</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>r_R_H0 <span class="ot">=</span> r_R_H[,i];</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>r_R_V0 <span class="ot">=</span> r_R_V[,i];</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>c_r_H <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">20</span>,<span class="dv">30</span>)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>c_r_V <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">20</span>,<span class="dv">30</span>)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="do">## CHECK</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>dP_x_r0_dc_r_H <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> c0 <span class="sc">/</span> c_r_H <span class="sc">*</span> E_soil0 <span class="sc">*</span>r_R_H0 <span class="sc">/</span> r_R0;</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>dP_x_r0_dc_r_V <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> c0 <span class="sc">/</span> c_r_V <span class="sc">*</span> <span class="fu">cumsum</span>((E_soil0<span class="sc">*</span> r_R_V0 <span class="sc">/</span> r_R0)[<span class="fu">length</span>(E_soil0<span class="sc">*</span> r_R_V0 <span class="sc">/</span> r_R0)<span class="sc">:</span><span class="dv">1</span>]);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>k_cmax <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span><span class="sc">/</span>k_l<span class="sc">/</span>f_l0 <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>c0 <span class="sc">+</span> LA<span class="sc">/</span>f_sw0<span class="sc">/</span>k_sw_max)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>df_l0_dP_x_r0 <span class="ot">=</span> (<span class="fu">VC_l</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l0 <span class="sc">+</span> dP)) <span class="sc">-</span> <span class="fu">VC_l</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l0))) <span class="sc">/</span> dP; <span class="co">#calculated in a finite-difference approach</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>df_l0_dH <span class="ot">=</span> <span class="sc">-</span> rho<span class="sc">*</span>g<span class="sc">/</span><span class="fl">1e6</span> <span class="sc">*</span> df_l0_dP_x_r0;</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>df_sw0_dP_x_r0 <span class="ot">=</span> (<span class="fu">VC_sw</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_r0)) <span class="sc">-</span> <span class="fu">VC_sw</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l0))) <span class="sc">/</span> (rho<span class="sc">*</span>g<span class="sc">*</span>H<span class="sc">/</span><span class="fl">1e6</span>);</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>df_sw0_dH <span class="ot">=</span> (<span class="fu">VC_sw</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l0)) <span class="sc">-</span> f_sw0) <span class="sc">/</span> H;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>c0 <span class="ot">=</span> <span class="fl">0.64</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>c1 <span class="ot">=</span> <span class="fl">0.63</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>dH_dD <span class="ot">=</span> c0 <span class="sc">*</span> H <span class="sc">/</span> D;</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>dW_dD <span class="ot">=</span> c1 <span class="sc">*</span> W <span class="sc">/</span> D;</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>W <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>D_hw <span class="ot">=</span> <span class="fl">0.08</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>dk_sw_max_dD <span class="ot">=</span> k_sw_max <span class="sc">/</span> D <span class="sc">*</span> (c2 <span class="sc">+</span> (c2<span class="sc">/</span>c0 <span class="sc">+</span> <span class="dv">1</span> <span class="sc">-</span> c2) <span class="sc">*</span> (D_hw <span class="sc">/</span> D) <span class="sc">^</span> (c2<span class="sc">/</span>c0 <span class="sc">+</span> <span class="dv">1</span>)) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> (D_hw <span class="sc">/</span> D) <span class="sc">^</span> (c2<span class="sc">/</span>c0 <span class="sc">+</span> <span class="dv">1</span>));</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>dk_cmax_dD <span class="ot">=</span> k_cmax<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> ((df_l0_dH<span class="sc">/</span>k_l<span class="sc">/</span>(f_l0<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> LA<span class="sc">*</span>df_sw0_dH<span class="sc">/</span>k_sw_max<span class="sc">/</span>(f_sw0<span class="sc">^</span><span class="dv">2</span>))<span class="sc">*</span>dH_dD <span class="sc">+</span></span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>             LA<span class="sc">/</span>(k_sw_max<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>f_sw0<span class="sc">*</span>dk_sw_max_dD);</span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>dk_cmax_dLA <span class="ot">=</span> k_cmax<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> (<span class="dv">1</span><span class="sc">/</span>k_sw_max<span class="sc">/</span>f_sw0 <span class="sc">-</span> <span class="dv">1</span><span class="sc">/</span>(c0<span class="sc">^</span><span class="dv">2</span><span class="sc">*</span>LA<span class="sc">^</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">sum</span>(<span class="dv">1</span><span class="sc">/</span>r_R0));</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># at E = E_max</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>P_x_lcrit <span class="ot">=</span> <span class="fu">min</span>(P_x_l[P_x_l <span class="sc">&gt;</span> <span class="sc">-</span><span class="cn">Inf</span>]);</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>A_nmax <span class="ot">=</span> A_n[P_x_l <span class="sc">==</span> P_x_lcrit];</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>E_max <span class="ot">=</span> E[P_x_l <span class="sc">==</span> P_x_lcrit];</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>dA_n_dE_crit <span class="ot">=</span> dA_n_dE[P_x_l <span class="sc">==</span> P_x_lcrit];</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>dA_n_dR_abs_crit <span class="ot">=</span> dA_n_dR_abs[P_x_l <span class="sc">==</span> P_x_lcrit];</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>G_wmin <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(A_nmax <span class="sc">&gt;</span> <span class="dv">0</span>){</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>    F_value <span class="ot">=</span> A_n <span class="sc">/</span> A_nmax <span class="sc">+</span> k_c <span class="sc">/</span> k_cmax;</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>    dF_dP_l <span class="ot">=</span> <span class="fu">diff</span>(F_value) <span class="sc">/</span> <span class="fu">diff</span>(P_x_l);</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>    i <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span>(i <span class="sc">&lt;</span> <span class="fu">length</span>(dF_dP_l)){</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>      i <span class="ot">=</span> i <span class="sc">+</span> <span class="dv">1</span>;</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(i <span class="sc">&gt;=</span> <span class="fu">length</span>(dF_dP_l)){</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>            <span class="fu">error</span>(<span class="st">'ERROR'</span>)</span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(dF_dP_l[i] <span class="sc">&gt;=</span> <span class="dv">0</span>){</span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(G_w[i] <span class="sc">&gt;=</span> G_wmin){</span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a>          <span class="cf">break</span></span>
+<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb57-20"><a href="#cb57-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-21"><a href="#cb57-21" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb57-22"><a href="#cb57-22" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>P_x_l <span class="ot">=</span> P_x_l[i];</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>P_x_s <span class="ot">=</span> P_x_s[i];</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>P_x_r <span class="ot">=</span> P_x_r[i];</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="test" class="level2">
+<h2 class="anchored" data-anchor-id="test">Test</h2>
+<p>This section cross-checks the compiled <code>Leaf</code> object against the prototype. It depends on a local build of <code>plant</code> (<code>devtools::load_all</code>), the compiled <code>Leaf</code> class, and the prototype state computed above, so every chunk is left unevaluated.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">load_all</span>(<span class="st">"."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>sw <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcmax_25 =</span> <span class="dv">100</span>,                  <span class="co">#  umol m^-2 s^-1</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">c =</span> <span class="fl">2.680147</span>,                  <span class="co"># unitless</span></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">b =</span> <span class="fl">3.898245</span>,                  <span class="co"># -MPa</span></span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">psi_crit =</span> <span class="fl">5.870283</span>,           <span class="co"># -MPa</span></span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta1 =</span> <span class="dv">20000</span>,                 <span class="co"># hydraulic cost for Bartlett method umol m^-3 s^-1</span></span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta2 =</span> <span class="fl">1.5</span>,                   <span class="co"># exponent for effect of hydraulic risk  (unitless)</span></span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">jmax_25 =</span> <span class="fl">157.44</span>,              <span class="co">#  maximum electron transport rate umol m^-2 s^-1</span></span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">hk_s =</span> <span class="dv">4</span>,                      <span class="co"># maximum hydraulic-dependent sapwood turnover rate yr ^ -1</span></span>
+<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">a =</span> <span class="fl">0.30</span>,                      <span class="co"># quantum yield of photosynthetic electron transport  (mol mol^-1)</span></span>
+<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_elec_trans =</span> <span class="fl">0.7</span>,    <span class="co"># curvature factor for the light response curve  (unitless)</span></span>
+<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_colim =</span> <span class="fl">0.99</span>,        <span class="co"># curvature factor for the colimited photosythnthesis equatiom</span></span>
+<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">GSS_tol_abs =</span> <span class="fl">1e-3</span>,            <span class="co">#  ???</span></span>
+<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">vulnerability_curve_ncontrol =</span> <span class="dv">100</span>,  <span class="co"># ????</span></span>
+<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_abs_tol =</span> <span class="fl">1e-3</span>,             <span class="co"># ???</span></span>
+<span id="cb61-16"><a href="#cb61-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_niter =</span> <span class="dv">1000</span></span>
+<span id="cb61-17"><a href="#cb61-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb61-18"><a href="#cb61-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-19"><a href="#cb61-19" aria-hidden="true" tabindex="-1"></a>leaf <span class="ot">&lt;-</span> <span class="fu">Leaf</span>(<span class="at">vcmax=</span> sw<span class="sc">$</span>vcmax_25, <span class="at">b =</span> sw<span class="sc">$</span>b, <span class="at">c =</span> sw<span class="sc">$</span>c, <span class="at">psi_crit =</span> sw<span class="sc">$</span>psi_crit,</span>
+<span id="cb61-20"><a href="#cb61-20" aria-hidden="true" tabindex="-1"></a>             <span class="at">beta2 =</span> sw<span class="sc">$</span>beta2, <span class="at">jmax_25 =</span> sw<span class="sc">$</span>jmax_25, <span class="at">hk_s =</span> sw<span class="sc">$</span>hk_s, <span class="at">a =</span> sw<span class="sc">$</span>a, <span class="at">curv_fact_elec_trans =</span> sw<span class="sc">$</span>curv_fact_elec_trans, <span class="at">curv_fact_colim =</span> sw<span class="sc">$</span>curv_fact_colim, <span class="at">GSS_tol_abs =</span> sw<span class="sc">$</span>GSS_tol_abs, <span class="at">vulnerability_curve_ncontrol =</span> sw<span class="sc">$</span>vulnerability_curve_ncontrol, <span class="at">ci_abs_tol =</span> sw<span class="sc">$</span>ci_abs_tol, <span class="at">ci_niter =</span> sw<span class="sc">$</span>ci_niter, <span class="at">g1_TF24 =</span> <span class="fl">46.32995</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">psi_r =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.06</span>,<span class="sc">-</span><span class="fl">3.30</span>,<span class="sc">-</span><span class="fl">0.01</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(<span class="at">E =</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(psi_r,</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span><span class="fu">E_from_Soil_to_Root_Collar</span>(.x, <span class="at">P_soil =</span> P_soil, <span class="at">rho =</span> rho, <span class="at">g =</span> g)[[<span class="dv">1</span>]])) <span class="ot">-&gt;</span> psi_r_E</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>psi_r_E <span class="sc">%&gt;%</span></span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> psi_r, <span class="at">y =</span> E)) <span class="sc">+</span></span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>find_psi_leaf_from_root <span class="ot">&lt;-</span> <span class="cf">function</span>(psi_root, E){</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  leaf<span class="sc">$</span><span class="fu">set_physiology</span>(<span class="at">PPFD =</span> <span class="dv">1000</span>, <span class="at">psi_soil =</span> psi_root, <span class="at">soil_moist =</span> <span class="fl">0.01</span>, <span class="at">leaf_specific_conductance_max =</span> k_sw_max, <span class="at">atm_vpd =</span> <span class="dv">2</span>, <span class="at">ca =</span> <span class="dv">40</span>, <span class="at">sapwood_volume_per_leaf_area =</span> <span class="fl">1.8e-04</span>, <span class="at">rho =</span> <span class="dv">608</span>, <span class="at">a_bio =</span> <span class="fl">0.0245</span>, <span class="at">leaf_temp =</span> <span class="dv">25</span>, <span class="at">atm_o2_kpa =</span> <span class="dv">21</span>, <span class="at">atm_kpa =</span> <span class="fl">101.3</span>)</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  psi_stem <span class="ot">=</span> leaf<span class="sc">$</span><span class="fu">transpiration_to_psi_stem</span>(E<span class="sc">/</span>kg_2_mol_h20)</span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  psi_stem <span class="ot">=</span> leaf<span class="sc">$</span><span class="fu">transpiration_to_psi_stem</span>(E)</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>  leaf<span class="sc">$</span><span class="fu">set_leaf_states_rates_from_psi_stem</span>(psi_stem)</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>  ci_ <span class="ot">=</span> leaf<span class="sc">$</span>ci_</span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>  assim_colimited_ <span class="ot">=</span> leaf<span class="sc">$</span>assim_colimited_</span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>  hydraulic_cost_TF <span class="ot">=</span> leaf<span class="sc">$</span><span class="fu">hydraulic_cost_TF</span>(psi_stem)</span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a>    P_x_l_i <span class="ot">=</span> <span class="sc">-</span>psi_root;</span>
+<span id="cb63-11"><a href="#cb63-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-12"><a href="#cb63-12" aria-hidden="true" tabindex="-1"></a>  n_i <span class="ot">=</span> <span class="dv">50</span></span>
+<span id="cb63-13"><a href="#cb63-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_i){</span>
+<span id="cb63-14"><a href="#cb63-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># P_x_l_i = P_x_l_i - E/(n_i*k_sw_max*((leaf$proportion_of_conductivity(psi = -P_x_l_i) +</span></span>
+<span id="cb63-15"><a href="#cb63-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">#                                        leaf$proportion_of_conductivity(psi = -(P_x_l_i- E/(n_i*k_sw_max*(leaf$proportion_of_conductivity(psi = -P_x_l_i)))))/2)));</span></span>
+<span id="cb63-16"><a href="#cb63-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">#</span></span>
+<span id="cb63-17"><a href="#cb63-17" aria-hidden="true" tabindex="-1"></a>        P_x_l_i <span class="ot">=</span> P_x_l_i <span class="sc">-</span> E<span class="sc">/</span>(n_i<span class="sc">*</span>k_sw_max<span class="sc">*</span>((leaf<span class="sc">$</span><span class="fu">proportion_of_conductivity</span>(<span class="at">psi =</span> <span class="sc">-</span>P_x_l_i))));</span>
+<span id="cb63-18"><a href="#cb63-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb63-19"><a href="#cb63-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-20"><a href="#cb63-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-21"><a href="#cb63-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-22"><a href="#cb63-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-23"><a href="#cb63-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-24"><a href="#cb63-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">P_x_l_i=</span> P_x_l_i,</span>
+<span id="cb63-25"><a href="#cb63-25" aria-hidden="true" tabindex="-1"></a>              <span class="at">psi_stem =</span> psi_stem,</span>
+<span id="cb63-26"><a href="#cb63-26" aria-hidden="true" tabindex="-1"></a>              <span class="at">assim_colimited_ =</span> assim_colimited_,</span>
+<span id="cb63-27"><a href="#cb63-27" aria-hidden="true" tabindex="-1"></a>              <span class="at">hydraulic_cost_TF =</span> hydraulic_cost_TF))</span>
+<span id="cb63-28"><a href="#cb63-28" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>psi_r_E <span class="sc">%&gt;%</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">324</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_l =</span> <span class="fu">map2</span>(psi_r, E, <span class="sc">~</span><span class="fu">find_psi_leaf_from_root</span>(<span class="sc">-</span>.x, .y)))<span class="sc">%&gt;%</span></span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_wider</span>(psi_l) <span class="ot">-&gt;</span> psi_r_l_E</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>psi_r_l_E <span class="sc">%&gt;%</span></span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_stem =</span> <span class="sc">-</span>psi_stem) <span class="sc">%&gt;%</span></span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">P_x_l_i =</span> P_x_l_i) <span class="sc">%&gt;%</span></span>
+<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_root_collar =</span> psi_r) <span class="sc">%&gt;%</span></span>
+<span id="cb64-10"><a href="#cb64-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_soil_1 =</span> <span class="sc">-</span><span class="fl">0.06</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb64-11"><a href="#cb64-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_soil_2 =</span> <span class="sc">-</span><span class="fl">0.12</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb64-12"><a href="#cb64-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(psi_soil_1, psi_soil_2, psi_root_collar, psi_stem, P_x_l_i)) <span class="sc">%&gt;%</span></span>
+<span id="cb64-13"><a href="#cb64-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> value, <span class="at">x =</span> E)) <span class="sc">+</span></span>
+<span id="cb64-14"><a href="#cb64-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> name, <span class="at">group =</span> name)) <span class="sc">+</span></span>
+<span id="cb64-15"><a href="#cb64-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_vline(xintercept = 0.00320) +</span></span>
+<span id="cb64-16"><a href="#cb64-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"psi"</span>) <span class="sc">+</span></span>
+<span id="cb64-17"><a href="#cb64-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()<span class="ot">-&gt;</span> a</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>psi_r_l_E <span class="sc">%&gt;%</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">profit =</span> assim_colimited_ <span class="sc">-</span> hydraulic_cost_TF) <span class="sc">%&gt;%</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">E_max_profit =</span> <span class="fu">ifelse</span>(profit <span class="sc">==</span> <span class="fu">max</span>(profit), E, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(profit,hydraulic_cost_TF, assim_colimited_)) <span class="sc">%&gt;%</span></span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> value, <span class="at">x =</span> E)) <span class="sc">+</span></span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> name, <span class="at">group =</span> name))<span class="sc">+</span></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept =</span> E_max_profit)) <span class="sc">+</span></span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Carbon inputs and outputs"</span>) <span class="sc">+</span></span>
+<span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()<span class="ot">-&gt;</span> b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>a<span class="sc">/</span>b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>find_psi_leaf_from_root <span class="ot">&lt;-</span> <span class="cf">function</span>(psi_root, E){</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  leaf<span class="sc">$</span><span class="fu">set_physiology</span>(<span class="at">PPFD =</span> <span class="dv">1000</span>, <span class="at">psi_soil =</span> psi_root, <span class="at">leaf_specific_conductance_max =</span> <span class="fl">4.8e-05</span>, <span class="at">atm_vpd =</span> <span class="dv">2</span>, <span class="at">ca =</span> <span class="dv">40</span>, <span class="at">sapwood_volume_per_leaf_area =</span> <span class="fl">1.8e-04</span>, <span class="at">rho =</span> <span class="dv">608</span>, <span class="at">a_bio =</span> <span class="fl">0.0245</span>, <span class="at">leaf_temp =</span> <span class="dv">25</span>, <span class="at">atm_o2_kpa =</span> <span class="dv">21</span>, <span class="at">atm_kpa =</span> <span class="fl">101.3</span>)</span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>   P_x_l_i <span class="ot">=</span> psi_root;</span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>        P_x_l_i <span class="ot">=</span> P_x_l_i <span class="sc">-</span> rho <span class="sc">*</span> g <span class="sc">*</span> (H <span class="sc">/</span> n) <span class="sc">/</span> <span class="fl">1e6</span> <span class="sc">-</span> (E <span class="sc">*</span> LA) <span class="sc">/</span> (n <span class="sc">*</span> k_sw_max <span class="sc">*</span> <span class="fu">VC_sw</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l_i)))</span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>        P_x_l_i <span class="ot">=</span> P_x_l_i <span class="sc">-</span> E <span class="sc">/</span> (n <span class="sc">*</span> k_l <span class="sc">*</span> <span class="fu">VC_l</span>(<span class="fu">min</span>(<span class="dv">0</span>, P_x_l_i)))</span>
+<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>solve_root_crit <span class="ot">&lt;-</span> <span class="cf">function</span>(){</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">psi_r =</span> <span class="fu">seq</span>(P_x_r_UB_crit,<span class="sc">-</span>sw<span class="sc">$</span>psi_crit,<span class="at">length.out =</span> n)) <span class="sc">%&gt;%</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">root_E =</span> <span class="fu">map_dbl</span>(psi_r, <span class="sc">~</span><span class="fu">E_from_Soil_to_Root_Collar</span>(.x, <span class="at">P_soil =</span> P_soil, <span class="at">rho =</span> rho, <span class="at">g =</span> g)[[<span class="dv">1</span>]])) <span class="ot">-&gt;</span> res</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>  res<span class="sc">$</span>transpiration_leaf <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>      leaf<span class="sc">$</span><span class="fu">set_physiology</span>(<span class="at">PPFD =</span> <span class="dv">1000</span>, <span class="at">psi_soil =</span> <span class="sc">-</span>res<span class="sc">$</span>psi_r[i], <span class="at">leaf_specific_conductance_max =</span> k_sw_max, <span class="at">atm_vpd =</span> <span class="dv">2</span>, <span class="at">ca =</span> <span class="dv">40</span>, <span class="at">sapwood_volume_per_leaf_area =</span> <span class="fl">1.8e-04</span>, <span class="at">rho =</span> <span class="dv">608</span>, <span class="at">a_bio =</span> <span class="fl">0.0245</span>, <span class="at">leaf_temp =</span> <span class="dv">25</span>, <span class="at">atm_o2_kpa =</span> <span class="dv">21</span>, <span class="at">atm_kpa =</span> <span class="fl">101.3</span>)</span>
+<span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a>    res<span class="sc">$</span>transpiration_leaf[i] <span class="ot">&lt;-</span> leaf<span class="sc">$</span><span class="fu">transpiration</span>(<span class="at">psi_stem =</span> sw<span class="sc">$</span>psi_crit)</span>
+<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb68-13"><a href="#cb68-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(res)</span>
+<span id="cb68-14"><a href="#cb68-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Solve the critical root pressure (i.e. the root pressure at which leaf crit is reached and E = E)</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_root_crit</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff =</span> root_E <span class="sc">-</span> transpiration_leaf) <span class="sc">%&gt;%</span></span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">abs</span>(diff) <span class="sc">==</span> <span class="fu">min</span>(<span class="fu">abs</span>(diff))) <span class="sc">%&gt;%</span></span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(psi_r) <span class="ot">-&gt;</span> root_crit</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>psi_r_E <span class="sc">%&gt;%</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_l =</span> <span class="fu">map2_dbl</span>(psi_r, E, <span class="sc">~</span><span class="fu">find_psi_leaf_from_root</span>(<span class="sc">-</span>.x, .y)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">psi_r =</span> <span class="fu">seq</span>(P_x_r_UB_crit,root_crit,<span class="sc">-</span><span class="fl">0.01</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(<span class="at">E =</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(psi_r,</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span><span class="fu">E_from_Soil_to_Root_Collar</span>(.x, <span class="at">P_soil =</span> P_soil, <span class="at">rho =</span> rho, <span class="at">g =</span> g)[[<span class="dv">1</span>]])) <span class="ot">-&gt;</span> psi_r_E</span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>psi_r_E <span class="sc">%&gt;%</span></span>
+<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> psi_r, <span class="at">y =</span> E)) <span class="sc">+</span></span>
+<span id="cb71-7"><a href="#cb71-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>psi_r_E <span class="sc">%&gt;%</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># slice(1:76) %&gt;%</span></span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_l =</span> <span class="fu">map2</span>(psi_r, E, <span class="sc">~</span><span class="fu">find_psi_leaf_from_root</span>(<span class="sc">-</span>.x, .y)))<span class="sc">%&gt;%</span></span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_wider</span>(psi_l) <span class="ot">-&gt;</span> psi_r_l_E</span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>psi_r_l_E <span class="sc">%&gt;%</span></span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_stem =</span> <span class="sc">-</span>psi_stem) <span class="sc">%&gt;%</span></span>
+<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">P_x_l_i =</span> P_x_l_i) <span class="sc">%&gt;%</span></span>
+<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_root_collar =</span> psi_r) <span class="sc">%&gt;%</span></span>
+<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_soil_1 =</span> <span class="sc">-</span><span class="fl">0.06</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psi_soil_2 =</span> <span class="sc">-</span><span class="fl">0.12</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb72-12"><a href="#cb72-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(psi_soil_1, psi_soil_2, psi_root_collar, psi_stem, P_x_l_i)) <span class="sc">%&gt;%</span></span>
+<span id="cb72-13"><a href="#cb72-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> value, <span class="at">x =</span> E)) <span class="sc">+</span></span>
+<span id="cb72-14"><a href="#cb72-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> name, <span class="at">group =</span> name)) <span class="sc">+</span></span>
+<span id="cb72-15"><a href="#cb72-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_vline(xintercept = 0.00320) +</span></span>
+<span id="cb72-16"><a href="#cb72-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"psi"</span>) <span class="sc">+</span></span>
+<span id="cb72-17"><a href="#cb72-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()<span class="ot">-&gt;</span> a</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>psi_r_l_E <span class="sc">%&gt;%</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">profit =</span> assim_colimited_ <span class="sc">-</span> hydraulic_cost_TF) <span class="sc">%&gt;%</span></span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(profit,hydraulic_cost_TF, assim_colimited_)) <span class="sc">%&gt;%</span></span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> value, <span class="at">x =</span> E)) <span class="sc">+</span></span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> name, <span class="at">group =</span> name))<span class="sc">+</span></span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_vline(xintercept = 0.00320) +</span></span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Carbon inputs and outputs"</span>) <span class="sc">+</span></span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()<span class="ot">-&gt;</span> b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>a<span class="sc">/</span>b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/traitecoevo\.github\.io\/overstorey");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Built with Quarto · frozen for reproducibility</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-06-19-root-water-uptake-prototype/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant/blob/master/LICENSE">
+<p>License</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

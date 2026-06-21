@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Overstorey – FF16</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../theory/models/k93.html" rel="next">
+<link href="../../theory/models/index.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../assets/extras.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Overstorey</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../guides/index.html"> 
+<span class="menu-text">Guides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../theory/index.html" aria-current="page"> 
+<span class="menu-text">Theory</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/index.html"> 
+<span class="menu-text">Adaptively</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/reproductions.html"> 
+<span class="menu-text">Reproductions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://traitecoevo.github.io/plant/reference/" target="_blank"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../develop.html"> 
+<span class="menu-text">Pipeline</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant" target="_blank"> <i class="bi bi-github" role="img" aria-label="plant source on GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">Models</a></li><li class="breadcrumb-item"><a href="../../theory/models/ff16.html">FF16</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Theory</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Core</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The size-structured PDE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive dynamics</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/ff16.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">FF16</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/k93.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">K93</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/tf24.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Implementation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Implementation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/characteristic-method.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The characteristic method</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/ode-stepping.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODE stepping &amp; control</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/node-spacing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The node-spacing algorithm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/canopy-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Canopy &amp; light-environment models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#growth" id="toc-growth" class="nav-link" data-scroll-target="#growth">Growth</a>
+  <ul class="collapse">
+  <li><a href="#leaf-photosynthesis" id="toc-leaf-photosynthesis" class="nav-link" data-scroll-target="#leaf-photosynthesis">Leaf photosynthesis</a></li>
+  <li><a href="#standard-model-for-mass-production" id="toc-standard-model-for-mass-production" class="nav-link" data-scroll-target="#standard-model-for-mass-production">Mass production</a></li>
+  <li><a href="#height-growth-rate" id="toc-height-growth-rate" class="nav-link" data-scroll-target="#height-growth-rate">Height growth</a></li>
+  <li><a href="#diameter-growth" id="toc-diameter-growth" class="nav-link" data-scroll-target="#diameter-growth">Diameter growth</a></li>
+  </ul></li>
+  <li><a href="#a-functional-balance-model-for-allocation" id="toc-a-functional-balance-model-for-allocation" class="nav-link" data-scroll-target="#a-functional-balance-model-for-allocation">Functional-balance model for allocation</a>
+  <ul class="collapse">
+  <li><a href="#leaf-area" id="toc-leaf-area" class="nav-link" data-scroll-target="#leaf-area">Leaf area</a></li>
+  <li><a href="#vertical-distribution-of-leaf-area" id="toc-vertical-distribution-of-leaf-area" class="nav-link" data-scroll-target="#vertical-distribution-of-leaf-area">Vertical distribution of leaf area</a></li>
+  <li><a href="#mass-of-sapwood" id="toc-mass-of-sapwood" class="nav-link" data-scroll-target="#mass-of-sapwood">Sapwood mass</a></li>
+  <li><a href="#bark-mass" id="toc-bark-mass" class="nav-link" data-scroll-target="#bark-mass">Bark mass</a></li>
+  <li><a href="#root-mass" id="toc-root-mass" class="nav-link" data-scroll-target="#root-mass">Root mass</a></li>
+  </ul></li>
+  <li><a href="#seed-production" id="toc-seed-production" class="nav-link" data-scroll-target="#seed-production">Seed production</a></li>
+  <li><a href="#mortality" id="toc-mortality" class="nav-link" data-scroll-target="#mortality">Mortality</a></li>
+  <li><a href="#traits" id="toc-traits" class="nav-link" data-scroll-target="#traits">Hyper-parameterisation of physiological model via traits</a>
+  <ul class="collapse">
+  <li><a href="#leaf-mass-per-unit-area" id="toc-leaf-mass-per-unit-area" class="nav-link" data-scroll-target="#leaf-mass-per-unit-area">Leaf mass per unit area</a></li>
+  <li><a href="#wood-density" id="toc-wood-density" class="nav-link" data-scroll-target="#wood-density">Wood density</a></li>
+  <li><a href="#seed-mass" id="toc-seed-mass" class="nav-link" data-scroll-target="#seed-mass">Seed mass</a></li>
+  <li><a href="#nitrogen-per-unit-leaf-area" id="toc-nitrogen-per-unit-leaf-area" class="nav-link" data-scroll-target="#nitrogen-per-unit-leaf-area">Nitrogen per unit leaf area</a></li>
+  </ul></li>
+  <li><a href="#tables" id="toc-tables" class="nav-link" data-scroll-target="#tables">Tables</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/models/ff16.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">Models</a></li><li class="breadcrumb-item"><a href="../../theory/models/ff16.html">FF16</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">FF16</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="eyebrow">
+<p>model</p>
+</div>
+<p>This document outlines the core physiological model used in the <code>plant</code> package. This model has primarily been developed elsewhere, in particular in <span class="citation" data-cites="Falster-2011">Falster, Brännström, Dieckmann, &amp; Westoby (<a href="#ref-Falster-2011" role="doc-biblioref">2011</a>)</span>. The model’s equations are presented here not as original findings, but rather so that users can understand the full system of equations being solved within <code>plant</code>.</p>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>The purpose of a physiological model in <code>plant</code> is to take a plant’s current size, light environment, and physiological parameters as inputs, and return its growth, mortality, and fecundity rates. In the <code>FF16</code> physiological model, these vital rates are all derived from the rate at which living biomass is produced by the plant, which in turn is calculated based on well-understood physiology (see <a href="#fig-phys" class="quarto-xref">Figure&nbsp;1</a>). Various physiological parameters influence demographic outcomes. Varying these parameters allows accounting for species differences, potentially via traits. Tables summarize the units and definitions of all variables, parameters, and hyper-parameters used in the material below.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-phys" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-phys-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/figures/models/FF16-schematic-phys.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-phys-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: <strong>Physiological model in <code>plant</code>, giving demographic rates on the basis of its traits, size, and light environment, as functions of net mass production.</strong> The dashed arrow towards mortality indicates that, although the mortality rate is assumed to depend on mass production, no mass is actually allocated there. Figure adapted from <span class="citation" data-cites="Falster-2011">Falster et al. (<a href="#ref-Falster-2011" role="doc-biblioref">2011</a>)</span> and <span class="citation" data-cites="Falster-2015">Falster, Brännström, Westoby, &amp; Dieckmann (<a href="#ref-Falster-2015" role="doc-biblioref">2015</a>)</span>.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="growth" class="level1">
+<h1>Growth</h1>
+<section id="leaf-photosynthesis" class="level2">
+<h2 class="anchored" data-anchor-id="leaf-photosynthesis">Leaf photosynthesis</h2>
+<p>We denote by <span class="math inline">\(p(x, E)\)</span> the gross rate of leaf photosynthesis per unit leaf area within the canopy of a plant with traits <span class="math inline">\(x\)</span> at light level <span class="math inline">\(E(z)\)</span>, where <span class="math inline">\(z\)</span> is height within the canopy. We assume a relationship of the form <span id="eq-photosynthesis"><span class="math display">\[
+p(x, E(z)) = \alpha_{{\rm p1}} \frac{ E(z)}{E(z) + \alpha_{{\rm p2}}},
+\tag{1}\]</span></span> for the average of <span class="math inline">\(p\)</span> across the year. The parameters <span class="math inline">\(\alpha_{{\rm p1}}\)</span> and <span class="math inline">\(\alpha_{{\rm p2}}\)</span> are derived from a detailed leaf-level model and measure, respectively, maximum annual photosynthesis and the light levels at 50% of this maximum. The average rate of leaf photosynthesis across the plant is then <span id="eq-photosynthesis-av"><span class="math display">\[
+\bar{p}(x, H, E_{a}) = \int_0^H p(x, E_a(z)) \, q(z, H) \, {\rm d}z,
+\tag{2}\]</span></span> where <span class="math inline">\(q(z, H)\)</span> is the vertical distribution of leaf area with respect to height <span class="math inline">\(z\)</span> (<a href="#eq-crown3" class="quarto-xref">Equation&nbsp;14</a>).</p>
+</section>
+<section id="standard-model-for-mass-production" class="level2">
+<h2 class="anchored" data-anchor-id="standard-model-for-mass-production">Mass production</h2>
+<p>The amount of biomass available for growth, <span class="math inline">\({\rm d}B  / {\rm d}t\)</span>, is given by the difference between income (total photosynthetic rate) and losses (respiration and turnover) within the plant <span class="citation" data-cites="Makela-1997 Thornley-2000 Falster-2011">(<a href="#ref-Makela-1997" role="doc-biblioref">Mäkelä, 1997</a>; <a href="#ref-Thornley-2000" role="doc-biblioref">Thornley &amp; Cannell, 2000</a>; <a href="#ref-Falster-2011" role="doc-biblioref">Falster et al., 2011</a>)</span>, <span id="eq-dbdt"><span class="math display">\[
+\underbrace{\strut \frac{{\rm d}B}{{\rm d}t}}_\textrm{net biomass production}
+= \underbrace{\strut \alpha_{\rm bio} }_\textrm{mass per C} \,
+\underbrace{\strut \alpha_{\rm y} }_\textrm{yield}
+\big( \underbrace{\strut A_{\rm l} \, \bar{p}}_\textrm{photosynthesis} -
+\underbrace{\strut \, \sum_{i = {\rm l}, {\rm b}, {\rm s}, {\rm r}}{M_i \, r_i}}_\textrm{respiration}\big)
+- \underbrace{\strut \sum_{i = {\rm l}, {\rm b}, {\rm s},  {\rm r}}{M_i \, k_i}}_\textrm{turnover}.
+\tag{3}\]</span></span> Here, <span class="math inline">\(M, r\)</span>, and <span class="math inline">\(k\)</span> refer to the mass, maintenance respiration rate, and turnover rate of different tissues, denoted by subscripts <span class="math inline">\(l\)</span> = leaves, <span class="math inline">\(b\)</span> = bark, <span class="math inline">\(s\)</span> = sapwood, and <span class="math inline">\(r\)</span> = roots. <span class="math inline">\(\bar{p}\)</span> is the assimilation rate of CO<span class="math inline">\(_2\)</span> per unit leaf area, <span class="math inline">\(\alpha_{\rm y}\)</span> is yield (i.e., the fraction of assimilated carbon fixed in biomass, with the remaining fraction being lost as growth respiration; this comes in addition to the costs of maintenance respiration), and <span class="math inline">\(\alpha_{\rm bio}\)</span> is the amount of biomass per unit carbon fixed. Gross photosynthetic production is proportional to leaf area, <span class="math inline">\(A_{\rm l} = M_{\rm l} / \phi\)</span>, where <span class="math inline">\(\phi\)</span> is leaf mass per area. The total mass of living tissues is <span class="math inline">\(M_{\rm a} = M_{\rm l} + M_{\rm b} + M_{\rm s} + M_{\rm r}.\)</span></p>
+</section>
+<section id="height-growth-rate" class="level2">
+<h2 class="anchored" data-anchor-id="height-growth-rate">Height growth</h2>
+<p>The key measure of growth required by the demographic model is the rate of height growth, denoted <span class="math inline">\(g(x, H, E_{a})\)</span>. To model height growth requires that we translate mass production into height increment, accounting for the costs of building new tissues, allocation to reproduction, and architectural layout. Using the chain rule, height growth can be decomposed into a product of physiologically relevant terms <span class="citation" data-cites="Falster-2011">(<a href="#ref-Falster-2011" role="doc-biblioref">Falster et al., 2011</a>)</span>, <span id="eq-dhdt"><span class="math display">\[
+g(x, H, E_{a}) = \frac{{\rm d}H}{{\rm d}t} = \frac{{\rm d}H}{{\rm d}A_{\rm l}}
+\times \frac{{\rm d}A_{\rm l} }{{\rm d}M_{\rm a}}
+\times \frac{{\rm d}M_{\rm a}}{{\rm d}B}
+\times \frac{{\rm d}B}{{\rm d}t}.
+\tag{4}\]</span></span></p>
+<p>The first factor, <span class="math inline">\({\rm d}H / {\rm d}A_{\rm l}\)</span>, is the growth in plant height per unit growth in total leaf area – accounting for the architectural strategy of the plant. Some species tend to leaf out more than grow tall, while other species emphasise vertical extension.</p>
+<p>The second factor, <span class="math inline">\({\rm d}A_{\rm l} / {\rm d}M_{\rm a}\)</span>, accounts for the marginal cost of deploying an additional unit of leaf area, including construction of the leaf itself and various support structures. As such, <span class="math inline">\({\rm d}A_{\rm l} / {\rm d}M_{\rm a}\)</span> can itself be expressed as a sum of construction costs per unit leaf area, <span id="eq-daldmt"><span class="math display">\[
+\frac{{\rm d}A_{\rm l}}{{\rm d}M_{\rm a}}
+= \bigg( \frac{{\rm d}M_{\rm l}}{{\rm d}A_{\rm l}} + \frac{{\rm d}M_{\rm s}}{{\rm d}A_{\rm l}} + \frac{{\rm d}M_{\rm b}}{{\rm d}A_{\rm l}} + \frac{{\rm d}M_{\rm r}}{{\rm d}A_{\rm l}}\bigg)^{-1}.
+\tag{5}\]</span></span></p>
+<p>The third factor, <span class="math inline">\({\rm d}M_{\rm a} / {\rm d}B\)</span>, is the fraction of net biomass production (<a href="#eq-dbdt" class="quarto-xref">Equation&nbsp;3</a>) that is allocated to growth rather than reproduction or storage. In the <code>FF16</code> physiological model, we let this growth fraction decrease with height according to the function <span id="eq-allocation"><span class="math display">\[
+\frac{{\rm d}M_{\rm a}}{{\rm d}B}(H) = 1 -
+\frac{\alpha_{{\rm f1}}} {1 + \exp\left(\alpha_{{\rm f2}} \left(1 - H / H_{\rm mat}\right)\right)},
+\tag{6}\]</span></span> where <span class="math inline">\(\alpha_{{\rm f1}}\)</span> is the maximum possible allocation (<span class="math inline">\(0-1\)</span>) and <span class="math inline">\(\alpha_{{\rm f2}}\)</span> determines the sharpness of the transition <span class="citation" data-cites="Falster-2011">(<a href="#ref-Falster-2011" role="doc-biblioref">Falster et al., 2011</a>)</span>.</p>
+</section>
+<section id="diameter-growth" class="level2">
+<h2 class="anchored" data-anchor-id="diameter-growth">Diameter growth</h2>
+<p>Analogously, the growth in basal area <span class="math inline">\(A_{\rm st}\)</span> can be expressed as the sum of growth in sapwood, bark, and heartwood areas (<span class="math inline">\(A_{\rm s}, A_{\rm b}\)</span>, and <span class="math inline">\(A_{\rm h}\)</span>, respectively), <span id="eq-dA-dst"><span class="math display">\[
+\frac{{\rm d}A_{\rm st}}{{\rm d}t} = \frac{{\rm d}A_{\rm b}}{{\rm d}t} + \frac{{\rm d}A_{\rm s}}{{\rm d}t} + \frac{{\rm d}A_{\rm h}}{{\rm d}t}.
+\tag{7}\]</span></span></p>
+<p>Applying the chain rule, we derive an equation for basal area growth that contains many of the same elements as <a href="#eq-dhdt" class="quarto-xref">Equation&nbsp;4</a>, <span id="eq-dast"><span class="math display">\[
+\frac{{\rm d}A_{\rm st}}{{\rm d}t} = \left(\frac{{\rm d}A_{\rm s}}{{\rm d}A_{\rm l}} + \frac{{\rm d}A_{\rm b}}{{\rm d}A_{\rm l}}\right) \times
+\frac{{\rm d}A_{\rm l}}{{\rm d}M_{\rm a}} \times \frac{{\rm d}M_{\rm a}}{{\rm d}B} \times \frac{{\rm d}B}{{\rm d}t} + \frac{{\rm d}A_{\rm h}}{{\rm d}t} .
+\tag{8}\]</span></span> Diameter growth is then given by the geometric relationship between stem diameter <span class="math inline">\(D\)</span> and <span class="math inline">\(A_{\rm st}\)</span>, <span id="eq-dDdt"><span class="math display">\[
+\frac{{\rm d}D}{{\rm d}t} = \left(\pi \, A_{\rm st}\right)^{-0.5} \, \frac{{\rm d}A_{\rm st}}{{\rm d}t}.
+\tag{9}\]</span></span></p>
+</section>
+</section>
+<section id="a-functional-balance-model-for-allocation" class="level1">
+<h1>Functional-balance model for allocation</h1>
+<p>Here we describe an allometric model linking to a plant’s height its various other size dimensions required by most ecologically realistic vegetation models (i.e., the masses of leaves, sapwood, bark, and fine roots). This approach allows us to track only the plant’s height, while still accounting for the mass needs to build leaves, roots, and stems. The growth rates of various tissues can then also be derived (<a href="#tbl-allometry" class="quarto-xref">Table&nbsp;2</a>).</p>
+<section id="leaf-area" class="level2">
+<h2 class="anchored" data-anchor-id="leaf-area">Leaf area</h2>
+<p>Based on empirically observed allometry <span class="citation" data-cites="Falster-2011">(<a href="#ref-Falster-2011" role="doc-biblioref">Falster et al., 2011</a>)</span>, we assume an allometric power-law scaling relationship between the accumulated leaf area of a plant and its height, <span id="eq-ha"><span class="math display">\[
+H = \alpha_{{\rm l1}} \, \left(A_{\rm l} \, {\rm m^{-2}}\right)^{\alpha_{{\rm l2}}}.
+\tag{10}\]</span></span> This relationship is normalised around a leaf area of 1m<span class="math inline">\({^2}\)</span>.</p>
+</section>
+<section id="vertical-distribution-of-leaf-area" class="level2">
+<h2 class="anchored" data-anchor-id="vertical-distribution-of-leaf-area">Vertical distribution of leaf area</h2>
+<p>We follow the model of <span class="citation" data-cites="Yokozawa-1995">Yokozawa &amp; Hara (<a href="#ref-Yokozawa-1995" role="doc-biblioref">1995</a>)</span> describing the vertical distribution of leaf area within the crowns of individual plants. This model can account for a variety of canopy profiles through a single parameter <span class="math inline">\(\eta\)</span>. Setting <span class="math inline">\(\eta = 1\)</span> results in a conical canopy, as seen in many conifers, while higher values, e.g., <span class="math inline">\(\eta = 12\)</span> , give a top-heavy canopy profile similar to those seen among angiosperms. We denote by <span class="math inline">\(A_{{\rm s},z}\)</span> the sapwood area at height <span class="math inline">\(z\)</span> within the plant, by <span class="math inline">\(q(z, H)\)</span> the vertical distribution of leaf area of leaf area with respect to height <span class="math inline">\(z\)</span>, and by <span class="math inline">\(Q(z, H)\)</span> the cumulative fraction of a plant’s leaves above height <span class="math inline">\(z\)</span>. As defined previously, <span class="math inline">\(A_{\rm s}\)</span> is the sapwood area at the base of the plant. Following <span class="citation" data-cites="Yokozawa-1995">Yokozawa &amp; Hara (<a href="#ref-Yokozawa-1995" role="doc-biblioref">1995</a>)</span>, we assume a relationship between <span class="math inline">\(A_{{\rm s},z}\)</span> and height such that <span id="eq-crown1"><span class="math display">\[
+\frac{A_{{\rm s},z}}{A_{\rm s}} = \left(1 - \left(\frac{z}{H}\right)^\eta\right)^2.
+\tag{11}\]</span></span></p>
+<p>We also assume that each unit of leaf area is supported by a fixed area <span class="math inline">\(\theta\)</span> of sapwood [in agreement with the pipe model; <span class="citation" data-cites="Shinozaki-1964">Shinozaki, Yoda, Hozumi, &amp; Kira (<a href="#ref-Shinozaki-1964" role="doc-biblioref">1964</a>)</span>], so that the total canopy area of a plant relates to its basal sapwood area <span class="math inline">\(A_{\rm s}\)</span>, <span id="eq-crown2"><span class="math display">\[
+A_{\rm s} = \theta \, A_{\rm l}.
+\tag{12}\]</span></span> The pipe model is assumed to hold within individual plants, as well as across plants of different size. It follows that,</p>
+<p><span id="eq-crown1b"><span class="math display">\[
+Q(z, H) = \left(1-\left(\frac{z}{H}\right)^\eta\right)^2.
+\tag{13}\]</span></span></p>
+<p>Differentiating with respect to <span class="math inline">\(z\)</span> then yields a solution for the probability density of leaf area as a function of height, <span id="eq-crown3"><span class="math display">\[
+q(z, H) = 2\frac{\eta}{H}\left(1-\left(\frac{z}{H}\right)^{\eta}\right) \left(\frac{z}{H}\right)^{\eta-1}.
+\tag{14}\]</span></span></p>
+</section>
+<section id="mass-of-sapwood" class="level2">
+<h2 class="anchored" data-anchor-id="mass-of-sapwood">Sapwood mass</h2>
+<p>Integrating <span class="math inline">\(A_{{\rm s},z}\)</span> yields the total mass of sapwood in a plant, <span id="eq-ms1"><span class="math display">\[
+M_{\rm s}  = \rho \int_0^H A_{{\rm s},z} \, {\rm d}z = \rho A_{\rm s} H \eta_{\rm c} ,
+\tag{15}\]</span></span> where <span class="math inline">\(\eta_{\rm c} = 1 - \frac{2}{1 + \eta} + \frac{1}{1 + 2\eta}\)</span> <span class="citation" data-cites="Yokozawa-1995">(<a href="#ref-Yokozawa-1995" role="doc-biblioref">Yokozawa &amp; Hara, 1995</a>)</span>. Substituting from <a href="#eq-crown2" class="quarto-xref">Equation&nbsp;12</a> into <a href="#eq-ms1" class="quarto-xref">Equation&nbsp;15</a> then gives an expression for sapwood mass as a function of leaf area and height, <span id="eq-ms2"><span class="math display">\[
+M_{\rm s} = \rho \, \eta_{\rm c} \, \theta \, A_{\rm l}  \, H.
+\tag{16}\]</span></span></p>
+</section>
+<section id="bark-mass" class="level2">
+<h2 class="anchored" data-anchor-id="bark-mass">Bark mass</h2>
+<p>Bark and phloem tissue are modelled using an analogue of the pipe model, leading to a similar equation as that for sapwood mass (<a href="#eq-ms2" class="quarto-xref">Equation&nbsp;16</a>). The cross-section area of bark per unit leaf area is assumed to be a constant fraction <span class="math inline">\(\alpha_{{\rm b1}}\)</span> of sapwood area per unit leaf area such that <span id="eq-mb"><span class="math display">\[
+M_{\rm b} = \alpha_{{\rm b1}} M_{\rm s}.
+\tag{17}\]</span></span></p>
+</section>
+<section id="root-mass" class="level2">
+<h2 class="anchored" data-anchor-id="root-mass">Root mass</h2>
+<p>Also consistent with the pipe model, we assume a fixed ratio of root mass per unit leaf area, <span id="eq-mr"><span class="math display">\[
+M_{\rm r} = \alpha_{{\rm r1}} \, A_{\rm l}.
+\tag{18}\]</span></span> Even though nitrogen and water uptake are not modelled explicitly, imposing a fixed ratio of root mass to leaf area ensures that approximate costs of root production are included in calculations of carbon budget.</p>
+</section>
+</section>
+<section id="seed-production" class="level1">
+<h1>Seed production</h1>
+<p>The rate of seed production, <span class="math inline">\(f(x, H, E_{a})\)</span>, is a direct function of the mass allocated to reproduction, <span id="eq-fecundity"><span class="math display">\[
+f(x, H, E_{a}) = \frac{(1 - \frac{{\rm d}M_{\rm a}}{{\rm d}B}) \times \frac{{\rm d}B}{{\rm d}t}}{
+\omega + \alpha_{{\rm f3}}},
+\tag{19}\]</span></span> where <span class="math inline">\(\omega\)</span> is the mass of the seed and <span class="math inline">\(\alpha_{{\rm f3}}\)</span> is the cost per seed of accessories, such as fruits, flowers, and dispersal structures. The function <span class="math inline">\(\frac{{\rm d}M_{\rm a}}{{\rm d}B}\)</span> is the fraction of <span class="math inline">\(\frac{{\rm d}B}{{\rm d}t}\)</span> that is allocated to growth (from <a href="#eq-allocation" class="quarto-xref">Equation&nbsp;6</a>, while <span class="math inline">\(1-\frac{{\rm d}M_{\rm a}}{{\rm d}B}\)</span> gives the fraction allocated to reproduction).</p>
+</section>
+<section id="mortality" class="level1">
+<h1>Mortality</h1>
+<p>Instantaneous rates of plant mortality are given by the sum of a growth-independent and a growth-dependent rate <span class="citation" data-cites="Falster-2011 Moorcroft-2001">(<a href="#ref-Moorcroft-2001" role="doc-biblioref">Moorcroft, Hurtt, &amp; Pacala, 2001</a>; <a href="#ref-Falster-2011" role="doc-biblioref">Falster et al., 2011</a>)</span>, <span id="eq-mortality"><span class="math display">\[
+d(x, H, E_{a}) = d_{{\rm I}}(x, H) + d_{{\rm G}}(x, H, E_{a}).
+\tag{20}\]</span></span> The growth-independent rate is taken to be constant, independent of plant performance, but potentially varying with species traits. The growth-dependent rate is assumed to decline exponentially with the rate of mass production per unit leaf area, <span id="eq-mortality-gd"><span class="math display">\[
+d_{{\rm G}}(x, H, E_{a}) = \alpha_{{\rm dG1}} \exp(-\alpha_{{\rm dG2}} X),
+\tag{21}\]</span></span> where <span class="math inline">\(X = {\rm d}B/{\rm d}t / A_{\rm l}\)</span>. This relationship allows for plants to increase in mortality as their growth rate approaches zero, while allowing for species to differ in the parameters <span class="math inline">\(\alpha_{{\rm dG1}}\)</span> and <span class="math inline">\(\alpha_{{\rm dG2}}\)</span>.</p>
+<p>We also require a function <span class="math inline">\(S_{\rm G}  (x^\prime, H_0, E_{{\rm a}0})\)</span> for plant survival through germination. For the demographic model to behave smoothly, <span class="math inline">\(S_{\rm G}  (x^\prime, H_0, E_{{\rm a}0}) / g(x, H_0, E_{{\rm a}0})\)</span> should approach zero as <span class="math inline">\(g(x, H_0, E_{{\rm a}0})\)</span> approaches zero. Following <span class="citation" data-cites="Falster-2011">Falster et al. (<a href="#ref-Falster-2011" role="doc-biblioref">2011</a>)</span>, we use the function <span id="eq-pi1"><span class="math display">\[
+S_{\rm G} (x^\prime, H_0, E_{{\rm a}0}) = \frac1{1 + X^2},
+\tag{22}\]</span></span> where <span class="math inline">\(X = \alpha_{{\rm d0}} \frac{A_{\rm l}}{{\rm d}B / {\rm d}t}\)</span> and <span class="math inline">\(\alpha_{{\rm d0}}\)</span> is a constant. <a href="#eq-pi1" class="quarto-xref">Equation&nbsp;22</a> is consistent with <a href="#eq-mortality-gd" class="quarto-xref">Equation&nbsp;21</a>, as both cause survival to decline with mass production.</p>
+</section>
+<section id="traits" class="level1">
+<h1>Hyper-parameterisation of physiological model via traits</h1>
+<p>The <code>FF16</code> physiological model includes default values for all needed parameters (<a href="#tbl-params-core" class="quarto-xref">Table&nbsp;3</a>). Species are known to vary considerably in many of these parameters, such as <span class="math inline">\(\phi\)</span>, <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\nu\)</span>, and <span class="math inline">\(\omega\)</span>; so by varying parameters one can account for species differences. When altering a parameter in the model, however, one must also consider whether there are trade-offs linking parameters.</p>
+<p><code>plant</code> allows for the hyper-parameterisation of the <code>FF16</code> physiological model via plant functional traits: this enables simultaneous variation in multiple parameters in accordance with an assumed trade-off. In the <code>FF16</code> physiological model, we implement the relationships described below. For more details, see <code>make_FF16_hyperpar.R</code>.</p>
+<section id="leaf-mass-per-unit-area" class="level2">
+<h2 class="anchored" data-anchor-id="leaf-mass-per-unit-area">Leaf mass per unit area</h2>
+<p>The trait leaf mass per unit area, denoted by <span class="math inline">\(\phi\)</span>, directly influences growth by changing <span class="math inline">\({\rm d}A_{\rm l} / {\rm d}M_{\rm a}\)</span>. In addition, we link <span class="math inline">\(\phi\)</span> to the rate of leaf turnover, based on a widely observed scaling relationship from <span class="citation" data-cites="Wright-2004">Wright et al. (<a href="#ref-Wright-2004" role="doc-biblioref">2004</a>)</span>, <span id="eq-k-l"><span class="math display">\[
+k_{\rm l} = \beta_{{\rm kl1}} \, \left(\frac{\phi}{\phi_0}\right)^{-\beta_{{\rm kl2}}}.
+\tag{23}\]</span></span></p>
+<p>This relationship is normalised around <span class="math inline">\(\phi_0\)</span>, the global mean of <span class="math inline">\(\phi\)</span>. This allows us to vary <span class="math inline">\(\beta_{{\rm kl1}}\)</span> and <span class="math inline">\(\beta_{{\rm kl2}}\)</span> without displacing the relationship from the observed mean.</p>
+<p>We also vary the mass-based leaf respiration rate so that it stays constant per unit leaf area and varies with <span class="math inline">\(\phi\)</span> and nitrogen per unit leaf area <span class="math inline">\(\nu\)</span>, as empirically observed by <span class="citation" data-cites="Wright-2004">Wright et al. (<a href="#ref-Wright-2004" role="doc-biblioref">2004</a>)</span>, <span id="eq-rl"><span class="math display">\[
+r_{\rm l} = \frac{\beta_{{\rm lf4}}\, \nu}{\phi}.
+\tag{24}\]</span></span></p>
+</section>
+<section id="wood-density" class="level2">
+<h2 class="anchored" data-anchor-id="wood-density">Wood density</h2>
+<p>The trait wood density, denoted by <span class="math inline">\(\rho\)</span>, directly influences growth by changing <span class="math inline">\({\rm d}A_{\rm l} / {\rm d}M_{\rm a}\)</span>. In addition, we allow for <span class="math inline">\(\rho\)</span> to influence the rate of growth-independent mortality, <span id="eq-di"><span class="math display">\[
+d_{\rm I} = \beta_{{\rm dI1}} \, \left(\frac{\rho}{\rho_0}\right) ^ {-\beta_{{\rm dI2}}},
+\tag{25}\]</span></span></p>
+<p>and also the rate of sapwood turnover, <span id="eq-ks"><span class="math display">\[
+k_{\rm s} = \beta_{{\rm ks1}} \, \left(\frac{\rho}{\rho_0}\right)^ {-\beta_{{\rm ks2}}},
+\tag{26}\]</span></span></p>
+<p>As for <span class="math inline">\(\phi\)</span>, these relationships are normalized around <span class="math inline">\(\rho_0\)</span>, the global mean of <span class="math inline">\(\rho\)</span>. By default, <span class="math inline">\(\beta_{{\rm kI2}}\)</span> and <span class="math inline">\(\beta_{{\rm ks2}}\)</span> are set to zero, so these linkages only become present when these parameters are set to something other than their default values.</p>
+<p>The rate of sapwood respiration per unit volume is assumed to be constant, so sapwood respiration per unit mass varies as <span id="eq-rs"><span class="math display">\[
+r_{\rm s}  = \frac{\beta_{{\rm rs1}}}{\rho},
+\tag{27}\]</span></span></p>
+<p>where <span class="math inline">\(\beta_{{\rm rs1}}\)</span> is a default rate per volume of sapwood. Similarly, the rate of bark respiration per unit mass varies as <span id="eq-rb"><span class="math display">\[
+r_{\rm b} = \frac{\beta_{{\rm rb1}}}{\rho},
+\tag{28}\]</span></span></p>
+<p>with <span class="math inline">\(\beta_{{\rm rb1}} = 2 \beta_{{\rm rs1}}\)</span>.</p>
+</section>
+<section id="seed-mass" class="level2">
+<h2 class="anchored" data-anchor-id="seed-mass">Seed mass</h2>
+<p>Effects of the trait seed mass, denoted by <span class="math inline">\(\omega\)</span>, are naturally embedded in the equation determining fecundity (<a href="#eq-fecundity" class="quarto-xref">Equation&nbsp;19</a>) and the initial height of seedlings. In addition, we let the accessory cost per seed be a multiple of seed size, <span id="eq-a-f3"><span class="math display">\[
+\alpha_{{\rm f3}} = \beta_{{\rm f1}} \omega,
+\tag{29}\]</span></span> as empirically observed <span class="citation" data-cites="Henery-2001">(<a href="#ref-Henery-2001" role="doc-biblioref">Henery &amp; Westoby, 2001</a>)</span>.</p>
+</section>
+<section id="nitrogen-per-unit-leaf-area" class="level2">
+<h2 class="anchored" data-anchor-id="nitrogen-per-unit-leaf-area">Nitrogen per unit leaf area</h2>
+<p>Photosynthesis per unit leaf area and respiration rates per unit leaf mass (or area) are assumed to vary with leaf nitrogen per unit area, <span class="math inline">\(\nu\)</span>. The calculation of respiration rates is already described above. To calculate the average annual photosynthesis for a leaf, we integrate the instantaneous rate per unit leaf area over the annual solar trajectory, using a rectangular-hyperbolic photosynthesis light response curve, <span id="eq-ptss"><span class="math display">\[
+p(\nu, E) = \frac1{365 \textrm{d}}\int_0^{365 \textrm{d}}\frac{Y(t) + A_{\rm max} - \sqrt{(Y(t) + A_{\rm max})^2 - 4 \beta_{{\rm lf2}} Y(t) A_{\rm max} }}{2 \beta_{{\rm lf2}}} {\rm d}t,
+\tag{30}\]</span></span> where</p>
+<ul>
+<li><span class="math inline">\(A_{\rm max}\)</span> is the maximum photosynthetic capacity of the leaf,</li>
+<li><span class="math inline">\(\beta_{{\rm lf2}}\)</span> is the curvature of the light response curve,</li>
+<li><span class="math inline">\(Y(t) = \beta_{{\rm lf3}} I(t)\)</span> is the initial yield of the light response curve, with <span class="math inline">\(\beta_{{\rm lf3}}\)</span> being the quantum yield parameter,</li>
+<li><span class="math inline">\(I(t) = k_{\rm I} \, I_0(t)\, E\)</span> is the intensity of light on the leaf surface, and</li>
+<li><span class="math inline">\(I_0(t)\)</span> is light incident on a surface perpendicular to the sun’s rays directly above the canopy at time <span class="math inline">\(t\)</span>.</li>
+</ul>
+<p>The profile of <span class="math inline">\(I_0(t)\)</span> is given by a solar model adapted from <span class="citation" data-cites="TerSteege-1997">Ter Steege (<a href="#ref-TerSteege-1997" role="doc-biblioref">1997</a>)</span>.</p>
+<p>We allow for the maximum photosynthetic capacity of the leaf to vary with leaf nitrogen per unit area, as <span id="eq-amax"><span class="math display">\[
+A_{\rm max} = \beta_{{\rm lf1}} \, \left(\frac{\nu}{\nu_0}\right)^{\beta_{{\rm lf5}}},
+\tag{31}\]</span></span> where <span class="math inline">\(\beta_{{\rm lf1}}\)</span> and <span class="math inline">\(\beta_{{\rm lf5}}\)</span> are constants. The relationships is normalized around <span class="math inline">\(\nu_0\)</span>, the global mean of leaf nitrogen per unit area.</p>
+<p>Values of <span class="math inline">\(p(\nu, E)\)</span> are calculated across a range of values of <span class="math inline">\(E\)</span>, and then an expression of the form in <a href="#eq-photosynthesis" class="quarto-xref">Equation&nbsp;1</a> is fitted to extract the parameters <span class="math inline">\(\alpha_{{\rm p1}}\)</span> and <span class="math inline">\(\alpha_{{\rm p2}}\)</span>, such that these become functions of <span class="math inline">\(\nu\)</span>.</p>
+</section>
+</section>
+<section id="tables" class="level1">
+<h1>Tables</h1>
+<div class="cell">
+<div id="tbl-definitions" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-definitions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Key variables of the <code>FF16</code> physiological model. For mass (<span class="math inline">\(M\)</span>), respiration (<span class="math inline">\(r\)</span>), and turnover (<span class="math inline">\(k\)</span>) variables, subscripts refer to any of the following tissues: <span class="math inline">\({\rm l}\)</span> = leaves, <span class="math inline">\({\rm b}\)</span> = bark, <span class="math inline">\({\rm s}\)</span> = sapwood,<span class="math inline">\({\rm r}\)</span> = roots, <span class="math inline">\({\rm a}\)</span> = all living tissue. For area <span class="math inline">\(A\)</span> variables, subscripts refer to any of the following: <span class="math inline">\({\rm l}\)</span> = leaves, <span class="math inline">\({\rm st}\)</span> = total stem cross-section, <span class="math inline">\({\rm s}\)</span> = sapwood cross-section, <span class="math inline">\({\rm b}\)</span> = bark cross-section, <span class="math inline">\({\rm h}\)</span> = heartwood cross-section
+</figcaption>
+<div aria-describedby="tbl-definitions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 9%">
+<col style="width: 73%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Symbol</th>
+<th style="text-align: left;">Unit</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Patch state variables</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(K\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Number of species in the metacommunity</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(a, a^{\prime}\)</span></td>
+<td style="text-align: left;">yr</td>
+<td style="text-align: left;">Patch age (time since disturbance)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(a_0\)</span></td>
+<td style="text-align: left;">yr</td>
+<td style="text-align: left;">Patch age when plant germinates</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(E_a\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Profile of canopy openness within a patch of age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(E_a(z)\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Canopy openness at height <span class="math inline">\(z\)</span> within a patch of age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Plant state variables</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(x\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Vector of traits for a species</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(H\)</span></td>
+<td style="text-align: left;">m</td>
+<td style="text-align: left;">Height of a plant</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(H_0(x)\)</span></td>
+<td style="text-align: left;">m</td>
+<td style="text-align: left;">Height of a seedling with traits <span class="math inline">\(x\)</span> after germination</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(z\)</span></td>
+<td style="text-align: left;">m</td>
+<td style="text-align: left;">Height in canopy</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(A_{\rm l}(H)\)</span></td>
+<td style="text-align: left;">m<span class="math inline">\(^2\)</span></td>
+<td style="text-align: left;">Leaf area of a plant with height <span class="math inline">\(H\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(Q(z, H)\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Fraction of leaf area above height <span class="math inline">\(z\)</span> for a plant with height <span class="math inline">\(H\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Abundance measures</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(P(a)\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">Frequency-density of patches of age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(Y_{x}\)</span></td>
+<td style="text-align: left;">m<span class="math inline">\(^{-2}\)</span> yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">Global birth rate for a species with traits <span class="math inline">\(x\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(N(H, x, a)\)</span></td>
+<td style="text-align: left;">m<span class="math inline">\(^{-1}\)</span> m<span class="math inline">\(^{-2}\)</span></td>
+<td style="text-align: left;">Density of plants at height <span class="math inline">\(H\)</span> per unit ground area for given traits <span class="math inline">\(x\)</span> and patch age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Demographic rates</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(g(x, H, E_a)\)</span></td>
+<td style="text-align: left;">m yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">Height growth rate of a plant with traits <span class="math inline">\(x\)</span> and height <span class="math inline">\(H\)</span> in the light environment <span class="math inline">\(E_a\)</span> in a patch of age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(f(x, H, E_a)\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">Seed production rate of a plant with traits <span class="math inline">\(x\)</span> and height <span class="math inline">\(H\)</span> in the light environment <span class="math inline">\(E_a\)</span> in a patch of age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(d(x, H, E_a)\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">Instantaneous mortality rate of a plant with traits <span class="math inline">\(x\)</span> and height <span class="math inline">\(H\)</span> in the light environment <span class="math inline">\(E_a\)</span> in a patch of age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(d_{\rm P}(a)\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">Instantaneous disturbance rate of a patch of age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Demographic outcomes</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(H(x, a_0, a)\)</span></td>
+<td style="text-align: left;">m</td>
+<td style="text-align: left;">Height of a plant with traits <span class="math inline">\(x\)</span> in a patch of age <span class="math inline">\(a\)</span> having germinated at patch age <span class="math inline">\(a_0\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(S_{\rm D}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Probability a seed survives dispersal</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(S_{\rm G} (x, H_0, E_{{\rm a}0})\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Probability the seed of a plant with traits <span class="math inline">\(x\)</span> germinates successfully at height <span class="math inline">\(H_0\)</span> in the light environment <span class="math inline">\(E_{{\rm a}0}\)</span> in a patch of age <span class="math inline">\(a_0\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(S_{\rm I} (x, a_0, a)\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Probability a plant survives from patch age <span class="math inline">\(a_0\)</span> to patch age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(S_{\rm P} ( a_0, a)\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Probability a patch remains undisturbed from patch age <span class="math inline">\(a_0\)</span> to patch age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\tilde{R}(x, a_0, a)\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Cumulative seed output for plants with traits <span class="math inline">\(x\)</span> from patch age <span class="math inline">\(a_0\)</span> to patch age <span class="math inline">\(a\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(R\left(x^\prime, x\right)\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Basic reproduction ratio for a mutant plant with traits <span class="math inline">\(x^\prime\)</span> growing in a metapopulation of resident plants with traits <span class="math inline">\(x\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Miscellaneous constants</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(k_{\rm I}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Light extinction coefficient</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\bar{a}\)</span></td>
+<td style="text-align: left;">yr</td>
+<td style="text-align: left;">Mean interval between patch disturbances</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-allometry" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-allometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Equations of the allometric growth model implemented within the <code>FF16</code> physiological model, based on functional-balance assumptions (see text for details). In (a) we list key assumptions of allocation model between specific variation with leaf area, under “Function”. From these assumptions, allocation functions are derived for tissue areas and tissue masses (b). Also the growth rate of each tissue type can be expressed as a function of the growth rate of leaf area. For mass (<span class="math inline">\(M\)</span>), respiration (<span class="math inline">\(r\)</span>), and turnover (<span class="math inline">\(k\)</span>) variables, subscripts refer to any of the following tissues: <span class="math inline">\({\rm l}\)</span> = leaves, <span class="math inline">\({\rm b}\)</span> = bark, <span class="math inline">\({\rm s}\)</span> = sapwood, <span class="math inline">\({\rm r}\)</span> = roots, <span class="math inline">\({\rm a}\)</span> = all living tissue. For area <span class="math inline">\(A\)</span> variables, subscripts refer to any of the following: <span class="math inline">\({\rm l}\)</span> = leaves, <span class="math inline">\({\rm st}\)</span> = total stem cross-section, <span class="math inline">\({\rm s}\)</span> = sapwood cross-section, <span class="math inline">\({\rm b}\)</span> = bark cross-section, <span class="math inline">\({\rm h}\)</span> = heartwood cross-section
+</figcaption>
+<div aria-describedby="tbl-allometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 22%">
+<col style="width: 41%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Variable</th>
+<th style="text-align: left;">Function</th>
+<th style="text-align: left;">Allocation</th>
+<th style="text-align: left;">Growth.rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>(a) Assumed</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Height</td>
+<td style="text-align: left;"><span class="math inline">\(H = \alpha_{{\rm l1}} \, \left(A_{\rm l} \, {\rm m^{-2}} \right)^{\alpha_{{\rm l2}}}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}H}{{\rm d}A_{\rm l}} = \alpha_{{\rm l2}} \alpha_{{\rm l1}} \left(A_{\rm l} \, {\rm m^{-2}} \right)^{\alpha_{{\rm l2}}-1}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}H}{{\rm d}t} = \frac{{\rm d}H}{{\rm d}A_{\rm l}} \, \frac{{\rm d}A_{\rm l}}{{\rm d}t}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sapwoood area</td>
+<td style="text-align: left;"><span class="math inline">\(A_{\rm s} = \theta \, A_{\rm l}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}A_{\rm s}}{{\rm d} A_{\rm l}} = \theta\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}A_{\rm s}}{{\rm d}t} = \frac{{\rm d}A_{\rm s}}{{\rm d} A_{\rm l}} \, \frac{{\rm d}A_{\rm l}}{{\rm d}t}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bark area</td>
+<td style="text-align: left;"><span class="math inline">\(A_{\rm b} = \alpha_{{\rm b1}} \, \theta \, A_{\rm l}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}A_{\rm b}}{{\rm d} A_{\rm l}} = \alpha_{{\rm b1}} \, \theta\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}A_{\rm b}}{{\rm d}t} = \frac{{\rm d}A_{\rm b}}{{\rm d} A_{\rm l}} \, \frac{{\rm d}A_{\rm l}}{{\rm d}t}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>(b) Derived</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Leaf mass</td>
+<td style="text-align: left;"><span class="math inline">\(M_{\rm l} = \phi \, A_{\rm l}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}M_{\rm l}}{{\rm d}A_{\rm l}} = \phi\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}M_{\rm l}}{{\rm d}t} = \frac{{\rm d}M_{\rm l}}{{\rm d}A_{\rm l}} \, \frac{{\rm d}A_{\rm l}}{{\rm d}t}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sapwood mass</td>
+<td style="text-align: left;"><span class="math inline">\(M_{\rm s} = \rho \, \theta \, \eta_{\rm c} \, A_{\rm l} \, H\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}M_{\rm s}}{{\rm d}A_{\rm l}} = \rho \, \theta \, \eta_{\rm c} \, \big(H + A_{\rm l} \, \frac{{\rm d}H}{{\rm d}A_{\rm l}} \big)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}M_{\rm s}}{{\rm d}t} = \frac{{\rm d}M_{\rm s}}{{\rm d}A_{\rm l}} \, \frac{{\rm d}A_{\rm l}}{{\rm d}t}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bark mass</td>
+<td style="text-align: left;"><span class="math inline">\(M_{\rm b} = \alpha_{{\rm b1}} \, \rho \, \theta \, \eta_{\rm c} \, A_{\rm l} \, H\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}M_{\rm b}}{{\rm d}A_{\rm l}} = \alpha_{{\rm b1}} \, \rho \, \theta \, \eta_{\rm c}\big(H + A_{\rm l} \, \frac{{\rm d}H}{{\rm d}A_{\rm l}} \big)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}M_{\rm b}}{{\rm d}t} = \frac{{\rm d}M_{\rm b}}{{\rm d}A_{\rm l}} \, \frac{{\rm d}A_{\rm l}}{{\rm d}t}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Root mass</td>
+<td style="text-align: left;"><span class="math inline">\(M_{\rm r} = \alpha_{{\rm r1}} \, A_{\rm l}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}M_{\rm r}}{{\rm d}A_{\rm l}} = \alpha_{{\rm r1}}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\frac{{\rm d}M_{\rm r}}{{\rm d}t} = \frac{{\rm d}M_{\rm r}}{{\rm d}A_{\rm l}} \, \frac{{\rm d}A_{\rm l}}{{\rm d}t}\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-params-core" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-params-core-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Core parameters of the <code>FF16</code> physiological model.
+</figcaption>
+<div aria-describedby="tbl-params-core-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 62%">
+<col style="width: 13%">
+<col style="width: 16%">
+<col style="width: 4%">
+<col style="width: 4%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Symbol</th>
+<th style="text-align: left;">Unit</th>
+<th style="text-align: left;">Code</th>
+<th style="text-align: left;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Plant construction</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Crown-shape parameter</td>
+<td style="text-align: left;"><span class="math inline">\(\eta\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">eta</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leaf mass per area</td>
+<td style="text-align: left;"><span class="math inline">\(\phi\)</span></td>
+<td style="text-align: left;">kg m<span class="math inline">\(^{-2}\)</span></td>
+<td style="text-align: left;">lma</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Wood density</td>
+<td style="text-align: left;"><span class="math inline">\(\rho\)</span></td>
+<td style="text-align: left;">kg m<span class="math inline">\(^{-3}\)</span></td>
+<td style="text-align: left;">rho</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sapwood area per unit leaf area</td>
+<td style="text-align: left;"><span class="math inline">\(\theta\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">theta</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Height of plant with leaf area of 1m<span class="math inline">\(^2\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm l1}\)</span></td>
+<td style="text-align: left;">m</td>
+<td style="text-align: left;">a_l1</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Exponent of relationship between height and leaf area</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm l2}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">a_l2</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Root mass per unit leaf area</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm r1}\)</span></td>
+<td style="text-align: left;">kg m<span class="math inline">\(^{-2}\)</span></td>
+<td style="text-align: left;">a_r1</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ratio of bark area to sapwood area</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm b1}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">a_b1</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Production</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leaf photosynthesis per area</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm p1}\)</span></td>
+<td style="text-align: left;">mol yr<span class="math inline">\(^{-1}\)</span> m<span class="math inline">\(^{-2}\)</span></td>
+<td style="text-align: left;">a_p1</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Saturation of leaf photosynthesis per area</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm p2}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">a_p2</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Yield = fraction of carbon fixed converted into mass</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm y}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">a_y</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Biomass per mol carbon</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm bio}\)</span></td>
+<td style="text-align: left;">kg mol<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">a_bio</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leaf respiration per mass</td>
+<td style="text-align: left;"><span class="math inline">\(r_{\rm l}\)</span></td>
+<td style="text-align: left;">mol yr<span class="math inline">\(^{-1}\)</span> kg<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">r_l</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fine-root respiration per mass</td>
+<td style="text-align: left;"><span class="math inline">\(r_{\rm r}\)</span></td>
+<td style="text-align: left;">mol yr<span class="math inline">\(^{-1}\)</span> kg<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">r_r</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sapwood respiration per mass</td>
+<td style="text-align: left;"><span class="math inline">\(r_{\rm s}\)</span></td>
+<td style="text-align: left;">mol yr<span class="math inline">\(^{-1}\)</span> kg<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">r_s</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bark respiration per mass</td>
+<td style="text-align: left;"><span class="math inline">\(r_{\rm b}\)</span></td>
+<td style="text-align: left;">mol yr<span class="math inline">\(^{-1}\)</span> kg<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">r_b</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Turnover rate for leaves</td>
+<td style="text-align: left;"><span class="math inline">\(k_{\rm l}\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">k_l</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Turnover rate for sapwood</td>
+<td style="text-align: left;"><span class="math inline">\(k_{\rm s}\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">k_s</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Turnover rate for bark</td>
+<td style="text-align: left;"><span class="math inline">\(k_{\rm b}\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">k_b</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Turnover rate for fine roots</td>
+<td style="text-align: left;"><span class="math inline">\(k_{\rm r}\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">k_r</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Fecundity</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Seed mass</td>
+<td style="text-align: left;"><span class="math inline">\(\omega\)</span></td>
+<td style="text-align: left;">kg</td>
+<td style="text-align: left;">omega</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Height at maturation</td>
+<td style="text-align: left;"><span class="math inline">\(H_{{\rm mat}}\)</span></td>
+<td style="text-align: left;">m</td>
+<td style="text-align: left;">hmat</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Maximum allocation to reproduction</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm f1}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">a_f1</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Parameter determining rate of change in<span class="math inline">\(r(x, m_\textrm{l})\)</span> around<span class="math inline">\(H_{\rm mat}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm f2}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">a_f2</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Accessory cost per seed</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm f3}\)</span></td>
+<td style="text-align: left;">kg</td>
+<td style="text-align: left;">a_f3</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Mortality</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Survival probability during dispersal</td>
+<td style="text-align: left;"><span class="math inline">\(S_{\rm D}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">S_D</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Parameter influencing survival through germination</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm d0}\)</span></td>
+<td style="text-align: left;">kg yr<span class="math inline">\(^{-1}\)</span> m<span class="math inline">\(^{-2}\)</span></td>
+<td style="text-align: left;">a_d0</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Intrinsic or growth-independent mortality</td>
+<td style="text-align: left;"><span class="math inline">\(d_{\rm I}\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">d_I</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Baseline rate for growth-dependent mortality</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm dG1}\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">a_dG1</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Risk coefficient for dry-mass production per unit leaf area in growth-dependent mortality</td>
+<td style="text-align: left;"><span class="math inline">\(\alpha_{\rm dG2}\)</span></td>
+<td style="text-align: left;">yr m^<span class="math inline">\({2}\)</span> kg<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">a_dG2</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-params-hyper" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-params-hyper-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Parameters for hyper-parameterisation of the <code>FF16</code> physiological model.
+</figcaption>
+<div aria-describedby="tbl-params-hyper-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 60%">
+<col style="width: 11%">
+<col style="width: 15%">
+<col style="width: 5%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Symbol</th>
+<th style="text-align: left;">Unit</th>
+<th style="text-align: left;">Code</th>
+<th style="text-align: left;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Leaf turnover</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Global average leaf mass per area</td>
+<td style="text-align: left;"><span class="math inline">\(\phi_0\)</span></td>
+<td style="text-align: left;">kg m<span class="math inline">\(^{-2}\)</span></td>
+<td style="text-align: left;">lma_0</td>
+<td style="text-align: left;">0.1978791</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rate of leaf turnover at average leaf mass per unit leaf area, <span class="math inline">\(\phi_0\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm kl1}\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">B_kl1</td>
+<td style="text-align: left;">0.4565855</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Scaling exponent for <span class="math inline">\(\phi\)</span> in leaf turnover</td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm kl2}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">B_kl2</td>
+<td style="text-align: left;">1.71</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Sapwood turnover</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Global average wood density</td>
+<td style="text-align: left;"><span class="math inline">\(\rho_0\)</span></td>
+<td style="text-align: left;">kg m<span class="math inline">\(^{-3}\)</span></td>
+<td style="text-align: left;">rho_0</td>
+<td style="text-align: left;">608</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rate of sapwood turnover at average wood density, <span class="math inline">\(\rho_0\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm ks1}\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">B_ks1</td>
+<td style="text-align: left;">0.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Scaling exponent for <span class="math inline">\(\rho\)</span> in sapwood turnover</td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm ks2}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">B_ks2</td>
+<td style="text-align: left;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Growth-independent mortality</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rate of instantaneous mortality at average wood density, <span class="math inline">\(\rho_0\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm dI1}\)</span></td>
+<td style="text-align: left;">yr<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">B_dI1</td>
+<td style="text-align: left;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Scaling exponent for wood density in intrinsic mortality</td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm dI2}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">B_dI2</td>
+<td style="text-align: left;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Photosynthesis</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leaf nitrogen per unit leaf area</td>
+<td style="text-align: left;"><span class="math inline">\(\nu\)</span></td>
+<td style="text-align: left;">kg m<span class="math inline">\(^{-2}\)</span></td>
+<td style="text-align: left;">narea</td>
+<td style="text-align: left;">0.00187</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Global average nitrogen per unit leaf area</td>
+<td style="text-align: left;"><span class="math inline">\(\nu_0\)</span></td>
+<td style="text-align: left;">kg m<span class="math inline">\(^{-2}\)</span></td>
+<td style="text-align: left;">narea_0</td>
+<td style="text-align: left;">0.00187</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Potential CO<span class="math inline">\(_2\)</span> photosynthesis at average leaf nitrogen, <span class="math inline">\(\nu_0\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm lf1}\)</span></td>
+<td style="text-align: left;">mol d<span class="math inline">\(^{-1}\)</span> m<span class="math inline">\(^{-2}\)</span></td>
+<td style="text-align: left;">B_lf1</td>
+<td style="text-align: left;">0.8273474</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Curvature of light response curve</td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm lf2}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">B_lf2</td>
+<td style="text-align: left;">0.5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Quantum yield of leaf photosynthesis (CO<span class="math inline">\(_2\)</span> per unit photosynthetically active radiation)</td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm lf3}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">B_lf3</td>
+<td style="text-align: left;">0.04</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Scaling exponent for leaf nitrogen in maximum leaf photosynthesis</td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm lf5}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">B_lf5</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Respiration</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CO<span class="math inline">\(_2\)</span> respiration per unit leaf nitrogen</td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm lf4}\)</span></td>
+<td style="text-align: left;">mol yr<span class="math inline">\(^{-1}\)</span> kg<span class="math inline">\(^{-1}\)</span></td>
+<td style="text-align: left;">B_lf4</td>
+<td style="text-align: left;">21000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CO<span class="math inline">\(_2\)</span> respiration per unit sapwood volume</td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm rs1}\)</span></td>
+<td style="text-align: left;">mol yr<span class="math inline">\(^{-1}\)</span> m<span class="math inline">\(^{-3}\)</span></td>
+<td style="text-align: left;">B_rs1</td>
+<td style="text-align: left;">4012</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CO<span class="math inline">\(_2\)</span>respiration per unit bark volume</td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm rb1}\)</span></td>
+<td style="text-align: left;">mol yr<span class="math inline">\(^{-1}\)</span> m<span class="math inline">\(^{-3}\)</span></td>
+<td style="text-align: left;">B_rb1</td>
+<td style="text-align: left;">8024</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Reproduction</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cost of seed accessories per unit seed mass</td>
+<td style="text-align: left;"><span class="math inline">\(\beta_{\rm f1}\)</span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">B_f1</td>
+<td style="text-align: left;">3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="references" class="level1">
+
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-Falster-2011" class="csl-entry" role="listitem">
+Falster, D. S., Brännström, Å., Dieckmann, U., &amp; Westoby, M. (2011). Influence of four major plant traits on average height, leaf-area cover, net primary productivity, and biomass density in single-species forests: A theoretical investigation. <em>Journal of Ecology</em>, <em>99</em>(1), 148–164. doi:<a href="https://doi.org/10.1111/j.1365-2745.2010.01735.x">10.1111/j.1365-2745.2010.01735.x</a>
+</div>
+<div id="ref-Falster-2015" class="csl-entry" role="listitem">
+Falster, D. S., Brännström, Åke, Westoby, M., &amp; Dieckmann, U. (2015). Multi-trait eco-evolutionary dynamics explain niche diversity and evolved neutrality in forests. <em>bioRxiv</em>, 014605. doi:<a href="https://doi.org/10.1101/014605">10.1101/014605</a>
+</div>
+<div id="ref-Henery-2001" class="csl-entry" role="listitem">
+Henery, M., &amp; Westoby, M. (2001). Seed mass and seed nutrient content as predictors of seed output variation between species. <em>Oikos</em>, <em>92</em>, 479–490. doi:<a href="https://doi.org/10.1034/j.1600-0706.2001.920309.x">10.1034/j.1600-0706.2001.920309.x</a>
+</div>
+<div id="ref-Makela-1997" class="csl-entry" role="listitem">
+Mäkelä, A. (1997). A carbon balance model of growth and self-pruning in trees based on structural relationships. <em>Forest Science</em>, <em>43</em>, 7–24.
+</div>
+<div id="ref-Moorcroft-2001" class="csl-entry" role="listitem">
+Moorcroft, P. R., Hurtt, G. C., &amp; Pacala, S. W. (2001). A method for scaling vegetation dynamics: The <span>Ecosystem Demography</span> model <span>(ED)</span>. <em>Ecological Monographs</em>, <em>71</em>(4), 557–586. doi:<a href="https://doi.org/10.1890/0012-9615(2001)071[0557:AMFSVD]2.0.CO;2">10.1890/0012-9615(2001)071[0557:AMFSVD]2.0.CO;2</a>
+</div>
+<div id="ref-Shinozaki-1964" class="csl-entry" role="listitem">
+Shinozaki, K., Yoda, K., Hozumi, K., &amp; Kira, T. (1964). A quantitative analysis of plant form - the pipe model theory. <span>I</span>. <span>B</span>asic analyses. <em>Japanese Journal of Ecology</em>, <em>14</em>, 97–105.
+</div>
+<div id="ref-TerSteege-1997" class="csl-entry" role="listitem">
+Ter Steege, H. (1997). <em>Winphot 5: A programme to analyze vegetation indices, light and light quality from hemispherical photographs</em>. Georgetown, Guyana: Tropenbos Guyana Programme. Retrieved from <a href="http://www.researchgate.net/publication/230608417">http://www.researchgate.net/publication/230608417</a>
+</div>
+<div id="ref-Thornley-2000" class="csl-entry" role="listitem">
+Thornley, J. H. M., &amp; Cannell, M. G. R. (2000). Modelling the components of plant respiration: Representation and realism. <em>Annals of <span>Botany</span></em>, <em>85</em>(1), 55–67. doi:<a href="https://doi.org/10.1006/anbo.1999.0997">10.1006/anbo.1999.0997</a>
+</div>
+<div id="ref-Wright-2004" class="csl-entry" role="listitem">
+Wright, I. J., Reich, P. B., Westoby, M., Ackerly, D. D., Baruch, Z., Bongers, F., … Villar, R. (2004). The world-wide leaf economics spectrum. <em>Nature</em>, <em>428</em>, 821–827. doi:<a href="https://doi.org/10.1038/nature02403">10.1038/nature02403</a>
+</div>
+<div id="ref-Yokozawa-1995" class="csl-entry" role="listitem">
+Yokozawa, M., &amp; Hara, T. (1995). Foliage profile, size structure and stem diameter plant height relationship in crowded plant-populations. <em>Annals of Botany</em>, <em>76</em>(3), 271–285.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/traitecoevo\.github\.io\/overstorey");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../theory/models/index.html" class="pagination-link" aria-label="Models">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Models</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../theory/models/k93.html" class="pagination-link" aria-label="K93">
+        <span class="nav-page-text">K93</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Built with Quarto · frozen for reproducibility</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/models/ff16.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant/blob/master/LICENSE">
+<p>License</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

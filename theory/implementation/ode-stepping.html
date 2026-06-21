@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Overstorey – ODE stepping &amp; control</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../theory/implementation/node-spacing.html" rel="next">
+<link href="../../theory/implementation/characteristic-method.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../assets/extras.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Overstorey</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../guides/index.html"> 
+<span class="menu-text">Guides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../theory/index.html" aria-current="page"> 
+<span class="menu-text">Theory</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/index.html"> 
+<span class="menu-text">Adaptively</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/reproductions.html"> 
+<span class="menu-text">Reproductions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://traitecoevo.github.io/plant/reference/" target="_blank"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../develop.html"> 
+<span class="menu-text">Pipeline</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant" target="_blank"> <i class="bi bi-github" role="img" aria-label="plant source on GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">Implementation</a></li><li class="breadcrumb-item"><a href="../../theory/implementation/ode-stepping.html">ODE stepping &amp; control</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Theory</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Core</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The size-structured PDE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive dynamics</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/ff16.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">FF16</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/k93.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">K93</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/tf24.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Implementation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Implementation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/characteristic-method.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The characteristic method</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/ode-stepping.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">ODE stepping &amp; control</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/node-spacing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The node-spacing algorithm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/canopy-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Canopy &amp; light-environment models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-rungekutta-45-ode-stepper" id="toc-the-rungekutta-45-ode-stepper" class="nav-link active" data-scroll-target="#the-rungekutta-45-ode-stepper">The Runge–Kutta 45 ODE stepper</a></li>
+  <li><a href="#setup-of-templated-ode-solver-in-c" id="toc-setup-of-templated-ode-solver-in-c" class="nav-link" data-scroll-target="#setup-of-templated-ode-solver-in-c">Setup of templated ODE solver in C++</a>
+  <ul class="collapse">
+  <li><a href="#solving-an-entire-patch" id="toc-solving-an-entire-patch" class="nav-link" data-scroll-target="#solving-an-entire-patch">Solving an entire patch</a></li>
+  <li><a href="#solving-individuals-and-other-systems" id="toc-solving-individuals-and-other-systems" class="nav-link" data-scroll-target="#solving-individuals-and-other-systems">Solving individuals and other systems</a></li>
+  </ul></li>
+  <li><a href="#controls-on-ode-stepping" id="toc-controls-on-ode-stepping" class="nav-link" data-scroll-target="#controls-on-ode-stepping">Controls on ODE stepping</a>
+  <ul class="collapse">
+  <li><a href="#limiting-the-minimum-and-maximum-step-size" id="toc-limiting-the-minimum-and-maximum-step-size" class="nav-link" data-scroll-target="#limiting-the-minimum-and-maximum-step-size">Limiting the Minimum and Maximum step size</a></li>
+  <li><a href="#fixing-the-step-sizes-option-1" id="toc-fixing-the-step-sizes-option-1" class="nav-link" data-scroll-target="#fixing-the-step-sizes-option-1">Fixing the step sizes (option 1)</a></li>
+  <li><a href="#fixing-the-step-sizes-option-2" id="toc-fixing-the-step-sizes-option-2" class="nav-link" data-scroll-target="#fixing-the-step-sizes-option-2">Fixing the step sizes (option 2)</a></li>
+  <li><a href="#fixing-the-step-sizes-option-3-forward-euler" id="toc-fixing-the-step-sizes-option-3-forward-euler" class="nav-link" data-scroll-target="#fixing-the-step-sizes-option-3-forward-euler">Fixing the step sizes (option 3): forward Euler</a></li>
+  <li><a href="#future-changes" id="toc-future-changes" class="nav-link" data-scroll-target="#future-changes">Future changes</a></li>
+  </ul></li>
+  <li><a href="#sec-adaptive-vs-fixed-step" id="toc-sec-adaptive-vs-fixed-step" class="nav-link" data-scroll-target="#sec-adaptive-vs-fixed-step">Adaptive vs fixed-step</a>
+  <ul class="collapse">
+  <li><a href="#enabling-fixed-step-forward-euler" id="toc-enabling-fixed-step-forward-euler" class="nav-link" data-scroll-target="#enabling-fixed-step-forward-euler">Enabling fixed-step forward Euler</a></li>
+  <li><a href="#a-workprecision-diagram" id="toc-a-workprecision-diagram" class="nav-link" data-scroll-target="#a-workprecision-diagram">A work–precision diagram</a></li>
+  <li><a href="#why-adaptive-stepping-dominates" id="toc-why-adaptive-stepping-dominates" class="nav-link" data-scroll-target="#why-adaptive-stepping-dominates">Why adaptive stepping dominates</a></li>
+  <li><a href="#a-run-that-completes-is-not-a-run-that-converged" id="toc-a-run-that-completes-is-not-a-run-that-converged" class="nav-link" data-scroll-target="#a-run-that-completes-is-not-a-run-that-converged">A run that completes is not a run that converged</a></li>
+  <li><a href="#caveats-and-scope" id="toc-caveats-and-scope" class="nav-link" data-scroll-target="#caveats-and-scope">Caveats and scope</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/implementation/ode-stepping.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">Implementation</a></li><li class="breadcrumb-item"><a href="../../theory/implementation/ode-stepping.html">ODE stepping &amp; control</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">ODE stepping &amp; control</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="eyebrow">
+<p>implementation</p>
+</div>
+<p><code>plant</code> casts the entire patch as a system of ordinary differential equations (ODEs) and steps it through time with classic ODE methods. (For details on the equations themselves see the <a href="../../theory/size-structured-pde.html">size-structured PDE</a> page.) This page first describes the Runge–Kutta solver and the <code>Control()</code> parameters that govern it, then works through the trade-off between the default <strong>adaptive</strong> stepper and a <strong>fixed-step</strong> forward-Euler mode using a work–precision diagram.</p>
+<section id="the-rungekutta-45-ode-stepper" class="level1">
+<h1>The Runge–Kutta 45 ODE stepper</h1>
+<p>The <code>plant</code> model uses an explicit Runge-Kutta ODE stepper to integrate the ordinary differential equations that describe the system. Specifically, we use the Runge-Kutta Cash-Karp 4-5 (RK45) algorithm, with adaptive time step.</p>
+<p>In brief, this means that the solver takes a step through time, and then evaluates the error in the step. Error is estimated by comparing two possible steps: one using 4 sub-intervals, and one using 5 sub-intervals. By comparing the step made with more sub-intervals, the algorithm can estimate the non-linearity in the system and error in the step. If the error is too high, the solver will attempt to take a smaller step. If the error is well below a target value, the solver will attempt to take a larger step. Importantly, the 5 step reuses information from the 4 step and thereby only requires a single extra call on rates of change, so the RK45 algorithm is much more efficient than alternatives like the RK48. The math of RK45 stepping has long been established, and the method is available in most solvers for ODE systems. You can read more about Runge-Kutta methods and adaptive time steps on <a href="https://en.wikipedia.org/wiki/Runge-Kutta_methods">Wikipedia</a>.</p>
+<p>The RK45 is an explicit method, as opposed to an implicit method. As <a href="https://en.wikipedia.org/wiki/Explicit_and_implicit_methods">wikipedia explains</a> <em>“Explicit methods calculate the state of a system at a later time from the state of the system at the current time, while implicit methods find a solution by solving an equation involving both the current state of the system and the later one”</em>. The advantage of explicit methods are that they are simple to implement and fast, particularly when allowing adaptive time steps. The disadvantage is that they are less stable than implicit methods when they encounter stiff systems. As described in wikipedia</p>
+<ul>
+<li><em>“<a href="https://en.wikipedia.org/wiki/Explicit_and_implicit_methods">Implicit methods</a> require an extra computation, and they can be much harder to implement. Implicit methods are used because many problems arising in practice are stiff, for which the use of an explicit method requires impractically small time steps <span class="math inline">\(\Delta t\)</span> to keep the error in the result bounded”</em>.</li>
+<li><em>“<a href="https://en.wikipedia.org/wiki/Runge–Kutta_methods">Explicit Runge Kutta methods</a> are generally unsuitable for the solution of stiff equations because their region of absolute stability is small; in particular, it is bounded. This issue is especially important in the solution of partial differential equations….. The advantage of implicit Runge–Kutta methods over explicit ones is their greater stability, especially when applied to stiff equations.”</em></li>
+</ul>
+<p>In practice, we’ve found the RK45 to be extremely stable and fast for solving the size-density distribution. However, there are circumstances where the system becomes stiff and the solver struggles. E.g.</p>
+<ul>
+<li>When implementing soil water into plant via the Richards Equation, Isaac Towers found the system became stiff.</li>
+<li>When implementing the FF16 model in another solver, Joshi et al 2023 <a href="https://doi.org/10.1101/2023.08.04.551683" class="uri">https://doi.org/10.1101/2023.08.04.551683</a> reported that the system became stiff when enabling a continuous feedback of seeds into germination.</li>
+</ul>
+<p>Any extensions should therefore be wary of stiff behaviours.</p>
+</section>
+<section id="setup-of-templated-ode-solver-in-c" class="level1">
+<h1>Setup of templated ODE solver in C++</h1>
+<p>The characteristic method used to solve density requires regular introduction of new nodes, which entails a resizing of the ODE system as the system progresses. To make this play nicely with the ODE stepping, Rich FitzJohn designed a custom ODE solver class based on the RK45 method. The code is built into the model, with some details ported from the <a href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a> <span class="citation" data-cites="Galassi-2009">(<a href="#ref-Galassi-2009" role="doc-biblioref">Galassi, 2009</a>)</span>.</p>
+<p>The main interface is described in the class <code>plant::ode::Solver</code> described in the file <code>ode_solver.h</code>. (See folder <code>inst/include/plant/ode_solver</code> where this and related class are implemented.) The class is established using a template <code>System</code> class, meaning you can effectively cast any variety of classes as an ODE Solver. (In a similar way, you can create a vector of any variety of data types.)</p>
+<p>From <code>ode_solver.h</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">class</span> System<span class="op">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Solver <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  Solver<span class="op">(</span><span class="at">const</span> System<span class="op">&amp;</span> system<span class="op">,</span> OdeControl <span class="va">control_</span><span class="op">);</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="solving-an-entire-patch" class="level2">
+<h2 class="anchored" data-anchor-id="solving-an-entire-patch">Solving an entire patch</h2>
+<p>The main solver for our system is the class <code>SCM</code>, (in the file <code>sch.h</code>). This creates an ode solver based on patch type. Simultaneously, the class <code>SCM</code> owns an actual instance of the patch, which contains species and environment.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">patch_type</span> patch<span class="op">;</span>                 <span class="er"># Instance of patch</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ode<span class="op">::</span>Solver<span class="op">&lt;</span><span class="dt">patch_type</span><span class="op">&gt;</span> solver<span class="op">;</span>   <span class="er"># ODE solver</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>All we need to do to advance the system is make calls like the following. These advance the system, using the patch to estimate rates of change. Moreover, we can take steps of a specified fixed size, or an adaptive step where the solver determines the spacing.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>solver<span class="op">.</span>advance_fixed<span class="op">(</span>patch<span class="op">,</span> e<span class="op">.</span>times<span class="op">);</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>solver<span class="op">.</span>advance_adaptive<span class="op">(</span>patch<span class="op">,</span> e<span class="op">.</span>time_end<span class="op">());</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>In the background, the solver then passes information (rates of change, states) between the actual patch (which contains all the biological information informing rates of change) and ode solver (which uses the RK45 math to calculate future states from rates of change).</p>
+<p>Additionally, we have the following function, which resizes the ODE system after a node has been introduced.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>solver<span class="op">.</span>set_state_from_system<span class="op">(</span>patch<span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For the above to work, the patch class (see <code>patch.h</code>) must have some essential functions used by the ODE system.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// * ODE interface</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Caluclate size of ode system (number of equations).</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">size_t</span> ode_size<span class="op">()</span> <span class="at">const</span><span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">// How many auxiallary variables are we tracking. These are being collected but</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">// are not part of core ode system</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="dt">size_t</span> aux_size<span class="op">()</span> <span class="at">const</span><span class="op">;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> ode_time<span class="op">()</span> <span class="at">const</span><span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Retrieve ode state from patch and save into the ode solver</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>ode<span class="op">::</span>iterator ode_state<span class="op">(</span>ode<span class="op">::</span>iterator it<span class="op">)</span> <span class="at">const</span><span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">// Retrieve ode rates from patch and save into the ode solver</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>ode<span class="op">::</span>iterator ode_rates<span class="op">(</span>ode<span class="op">::</span>iterator it<span class="op">)</span> <span class="at">const</span><span class="op">;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Retrieve auxillary variables and save into the ode solver</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>ode<span class="op">::</span>iterator ode_aux<span class="op">(</span>ode<span class="op">::</span>iterator it<span class="op">)</span> <span class="at">const</span><span class="op">;</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">// Set state of patch, based on estimate of future state estimated by the solver</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>ode<span class="op">::</span>const_iterator set_ode_state<span class="op">(</span>ode<span class="op">::</span>const_iterator it<span class="op">,</span> <span class="dt">double</span> time<span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Note the use of iterators. These enable state from a complicated data structure like a patch, to be converted into a vector, as needed by ode solver. And vice versa.</p>
+</section>
+<section id="solving-individuals-and-other-systems" class="level2">
+<h2 class="anchored" data-anchor-id="solving-individuals-and-other-systems">Solving individuals and other systems</h2>
+<p>As templated C++, we can use the <code>ode::Solver</code> class to step any “system” that has the requisite functions. In addition to patches, we also use the ode solver to run individual plants, given an environment. This is achieved by introducing a wrapper class <code>ode::Runner</code> (in <code>ode_runner.h</code>), which according to its author simplifies <em>“the difficulty of ownership semantics around the solver and object.”</em></p>
+<p>Like the <code>Solver</code> class, the <code>Runner</code> class is templated, meaning we can setup a variety of systems.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> T<span class="op">&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Runner <span class="op">{</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  Runner<span class="op">(</span>T <span class="va">obj_</span><span class="op">,</span> OdeControl control<span class="op">)</span> <span class="op">:</span> obj<span class="op">(</span><span class="va">obj_</span><span class="op">),</span> solver<span class="op">(</span>obj<span class="op">,</span> control<span class="op">)</span> <span class="op">{}</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The class <code>plant::tools::IndividualRunner</code> uses this approach to create a system for stepping individual plants to a given size. This is available via the R functions <code>grow_individual_...</code>, which in turn uses the <code>OdeRunner</code>.</p>
+<p>The test suite also shows how to use the OdeRunner to step the classic Lorenz system.</p>
+</section>
+</section>
+<section id="controls-on-ode-stepping" class="level1">
+<h1>Controls on ODE stepping</h1>
+<p>The RK45 ode solver is controlled by a set of parameters that determine how the solver steps through time.</p>
+<p>As a simple example, we can step a system using the default values for ODE stepping:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># configure a patch containing a single species</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"FF16"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>p0<span class="sc">$</span>max_patch_lifetime <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">expand_parameters</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), p0)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Controls on numerical methods</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># run</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p, <span class="at">ctrl =</span> ctrl)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># number of steps</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(out<span class="sc">$</span>ode_times)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 97</code></pre>
+</div>
+</div>
+<p>The precise times used by the solver are stored in <code>out$ode_times</code>, so the length of this object indicates the number of times used.</p>
+<p>The number and timing of steps taken by the solver will vary with the controls on the ode solver. Looking at the ctrl object, we can extract the items beginning with <code>ode_</code>, which control the ODE solver:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ctrl <span class="sc">%&gt;%</span> <span class="fu">subset</span>(<span class="fu">grepl</span>(<span class="st">"(?&lt;!n)ode_"</span>, <span class="fu">names</span>(.), <span class="at">perl =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$ode_step_size_initial
+[1] 1e-06
+
+$ode_step_size_min
+[1] 1e-06
+
+$ode_step_size_max
+[1] 5
+
+$ode_tol_rel
+[1] 1e-04
+
+$ode_tol_abs
+[1] 1e-04
+
+$ode_a_y
+[1] 1
+
+$ode_a_dydt
+[1] 0</code></pre>
+</div>
+</div>
+<p>These have the following effect</p>
+<ul>
+<li><code>ode_step_size_initial</code>: The initial step size used by the solver in the first step.</li>
+<li><code>ode_step_size_min</code>, <code>ode_step_size_max</code>: The minimum step size permitted. Any attempt by the solver to use a smaller value will be curtailed at this value.</li>
+<li><code>ode_tol_abs</code>, <code>ode_tol_rel</code>: When taking a step, the absolute and relative error for any single equation that is allowed. If the error is too high, the solver will attempt to take a smaller step. If the error is well below this value, the solver attempts to expand the step size in the next step.</li>
+<li><code>ode_a_y</code>, <code>ode_a_dydt</code>: Weightings on y and dy/dt, in calculation of allowable relative error (see <code>OdeControl::errlevel</code>).</li>
+</ul>
+<p>Varying these will potentially change the number of steps taken by the solver.</p>
+<p>However, note that unlike a regular ode solver, the number of steps taken is also influenced by the timing of node introduction. The ode stepper will only expand the time step up until the next node introduction event, for any species. So the node scheduling sets an upper limit on the size of time steps. In the default setup, the node schedule primarily determines the timesteps in the first months of the simulation. After that, the ode stepper takes a bigger control.</p>
+<section id="limiting-the-minimum-and-maximum-step-size" class="level2">
+<h2 class="anchored" data-anchor-id="limiting-the-minimum-and-maximum-step-size">Limiting the Minimum and Maximum step size</h2>
+<p>Let’s alter the maximum step size and compare to what we had above.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ctrl2 <span class="ot">&lt;-</span> ctrl</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ctrl2<span class="sc">$</span>ode_step_size_max <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># run</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>out2 <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p, <span class="at">ctrl =</span> ctrl2)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># compare</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(out<span class="sc">$</span>ode_times)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(out2<span class="sc">$</span>ode_times)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># maximum</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(ode_times, <span class="at">title =</span> <span class="st">"</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>) {</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="fu">diff</span>(ode_times) <span class="sc">%&gt;%</span> <span class="fu">hist</span>(<span class="at">main =</span> title, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="at">breaks  =</span><span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="at">length.out=</span><span class="dv">20</span>), <span class="at">freq =</span> <span class="cn">FALSE</span>)}</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(out<span class="sc">$</span>ode_times, <span class="st">"original"</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(out2<span class="sc">$</span>ode_times, <span class="st">"max 0.1"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Now let’s alter the minimum step size and compare to what we had above.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ctrl3 <span class="ot">&lt;-</span> ctrl</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ctrl3<span class="sc">$</span>ode_step_size_min <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>ctrl3<span class="sc">$</span>ode_step_size_initial <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># run</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>out3 <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p, <span class="at">ctrl =</span> ctrl3)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># compare</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(out<span class="sc">$</span>ode_times)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(out3<span class="sc">$</span>ode_times)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(out<span class="sc">$</span>ode_times, <span class="st">"original"</span>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(out3<span class="sc">$</span>ode_times, <span class="st">"min 0.01"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="fixing-the-step-sizes-option-1" class="level2">
+<h2 class="anchored" data-anchor-id="fixing-the-step-sizes-option-1">Fixing the step sizes (option 1)</h2>
+<p>We set exact step sizes by specifying max and min step sizes. But this could result in other times, depending on the cohort schedule.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ctrl<span class="sc">$</span>ode_step_size_min <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>ctrl<span class="sc">$</span>ode_step_size_max <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>ctrl<span class="sc">$</span>ode_step_size_initial <span class="ot">&lt;-</span> <span class="fl">0.1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="fixing-the-step-sizes-option-2" class="level2">
+<h2 class="anchored" data-anchor-id="fixing-the-step-sizes-option-2">Fixing the step sizes (option 2)</h2>
+<p>We can also specify some exact steps, by passing in a vector of ode_times.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pc <span class="ot">&lt;-</span> p</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>pc<span class="sc">$</span>node_schedule_times[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.4</span>, <span class="fl">0.8</span>, <span class="fl">1.2</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>pc<span class="sc">$</span>ode_times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, p<span class="sc">$</span>max_patch_lifetime, <span class="at">by=</span><span class="fl">0.1</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>result2 <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(pc, <span class="at">ctrl =</span> ctrl, <span class="at">use_ode_times =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>result2<span class="sc">$</span>ode_times</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7
+[50] 4.8 4.9 5.0</code></pre>
+</div>
+</div>
+</section>
+<section id="fixing-the-step-sizes-option-3-forward-euler" class="level2">
+<h2 class="anchored" data-anchor-id="fixing-the-step-sizes-option-3-forward-euler">Fixing the step sizes (option 3): forward Euler</h2>
+<p>The options above still drive the full adaptive RK45 machinery at each step. For operational-realism comparisons with daily-step DGVMs, <code>plant</code> can instead use plain <strong>forward (explicit) Euler</strong> on a uniform grid — one derivative evaluation per step, no error estimate — by setting <code>fixed_time_step</code> (units: years) on the <code>Control</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>(<span class="at">fixed_time_step =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="dv">365</span>)  <span class="co"># daily step; 0 = adaptive (default)</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">run_scm</span>(p, <span class="at">ctrl =</span> ctrl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This is not the way to get an accurate or cheap solution: forward Euler is first-order, and matching the adaptive solver’s accuracy needs far more evaluations. The <a href="#sec-adaptive-vs-fixed-step">next part</a> works this trade-off through with a work–precision diagram. Note that <code>fixed_time_step</code> is incompatible with the mutant-fitness replay path (<code>save_RK45_cache</code> / <code>use_ode_times</code>) and errors clearly if combined.</p>
+</section>
+<section id="future-changes" class="level2">
+<h2 class="anchored" data-anchor-id="future-changes">Future changes</h2>
+<p>Would it help to have option to pass in ode_times, use if supplied?</p>
+<ul>
+<li>But, current system in NodeSchedule interweaves ode_times and node_schedule_times. It’s complex code, poorly documented, low value to mess with. Suggests leaving as is</li>
+<li>could have option to pass in ode_times, add to pars inside function, use if supplied?</li>
+<li>if supplied, do we always want to use ode_times?</li>
+<li>what’s the advantage of using previous ode_times?
+<ul>
+<li>suggest always using them if present?</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="sec-adaptive-vs-fixed-step" class="level1">
+<h1>Adaptive vs fixed-step</h1>
+<p>By default, <code>plant</code> integrates the patch with the <strong>adaptive, error-controlled Cash–Karp Runge–Kutta (RK45)</strong> stepper described above. The solver chooses each step size to keep the local error within a tolerance: tiny steps early on, when newly introduced cohorts are diverging rapidly, and much coarser steps later, once the stand settles.</p>
+<p>Many widely used <strong>dynamic global vegetation models (DGVMs)</strong> instead march the state forward on a <em>fixed</em> grid — most commonly a <strong>daily</strong> time step — using plain forward (explicit) Euler. <code>plant</code> can be run this way too, via the <code>fixed_time_step</code> control (option 3 above). This part shows how to enable it and uses a <strong>work–precision diagram</strong> to make the central trade-off concrete: at <em>matched accuracy</em>, adaptive stepping does far less work.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="enabling-fixed-step-forward-euler" class="level2">
+<h2 class="anchored" data-anchor-id="enabling-fixed-step-forward-euler">Enabling fixed-step forward Euler</h2>
+<p>The integration mode is selected by a single control field, <code>fixed_time_step</code> (units: <strong>years</strong>):</p>
+<ul>
+<li><code>fixed_time_step = 0</code> (the default) → adaptive RK45.</li>
+<li><code>fixed_time_step &gt; 0</code> → forward Euler on a uniform grid of that spacing.</li>
+</ul>
+<p>A <em>daily</em> step is therefore <code>fixed_time_step = 1 / 365</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"FF16"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>p0<span class="sc">$</span>max_patch_lifetime <span class="ot">&lt;-</span> <span class="dv">60</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">expand_parameters</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), p0, <span class="at">birth_rate_list =</span> <span class="fl">1.0</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"FF16"</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>ctrl_adaptive <span class="ot">&lt;-</span> <span class="fu">Control</span>()                       <span class="co"># fixed_time_step = 0</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>ctrl_daily    <span class="ot">&lt;-</span> <span class="fu">Control</span>(<span class="at">fixed_time_step =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="dv">365</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>out_adaptive <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p, env, ctrl_adaptive)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>out_daily    <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p, env, ctrl_daily)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Forward Euler does <strong>one</strong> derivative evaluation per step (<code>y &lt;- y + h * dy/dt</code>), whereas each RK45 step evaluates the derivatives six times. The two runs report slightly different fitness, and use a very different number of steps:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">mode    =</span> <span class="fu">c</span>(<span class="st">"adaptive RK45"</span>, <span class="st">"daily Euler"</span>),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">R0      =</span> <span class="fu">c</span>(out_adaptive<span class="sc">$</span>net_reproduction_ratios,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>              out_daily<span class="sc">$</span>net_reproduction_ratios),</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_steps =</span> <span class="fu">c</span>(<span class="fu">length</span>(out_adaptive<span class="sc">$</span>ode_times),</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>              <span class="fu">length</span>(out_daily<span class="sc">$</span>ode_times))</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  mode             R0 n_steps
+  &lt;chr&gt;         &lt;dbl&gt;   &lt;int&gt;
+1 adaptive RK45  4.48     166
+2 daily Euler    4.49   21959</code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Caution — don’t read this as “Euler is faster”.</strong> A <em>single</em> daily step is cheaper than a single adaptive step (1 derivative evaluation versus 6), so a naive timing race makes Euler look quick. But that comparison holds the <em>step count</em> fixed, not the <em>accuracy</em>. Daily Euler here is visibly less accurate than the adaptive run. The honest question is: <em>how much work does each method need to reach the same accuracy?</em> That is what the work–precision diagram below answers — and there adaptive wins comfortably.</p>
+</blockquote>
+</section>
+<section id="a-workprecision-diagram" class="level2">
+<h2 class="anchored" data-anchor-id="a-workprecision-diagram">A work–precision diagram</h2>
+<p>We sweep the adaptive solver over a range of error tolerances, and forward Euler over a range of step sizes, and for each run record:</p>
+<ul>
+<li><strong>work</strong>: total derivative evaluations — <code>6 × n_steps</code> for RK45, <code>1 × n_steps</code> for Euler (this is the dominant cost of the inner loop);</li>
+<li><strong>error</strong>: relative error in the net reproduction ratio <span class="math inline">\(R_0\)</span> against a tight-tolerance adaptive <strong>reference</strong>.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Tight-tolerance adaptive reference.</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>ctrl_ref <span class="ot">&lt;-</span> <span class="fu">control_accurate</span>()</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>ctrl_ref<span class="sc">$</span>ode_tol_rel <span class="ot">&lt;-</span> <span class="fl">1e-8</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>ctrl_ref<span class="sc">$</span>ode_tol_abs <span class="ot">&lt;-</span> <span class="fl">1e-8</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>R0_ref <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p, env, ctrl_ref)<span class="sc">$</span>net_reproduction_ratios</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>measure <span class="ot">&lt;-</span> <span class="cf">function</span>(ctrl, mode) {</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  stages <span class="ot">&lt;-</span> <span class="cf">if</span> (mode <span class="sc">==</span> <span class="st">"adaptive"</span>) <span class="dv">6</span> <span class="cf">else</span> <span class="dv">1</span>   <span class="co"># derivative evals per step</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  scm <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p, env, ctrl)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  n   <span class="ot">&lt;-</span> <span class="fu">length</span>(scm<span class="sc">$</span>ode_times)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">mode  =</span> mode,</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">work  =</span> n <span class="sc">*</span> stages,</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">error =</span> <span class="fu">abs</span>(scm<span class="sc">$</span>net_reproduction_ratios <span class="sc">-</span> R0_ref) <span class="sc">/</span> R0_ref</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>adaptive_sweep <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dfr</span>(<span class="fu">c</span>(<span class="fl">1e-2</span>, <span class="fl">1e-3</span>, <span class="fl">1e-4</span>, <span class="fl">1e-5</span>, <span class="fl">1e-6</span>), <span class="cf">function</span>(tol) {</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  ctrl<span class="sc">$</span>ode_tol_rel <span class="ot">&lt;-</span> tol</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  ctrl<span class="sc">$</span>ode_tol_abs <span class="ot">&lt;-</span> tol</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">measure</span>(ctrl, <span class="st">"adaptive"</span>)</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>euler_sweep <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dfr</span>(<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="fl">0.5</span>, <span class="fl">0.25</span>, <span class="fl">0.125</span>, <span class="fl">0.0625</span>), <span class="cf">function</span>(dt) {</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">measure</span>(<span class="fu">Control</span>(<span class="at">fixed_time_step =</span> dt), <span class="st">"euler"</span>)</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>work_precision <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(adaptive_sweep, euler_sweep)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(work_precision, <span class="fu">aes</span>(work, error, <span class="at">colour =</span> mode)) <span class="sc">+</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Derivative evaluations (work)"</span>,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="fu">expression</span>(<span class="st">"Relative error in "</span> <span class="sc">*</span> R[<span class="dv">0</span>]),</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">colour =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-work-precision" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-work-precision-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="ode-stepping_files/figure-html/fig-work-precision-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-work-precision-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Work-precision diagram. Lower and to the left is better (less work, smaller error). The adaptive RK45 frontier sits well below the fixed-step Euler frontier: for any target accuracy it reaches it with fewer derivative evaluations.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="why-adaptive-stepping-dominates" class="level2">
+<h2 class="anchored" data-anchor-id="why-adaptive-stepping-dominates">Why adaptive stepping dominates</h2>
+<p>The two curves tell a consistent story:</p>
+<ul>
+<li><strong>Forward Euler is first-order.</strong> Halving the step size roughly halves the error, so the Euler curve descends slowly — buying an extra digit of accuracy costs roughly a <em>tenfold</em> increase in work.</li>
+<li><strong>Adaptive RK45 is high-order <em>and</em> adaptive.</strong> It spends small steps only where the dynamics demand them (the first weeks, while cohorts diverge) and coarsens dramatically once the stand stabilises. It reaches an error floor — set by the node-introduction schedule rather than the ODE tolerance — at a fraction of the evaluations Euler would need to match it.</li>
+</ul>
+<p>To get daily-Euler accuracy <em>down to</em> the adaptive frontier you would need a sub-daily step everywhere, including the long, smooth tail of the simulation where the adaptive solver is happily taking steps of years. That is wasted work, and it is exactly the inefficiency adaptive stepping removes.</p>
+<p>The practical conclusion: fixed-step Euler is valuable for <strong>operational-realism comparisons</strong> — running <code>plant</code> on the same footing as a daily-step DGVM — but it is not the way to get an accurate or cheap solution. For that, keep the default adaptive solver.</p>
+</section>
+<section id="a-run-that-completes-is-not-a-run-that-converged" class="level2">
+<h2 class="anchored" data-anchor-id="a-run-that-completes-is-not-a-run-that-converged">A run that completes is not a run that converged</h2>
+<p>Fixed-step integration removes the solver’s safety net: forward Euler will march across <em>anything</em>, including a discontinuous right-hand side that the adaptive solver rightly refuses. When that happens the integrator still returns numbers — but they are an artefact of where the step grid happens to fall, not an approximation to a solution that gets better as you refine.</p>
+<p><code>plant</code>’s experimental <strong>PPA hard-step</strong> shading variant (<code>ppa_layer_smoothing = 0</code>, the literal field discretisation) is exactly such a case: its light profile is discontinuous in height, so the adaptive solver fails with <em>“Cannot achieve the desired accuracy”</em>. Under a fixed step it runs. The test of whether that result <em>means</em> anything is convergence: does it settle as the step shrinks? We compare it with the smoothed variant (<code>ppa_layer_smoothing = 0.3</code>), which is a well-posed, continuous problem.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>seed_output <span class="ot">&lt;-</span> <span class="cf">function</span>(steps_per_year, smoothing) {</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>(<span class="at">fixed_time_step =</span> <span class="dv">1</span> <span class="sc">/</span> steps_per_year)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  ctrl<span class="sc">$</span>shading_model      <span class="ot">&lt;-</span> <span class="st">"ppa"</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  ctrl<span class="sc">$</span>ppa_layer_smoothing <span class="ot">&lt;-</span> smoothing</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scm</span>(p, env, ctrl)<span class="sc">$</span>offspring_production</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>convergence <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dfr</span>(<span class="fu">c</span>(<span class="dv">91</span>, <span class="dv">182</span>, <span class="dv">365</span>, <span class="dv">730</span>, <span class="dv">1460</span>), <span class="cf">function</span>(spy) {</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">steps_per_year =</span> spy,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">hard step (s = 0)</span><span class="st">`</span>   <span class="ot">=</span> <span class="fu">seed_output</span>(spy, <span class="dv">0</span>),</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">smoothed (s = 0.3)</span><span class="st">`</span>  <span class="ot">=</span> <span class="fu">seed_output</span>(spy, <span class="fl">0.3</span>))</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">|&gt;</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(<span class="sc">-</span>steps_per_year, <span class="at">names_to =</span> <span class="st">"variant"</span>, <span class="at">values_to =</span> <span class="st">"seed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(convergence, <span class="fu">aes</span>(steps_per_year, seed, <span class="at">colour =</span> variant)) <span class="sc">+</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>variant, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Steps per year (1 / fixed_time_step)"</span>, <span class="at">y =</span> <span class="st">"Resident seed output"</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">colour =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-hard-step-convergence" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hard-step-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="ode-stepping_files/figure-html/fig-hard-step-convergence-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hard-step-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Resident seed output as the fixed step shrinks. The smoothed variant converges; the hard step does not — it wanders by an order of magnitude with no limit. Note the independent y-scales: the hard step’s values are ~1000x smaller, and erratic. A result that depends on the step size is a property of the grid, not of the model.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The smoothed variant marches monotonically toward a limit — refining the step buys accuracy, as it should. The hard step does not converge to anything: each step size gives a different answer, so no step size gives <em>the</em> answer. This is why such variants must not be read as fitness or as a solution — the fixed-step solver makes them <em>executable</em>, not <em>correct</em>.</p>
+</section>
+<section id="caveats-and-scope" class="level2">
+<h2 class="anchored" data-anchor-id="caveats-and-scope">Caveats and scope</h2>
+<ul>
+<li><strong>Mutant fitness / resident replay is not supported under <code>fixed_time_step</code>.</strong> The mutant pathway replays a resident run by reusing the six cached RK sub-step environments per step; forward Euler has a single stage and no such cache. Combining <code>fixed_time_step &gt; 0</code> with <code>save_RK45_cache</code> (or with a pinned <code>use_ode_times</code> replay) raises a clear error rather than returning a wrong fitness.</li>
+<li><strong>Discontinuous/“hard-step” environment variants</strong> only <em>run to completion</em> under a fixed grid and do not converge as the step shrinks (see the section above) — any apparent result is a grid artefact, not a solution. Do not interpret such runs as fitness or as a converged answer.</li>
+</ul>
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-Galassi-2009" class="csl-entry" role="listitem">
+Galassi, M. (Ed.). (2009). <em><span>GNU</span> scientific library: Reference manual</em> (3. ed., for GSL version 1.12). s.l.: Network Theory.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/traitecoevo\.github\.io\/overstorey");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../theory/implementation/characteristic-method.html" class="pagination-link" aria-label="The characteristic method">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The characteristic method</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../theory/implementation/node-spacing.html" class="pagination-link" aria-label="The node-spacing algorithm">
+        <span class="nav-page-text">The node-spacing algorithm</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Built with Quarto · frozen for reproducibility</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/implementation/ode-stepping.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant/blob/master/LICENSE">
+<p>License</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
