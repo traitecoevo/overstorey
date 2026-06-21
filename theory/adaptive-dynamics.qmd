@@ -5,4 +5,63 @@ title: "Adaptive dynamics"
 theory
 :::
 
-> Stub — consolidate the maths here. Use `$$ $$` for display math.
+This page builds on the demographic machinery developed for the
+[size-structured PDE](size-structured-pde.qmd) to estimate the fitness of rare
+mutant phenotypes and so reason about evolutionary endpoints in a trait-, size-,
+and patch-structured metacommunity. The approach for calculating fitness
+implemented here follows @Falster-2015.
+
+# Invasion fitness {#sec-invasion-fitness}
+
+We now consider how to estimate the fitness of a rare mutant individual
+with traits $x^\prime$ growing in the light environment of a resident
+community with traits $x$. We focus on phenotype-dependent components
+of fitness -- describing the aggregate consequences of a given set of traits for growth,
+fecundity, and mortality -- taking into account the non-linear effects of
+competition, but ignoring the underlying genetic
+basis for trait inheritance and expression. We also adhere to standard
+conventions in such analyses by assuming that the mutant phenotype is sufficiently
+rare to have a negligible effect on the light environment where it is growing [@Geritz-1998].
+The approach for calculating fitness implemented here follows the approach
+described by @Falster-2015.
+
+In general, invasion fitness is defined as the long-term per capita
+growth rate of a rare mutant phenotype in the environment
+determined by a resident phenotype [@Metz-1992]. Calculating
+per capita growth rates, however, is particularly challenging in a
+structured metacommunity model [@Gyllenberg-2001; @Metz-2001]. As
+an alternative measure of invasion fitness in metacommunities, we can use the basic reproduction
+ratio measuring the expected number of new dispersers arising from a
+single dispersal event. For metacommunities at demographic equilibrium, evolutionary inferences made using basic
+reproduction ratios are equivalent to those made using per capita growth
+rates
+[@Gyllenberg-2001; @Metz-2001].
+
+We denote by $R\left(x^\prime, x\right)$ the basic reproduction ratio of
+individuals with traits $x^\prime$ growing in the competitive
+light environment of the resident traits $x$. Recalling that patches of age
+$a$ have frequency-density $P(a)$ in the landscape (the equilibrium patch-age
+distribution derived on the [size-structured PDE](size-structured-pde.qmd)
+page), it follows that any seed
+with traits $x^\prime$ has a probability of $P(a)$ of landing in a patch of age
+$a$. The basic reproduction ratio for individuals with traits
+$x^\prime$ is then
+$$
+R\left(x^\prime,x\right) = \int _0^{\infty} P\left(a\right) \, \tilde{R}\left(x^\prime, a, \infty \right) \, {\rm d}a ,
+$$ {#eq-invfit}
+where $\tilde{R}\left(x^\prime, a_0, a \right)$ is the expected number
+of dispersing offspring produced by a single dispersing seed with traits $x^\prime$ arriving in
+a patch of age $a_0$ up until age $a$
+[@Gyllenberg-2001; @Metz-2001].
+In turn, $\tilde{R}\left(x^\prime, a,\infty\right)$ is calculated by integrating
+an individual's fecundity over the expected lifetime of a patch, taking
+into account competitive shading from residents with traits $x$, the
+individual's probability of surviving, and its traits,
+$$
+\tilde{R}(x^\prime, a_0, \infty) = \int_{a_0}^{\infty} S_{\rm D} \, f(x^\prime, H(x^\prime, a_0, a), E_{a}) \, S_{\rm I} (x^\prime, a_0, a) \, S_{\rm P} (a_0, a) \, {\rm d} a.
+$$ {#eq-tilder}
+Here $S_{\rm I}$ is the individual survival probability and $S_{\rm P}$ the
+patch survival probability, both defined on the
+[size-structured PDE](size-structured-pde.qmd) page.
+
+# References

@@ -1,0 +1,28 @@
+---
+title: "Models"
+toc: false
+---
+::: {.eyebrow}
+theory · the physiological strategies
+:::
+
+A *strategy* in `plant` is a self-contained set of functions that turn an
+individual's size and light environment into instantaneous growth, fecundity,
+and mortality rates. The [size-structured PDE](../size-structured-pde.qmd)
+machinery is strategy-agnostic; swapping the strategy swaps the biology.
+
+Three strategies are documented here:
+
+- **[FF16](ff16.qmd)** — the default trait-based model (Falster *et al.* 2016).
+  Growth follows a functional-balance allocation scheme driven by leaf
+  photosynthesis; four traits (LMA, wood density, seed mass, maximum height)
+  hyper-parameterise a whole strategy.
+- **[K93](k93.qmd)** — Kohyama's 1993 model, where growth, fecundity, and
+  mortality are direct functions of stem diameter and stand basal area. A
+  compact example of a non-physiological strategy.
+- **[TF24](tf24.qmd)** — extends the leaf model with explicit stomatal
+  optimisation and plant hydraulics, choosing conductance to maximise carbon
+  profit net of hydraulic cost.
+
+To implement your own, see
+[implementing a new strategy](../../contributing/implementing-a-strategy.qmd).

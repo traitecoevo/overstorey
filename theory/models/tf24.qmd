@@ -1,0 +1,52 @@
+---
+title: "TF24"
+---
+::: {.eyebrow}
+model
+:::
+
+TF24 is the hydraulically-explicit strategy. It keeps the trait-based
+functional-balance growth and allocation machinery of [FF16](ff16.qmd) but
+replaces FF16's fixed light-use efficiency with a mechanistic leaf model: at
+each instant the plant chooses stomatal conductance to **maximise carbon
+profit net of the hydraulic cost** of transpiration.
+
+That leaf-level optimisation — photosynthetic revenue from the Farquhar model,
+hydraulic cost from a xylem vulnerability curve, and the golden-section search
+that balances them — is the heart of TF24 and is documented in full on the
+core theory page:
+
+- **[Assimilation & hydraulics](../assimilation-hydraulics.qmd)** — the
+  profit-maximisation leaf model, equation by equation, with worked examples.
+
+## How TF24 relates to FF16
+
+| | FF16 | TF24 |
+|---|---|---|
+| Carbon income | fixed leaf-level light-use efficiency | Farquhar photosynthesis coupled to stomatal conductance |
+| Water | implicit | explicit supply–demand hydraulics with a vulnerability curve |
+| Stomata | — | conductance set by profit maximisation |
+| Allocation / growth | functional balance (shared) | functional balance (shared) |
+
+Everything below the leaf model — how assimilate is turned into height,
+diameter, and tissue pools, and how those feed the
+[size-structured PDE](../size-structured-pde.qmd) — is inherited from FF16.
+
+## Soil water and root uptake
+
+TF24's hydraulics terminate at the root collar. The supply side — soil water
+balance and multi-layer root water uptake — has been prototyped and
+benchmarked separately; those explorations live in the notebook:
+
+- [The AWRA soil-water bucket model](../../posts/index.qmd) <!-- TODO: point at the migrated awra-soil-water post slug once created -->
+- [Multi-layer root water uptake](../../posts/index.qmd) <!-- TODO: point at the migrated root-water-uptake post slug -->
+- [Root water-uptake performance work](../../posts/index.qmd) <!-- TODO: point at the test-root summary post slug -->
+
+::: {.callout-note}
+## Strategy-level documentation is partial
+The original `strategy_TF24` vignette was an empty stub. This page assembles
+TF24 from its documented parts (the leaf model and the inherited FF16
+machinery). A full strategy-level write-up — the exact coupling of the leaf
+model into whole-plant growth, and the complete TF24 parameter set — is still
+**TODO** and should be supplied by the model authors rather than guessed.
+:::

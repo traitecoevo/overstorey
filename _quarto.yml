@@ -4,12 +4,21 @@ project:
   preview:
     port: 4848
     browser: true
+  # Reorder browser-tab titles from "Page – Overstorey" to "Overstorey – Page".
+  # Quarto composes <title> in its HTML writer after Lua filters run, so this
+  # is only fixable on rendered output. See assets/swap-title.py.
+  post-render: assets/swap-title.py
 
 # Only re-execute a .qmd when it (or its deps) change. Essential given
 # plant's run times. Commit _freeze/ so CI never re-runs everything.
+#
+# Do NOT enable knitr `cache: true` here. plant's objects (Parameters, SCM,
+# Environment, ...) are Rcpp/R6 wrappers around external C++ pointers, which do
+# not survive knitr's per-chunk serialize/lazy-load. A cached upstream object
+# reloads with a dangling pointer, so e.g. `run_scm(p)` silently fails ("All
+# events completed"). File-level `freeze` already gives us the caching we need.
 execute:
   freeze: auto
-  cache: true
   warning: false
   message: false
 
@@ -62,20 +71,53 @@ website:
           contents:
             - guides/patch-dynamics.qmd
             - guides/strategies.qmd
+            - guides/extrinsic-drivers.qmd
             - guides/calibration.qmd
+        - section: "Worked examples"
+          contents:
+            - guides/example-analysis.qmd
+            - guides/self-thinning.qmd
+            - guides/emergent-properties.qmd
     - title: "Theory"
       style: floating
       contents:
         - theory/index.qmd
-        - theory/size-structured-pde.qmd
-        - theory/assimilation-hydraulics.qmd
-        - theory/adaptive-dynamics.qmd
+        - section: "Core"
+          contents:
+            - theory/size-structured-pde.qmd
+            - theory/assimilation-hydraulics.qmd
+            - theory/adaptive-dynamics.qmd
+        - section: "Models"
+          contents:
+            - theory/models/index.qmd
+            - theory/models/ff16.qmd
+            - theory/models/k93.qmd
+            - theory/models/tf24.qmd
+        - section: "Implementation"
+          contents:
+            - theory/implementation/index.qmd
+            - theory/implementation/characteristic-method.qmd
+            - theory/implementation/ode-stepping.qmd
+            - theory/implementation/node-spacing.qmd
+            - theory/implementation/canopy-models.qmd
+    - title: "Pipeline"
+      style: floating
+      contents:
+        - develop.qmd
+        - section: "Contributing"
+          contents:
+            - contributing/package-organisation.qmd
+            - contributing/implementing-a-strategy.qmd
+            - contributing/profiling.qmd
 
   page-footer:
     left: "Built with Quarto · frozen for reproducibility"
     right:
       - text: "License"
         href: "https://github.com/traitecoevo/plant/blob/master/LICENSE"
+
+bibliography: assets/refs.bib
+csl: assets/mee.csl
 
 format:
   html:

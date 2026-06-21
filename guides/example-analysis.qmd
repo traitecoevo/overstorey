@@ -1,0 +1,328 @@
+---
+title: "Example analysis"
+---
+::: {.eyebrow}
+example
+:::
+
+This is the flagship end-to-end example: set up parameters, run a patch with
+the size-structured model, then summarise, integrate, and interpolate the
+results.
+
+::: {.callout-note}
+## Running the `TF24` model needs a configured soil-water environment
+The `TF24` strategy couples plant growth to a multi-layer soil-water balance,
+so — unlike `FF16` — it cannot run against a bare `Environment("TF24")`. The
+soil column must be given a number of layers and an initial moisture state, and
+the rainfall driver must keep the mean high enough that a layer never dries to
+zero (where the retention curve `psi_from_soil_moist` goes non-finite and the
+run aborts with `set_physiology received non-finite psi_soil`). We wrap that
+setup in `make_tf24_env()` below. Runtime is dominated by the hydraulic solver
+and scales with `max_patch_lifetime`, so this page pins it short
+(`max_patch_lifetime = 25`) to keep the build fast; raise it for production
+runs. The recipe follows the `test-root` vignette in the `plant` package.
+:::
+
+## installation
+
+```{r}
+#| label: load-libraries
+library(plant)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(patchwork)
+```
+
+Activate logger
+
+```{r}
+#| label: console-logging
+plant_log_console()
+```
+
+We pin the patch lifetime short and define a helper that builds a `TF24`
+environment with an initialised soil column (15 layers at moisture 0.2) and a
+seasonal rainfall driver with mean 1.0 — see the note above for why this is
+required.
+
+```{r}
+#| label: tf24-env-helper
+max_patch_lifetime <- 25
+
+make_tf24_env <- function(max_patch_lifetime, n_layers = 15, theta0 = 0.2) {
+  env <- Environment("TF24")
+  env$set_soil_number_of_depths(n_layers)
+  env$set_soil_water_state(rep(theta0, n_layers))
+
+  # seasonal rainfall; mean 1.0 keeps the column from drying to a non-finite psi
+  x <- seq(0, max_patch_lifetime, length.out = 1000)
+  y <- 0.25 * sin(2 * pi * x) + 1.0
+  env$extrinsic_drivers_set_variable("rainfall", x = x, y = y)
+
+  env
+}
+```
+
+Very minimalist
+
+```{r}
+#| label: minimal-run
+p0 <- scm_base_parameters("TF24", "TF24_Env")
+p0$max_patch_lifetime <- max_patch_lifetime
+
+traits <- trait_matrix(c(0.07), c("lma"))
+
+p1 <- expand_parameters(traits, p0)
+
+env <- make_tf24_env(max_patch_lifetime)
+
+results <- run_scm(p1, env = env, refine_schedule = TRUE)$parameters
+results <- run_scm(results, env = env, collect = TRUE)
+```
+
+This uses the default parameters in plant. But you may want alter some of the defaults. For that we recommend setting up some functions to set `base_parameters`.
+
+```{r}
+#| label: base-parameters-fn
+base_parameters <- function() {
+  p0 <- scm_base_parameters("TF24", "TF24_Env")
+  p0$max_patch_lifetime <- max_patch_lifetime
+
+  p0$strategy_default$hmat <- 15
+  p0$strategy_default$rho <- 700
+  p0$strategy_default$a_l1 <- 2.17
+  p0$strategy_default$a_l2 <- 0.5
+
+  p0
+}
+```
+
+We can now create a second function called `run_mypatch` which takes a number of a arguments, including `traits` which we assign a trait matrix. The `expand_parameters` function takes this trait matrix as an argument which allows us to simulate patches with multiple functional strategies, in addition to the base_parameters and any newly defined hyperparameters such as B_lf1. We also provide a latitude as an argument, as well as whether or not we want to run the patch to equilibrium birth rate.
+
+```{r}
+#| label: run-mypatch-fn
+run_mypatch <- function(
+  traits =  trait_matrix(c(0.07), c("lma")),
+  birth_rate_list = c(10, 10),
+  B_lf1 = 1,
+  p0 = base_parameters(),
+  optimise_schedule = FALSE,
+  latitude = 28.182
+  ) {
+
+  hyper_par_fn = make_TF24_hyperpar(B_lf1 = B_lf1, latitude = latitude)
+  p1 <- expand_parameters(traits, p0, hyper_par_fn,  birth_rate_list = birth_rate_list)
+
+  env <- make_tf24_env(p0$max_patch_lifetime)
+
+  if(optimise_schedule)
+    result <- run_scm(p1, env = env, refine_schedule = TRUE)$parameters
+  else
+    result <- p1
+
+  # gather outputs at each time step
+  run_scm(result, env = env, collect = TRUE)
+}
+```
+
+
+Run patch for two species.  Here, we have provided two values of lma, being thin leaves (0.07) or thick leaves (0.24). You could run this patch for just one species by defining just one lma value, or none if you just want to use the default trait values.
+
+```{r}
+#| label: run-two-species
+results <-
+  run_mypatch(traits=trait_matrix(c(0.07, 0.24), c("lma")))
+```
+
+`run_scm(..., collect = TRUE)` in run_mypatch already returns the results in a tidy format (collecting and tidying the patch state at every step), so we can use the output directly.
+
+```{r}
+#| label: tidy-results
+results_tidy <- results
+
+results_tidy
+```
+
+By pulling out the 'species' object from our list of tidied result outputs, we can plot the size distribution for each of the species in the patch. In this plot, each line represents the height over time of a characteristic originating at a given height (given by seed mass) at each step. Note that steps in this case are not equivalent to years, where the distance between steps is instead determined by the node spacing algorithm. We can take advantage of varying line transparency in ggplot2 to plot the relative log(Density) of each characteristic the size distribution of each species in the patch.
+
+```{r}
+#| label: plot-size-distribution
+results_tidy$species %>%
+  drop_na() %>%
+  plot_size_distribution()
+```
+
+
+## Calculate totals by species for each step
+
+For each species, we can integrate over the height distribution to get the total value of the state variable per $m^2$
+
+```{r}
+#| label: integrate-totals
+data_species_tot <-
+  results_tidy$species %>% integrate_over_size_distribution()
+
+data_species_tot
+```
+
+For example, the number of individuals per $m^2$ is found by integrating the density of each characteristic at a given step over height.
+
+```{r}
+#| label: plot-total-density
+data_species_tot %>%
+  ggplot(aes(time, density, colour=species)) +
+  geom_line()
+```
+
+We can use the function `TF24_expand_state` to capture a large number of additional state variables (e.g.leaf area)
+
+```{r}
+#| label: expand-state
+results_tidy_expand <- results_tidy %>% expand_state()
+
+results_tidy_expand$species
+```
+
+In the same way as individuals above, we can have a look at the total leaf area over time by intergrating across the size (i.e. height) distribution for a given step or time. This involves finding the product of the density of each of the characteristics present multiplied by the state variable in question (i.e. leaf area) before integrating across height.
+
+```{r}
+#| label: plot-total-leaf-area
+data_species_tot <-
+  results_tidy_expand$species %>%
+  integrate_over_size_distribution()
+
+data_species_tot %>%
+  ggplot(aes(time, area_leaf, colour = species)) +
+  geom_line()
+```
+
+
+In this case, species 1 with cheap, thin leaves briefly has a much higher total leaf area deployed comapred across the height distribution before eventually being overtaken by species with thicker, more expensive leaves.
+
+We can convert these integrated total state variables into their respective biomass components to get an idea of how total biomass and relative biomass allocation varies through time for each species.
+
+```{r}
+#| label: plot-biomass-allocation
+v <- c("mass_heartwood", "mass_sapwood", "mass_bark", "mass_leaf")
+
+data_long <-
+  data_species_tot %>%
+  select(time,species, one_of(v)) %>%
+  pivot_longer(cols=starts_with("mass"), names_to = "tissue")
+
+data_long$tissue <- factor(data_long$tissue, levels = v)
+
+species_names <- tibble(species = unique(data_long$species),
+                      species_name = c("Species_1","Species_2"))
+
+data_long %>%
+  left_join(species_names) %>%
+  ggplot(aes(time, value, fill=tissue)) +
+  geom_area() +
+  labs(x = "Patch age (yr)", y = "Above ground mass (kg/m2)") +
+  theme_classic() +
+  xlim(c(0,100)) +
+  facet_wrap(~species_name)
+```
+
+
+## Interpolate to specific times
+
+The node spacing algorithim determines the optimum introduction times for characterstics, which means that the time values associated with steps may not correspond to known times that we might like to extract information about. For example, what the total amount of biomass per $m^2$ will be at 50 years. By doing this, it also means that we can integrate between defined times. Let's work with our results again by running a patch again and then tidying.
+
+```{r}
+#| label: rerun-patch
+results <- run_mypatch(traits =  trait_matrix(c(0.07, 0.24), c("lma")))
+
+results_tidy <- results
+```
+
+
+Lets interpolate our results from the `run_mypatch` above for timepoints 1,5,10 using the function `interpolate_to_times`. Note that time in units of years.
+
+```{r}
+#| label: interpolate-times
+times <- c(1, 5, 10)
+
+tidy_species_data <- results_tidy$species
+
+tidy_species_new <- interpolate_to_times(tidy_species_data, times)
+
+```
+
+Gives interpolated values for state variables at new time points.
+
+```{r}
+#| label: interpolated-time-values
+tidy_species_new %>% drop_na()
+```
+
+We can now assess their correspondence with the values already predicted in the original results output. We can see in this case that the points (represneting the interpolated values) fall along the curves which indicates good correspondence bewteen our interpolation and the original simulation.
+
+```{r}
+#| label: plot-time-interpolation
+data_combined <-
+  tidy_species_data %>%
+  bind_rows(tidy_species_new) %>%
+  arrange(species, node, time) %>%
+  filter(node %in% seq(1, 101, by=20))
+
+data_combined_long <-
+  data_combined  %>%
+  select(node, time, step, density, height, species) %>%
+  pivot_longer(cols = c("density", "height"))
+
+data_combined_long %>%
+  ggplot(aes(time, value, group=node,colour=node)) +
+  geom_line() +
+  geom_point(data = data_combined_long %>% filter(is.na(step)), col=2) +
+  scale_y_log10() +
+  xlim(c(0, 20)) +
+  facet_grid(name~species, scales="free") +
+  theme_classic()
+```
+
+## Interpolate to specific heights
+
+Similar to above, we can interpolate across nodes at given time to sepcific heights, using the function `interpolate_to_heights`
+
+```{r}
+#| label: interpolate-heights
+heights <- c(1, 5, 10)
+
+tidy_species_data <- results_tidy$species
+
+tidy_species_new <- interpolate_to_heights(tidy_species_data, heights)
+```
+
+Gives predictions at new height.
+
+```{r}
+#| label: interpolated-height-values
+tidy_species_new %>% drop_na()
+```
+
+To see how good these are, plot together with old points
+
+```{r}
+#| label: plot-height-interpolation
+data_combined <-
+  tidy_species_data %>%
+  bind_rows(tidy_species_new) %>%
+  arrange(species, time, height) %>%
+  filter(step %in% c(100, 142))
+
+data_combined_long <-
+  data_combined  %>%
+  select(node, time, step, height, density, mortality, area_heartwood, species) %>%
+  pivot_longer(cols = c("density", "mortality", "area_heartwood"))
+
+data_combined_long %>%
+    filter(!is.na(node)) %>%
+  ggplot() +
+  geom_line(aes(height, value, group=step, colour=step)) +
+  geom_point(data = data_combined_long %>% filter(is.na(node)), aes(x=height, y=value), col="red")+
+  facet_grid(name~species, scales="free") +
+  theme_classic()
+```

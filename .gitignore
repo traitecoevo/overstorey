@@ -12,6 +12,28 @@ renv/staging/
 # _freeze/ is the committed reproducibility record, NOT these.
 **/*_cache/
 
+# Quarto/knitr render leakage. A website project's output belongs in
+# _site/ only; these appear when a page is rendered outside project mode.
+# (assets/figures/ IS tracked content — pre-rendered figures — so it is
+#  deliberately NOT matched here.)
+**/*_files/
+/figure/
+/site_libs/
+/posts/*-listing.json
+/posts/*.feed*
+/index.html
+/guides/**/*.html
+/theory/**/*.html
+/contributing/**/*.html
+/posts/**/*.html
+
+# knitr render intermediates. Quarto knits .qmd -> .rmarkdown -> .knit.md and
+# deletes these on success; a crashed/interrupted render leaves them behind.
+# On the next full `quarto render` they get globbed in as phantom input files
+# (e.g. "guides/example-analysis.rmarkdown" -> NotFound) and abort the build.
+**/*.rmarkdown
+**/*.knit.md
+
 # CI scratch
 targets.txt
 drift-report.md

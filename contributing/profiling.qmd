@@ -1,0 +1,385 @@
+---
+title: "Profiling"
+---
+::: {.eyebrow}
+for contributors
+:::
+
+As a complex systems model, speed matters. The `plant` package is written in
+C++ using Rcpp, so it is already fast — but there is always room to improve. This
+page documents how we profile the code to find bottlenecks, the workflow we use
+to get *trustworthy* numbers, and how to drive an AI assistant (Claude) through a
+profiling pass without being misled.
+
+The code is awkward to profile because the hot C++ is called from R. Traditional
+R profilers see almost nothing useful: they stop at the `.Call` boundary and
+cannot look into the compiled code. In a typical FF16 run, `Rprof` attributes
+roughly 97–99% of the time to a single native entry point (`SCM::run` or
+`SCM::refine_schedule`). The useful detail comes from a *native* sampler.
+
+# The approach
+
+Profiling is a loop, and the order of the steps matters:
+
+1. **Quantify the target.** Before changing anything, measure *how big the
+   opportunity is*. Find the hotspot in the native sample, then put a number on
+   it — ideally an upper bound on what removing it could save (see [Size a
+   hotspot before optimising it](#size-a-hotspot)). A change to a path that is 3%
+   of runtime cannot return more than 3%, however clever it is.
+2. **Seek the optimisation.** Only once the target is sized do you look for a way
+   to cut it — and you now know roughly what success looks like, so you can tell a
+   real win from noise.
+3. **Re-measure.** Confirm the change against a same-session baseline, check it
+   against the upper bound from step 1 ("I expected ≤ X%, I measured Y%"), and
+   verify correctness. If the measured gain is far below the bound, the bottleneck
+   moved — go back to step 1 rather than piling on more changes blind.
+
+The cardinal rule is that **every step is a measurement**. Don't optimise a path
+you haven't sized, and don't trust a speedup you haven't re-measured against a
+fresh baseline. The rest of this page is the tooling (the harness) and the
+discipline (trustworthy numbers) that make each step of this loop reliable.
+
+# Quick timing
+
+For a one-off "is this faster?" check, time the call directly. This is fine for
+order-of-magnitude answers but far too noisy to attribute a few-percent change —
+for that, use the harness below.
+
+## `system.time`
+
+```r
+system.time({
+  ind <- FF16_Individual()
+  env <- FF16_fixed_environment(1.0)
+  times <- seq(0, 50, length.out = 101)
+  result <- grow_individual_to_time(ind, times, env)
+})
+#>    user  system elapsed
+#>   0.022   0.000   0.022
+```
+
+## `tictoc`
+
+For longer blocks, wrapping everything in `system.time` is awkward.
+[`tictoc`](http://jabiru.github.io/tictoc/) lets you bracket arbitrary code:
+
+```r
+library(tictoc)
+tic()
+ind <- FF16_Individual()
+env <- FF16_fixed_environment(1.0)
+times <- seq(0, 50, length.out = 101)
+result <- grow_individual_to_time(ind, times, env)
+toc()
+#> 0.049 sec elapsed
+```
+
+# The benchmark harness
+
+`plant` ships a reproducible benchmark + profiling harness. Prefer it over ad hoc
+timing: it pins two canonical scenarios, records `bench::mark` timings, an
+`Rprof` profile, and (on macOS) a native sample, and writes everything to a
+timestamped directory so runs are comparable.
+
+## The two scenarios
+
+`run_plant_benchmarks()` in [`R/benchmark.R`](https://github.com/traitecoevo/plant/blob/master/R/benchmark.R)
+defines the cases everything else builds on:
+
+- **`scm`** — `run_scm()` on a one-species FF16 patch. Exercises the steady
+  per-step solve.
+- **`build_schedule`** — `run_scm(..., refine_schedule = TRUE)`. Exercises
+  adaptive node-schedule refinement, which calls the assimilation quadrature far
+  more often. This is usually the more sensitive case for crown/light work.
+
+Both run the same dominant native path, so an optimisation that helps one usually
+helps the other:
+
+```
+SCM::run → run_next → ode::Solver::step → derivs → Patch::compute_rates
+  → Species::compute_rates → Node::compute_rates → growth_rate_gradient
+  → Individual::growth_rate_given_height → FF16_Strategy::compute_rates
+  → net_mass_production_dt → assimilation
+```
+
+## Running it
+
+Compile first, then run the profiling script against one or more strategies:
+
+```sh
+make compile
+Rscript scripts/profile-benchmarks.R FF16
+```
+
+`make compile` builds the package DLL with the normal optimisation flags
+(`pkgbuild::compile_dll(debug = FALSE)`). `scripts/profile-benchmarks.R` then
+loads that *already-built* DLL (`pkgload::load_all(compile = FALSE)`) rather than
+recompiling — so the numbers reflect the optimised build, not a debug one. See
+[Compile, don't `load_all`](#compile-dont-load_all) for why this matters.
+
+Longer, lower-noise runs and a native sample are controlled by environment
+variables:
+
+```sh
+PLANT_PROFILE_REPEATS=20 PLANT_SAMPLE_SECONDS=5 Rscript scripts/profile-benchmarks.R FF16
+```
+
+| Variable | Default | Effect |
+|---|---|---|
+| `PLANT_PROFILE_REPEATS` | `1` | How many times each case is repeated inside the `Rprof` window. Higher = lower noise. |
+| `PLANT_SAMPLE_SECONDS` | `0` (off) | If > 0, run macOS `/usr/bin/sample` against the R process for this many seconds, concurrently with `Rprof`. |
+| `PLANT_BENCHMARK_ITERATIONS` | `1` | Iterations passed to `bench::mark` for the one-iteration summary. |
+| `PLANT_RPROF_INTERVAL` | `0.005` | `Rprof` sampling interval, in seconds. |
+
+## Outputs
+
+Everything lands under `tmp/profile-benchmarks/<timestamp>/` (gitignored):
+
+| File | Contents |
+|---|---|
+| `benchmark-summary.csv` / `.rds` | `bench::mark` one-iteration timings (min, median, itr/sec, mem_alloc). |
+| `<strategy>-<case>.Rprof` | Raw R-level profile. |
+| `<strategy>-<case>-by-self.csv` / `-by-total.csv` | `summaryRprof()` tables. |
+| `<strategy>-<case>.sample.txt` | Native call graph from `/usr/bin/sample` (only if sampling succeeded). |
+| `<strategy>-<case>.sample.log` | Sampler stdout/stderr — check here when no `.sample.txt` appears. |
+
+# Reading the results
+
+Three views, from coarsest to most detailed.
+
+**`bench::mark` (one-iteration).** The headline median per case. Best for the
+clean A/B of a single change. Watch `mem_alloc` too — an allocation removed from a
+hot loop (e.g. a per-call object copy) shows up here.
+
+**`Rprof` (R-level).** Confirms where time sits relative to the `.Call` boundary
+— almost all of it, for `plant`. The `by-total`/`by-self` CSVs are mostly useful
+to confirm you are measuring the boundary you think you are, and to track the
+20-repeat total as a less-noisy aggregate than a single `bench::mark` median.
+
+**`/usr/bin/sample` (native, macOS).** This is where the real signal is: the C++
+call graph and the hot symbols. A typical `build_schedule` sample puts the cost
+in, roughly in order, `FF16_Strategy::compute_competition`, the assimilation
+quadrature integrand (`QK::integrate` and its callable), `Interpolator::eval` /
+`tk::spline::operator()`, and libm `pow`/`exp`. Note that with our **no-LTO**
+build, small functions defined in a `.cpp` translation unit appear as their own
+sampled frames precisely because they can't be inlined across translation units —
+which is both a reading hint and, as it turned out, a lever (moving a hot helper
+into a header to let it inline was one of the largest single wins).
+
+On macOS, `/usr/bin/sample` may need permission to inspect the R process. When it
+fails it writes `sample cannot examine process …` to the `.sample.log` and the
+run continues with `Rprof` only — see the note on sampler perturbation below.
+
+# Getting trustworthy numbers
+
+Short C++ benchmarks are noisy and easy to misread. The discipline below is what
+separates a real few-percent win from wishful thinking. Most of these lessons were
+learned the hard way — see `notes/profile-ff16-2026-06-16.md` in the `plant` repo
+for the full worked log.
+
+## Compile, don't `load_all` {#compile-dont-load_all}
+
+Always `make compile` before timing. A bare `devtools::load_all()` compiles
+*without* the normal optimisation flags, so its timings are not representative of
+the shipped package. The harness loads the pre-built DLL for exactly this reason.
+
+(The exception is *symbol-level native profiling* with Instruments/gperftools,
+where a debug build with symbols and no inlining can make the call graph easier to
+read. For **timing**, always use the optimised build.)
+
+## The sampler perturbs the profile
+
+Running `/usr/bin/sample` concurrently with `Rprof` can inflate the `Rprof`
+totals — in one audit, a successful concurrent sample pushed totals up ~20% versus
+the same code sampled-off, which masqueraded as a regression. So:
+
+- Use a **sample-on** run to *understand* where time goes (the native call graph).
+- Use **sample-off** runs (`PLANT_SAMPLE_SECONDS` unset) when *comparing* two
+  versions of a small source change.
+
+Don't compare a sample-on total against a sample-off one.
+
+## Defeat machine drift with same-session A/B
+
+Absolute timings drift between sessions (thermal state, background load, OS
+version). Numbers from last week are *not* directly comparable to today's. To
+attribute a change honestly:
+
+1. Measure the change.
+2. In the **same session**, recompile the parent commit (`git stash`, a detached
+   `git worktree`, or a checkout) and measure it the same way.
+3. Report the **ratio**, not the absolute totals.
+
+For anything marginal, do A/B/A (baseline, change, baseline again) so you can see
+how much the baseline itself wandered between the two measurements.
+
+## Know the noise floor
+
+These runs have roughly a 10% run-to-run noise floor on the short cases. A change
+whose effect is smaller than the spread between repeated baseline runs is "within
+noise" — record it as such rather than claiming a speedup. The 20-repeat `Rprof`
+total is steadier than a single `bench::mark` median; when the two disagree in
+magnitude, trust neither beyond "within noise".
+
+## Track bit-identity
+
+For every change, state whether it is **bit-identical** (same arithmetic, same
+floating-point operation order → same bits out) or not:
+
+- *Bit-identical* (e.g. hoisting an invariant, deduping a `pow()`, inlining):
+  existing tests must pass with **no tolerance change**. If a tolerance needs
+  relaxing, the change was *not* bit-identical and you mislabelled it.
+- *Not bit-identical* (e.g. replacing a division by a cached reciprocal): expect
+  small reference-value shifts; decide explicitly whether to update expected
+  values or relax a named tolerance, and document the magnitude.
+
+After any change, at minimum run the targeted tests for the paths you touched —
+usually `test-interpolator.R`, `test-strategy-ff16.R`, and the relevant
+TF24/individual tests if shared strategy or environment code changed:
+
+```sh
+make compile
+Rscript -e 'devtools::load_all(compile = FALSE); \
+  for (f in c("test-interpolator.R","test-strategy-ff16.R","test-individual.R")) \
+    testthat::test_file(file.path("tests/testthat", f))'
+```
+
+## Size a hotspot before optimising it {#size-a-hotspot}
+
+A cheap diagnostic: temporarily short-circuit a suspected hotspot to a constant
+and re-time. If the timing barely moves, the cost was elsewhere. This is how the
+light-spline query was shown to be ~2/3 of the `build_schedule` run — which
+justified the effort spent on the spline lookup. Revert the diagnostic before
+committing; it is a measurement device, not a change.
+
+# Other native profilers
+
+The `sample`-based harness is the default on macOS, but these are useful
+alternatives, especially on Linux or when you want a richer UI.
+
+## Xcode Instruments (macOS)
+
+Apple's Xcode ships **Instruments**, which can profile the R process directly:
+
+1. Build with debug symbols. `devtools::load_all()` compiles without optimisation
+   and *with* debug symbols by default, which aids symbol resolution (at the cost
+   of representative timing — see above).
+2. Open Instruments.app and pick the **Time Profiler** template.
+3. Attach to the running R process and start recording.
+4. Run your R code; Instruments profiles the execution and shows the call tree.
+
+## uProf (Linux)
+
+AMD's [uProf](https://www.amd.com/en/developer/uprof.html) has been used
+successfully on Linux for `plant`. An earlier uProf run
+([issue #361](https://github.com/traitecoevo/plant/issues/361)) found roughly 40%
+of `run_plant_benchmarks()` time in libm `pow`, which directly motivated the
+eta-specialised canopy-shape work in
+[issue #465](https://github.com/traitecoevo/plant/issues/465).
+
+## Google gperftools
+
+[gperftools](https://github.com/gperftools/gperftools) can profile Rcpp code via
+the [Rgperftools](https://github.com/bnprks/Rgperftools) package, following this
+[blog post](http://minimallysufficient.github.io/r/programming/c++/2018/02/16/profiling-rcpp-packages.html)
+by Minimally Sufficient. (The [jointprof](https://github.com/r-prof/jointprof/)
+package is an alternative interface, but had macOS compatibility issues when last
+tried.)
+
+Both expose `start_profiler` / `stop_profiler`:
+
+```r
+start_profiler("/tmp/profile.out")
+run_your_cpp_stuff()
+stop_profiler()
+```
+
+Setup:
+
+1. Install gperftools, e.g. `brew install gperftools`.
+2. Install the R package: `devtools::install_github("bnprks/Rgperftools")`.
+3. Install `pprof` for analysis. On macOS in 2024 the Homebrew build errored;
+   installing via Go worked better — install [Go](https://go.dev/dl/), then
+   `go install github.com/google/pprof@latest`.
+4. You may need to set include/library paths in your shell profile:
+
+   ```sh
+   export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/usr/local/include:/opt/homebrew/include/"
+   export LIBRARY_PATH="/opt/homebrew/lib/"
+   ```
+
+5. Compile with gperftools: add `PKG_LIBS = -lprofiler` to `src/Makevars`, add
+   `#include "gperftools/profiler.h"`, and `devtools::load_all()` to rebuild.
+6. Run the profiled code:
+
+   ```r
+   library("Rgperftools")
+   start_profiler("/tmp/profile.out")
+   p0 <- scm_base_parameters("FF16")
+   p <- expand_parameters(trait_matrix(0.0825, "lma"), p0)
+   res <- run_scm(p)
+   stop_profiler()
+   ```
+
+7. Analyse in the terminal:
+
+   ```sh
+   $HOME/go/bin/pprof --web src/plant.so /tmp/profile.out   # graphical
+   $HOME/go/bin/pprof -top src/plant.so /tmp/profile.out    # text top-N
+   ```
+
+# Working with Claude on profiling
+
+Profiling is a good fit for an AI assistant — it is iterative, measurement-driven,
+and benefits from someone tirelessly recording every run. But the same noise that
+fools a human fools an assistant, and an assistant that *wants* to report a win
+will find one in the noise. The discipline below keeps it honest. (The
+`notes/profile-ff16-2026-06-16.md` log is a model of it.)
+
+**Keep a running notes file.** Point Claude at one markdown file (e.g.
+`notes/profile-<model>-<date>.md`) and have it append to, not overwrite, a
+"Timing history" table plus a detailed section per change. This gives the next
+session a baseline and stops it re-discovering dead ends. The log should record,
+for every change:
+
+- the exact command run and the output directory under `tmp/profile-benchmarks/`;
+- one-iteration timings *and* the 20-repeat `Rprof` totals;
+- the speedup versus the *same-session* baseline (not a cross-session number);
+- whether the change is bit-identical, and which tests passed;
+- an honest verdict — including "within noise" and backed-out experiments.
+
+**Insist on same-session baselines.** The single most common error is comparing a
+fresh measurement against a stale documented total and reporting machine drift as a
+speedup. Require a same-session A/B (recompile the parent, measure both now) before
+any speedup claim is recorded.
+
+**Make it prove bit-identity, don't take its word.** If it labels a change
+bit-identical, the targeted tests must pass with no tolerance change. If it relaxed
+a tolerance, the label is wrong — push back.
+
+**A standing prompt.** Something like the following gives a new session enough
+context to be useful immediately:
+
+````md
+We are optimising performance in the `plant` R package, focusing on FF16
+benchmarks from `run_plant_benchmarks()` in `R/benchmark.R`. Compile via
+`make compile` before timing — `devtools::load_all()` alone is not representative.
+
+Profile/time with `scripts/profile-benchmarks.R FF16`, using longer runs via:
+
+    PLANT_PROFILE_REPEATS=20 PLANT_SAMPLE_SECONDS=5 Rscript scripts/profile-benchmarks.R FF16
+
+Use sample-OFF runs when comparing small source changes (the concurrent sampler
+perturbs Rprof totals). Attribute every change with a same-session A/B, recompiling
+the baseline between states — cross-session totals are not comparable.
+
+Record results and interpretation in notes/profile-<date>.md: add a compact row to
+the "Timing history" table, then put detail under the relevant optimisation target.
+Relevant prior work: issue #361 (libm `pow` hot), #465 (eta-specialised canopy
+shape), #435 (uniform-grid spline index), #470 (LTO — declined, no measurable gain).
+
+For each change report: exact command, output directory, one-iteration timings,
+20-repeat Rprof totals, speedup vs the same-session baseline, whether the result is
+bit-identical (and which tests passed). Run at least test-interpolator.R,
+test-strategy-ff16.R, and any relevant TF24/individual tests for touched paths.
+````

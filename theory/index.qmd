@@ -9,6 +9,33 @@ the model, from the ground up
 What `plant` actually solves, and why. Consolidates material currently
 scattered across papers and vignettes.
 
-- [The size-structured PDE](size-structured-pde.qmd)
-- [Assimilation & hydraulics](assimilation-hydraulics.qmd)
-- [Adaptive dynamics](adaptive-dynamics.qmd)
+## Core
+
+The demographic and physiological machinery shared by every strategy.
+
+- [The size-structured PDE](size-structured-pde.qmd) — demography of
+  individuals, patches, and metacommunities.
+- [Assimilation & hydraulics](assimilation-hydraulics.qmd) — the leaf-level
+  carbon and water economy.
+- [Adaptive dynamics](adaptive-dynamics.qmd) — invasion fitness and
+  evolutionary endpoints.
+
+## Models {#models}
+
+The physiological strategies that plug into that machinery — each a concrete
+set of growth, fecundity, and mortality functions. See the
+[models overview](models/index.qmd).
+
+- [FF16](models/ff16.qmd) — the trait-based functional-balance model.
+- [K93](models/k93.qmd) — Kohyama's basal-area competition model.
+- [TF24](models/tf24.qmd) — the hydraulically-coupled leaf model.
+
+## Implementation {#implementation}
+
+How the equations are solved numerically. See the
+[implementation overview](implementation/index.qmd).
+
+- [The characteristic method](implementation/characteristic-method.qmd)
+- [ODE stepping & control](implementation/ode-stepping.qmd)
+- [The node-spacing algorithm](implementation/node-spacing.qmd)
+- [Canopy & light-environment models](implementation/canopy-models.qmd)

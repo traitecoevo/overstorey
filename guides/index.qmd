@@ -10,8 +10,26 @@ Practical, sequential walkthroughs. For the *why*, read the
 [theory](../theory/index.qmd); for function signatures, the
 [reference site](https://traitecoevo.github.io/plant/reference/).
 
+## Getting started
+
 - [Installation](install.qmd)
-- [Your first individual](first-individual.qmd)
-- [Patch dynamics](patch-dynamics.qmd)
-- [Strategies & traits](strategies.qmd)
+- [Your first individual](first-individual.qmd) — grow a single plant and read
+  its state, rates, and trajectory.
+
+## Running the model
+
+- [Patch dynamics](patch-dynamics.qmd) — grow a patch of competing plants and
+  explore the light environment.
+- [Strategies & traits](strategies.qmd) — change parameters, build trait
+  matrices, and set control accuracy.
+- [Extrinsic drivers](extrinsic-drivers.qmd) — drive a run with time-varying
+  rainfall or birth rates.
 - [Calibration](calibration.qmd)
+
+## Worked examples
+
+- [Example analysis](example-analysis.qmd) — the full pipeline, setup to
+  results.
+- [Self-thinning](self-thinning.qmd) — recover the classic size–density line.
+- [Emergent properties](emergent-properties.qmd) — integrate patch outputs up
+  to the metapopulation.

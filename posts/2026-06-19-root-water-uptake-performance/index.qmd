@@ -1,0 +1,155 @@
+---
+title: "Making root water uptake fast"
+description: "How the TF24 multi-layer root water-uptake solver went from a runtime hotspot to a structurally optimised path — caching, superlinear root-finders, and an analytical gamma-integral hydraulic transform."
+date: 2026-06-19
+plant-ref: "develop"
+plant-sha: "81cfeab16a049478ca0ff81f1239b78221c49ebb"
+categories: [tf24, performance, hydraulics]
+reading-time: true
+---
+
+```{r setup, include=FALSE}
+source(here::here("R/version-badge.R"))
+```
+
+`r plant_version_badge()`
+
+This post summarises a sustained performance-engineering effort on the
+`root_water_uptake` branch of [`plant`](https://github.com/traitecoevo/plant).
+It is a high-level account of what was achieved and which ideas worked; the
+blow-by-blow record — every A/B timing, profile, and rejected experiment —
+lives in the branch's commit history and in the issues linked below.
+
+## What was achieved
+
+In short: the new multi-layer root-water hydraulic solver went from a raw
+hotspot to a structurally optimised path, **roughly an order of magnitude
+faster end-to-end**, with the science held to a tolerance-level shift that
+moves *toward* the more accurate reference.
+
+- **≈4.4× from the algorithmic stack** (first working version → end of the
+  early phase): 39.8 s → 9.0 s on the single-species MPL = 10 benchmark, from
+  O(1) spline indexing, transpiration/integral-spline caches, the exact
+  interval-mean conductivity, and int-keyed lookups. The integral-spline cache
+  added a further ≈1.32×, for **≈5–6× by the end of the early phase**.
+- **A further ≈2.3× on the hot path afterwards**, once each nested root-find
+  was characterised individually and given a *superlinear* solver where that
+  was provably safe: **≈1.8×** (TOMS748 on the inner `psi_stem_to_ci` solve)
+  × **≈1.2×** (TOMS748 on `find_root_psi`) × **~1.08×** (halving the divisions
+  in the per-layer `E_from_Soil` loop).
+- **~60–75× more accurate inverse hydraulic transform** by seeding the
+  integral-spline knots from the closed-form incomplete-gamma integral (issue
+  #468) instead of a trapezoid sum — same hot-path cost, quadrature bias
+  removed at source.
+- **A documented set of *rejected* levers** — global TOMS748, Brent on the
+  outer collar solve, a logistic vulnerability curve, `pow(x,2)→x*x`, splining
+  the hydraulic cost, loosening the Cᵢ tolerance — each measured, found to be
+  slower / less stable / less accurate, and recorded so they are not
+  re-litigated.
+- **Two safety gates held throughout**: every change is bit-identical *or* its
+  numeric shift is quantified, and every solver swap must still pass the
+  drought-stability scenario (issue #485) with finite output and no NaN.
+
+The model is now considered structurally optimised: ~75% of runtime is the
+irreducible nested root-find structure, and every bit-identical lever has been
+taken.
+
+## What the model is, and why it was a hotspot
+
+The branch couples three pieces, integrated together by `run_scm`: a
+multi-layer **soil-water bucket model**, a depth-resolved **root mass
+distribution**, and a **plant hydraulics** solver (after Potkay et al. 2021)
+that finds each individual's water-stress operating point. The expensive part
+is the hydraulics: for every individual, at every ODE sub-step, the model
+solves for the root-collar water potential that maximises profit
+(assimilation minus hydraulic cost). That solve is *two nested root-finds*
+wrapped in an outer optimisation, and each inner evaluation sweeps all soil
+layers and evaluates vulnerability-curve splines. Profiling consistently put
+essentially all runtime in this `find_root_collar_psi` path — a flat profile
+spread across solver structure and spline evaluation, not memory allocation.
+
+## The optimisation phases
+
+Work proceeded through roughly nine phases. The honest pattern: the early
+algorithmic wins were large; later phases were as much about *rejecting*
+plausible-looking levers as landing new ones. A summary of the main levers:
+
+| Lever | Outcome |
+|---|---|
+| O(1) spline indexing (equidistant-grid arithmetic vs binary search) | **Adopted** — was the single hottest leaf; bit-identical |
+| Memoised `transpiration()` / integral-spline caches for the per-layer root-vuln integral | **Adopted** — bit-identical; collapsed ~30 spline evals/call to ~1 |
+| Exact interval-mean of root conductivity via a pre-integrated curve | **Adopted** — fewer evals *and* more accurate |
+| String-keyed name→index lookups cached as ints; per-time driver memo | **Adopted** — bit-identical |
+| TOMS748 swapped *globally* across both nested root-finds | **Rejected** — produced NaN soil potentials, ran slower |
+| Brent on the *outer* collar profit-max | **Adopted then reverted** — its argmax is non-smooth, and the demographic growth gradient needs a smooth operating point; reverted to golden-section search |
+| TOMS748 on the *inner* `psi_stem_to_ci` solve only | **Adopted** — target is smooth & monotone; ~1.8× |
+| TOMS748 on the `find_root_psi` solve only | **Adopted** — brackets provably finite & opposite-sign; ~1.2× |
+| Halve divisions in the `E_from_Soil` per-layer loop | **Adopted** — `fdiv` latency was the real cost |
+| Spline the xylem hydraulic cost; `pow(x,2)→x*x`; loosen the Cᵢ tolerance | **Rejected** — slower or no faster, or destabilised the coupled ODE |
+
+Two recurring lessons shaped the rejections. First, **bisection precision is
+load-bearing for coupled-ODE stability**: loosening the inner Cᵢ tolerance
+drives a soil layer to zero moisture and trips a drought singularity (issue
+#485). Second, on Apple-ARM hardware a spline eval already costs about as much
+as the transcendentals it would replace, so the "spline everything" strategy
+hit diminishing returns.
+
+## Key innovations
+
+**Solver choice, split by target.** The early blanket rejection of superlinear
+solvers conflated two different functions. Once each nested root-find was
+characterised on its own, the *inner* `psi_stem_to_ci` solve (smooth, strictly
+monotone) and the `find_root_psi` solve (provably finite, opposite-sign
+brackets) both took TOMS748 safely — converging to the *same* tolerance in far
+fewer evaluations. The *outer* collar optimisation kept golden-section search
+specifically because its argmax feeds a demographic gradient that must vary
+smoothly. The single biggest reproducibility constraint throughout: a faster
+method is only acceptable if it reaches the same answer, not a looser one.
+
+**Caching strategy.** The cumulative-integral splines (transpiration supply
+and root vulnerability) are built once per strategy and evaluated O(1) on the
+hot path, with the per-solve, per-layer integral lookups memoised down to
+roughly one evaluation per call.
+
+**Analytical gamma-integral hydraulic transform (issue
+[#468](https://github.com/traitecoevo/plant/issues/468)).** The Weibull xylem
+vulnerability curve $\exp(-(m/b)^c)$  has a closed-form integral in terms of the
+lower incomplete gamma function, $F(m) = (b/c)\,\gamma(1/c,\,(m/b)^c)$.
+This was verified against independent adaptive quadrature (agreement to
+~1e−6 relative) and is now used to **seed the integral-spline knots
+analytically** instead of by a running trapezoid sum — same knots, same O(1)
+hot-path eval, but the quadrature bias removed at the source. The payoff lands
+on the *inverse* transform used in simulation: roughly 60–75× more accurate.
+
+**Logistic vulnerability curve, evaluated and declined (issue
+[#467](https://github.com/traitecoevo/plant/issues/467)).** A logistic curve
+was assessed as a cheaper, AD-friendly alternative. Its forward integral is
+elementary, but its inverse is *not* explicit, and for the production stem
+curve ($c\approx1.09$) it biases the transpiration integral by 4–13% — a model
+change, not a numerical refinement. Recommendation: keep the Weibull for the
+core; revisit a logistic only in an external calibration/AD context.
+
+## Measured outcome
+
+The early algorithmic stack (O(1) splines, memoisation, integral-spline
+caches, the off-path Brent work) took the model from its first working version
+to several-fold faster — an end-to-end ≈4.4× was measured on one benchmark
+build before the later solver work, with further gains from the integral-spline
+cache. The two newer superlinear-solver wins on the hot path then added roughly
+1.8× and 1.2× on the 15-layer scenario, and the `E_from_Soil` division work a
+further few percent. Numerically, most adopted changes are bit-identical; the
+solver swaps and the analytical transform shift results at the *tolerance
+level* (sub-percent), and where they move, they move *toward* the more accurate
+reference. The model is now considered structurally optimised: ~75% of runtime
+is the nested root-find structure, and every bit-identical lever has been taken.
+
+::: {.callout-note}
+This post is pinned to a `develop` SHA. Absolute timings are machine-specific
+and deliberately not reproduced here as headline numbers; the durable results
+are the *ratios* and the adopted/rejected verdicts. For the full record — exact
+A/B tables, profiles, and the reasoning behind each rejection — see the
+`root_water_uptake` branch history in the
+[plant repository](https://github.com/traitecoevo/plant) and issues
+[#467](https://github.com/traitecoevo/plant/issues/467) and
+[#468](https://github.com/traitecoevo/plant/issues/468).
+:::

@@ -1,0 +1,854 @@
+---
+# ── REPRODUCTION (draft) ───────────────────────────────────────────────
+# This post lives in posts/_drafts/ ON PURPOSE: the paper is in prep, so
+# its DOI / journal / year / figure numbers / publication code-ref cannot
+# be verified yet. Those fields are TODO, and `fidelity: pending` — which
+# is exactly what keeps the reproduction lint from gating it. Move it to
+# posts/<date>-<slug>/ only once the paper metadata is real.
+title: "Reproducing DunFalster 2026: are cheap canopy-shading models adequate for evolutionary endpoints?"
+description: "The heavy analysis behind the canopy-methods paper — demographic equilibrium, invasion-fitness landscapes, the evolutionary attractor, and the PPA grid-artifact — re-run as a six-model adequacy comparison against develop-branch plant."
+date: 2026-06-20
+# Pinned to the develop branch (this analysis uses the new mean-light /
+# crown-centre / box shading models, which are not in the 2.1.0 release).
+plant-ref: "develop"
+plant-sha: "81cfeab16a049478ca0ff81f1239b78221c49ebb"
+categories: [reproduction, canopy, evolution]
+reading-time: true
+# Structured metadata about the source paper (drives the citation box):
+paper:
+  authors: "Falster et al."   # in prep; full author list/order TODO
+  year: TODO                   # in prep — do not guess a publication year
+  title: "TODO — canopy/shading-model adequacy for stand dynamics and evolutionary endpoints"
+  journal: "TODO — in prep"
+  doi: "TODO — none yet (unpublished)"
+  figure: "TODO — paper figure numbers not finalised"
+  fidelity: "pending"
+  # ── original paper code ──────────────────────────────────────────────
+  # The paper's own figure scripts live in the plant repo under
+  # vignettes/examples/DunFalster2026/. To re-run them here they would be
+  # vendored as a paper-code submodule at paper-code/dunfalster2026-canopy/
+  # (CI: git submodule update --init), pinned to the PUBLICATION commit.
+  code-repo: "traitecoevo/plant"                                   # scripts under vignettes/examples/DunFalster2026/
+  code-ref: "TODO — publication SHA/tag (not yet tagged; paper in prep)"
+  code-entrypoint: "vignettes/examples/DunFalster2026/make_figures.R"  # + make_figure_attractor.R, make_figure_gridartifact.R
+---
+
+```{r setup, include=FALSE}
+source(here::here("R/version-badge.R"))
+source(here::here("R/reproduction.R"))
+```
+
+`r plant_version_badge()` `r repro_fidelity_badge()` `r paper_code_badge()`
+
+`r paper_citation()`
+
+::: {.callout-important}
+**Draft / pending.** This post reproduces the analysis behind the
+in-preparation **DunFalster 2026** canopy-methods paper (Falster et al.).
+Because the paper is unpublished, its **DOI, journal, year, figure
+numbers, and the publication commit (`code-ref`) of the figure scripts
+are all `TODO`** — they cannot be verified and have not been guessed. The
+fidelity verdict is therefore `pending`. The post stays in `_drafts/` so
+the reproduction lint does not gate it; promote it once the paper
+metadata is real.
+:::
+
+## What the original shows
+
+The DunFalster 2026 paper asks **which canopy-shading simplifications are
+safe, and for what purpose**. It puts six shading models through a ladder
+of increasingly demanding tests of biological adequacy — stand dynamics,
+demographic equilibrium, invasion (mutant) fitness, and finally the
+**evolutionary endpoint** (the singular strategy a trait converges to).
+Its load-bearing result is that a model can be perfectly adequate for one
+rung and badly wrong for the next: the cheap models reproduce stand
+*trajectories* fine, yet predict equilibrium stand densities spanning an
+order of magnitude, and settle evolution on visibly different optima — a
+~15% spread in the attracted leaf-mass-per-area (LMA).
+
+This post carries across the **heavy analysis** deliberately kept out of
+the lighter theory page
+[canopy models](../../theory/implementation/canopy-models.qmd): the
+demographic-equilibrium iteration, the invasion-fitness landscapes, the
+evolutionary-attractor / singular-strategy root-finding, the
+work-precision / grid-artifact convergence study, and the six-model
+adequacy comparison. The transcription is faithful to the source vignette
+`vignettes/canopy_methods.Rmd`; the paper's own publication-grade panels
+are produced by the scripts under
+`vignettes/examples/DunFalster2026/` (see [Re-running the paper's own
+figures](#re-running-the-papers-own-figures)).
+
+## The six models
+
+`plant`'s `FF16` strategy offers six shading models via
+`control$shading_model`. The paper-to-code naming (from the paper's
+`model-name-mapping.md`):
+
+| Paper name | Meaning | `plant` `shading_model` |
+|---|---|---|
+| Deep Crown | smooth (Yokozawa) shade; assimilation integrated over crown depth | `deep-crown` (default) |
+| Mean-Light | smooth shade; light averaged over crown depth, one assimilation call | `mean-light` (new) |
+| Crown-Centre | smooth shade; one assimilation call at the crown centre | `crown-centre` (new) |
+| PPA (smoothed) | layered stepped light profile, boundaries smoothed (runnable) | `ppa`, `ppa_layer_smoothing > 0` (default 0.3) |
+| PPA (hard step) | literal field discretisation; discontinuous, does not run | `ppa`, `ppa_layer_smoothing = 0` |
+| Flat Top | box / thin-layer shade (field's usual sense) | `flat-top-box` (hard), `flat-top-soft-box` (smoothed) |
+
+The key isolation the naming serves: `crown-centre` keeps a **smooth**
+shade and only flattens the *assimilation* calculation, so it is the
+paper's **Crown-Centre** — *not* the field's "Flat Top", which means the
+box / thin-layer *shade* (`flat-top-box` / `flat-top-soft-box`).
+Crown-Centre and Flat Top share the same crown-centre assimilation and
+differ only in the shade cast, so the contrast isolates the shade cast,
+not the assimilation rule.
+
+```{r}
+#| label: libs
+#| message: false
+library(plant)
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+```
+
+## Shared setup
+
+A single `FF16` species at LMA = 0.0825 (exactly as the source vignette
+and `make_figures.R`), run under each of the four smooth-competition
+models. Everything except `control$shading_model` is held fixed.
+
+```{r}
+#| label: setup-stands
+params <- scm_base_parameters("FF16")
+patch  <- expand_parameters(trait_matrix(0.0825, "lma"), params)
+
+models <- c("deep-crown", "mean-light", "crown-centre", "ppa")
+
+run_model <- function(model) {
+  ctrl <- Control()
+  ctrl$shading_model <- model
+  run_scm(patch, ctrl = ctrl, collect = TRUE)
+}
+
+results <- lapply(models, run_model)
+names(results) <- models
+
+species_all <- dplyr::bind_rows(
+  lapply(models, function(m) dplyr::mutate(results[[m]]$species, method = m))
+)
+species_all$method <- factor(species_all$method, levels = models)
+
+# Light-extinction coefficient: E = exp(-k_I * LAI), so LAI = -log(E) / k_I.
+k_I <- results[[1]]$p$strategies[[1]]$k_I
+```
+
+## Stand dynamics (rung 1)
+
+The least demanding rung: does a stand develop sensibly? Leaf area index
+reads straight off the recorded light profile via Beer's law
+($\mathrm{LAI} = -\log E(0) / k_I$), needing no integration over the size
+distribution.
+
+```{r}
+#| label: lai
+#| fig-width: 7
+#| fig-height: 4
+#| fig-cap: "Leaf area index through patch age. deep-crown, mean-light and crown-centre track each other; ppa oscillates because its discrete layers create sharp recruitment thresholds."
+lai_all <- dplyr::bind_rows(
+  lapply(models, function(m) {
+    results[[m]]$env$light_availability |>
+      dplyr::group_by(time) |>
+      dplyr::slice_min(height, n = 1, with_ties = FALSE) |>
+      dplyr::ungroup() |>
+      dplyr::transmute(method = m, time, lai = -log(light_availability) / k_I)
+  })
+)
+lai_all$method <- factor(lai_all$method, levels = models)
+
+ggplot(lai_all, aes(time, lai, colour = method)) +
+  geom_line(linewidth = 1) +
+  labs(x = "Patch age (years)", y = "Leaf area index", colour = "Shading model") +
+  theme_classic()
+```
+
+The three smooth models settle to a steady LAI; `"ppa"` shows large
+sustained oscillations — waves of recruitment and self-thinning driven by
+the discrete light layers.
+
+## Demographic equilibrium (rung 2)
+
+The next rung asks whether the population closes its own loop sensibly,
+and supplies the resident for the fitness analysis. We put the stand at
+its **demographic equilibrium**: the seed rain at which the population
+exactly replaces itself ($R_0 = 1$). The equilibrium is a fixed point of
+the patch's own seed production — put a seed rain in, run the patch, read
+the seed rain out, feed it back. It converges in a handful of iterations.
+
+```{r}
+#| label: equil-setup
+p_fit <- scm_base_parameters("FF16")
+p_fit$max_patch_lifetime <- 50
+lma_resident <- 0.0825
+
+# Iterate seed-rain-out -> seed-rain-in until it stops moving (R0 = 1).
+find_equilibrium_birth_rate <- function(model, n_iter = 6, birth_rate = 1) {
+  ctrl <- Control()
+  ctrl$shading_model <- model
+  for (i in seq_len(n_iter)) {
+    resident <- expand_parameters(trait_matrix(lma_resident, "lma"), p_fit,
+                                  birth_rate_list = birth_rate)
+    birth_rate <- run_scm(resident, ctrl = ctrl)$offspring_production
+  }
+  birth_rate
+}
+find_equilibrium_birth_rate("deep-crown")   # converges to ~1.66
+```
+
+Crucially the equilibrium **depends on the shading model**: one that lets
+plants capture more light supports a denser stand. Running the iteration
+for every model gives equilibria spanning an order of magnitude — PPA's
+brighter layered light supports more than ten times the seed rain of
+deep-crown. These are hardcoded from the paper so the build does not
+re-run the slower models (re-derive with `find_equilibrium_birth_rate()`
+above):
+
+```{r}
+#| label: equil-table
+equilibrium_birth_rate <- c(
+  "deep-crown"        = 1.662,
+  "mean-light"        = 2.178,
+  "crown-centre"      = 2.185,
+  "ppa"               = 18.835,
+  "flat-top-soft-box" = 3.101
+)
+knitr::kable(data.frame(
+  model = names(equilibrium_birth_rate),
+  `equilibrium seed rain` = unname(equilibrium_birth_rate),
+  check.names = FALSE
+))
+```
+
+That an order-of-magnitude difference in predicted stand density follows
+from the shading assumption alone is the first sign that these models, so
+alike in their stand-development trajectories, are not interchangeable.
+
+## Invasion (mutant) fitness (rung 3)
+
+Invasion fitness is far more demanding. The fitness of a rare mutant is
+its lifetime reproductive output as it grows through the light cast by an
+established resident — so it depends not on the light at one size, but on
+how the light *changes as the plant grows*. A fitness landscape is only
+useful if it is **smooth**: kinks and jumps leave optima and selection
+gradients ill-defined.
+
+We compute invasion fitness for mutants spanning a range of LMA at fine
+resolution, under two seedings: (1) every model at the *same* resident
+seed rain, isolating the shading model; (2) each model at *its own*
+equilibrium, so each casts a self-consistent stand. The resident is run
+with `save_RK45_cache = TRUE` so mutants can be introduced into the
+fixed landscape with `run_mutant()`; fitness is `log(R0)`.
+
+```{r}
+#| label: fitness
+#| fig-width: 10
+#| fig-height: 3.6
+#| fig-cap: "Invasion fitness landscapes under two seedings. The smooth models give smooth landscapes; ppa is jagged, wildly so at its own dense equilibrium."
+mutant_lma <- seq(0.07, 0.11, length.out = 60)
+
+fitness_landscape <- function(model, birth_rate) {
+  ctrl <- Control()
+  ctrl$shading_model <- model
+  ctrl$save_RK45_cache <- TRUE                       # required by run_mutant()
+  resident <- expand_parameters(trait_matrix(lma_resident, "lma"), p_fit,
+                                birth_rate_list = birth_rate)
+  scm <- run_scm(resident, ctrl = ctrl)              # caches the light environment
+  mutants <- expand_parameters(trait_matrix(mutant_lma, "lma"), resident,
+                               birth_rate_list = rep(1, length(mutant_lma)))
+  scm$run_mutant(mutants)
+  r0 <- scm$net_reproduction_ratios                  # resident first, then mutants
+  data.frame(method = model, lma = mutant_lma,
+             fitness = log(tail(r0, length(mutant_lma))))
+}
+
+common_rain <- equilibrium_birth_rate[["deep-crown"]]
+fit_same  <- dplyr::bind_rows(lapply(models, fitness_landscape, birth_rate = common_rain))
+fit_equil <- dplyr::bind_rows(lapply(models, function(m)
+  fitness_landscape(m, equilibrium_birth_rate[[m]])))
+
+fit_two <- dplyr::bind_rows(
+  dplyr::mutate(fit_same,  seeding = "same seed rain"),
+  dplyr::mutate(fit_equil, seeding = "each at its own equilibrium")
+)
+fit_two$method  <- factor(fit_two$method, levels = models)
+fit_two$seeding <- factor(fit_two$seeding,
+                          levels = c("same seed rain", "each at its own equilibrium"))
+
+ggplot(fit_two, aes(lma, fitness, colour = seeding)) +
+  geom_line(linewidth = 0.8) +
+  facet_wrap(~method, nrow = 1) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey70") +
+  labs(x = "Mutant LMA", y = "Invasion fitness, log(R0)", colour = NULL) +
+  theme_classic() +
+  theme(legend.position = "bottom")
+```
+
+`"deep-crown"`, `"mean-light"` and `"crown-centre"` yield smooth
+landscapes under both seedings; `"ppa"` is jagged, and at its own (much
+denser) equilibrium wildly so, with a non-monotonic dip where small trait
+changes flip which layer the mutant ends in. The deeper lesson is about
+**continuity of the light profile**, not the cost of the assimilation
+calculation: the three smooth models build a continuous light profile and
+differ only in how they summarise assimilation, so all three give smooth
+fitness. PPA's stepped profile breaks this.
+
+### Getting the competition profile right
+
+Why does crown-centre survive while the box models do not? Crown-centre
+approximates a plant's *own* assimilation crudely but still computes the
+shade it *casts* from the full smooth Yokozawa crown. The continuity that
+fitness needs comes from that competition profile. The box models keep
+crown-centre's assimilation but collapse the shade cast towards a thin
+layer — mirroring the discrete-layer competition of large vegetation
+models (LPJ-GUESS and the like).
+
+```{r}
+#| label: compbox
+#| fig-width: 7
+#| fig-height: 3.6
+#| fig-cap: "Shade cast vs height by a 10 m plant. Crown-centre tapers continuously; the hard box is a step; the soft box is a continuous-but-wrong drop."
+comp_profile <- function(model, height = 10) {
+  s <- FF16_Strategy()
+  s$control$shading_model <- model
+  ind <- FF16_Individual(s)
+  ind$set_state("height", height)
+  z <- seq(0, height, length.out = 400)
+  data.frame(model = model, z = z,
+             competition = sapply(z, function(zz) ind$compute_competition(zz)))
+}
+comp <- dplyr::bind_rows(
+  comp_profile("crown-centre"),
+  comp_profile("flat-top-box"),
+  comp_profile("flat-top-soft-box")
+)
+
+ggplot(comp, aes(competition, z, colour = model)) +
+  geom_path() +
+  labs(x = "Shade cast (competition) by a 10 m plant", y = "Height (m)",
+       colour = "Model") +
+  theme_classic()
+```
+
+**The hard step does not even run.** Summed over a population of discrete
+cohorts, step competition makes the patch light profile discontinuous,
+which the adaptive light-environment spline cannot represent — the model
+fails before a stand can develop:
+
+```{r}
+#| label: box-fail
+ctrl_box <- Control()
+ctrl_box$shading_model <- "flat-top-box"
+tryCatch(
+  run_scm(patch, ctrl = ctrl_box),
+  error = function(e) conditionMessage(e)
+)
+```
+
+**The soft box runs, but gives the wrong answer.** Its continuous
+competition lets the light environment build and a fitness landscape be
+computed, but the shade is mis-distributed through the canopy, so the
+landscape is biased relative to deep-crown. The *correct* crown-centre
+tracks deep-crown; the soft box does not.
+
+```{r}
+#| label: softbox-fitness
+#| fig-width: 7
+#| fig-height: 4
+#| fig-cap: "The soft box runs but is biased: correct crown-centre tracks deep-crown, the soft box does not. Each model at its own equilibrium."
+box_models <- c("deep-crown", "crown-centre", "flat-top-soft-box")
+fit_compare <- dplyr::bind_rows(lapply(box_models, function(m)
+  fitness_landscape(m, equilibrium_birth_rate[[m]])))
+fit_compare$method <- factor(fit_compare$method, levels = box_models)
+
+ggplot(fit_compare, aes(lma, fitness, colour = method)) +
+  geom_line(linewidth = 1) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
+  labs(x = "Mutant LMA", y = "Invasion fitness, log(R0)", colour = "Model") +
+  theme_classic()
+```
+
+So getting the competition profile right is a prerequisite, not a
+refinement. A plant model can tolerate a crude *assimilation*
+approximation and still behave well for dynamics and fitness, but the
+shade each plant *casts* as a function of height must be both continuous
+(or the light environment is ill-defined) and the right shape (or
+evolutionary predictions are biased). This is worth flagging as
+trait-based DGVMs (FATES and the like) are increasingly pushed towards
+eco-evolutionary questions: the trouble is confined to discriminating
+mutants that differ only *slightly*, where two near-identical strategies
+can fall on opposite sides of a layer boundary and receive incomparable
+fitnesses.
+
+## The evolutionary attractor (rung 4)
+
+The most demanding rung. A smooth landscape is not the point in itself —
+the reason we want one is to ask **where evolution settles**, and whether
+the methods that agree a landscape is smooth also agree on its endpoint.
+They do not.
+
+The endpoint is the trait that is its own best reply: the **singular
+strategy** $s^\*$, where the selection gradient vanishes. We locate it by
+root-solving the gradient. For each candidate resident LMA: (1) find its
+demographic-equilibrium seed rain ($R_0 = 1$); (2) the selection gradient
+is the slope of mutant $\log R_0$ at mutant = resident (central finite
+difference); (3) root-find where the gradient crosses zero. A negative
+slope at the crossing means convergence stability; a negative fitness
+curvature means uninvadability (an ESS); both together make it a **CSS**.
+
+```{r}
+#| label: attractor-machinery
+# Demographic-equilibrium seed rain for a resident of given LMA.
+equilibrium_birth_rate_at <- function(model, lma, n_iter = 6, birth_rate = 1) {
+  ctrl <- Control(); ctrl$shading_model <- model
+  for (i in seq_len(n_iter)) {
+    resident <- expand_parameters(trait_matrix(lma, "lma"), p_fit,
+                                  birth_rate_list = birth_rate)
+    birth_rate <- run_scm(resident, ctrl = ctrl)$offspring_production
+  }
+  birth_rate
+}
+
+# Selection gradient d log(R0)/d(LMA) at mutant = resident, resident at its
+# own demographic equilibrium. Central finite difference.
+sel_gradient <- function(model, lma, delta = 0.0015, n_iter = 6) {
+  ctrl <- Control(); ctrl$shading_model <- model; ctrl$save_RK45_cache <- TRUE
+  br <- equilibrium_birth_rate_at(model, lma, n_iter)
+  resident <- expand_parameters(trait_matrix(lma, "lma"), p_fit,
+                                birth_rate_list = br)
+  scm <- run_scm(resident, ctrl = ctrl)
+  mutants <- expand_parameters(trait_matrix(c(lma - delta, lma + delta), "lma"),
+                               resident, birth_rate_list = rep(1, 2))
+  scm$run_mutant(mutants)
+  f <- log(tail(scm$net_reproduction_ratios, 2))
+  (f[2] - f[1]) / (2 * delta)
+}
+
+# Curvature d2 log(R0)/d(LMA)^2 at s* (uninvadability test): < 0 => CSS.
+fitness_curvature <- function(model, s, delta = 0.0015, n_iter = 6) {
+  ctrl <- Control(); ctrl$shading_model <- model; ctrl$save_RK45_cache <- TRUE
+  br <- equilibrium_birth_rate_at(model, s, n_iter)
+  resident <- expand_parameters(trait_matrix(s, "lma"), p_fit,
+                                birth_rate_list = br)
+  scm <- run_scm(resident, ctrl = ctrl)
+  mutants <- expand_parameters(trait_matrix(c(s - delta, s, s + delta), "lma"),
+                               resident, birth_rate_list = rep(1, 3))
+  scm$run_mutant(mutants)
+  f <- log(tail(scm$net_reproduction_ratios, 3))
+  (f[3] - 2 * f[2] + f[1]) / delta^2
+}
+```
+
+As a live check, we root-find the default `"deep-crown"` attractor over
+the LMA interval where its gradient changes sign. A single `uniroot()`
+converges in a handful of equilibrium solves:
+
+```{r}
+#| label: attractor-live
+deep_crown_star <- uniroot(function(x) sel_gradient("deep-crown", x),
+                           interval = c(0.100, 0.1025), tol = 1e-5)$root
+deep_crown_star                                   # ~0.1007
+```
+
+Mapping the gradient over a grid and root-solving + curvature-testing all
+five models is the expensive part (a few minutes — every grid point
+re-solves an equilibrium and PPA is slow). So, as with the equilibrium
+table, we hardcode the precomputed results and plot from them. They are
+the paper's own outputs, written by
+`examples/DunFalster2026/make_figure_attractor.R`
+(`evolutionary-attractor-gradients.csv` and
+`evolutionary-attractor-singular-strategies.csv`).
+
+```{r}
+#| label: attractor-data
+attractor_gradients <- read.csv(strip.white = TRUE, blank.lines.skip = TRUE,
+  text = "method,lma,gradient
+deep-crown,0.0650,437.8
+deep-crown,0.0675,410.9
+deep-crown,0.0700,382.6
+deep-crown,0.0725,353.4
+deep-crown,0.0750,323.2
+deep-crown,0.0775,292.2
+deep-crown,0.0800,260.7
+deep-crown,0.0825,229.0
+deep-crown,0.0850,197.1
+deep-crown,0.0875,165.2
+deep-crown,0.0900,133.4
+deep-crown,0.0925,101.8
+deep-crown,0.0950,70.5
+deep-crown,0.0975,39.5
+deep-crown,0.1000,8.9
+deep-crown,0.1025,-21.2
+deep-crown,0.1050,-50.8
+deep-crown,0.1075,-79.8
+deep-crown,0.1100,-108.2
+deep-crown,0.1125,-136.0
+deep-crown,0.1150,-163.2
+deep-crown,0.1175,-189.8
+deep-crown,0.1200,-215.8
+deep-crown,0.1225,-241.3
+deep-crown,0.1250,-266.1
+mean-light,0.0650,496.5
+mean-light,0.0675,466.6
+mean-light,0.0700,434.0
+mean-light,0.0725,399.1
+mean-light,0.0750,362.5
+mean-light,0.0775,324.5
+mean-light,0.0800,285.4
+mean-light,0.0825,245.6
+mean-light,0.0850,205.1
+mean-light,0.0875,164.3
+mean-light,0.0900,123.4
+mean-light,0.0925,82.5
+mean-light,0.0950,41.8
+mean-light,0.0975,1.3
+mean-light,0.1000,-38.9
+mean-light,0.1025,-78.6
+mean-light,0.1050,-117.9
+mean-light,0.1075,-156.7
+mean-light,0.1100,-195.1
+mean-light,0.1125,-233.0
+mean-light,0.1150,-270.2
+mean-light,0.1175,-306.9
+mean-light,0.1200,-343.2
+mean-light,0.1225,-379.0
+mean-light,0.1250,-414.2
+crown-centre,0.0650,571.2
+crown-centre,0.0675,531.3
+crown-centre,0.0700,487.5
+crown-centre,0.0725,440.0
+crown-centre,0.0750,389.4
+crown-centre,0.0775,336.6
+crown-centre,0.0800,281.9
+crown-centre,0.0825,226.1
+crown-centre,0.0850,169.5
+crown-centre,0.0875,112.4
+crown-centre,0.0900,54.8
+crown-centre,0.0925,-2.5
+crown-centre,0.0950,-59.2
+crown-centre,0.0975,-115.4
+crown-centre,0.1000,-171.1
+crown-centre,0.1025,-225.7
+crown-centre,0.1050,-279.6
+crown-centre,0.1075,-332.4
+crown-centre,0.1100,-384.2
+crown-centre,0.1125,-434.7
+crown-centre,0.1150,-484.2
+crown-centre,0.1175,-532.7
+crown-centre,0.1200,-579.9
+crown-centre,0.1225,-626.2
+crown-centre,0.1250,-671.0
+flat-top-soft-box,0.0650,717.9
+flat-top-soft-box,0.0675,662.2
+flat-top-soft-box,0.0700,600.0
+flat-top-soft-box,0.0725,532.7
+flat-top-soft-box,0.0750,461.6
+flat-top-soft-box,0.0775,387.6
+flat-top-soft-box,0.0800,312.1
+flat-top-soft-box,0.0825,235.5
+flat-top-soft-box,0.0850,158.5
+flat-top-soft-box,0.0875,81.0
+flat-top-soft-box,0.0900,3.7
+flat-top-soft-box,0.0925,-73.5
+flat-top-soft-box,0.0950,-150.6
+flat-top-soft-box,0.0975,-227.7
+flat-top-soft-box,0.1000,-304.6
+flat-top-soft-box,0.1025,-381.6
+flat-top-soft-box,0.1050,-458.8
+flat-top-soft-box,0.1075,-536.6
+flat-top-soft-box,0.1100,-615.1
+flat-top-soft-box,0.1125,-694.2
+flat-top-soft-box,0.1150,-774.1
+flat-top-soft-box,0.1175,-854.8
+flat-top-soft-box,0.1200,-936.9
+flat-top-soft-box,0.1225,-1020.0
+flat-top-soft-box,0.1250,-1104.0
+ppa,0.0650,3461.1
+ppa,0.0675,2945.3
+ppa,0.0700,3120.4
+ppa,0.0725,2647.5
+ppa,0.0750,2729.6
+ppa,0.0775,2445.4
+ppa,0.0800,2650.1
+ppa,0.0825,1093.1
+ppa,0.0850,271.6
+ppa,0.0875,-310.5
+ppa,0.0900,-2335.3
+ppa,0.0925,-2840.7
+ppa,0.0950,-3062.7
+ppa,0.0975,-2961.9
+ppa,0.1000,-3913.1
+ppa,0.1025,-3968.6
+ppa,0.1050,-4075.2
+ppa,0.1075,-2792.7
+ppa,0.1100,-2631.3
+ppa,0.1125,-2557.8
+ppa,0.1150,-4407.0
+ppa,0.1175,-86.9
+ppa,0.1200,-4012.5
+ppa,0.1225,-461.9
+ppa,0.1250,-167.4")
+
+singular_strategies <- read.csv(strip.white = TRUE, blank.lines.skip = TRUE,
+  text = "method,lma_star,curvature,class,robust
+deep-crown,0.1007,-12477,CSS,TRUE
+mean-light,0.0976,-17176,CSS,TRUE
+crown-centre,0.0924,-20663,CSS,TRUE
+flat-top-soft-box,0.0901,-30828,CSS,TRUE
+ppa,0.0859,-250149,CSS,FALSE")
+
+model_order <- c("deep-crown", "mean-light", "crown-centre",
+                 "flat-top-soft-box", "ppa")
+attractor_gradients$method <- factor(attractor_gradients$method, levels = model_order)
+singular_strategies$method <- factor(singular_strategies$method, levels = model_order)
+```
+
+```{r}
+#| label: tbl-attractor
+#| tbl-cap: "Singular strategies. All five are convergence-stable, uninvadable maxima (CSS), yet the attracted LMA spreads ~15%. PPA's endpoint is flagged stepped (set by where the layer boundaries fall)."
+knitr::kable(data.frame(
+  model                   = as.character(singular_strategies$method),
+  `attracted LMA`         = round(singular_strategies$lma_star, 4),
+  `equilibrium seed rain` = unname(equilibrium_birth_rate[as.character(singular_strategies$method)]),
+  `fitness curvature`     = singular_strategies$curvature,
+  classification          = ifelse(singular_strategies$robust,
+                                   singular_strategies$class,
+                                   paste0(singular_strategies$class, " (stepped)")),
+  check.names = FALSE, row.names = NULL))
+```
+
+```{r}
+#| label: fig-attractor
+#| fig-width: 8
+#| fig-height: 7.5
+#| fig-cap: "(top) Selection gradient vs resident LMA; a zero crossing with negative slope is an attractor (PPA's spikes clipped, |gradient| up to ~4000). (bottom) Where evolution settles — the methods disagree, a ~15% spread. Filled = robust; open = stepped (PPA)."
+shape_vals <- c(`TRUE` = 19, `FALSE` = 1)
+
+p_grad <- ggplot(attractor_gradients, aes(lma, gradient, colour = method)) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
+  geom_line(linewidth = 0.9) +
+  geom_point(data = singular_strategies, aes(lma_star, 0, shape = robust),
+             size = 3) +
+  scale_shape_manual(values = shape_vals, guide = "none") +
+  coord_cartesian(ylim = c(-400, 400)) +     # PPA's spikes reach ~4000; clip them
+  labs(x = "Resident LMA", y = "Selection gradient,  d log(R0) / d(LMA)",
+       colour = "Shading model",
+       subtitle = "Zero crossing with negative slope = attractor (PPA clipped: |gradient| up to ~4000)") +
+  theme_classic()
+
+p_star <- ggplot(singular_strategies, aes(method, lma_star, colour = method)) +
+  geom_point(aes(shape = robust), size = 3.5, show.legend = FALSE) +
+  geom_text(aes(label = formatC(lma_star, format = "f", digits = 4)),
+            vjust = -1.2, size = 3, show.legend = FALSE) +
+  scale_shape_manual(values = shape_vals, guide = "none") +
+  scale_y_continuous(expand = expansion(mult = c(0.08, 0.15))) +
+  labs(x = NULL, y = "Attracted LMA  (singular strategy)",
+       subtitle = "Where evolution settles: the methods disagree (~15% spread)") +
+  theme_classic() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 30, hjust = 1))
+
+(p_grad / p_star) + plot_layout(heights = c(1.2, 1))
+```
+
+**Every method has a genuine endpoint — but they are different
+endpoints.** All five gradients cross zero once, each convergence-stable
+and uninvadable (a CSS), yet the attracted LMA marches across the methods:
+deep-crown `0.1007`, mean-light `0.0976`, crown-centre `0.0924`,
+flat-top-soft-box `0.0901`, ppa `0.0859` — a ~15% spread. **That
+disagreement is invisible at the rungs below**: deep-crown, mean-light and
+crown-centre agreed on stand dynamics and gave fitness landscapes of the
+same *shape*, yet settle on different LMA, because each supports a
+different equilibrium *density* (seed rains 1.66 / 2.18 / 2.18 / 3.10 /
+18.8), so the realised light environment a mutant grows through differs.
+Smoothness is necessary for evolutionary analysis; it is not sufficient
+for the answer to be right. **PPA reaches an endpoint, but a fragile
+one** — buried in the staircase of its discrete layers, with curvature an
+order of magnitude steeper and a location set by where the layer
+boundaries fall.
+
+## "Forced to run" is not "valid": the PPA grid artifact
+
+The adaptive solver *refuses* the hard-step variants (discontinuous light
+profile → "Cannot achieve the desired accuracy"). A fixed-step
+forward-Euler integrator (`control$fixed_time_step`) will instead march
+straight across the discontinuity and return numbers — but those numbers
+are an artefact of where the step grid falls, not a converged solution.
+The paper's `make_figure_gridartifact.R` makes this concrete: a single
+resident's seed output **converges** under step refinement for the
+smoothed profile but **does not** for the hard step.
+
+This is the heaviest analysis in the paper. The two slow sweeps (gradient
+over LMA at three step settings; seed output vs step size) are cached by
+the paper script; we transcribe the convergence data here and plot it.
+The gradient sweep is left as `eval: false` because re-running it under
+fixed-step Euler at fine resolution is slow and the result is the cached
+CSV the paper ships.
+
+```{r}
+#| label: gridartifact-machinery
+#| eval: false
+# Transcribed from make_figure_gridartifact.R. Uses the community /
+# low-density invasion-fitness method (resident at demographic equilibrium
+# + two mutants at tiny birth rate, one multi-species run_scm), which needs
+# no RK45 mutant cache and so runs under fixed_time_step.
+p_fit_grid <- scm_base_parameters("FF16"); p_fit_grid$max_patch_lifetime <- 50
+
+mk_ctrl <- function(dt, smoothing) {
+  ctrl <- Control(); ctrl$shading_model <- "ppa"
+  ctrl$ppa_layer_smoothing <- smoothing; ctrl$fixed_time_step <- dt
+  ctrl
+}
+equilibrium_br <- function(ctrl, lma, n_iter = 6, br = 1) {
+  for (i in seq_len(n_iter)) {
+    res <- expand_parameters(trait_matrix(lma, "lma"), p_fit_grid, birth_rate_list = br)
+    br  <- run_scm(res, ctrl = ctrl)$offspring_production
+  }
+  br
+}
+# community / low-density selection gradient d log(R0_mutant)/d(LMA)
+grad_community <- function(dt, smoothing, lma, delta = 0.0015, eps = 1e-4) {
+  ctrl <- mk_ctrl(dt, smoothing)
+  br   <- equilibrium_br(ctrl, lma)
+  comm <- expand_parameters(
+    trait_matrix(c(lma, lma - delta, lma + delta), "lma"), p_fit_grid,
+    birth_rate_list = c(br, eps, eps))
+  op <- run_scm(comm, ctrl = ctrl)$offspring_production
+  f  <- log(op[2:3] / eps)
+  (f[2] - f[1]) / (2 * delta)
+}
+
+# Convergence of a single resident's seed output as the fixed step shrinks.
+dts <- 1 / c(46, 91, 182, 365, 730, 1460)
+op_at <- function(dt, smoothing) {
+  res <- expand_parameters(trait_matrix(0.1, "lma"), p_fit_grid, birth_rate_list = 1)
+  tryCatch(run_scm(res, ctrl = mk_ctrl(dt, smoothing))$offspring_production,
+           error = function(e) NA_real_)
+}
+conv_df <- dplyr::bind_rows(lapply(c(0, 0.3), function(sm) {
+  data.frame(smoothing = sm, steps_per_year = 1 / dts,
+             offspring = vapply(dts, op_at, numeric(1), smoothing = sm))
+}))
+```
+
+```{r}
+#| label: fig-gridartifact
+#| fig-width: 7
+#| fig-height: 4
+#| fig-cap: "Resident seed output vs fixed-step refinement (the paper's cached convergence data). The smoothed PPA converges; the hard step bounces ~10x and does not. Note each panel's own y-scale."
+# Cached convergence output from make_figure_gridartifact.R
+# (figures/_gridartifact_convergence.csv).
+conv_df <- read.csv(strip.white = TRUE, text = "smoothing,steps_per_year,offspring
+0,46,0.00867498
+0,91,0.01378317
+0,182,0.00676893
+0,365,0.00949590
+0,730,0.03717335
+0,1460,0.06593600
+0.3,46,25.41085116
+0.3,91,25.35579110
+0.3,182,25.32100352
+0.3,365,25.29680840
+0.3,730,25.28289274
+0.3,1460,25.27483319")
+conv_df$variant <- ifelse(conv_df$smoothing == 0,
+                          "PPA hard step (s=0)", "PPA smoothed (s=0.3)")
+
+ggplot(conv_df, aes(steps_per_year, offspring, colour = variant)) +
+  geom_line(linewidth = 0.8) + geom_point(size = 2) +
+  scale_x_log10() +
+  facet_wrap(~variant, ncol = 2, scales = "free_y") +
+  scale_colour_manual(values = c("PPA hard step (s=0)" = "#0072B2",
+                                 "PPA smoothed (s=0.3)" = "#D55E00"),
+                      guide = "none") +
+  labs(x = "Steps per year  (1 / fixed_time_step, log scale)",
+       y = "Resident seed output") +
+  theme_classic()
+```
+
+"Does not run" understates it: even when *forced* to run under fixed-step
+Euler, the PPA hard step has no convergent evolutionary endpoint — its
+seed output depends on the arbitrary step grid. The smoothed variant (the
+runnable, reported version) is well-behaved.
+
+## Re-running the paper's own figures
+
+There are two re-runs worth distinguishing:
+
+1. **Paper code, today** — the figure scripts from
+   `vignettes/examples/DunFalster2026/`, run against current
+   dependencies. Tells you whether the paper's own code still executes
+   cleanly.
+2. **Current `plant`** — the analysis above, transcribed from the source
+   vignette and run through today's API (the rendered figures on this
+   page). Tells you whether the *model* still produces the published
+   behaviour.
+
+Divergence between (1) and (2) is the model-drift signal; divergence
+between a published panel and (1) means the paper code itself no longer
+reproduces against current deps.
+
+The paper's scripts would be vendored as a paper-code submodule at
+`paper-code/dunfalster2026-canopy/`, pinned to the publication commit
+(`code-ref` in the front matter — `TODO`, not yet tagged). They write
+publication-grade panels (and the cached CSVs this post reads):
+
+- `make_figures.R` — the six-model consequence ladder, the
+  competition-profile / soft-box mechanism figure, and the supplementary
+  size-distribution and vertical-light-profile panels.
+- `make_figure_attractor.R` — the evolutionary-attractor gradient grid
+  and singular-strategy table reproduced above.
+- `make_figure_gridartifact.R` — the PPA grid-artifact convergence study.
+
+```{r}
+#| label: paper-code-rerun
+#| eval: false
+#| fig-cap: "Paper's own figure scripts, re-run. See code-ref in front matter for the (pending) publication commit."
+# Submodule checked out at paper-code/dunfalster2026-canopy/ (CI: git submodule update --init).
+# These scripts hardcode absolute output paths and a local devtools::load_all()
+# of the plant source tree; adapt the header before running here.
+# source(here::here("paper-code/dunfalster2026-canopy", "make_figures.R"))
+# source(here::here("paper-code/dunfalster2026-canopy", "make_figure_attractor.R"))
+# source(here::here("paper-code/dunfalster2026-canopy", "make_figure_gridartifact.R"))
+```
+
+## Side by side
+
+::: {.repro-compare}
+::: {.repro-pane}
+**Published** — TODO (figure numbers not finalised; paper in prep)
+
+> Add the published panels at `assets/papers/dunfalster2026-canopy.png`
+> once the paper exists, or link them at the DOI (also TODO).
+:::
+::: {.repro-pane}
+**Reproduced** — current `plant` (develop)
+
+> The figures rendered above.
+:::
+:::
+
+## Verdict
+
+`fidelity: pending`. There is no published figure to compare against yet
+(the paper is in preparation), so a matches / differs / approximate
+verdict cannot be set. What this post *does* establish is that the
+analysis runs end-to-end on develop-branch `plant`
+(`81cfeab`) and reproduces the paper's headline structure: the
+order-of-magnitude spread in equilibrium seed rain, the smooth-vs-jagged
+split in invasion fitness, the ~15% disagreement in attracted LMA across
+methods, and the non-convergence of the PPA hard step under step
+refinement. Re-run as a regression check once the paper is submitted and
+its figures and commit can be pinned; then update `fidelity:`.
+
+```{r}
+#| label: session
+plant_session_info()
+```

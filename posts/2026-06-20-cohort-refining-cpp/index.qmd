@@ -1,0 +1,87 @@
+---
+title: "Moving cohort refining into C++"
+description: "Issue #408: the adaptive cohort-schedule refinement loop moves from R into the C++ SCM, and the public API consolidates onto a single run_scm() entry point — behaviour-preserving throughout."
+date: 2026-06-20
+plant-ref: "develop"
+plant-sha: "ad280e9946be86bc1305c88f7be3a03f73c313c4"
+categories: [scm, refactor, develop, engineering]
+reading-time: true
+---
+
+```{r setup, include=FALSE}
+source(here::here("R/version-badge.R"))
+```
+
+`r plant_version_badge()`
+
+This post summarises [issue #408](https://github.com/traitecoevo/plant/issues/408):
+moving the SCM's adaptive cohort-schedule refinement out of R and into C++, and
+collapsing the surrounding R helpers onto one entry point. The governing
+constraint was that the FF16 reference baselines stay green at every step — the
+refactor changes *where* the work happens, not *what* it computes.
+
+## The problem
+
+The solver carried two intertwined machines smeared across the R/C++ boundary:
+
+- **A refinement loop** that lived mostly in R (`build_schedule()`). Each
+  iteration constructed a fresh `SCM`, **manually single-stepped** it from R to
+  sample a per-node competition (LAI) error during the run, read a per-node
+  reproduction error at the end, flagged nodes whose combined error exceeded
+  `schedule_eps`, bisected the intervals below them, and repeated.
+- **Reproduction accounting** that was already integrated inside the C++ ODE,
+  but was then re-weighted *post-hoc* — `SCM` reached back into `node_schedule`
+  to re-derive each node's introduction time and re-queried
+  `survival_weighting->density(t)`, even though both values were knowable the
+  moment the node was born.
+
+The only reason the refinement loop was stuck in R was that the competition
+error had to be sampled *during* the run as a running maximum across steps — and
+the R code re-implemented the step loop just to observe it.
+
+## The key insight
+
+Every "look it up later" path could be replaced by **recording the value on the
+node at introduction**. Once a `Node` owns its `introduction_time` and
+`density_at_birth`, `Species` can produce both the weighted-fitness vector and
+the integration x-axis itself, and `SCM` no longer needs `node_schedule` or
+`survival_weighting` for any reproduction calculation. With that in place, the
+running-max competition error can be maintained directly inside `SCM::run()` —
+removing the last thing forcing the loop into R.
+
+## How it was done — four behaviour-preserving phases
+
+| Phase | What moved into C++ | Verification |
+|---|---|---|
+| **1. Node-level bookkeeping** | Nodes stamp their own `introduction_time` + `patch_density_at_birth` at birth; reproduction methods read `species.node_times()` instead of reaching back into `node_schedule`/`survival_weighting`. | Full SCM / strategy / stochastic suites green; no R-facing signatures changed. |
+| **2. Error collection in `run()`** | A `collect_errors` flag makes `SCM::run()` fold in the per-species running-max competition error; `combined_node_errors()` returns the exact per-node `max(competition, reproduction)` signal the R loop used to assemble. | Asserted bit-exact against the old `run_scm_error()$err$total` for FF16 single / two-species / refined schedules; durable regression test added. |
+| **3. Refinement loop + `split_times`** | `SCM::refine_schedule()` owns the adaptive loop end-to-end (run → flag → upwind bisection → reset), reusing a single SCM instance. | Reproduces R `build_schedule` exactly (refined times, ODE times, offspring production) for FF16 and K93; durable test added. |
+| **4. Breaking API cleanup** | One entry point: `run_scm(p, env, ctrl, refine_schedule = FALSE, collect = FALSE, use_ode_times = FALSE)`. `run_scm_collect`, `run_scm_error`, and R-side `build_schedule`/`split_times` removed. | Full suite: 1832 pass, 0 fail, 1 pre-existing skip. |
+
+The phasing is the point: phases 1–3 are each independently green and
+behaviour-preserving, so the numerics never moved. Only phase 4 — the API
+consolidation — is a deliberate breaking change.
+
+## What callers see now
+
+```r
+# Refine an adaptive schedule (was: build_schedule(p, ctrl))
+p_refined <- run_scm(p, ctrl = ctrl, refine_schedule = TRUE)$parameters
+
+# Run and collect tidied history + reproduction outputs (was: run_scm_collect(x))
+out <- run_scm(x, collect = TRUE)
+```
+
+## Follow-ups outside this repo
+
+- **`plant.assembly`** still calls the removed helpers (`build_schedule()`,
+  `run_scm_collect()`) in `R/community_plant.R` and `scripts/example/ESA.Rmd`.
+  These need the same migration:
+  `build_schedule(p, ctrl = ctrl)` → `run_scm(p, ctrl = ctrl, refine_schedule = TRUE)$parameters`,
+  and `run_scm_collect(x)` → `run_scm(x, collect = TRUE)`.
+
+::: {.callout-note}
+The FF16 reference baselines in `tests/testthat/FF16_reference/` are the safety
+net for this whole refactor. If any phase had shifted numerics beyond tolerance,
+that would be a bug — not an expected regeneration.
+:::

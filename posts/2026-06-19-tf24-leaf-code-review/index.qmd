@@ -1,0 +1,83 @@
+---
+title: "Reviewing the TF24 leaf model code"
+description: "A structural code review of the TF24 hydraulics sources, resolving eleven findings while keeping the science bit-identical."
+date: 2026-06-19
+plant-ref: "develop"
+plant-sha: "81cfeab16a049478ca0ff81f1239b78221c49ebb"
+categories: [tf24, code-review, hydraulics]
+reading-time: true
+---
+
+```{r setup, include=FALSE}
+source(here::here("R/version-badge.R"))
+```
+
+`r plant_version_badge()`
+
+This post summarises a structural code review of the two core TF24 hydraulics
+sources in `plant`: `src/leaf_model.cpp` (the plant hydraulic solver) and
+`src/tf24_strategy.cpp` (the strategy/allocation layer that drives it). The
+review targeted structure, clarity, and maintainability rather than new
+science — with speed called out only where existing profiling supported it.
+
+Because both files sit on a numerically sensitive hot path, the governing
+constraint throughout was that every accepted change be validated
+**bit-identically** against `HEAD` (or its trajectory shift quantified) before
+being considered done. The headline result: eleven findings resolved, the
+science provably unchanged.
+
+## What changed, by class of finding
+
+| Class | What was addressed | Outcome |
+|---|---|---|
+| Caching redundant work | Temperature/O2-dependent photosynthesis params recomputed every `set_physiology` call | Cached on `(leaf_temp_, atm_o2_kpa_)`; bit-identical, speed-neutral, kept for clarity |
+| Heap-allocation reuse | Per-call `mass_root_prop_` vector allocated in `net_mass_production_dt` | Promoted to a reused member buffer; hygiene, not a measured speed win |
+| Redundant builders (DRY) | `setup_transpiration` / `setup_root_vulnerability` duplicated the knot-grid + gamma cumulative-integral build | Factored into a shared `build_cumulative_vulnerability_integral` helper |
+| Duplicated logic | Triple-inlined "shut down at psi_crit" early-exit in `find_root_collar_psi` | Extracted `set_shutdown_state(...)` helper |
+| Variable shadowing | Local `hydraulic_cost_` shadowing the member in `profit_psi_stem_*` | Renamed locals to `cost` |
+| Magic constants | Hard-coded root-distribution numbers and a duplicated unit factor | Named file-scope constants; unit factor documented and left inline (FP rounding) |
+| Unit divergence | `E_up_` in kg vs per-layer consumption in mol | Named `kg_per_mol_h2o`; intentional divergence documented at both sites |
+| Sign conventions | `root_collar_psi_` and `opt_psi_stem_` flipped sign by code path | Made sign-consistent across all branches; diagnostic-only change |
+| Naming / hygiene | `soil_depth` arg that was really a layer index; signed/unsigned loop comparison; truncated comment | Renamed to `soil_layer`, loop types aligned, comment completed |
+
+Two further items from the original log were resolved by being **rejected** or
+deferred on profiling grounds — the `hydraulic_cost_TF` inner-loop `exp/pow` and
+the `isfinite` guards in the transport hot loop — and are tracked in the
+companion performance notes rather than here.
+
+## Key takeaways
+
+- **Bit-identical was the bar, not a bonus.** Most changes were proven exact by
+  construction (same arithmetic, same accumulation order). Where a change would
+  have reordered a floating-point summation — collapsing the `60*60*12*365` unit
+  product, or moving a kg conversion inside a per-layer loop — it was
+  *deliberately not made*, because the adaptive ODE amplifies the rounding
+  difference. Documenting why something stays "ugly" turned out to be as
+  valuable as cleaning it up.
+- **The sign-convention fix was the only correctness finding.** The apparent
+  `transpiration` / `transpiration_to_psi_stem` discrepancy was confirmed *not*
+  a bug — two domain-natural conventions, internally consistent. The genuine
+  defect was diagnostic aux columns (`root_collar_psi_`, `opt_psi_stem_`) that
+  stored signed-negative vs positive-magnitude potentials depending on code
+  path. These are written out but never read back into any rate, so the fix is
+  diagnostic-only — every driver column verified `max|Δ| = 0`.
+- **"Speed" findings were mostly clarity findings.** Profiling showed the nested
+  solver dominates; caching ~8 transcendentals and preallocating buffers were
+  measured as washes. They were kept for code health, with the speed claims
+  explicitly retracted in the record.
+- **A shared sign-conventions reference block** now sits above
+  `E_from_Soil_to_Root_Collar`, and a new `test-leaf.r` case (wet soil, zero
+  light) locks in the sign relationships so the wart cannot silently return.
+
+## Where the detail lives
+
+This is a high-level summary. The per-item analysis — line references,
+before/after rationale, validation digests, and the deliberate
+non-changes — lives in the original review document and the commit history in
+the `plant` repository:
+
+<https://github.com/traitecoevo/plant>
+
+The review was conducted against the `develop` commit badged above; consult the
+commit history around that point for the line-by-line changes and the A/B
+validation records referenced here.

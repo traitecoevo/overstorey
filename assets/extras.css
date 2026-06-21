@@ -18,14 +18,14 @@
 .hero-title {
   font-family: "Space Grotesk", sans-serif;
   font-weight: 600;
-  font-size: clamp(2.1rem, 5vw, 3.4rem);
-  line-height: 1.04;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  line-height: 1.08;
   letter-spacing: -0.03em;
   color: #0b1f17;
   margin: 0.2rem 0 1rem;
 }
 .hero-lede {
-  font-size: 1.08rem;
+  font-size: 1rem;
   color: #1c4733;
   max-width: 46ch;
   margin-bottom: 1.6rem;
@@ -53,6 +53,14 @@
   stroke: #e8a317; stroke-width: 1; stroke-dasharray: 2 5; opacity: 0.45;
 }
 .mono { font-family: "JetBrains Mono", monospace; }
+
+/* Equations: MathJax sizes math larger than the surrounding text by
+   default, which reads as oversized against our body size. Pull both
+   inline and display math back. Selectors cover MathJax (mjx-container)
+   and the KaTeX/Quarto .math fallback. */
+mjx-container, .math, .math.inline, .math.display {
+  font-size: 0.85em;
+}
 
 .feature-row { max-width: 1080px; margin: 0 auto 2rem; gap: 1.5rem; }
 .feature-row h3 { font-size: 1.05rem; color: #0b1f17; margin-bottom: 0.4rem; }
