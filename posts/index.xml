@@ -8804,6 +8804,709 @@ font-style: inherit;">plant_session_info</span>()</span></code></pre></div></div
   <pubDate>Wed, 10 Jun 2026 00:00:00 GMT</pubDate>
 </item>
 <item>
+  <title>When the Richards equation fights back</title>
+  <link>https://traitecoevo.github.io/overstorey/posts/2025-07-29-richards-equation-instability/</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>We’ve recently been trying to expand the TF24 strategy to handle soil water, but our initial attempt encountered serious instability after we implemented the Richards equation. The symptom was unmissable: with anything but an absurdly small time step the integrator produced nonsense within a few steps — soil moisture leaping above saturation, going negative, then collapsing to <code>NaN</code>. The same pathology showed up whether the equation was implemented in C++ or in R, which is the first clue that the problem is mathematical rather than a coding slip.</p>
+<p>This post works through a minimal R reproduction of that instability, shows the contrast between an explicit and an implicit solver, and ends with the diagnosis: the discretised Richards equation is <strong>stiff</strong>, and no amount of careful coding will rescue an explicit Runge–Kutta scheme from it. The full back-and-forth — including the <img src="https://latex.codecogs.com/png.latex?%5Cpsi">-based form, a single-bucket fallback, and a delay-equation experiment — lives in <a href="https://github.com/traitecoevo/plant/discussions/444">traitecoevo/plant discussion #444</a>; here we keep just enough to stand on its own.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a standalone numerical experiment. It prototypes the soil-water dynamics directly with <code>deSolve</code> and does <strong>not</strong> use the <code>plant</code> package API, so it isn’t pinned to a <code>plant</code> version — the point is the solver behaviour, which is independent of the model it will eventually live in.</p>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tidyr)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(deSolve)</span></code></pre></div></div>
+</div>
+<section id="the-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-model">The model</h2>
+<p>We track volumetric soil water content <img src="https://latex.codecogs.com/png.latex?%5Ctheta"> on a vertical grid of <img src="https://latex.codecogs.com/png.latex?n"> nodes. Each node exchanges water with its neighbours by Darcy flux, driven by gradients in the matric potential <img src="https://latex.codecogs.com/png.latex?%5Cpsi">, plus gravity. This is the <em>mixed form</em> of the Richards equation, following Ireson et al.&nbsp;(2023):</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20%5Ctheta%7D%7B%5Cpartial%20t%7D%20=%20-%5Cfrac%7B%5Cpartial%20q%7D%7B%5Cpartial%20z%7D,%0A%5Cqquad%0Aq%20=%20-K(%5Ctheta)%5Cleft(%5Cfrac%7B%5Cpartial%20%5Cpsi%7D%7B%5Cpartial%20z%7D%20-%201%5Cright)."></p>
+<p>The constitutive relations — hydraulic conductivity <img src="https://latex.codecogs.com/png.latex?K(%5Ctheta)"> and matric potential <img src="https://latex.codecogs.com/png.latex?%5Cpsi(%5Ctheta)"> — are the usual power laws:</p>
+<p><img src="https://latex.codecogs.com/png.latex?K(%5Ctheta)%20=%20K_%5Ctext%7Bsat%7D%5Cleft(%5Cfrac%7B%5Ctheta%7D%7B%5Ctheta_%5Ctext%7Bsat%7D%7D%5Cright)%5E%7B2n_%5Cpsi%20+%203%7D,%0A%5Cqquad%0A%5Cpsi(%5Ctheta)%20=%20a_%5Cpsi%5Cleft(%5Cfrac%7B%5Ctheta%7D%7B%5Ctheta_%5Ctext%7Bsat%7D%7D%5Cright)%5E%7B-n_%5Cpsi%7D."></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">pow <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x, y) x<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span>y</span>
+<span id="cb2-2"></span>
+<span id="cb2-3">soil_K_from_soil_theta <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(theta, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">K_sat =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">440.628</span>,</span>
+<span id="cb2-4">                                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">soil_moist_sat =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.453</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n_psi =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4.8</span>) {</span>
+<span id="cb2-5">  K_sat <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pow</span>(theta <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> soil_moist_sat, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> n_psi <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)</span>
+<span id="cb2-6">}</span>
+<span id="cb2-7"></span>
+<span id="cb2-8">psi_from_soil_moist <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(soil_moist, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">soil_moist_sat =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.453</span>,</span>
+<span id="cb2-9">                                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">a_psi =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8.7</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n_psi =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4.8</span>) {</span>
+<span id="cb2-10">  a_psi <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pow</span>(soil_moist <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> soil_moist_sat, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>n_psi)</span>
+<span id="cb2-11">}</span>
+<span id="cb2-12"></span>
+<span id="cb2-13">params <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<span id="cb2-14">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">soil_moist_sat =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.453</span>,   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># saturated water content (m^3/m^3)</span></span>
+<span id="cb2-15">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">K_sat          =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">440.628</span>, <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># saturated conductivity (units below)</span></span>
+<span id="cb2-16">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n_psi          =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4.8</span>,     <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># pore-size distribution exponent</span></span>
+<span id="cb2-17">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">a_psi          =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8.7</span>,     <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># air-entry scaling</span></span>
+<span id="cb2-18">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">b_infil        =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8.0</span>,     <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># infiltration shape parameter</span></span>
+<span id="cb2-19">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rain           =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,       <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># rainfall forcing</span></span>
+<span id="cb2-20">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n              =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>       <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># number of soil nodes</span></span>
+<span id="cb2-21">)</span></code></pre></div></div>
+</div>
+<p>The right-hand side assembles the inter-node fluxes — an infiltration flux at the surface that shuts off as the top layer saturates, Darcy fluxes between interior nodes, and a free-drainage lower boundary (<img src="https://latex.codecogs.com/png.latex?q%20=%20K"> at the bottom) — then differences them to get <img src="https://latex.codecogs.com/png.latex?d%5Ctheta/dt"> at each node:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">rates <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(t, theta, params) {</span>
+<span id="cb3-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.list</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(theta, params)), {</span>
+<span id="cb3-3"></span>
+<span id="cb3-4">    psi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">psi_from_soil_moist</span>(theta, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">soil_moist_sat =</span> soil_moist_sat)</span>
+<span id="cb3-5">    K   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">soil_K_from_soil_theta</span>(theta, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">soil_moist_sat =</span> soil_moist_sat)</span>
+<span id="cb3-6"></span>
+<span id="cb3-7">    q  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rep</span>(<span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NA_real_</span>, n <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb3-8">    dz <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rep</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> n, n)</span>
+<span id="cb3-9">    dtheta_dt <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rep</span>(<span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NA_real_</span>, n)</span>
+<span id="cb3-10"></span>
+<span id="cb3-11">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># top boundary: infiltration, shutting off as the top layer fills</span></span>
+<span id="cb3-12">    q[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> rain <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">max</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pow</span>(theta[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> soil_moist_sat, b_infil))</span>
+<span id="cb3-13"></span>
+<span id="cb3-14">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># interior boundaries: Darcy flux (Eq. 3 + 11, Ireson et al. 2023)</span></span>
+<span id="cb3-15">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq_len</span>(n <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)) {</span>
+<span id="cb3-16">      dpsi_dz  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (psi[i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> psi[i]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> dz[i]</span>
+<span id="cb3-17">      q[i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (K[i] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> K[i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (dpsi_dz <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb3-18">    }</span>
+<span id="cb3-19"></span>
+<span id="cb3-20">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># lower boundary: free drainage (Eq. 13, Ireson et al. 2023)</span></span>
+<span id="cb3-21">    q[n <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> K[n]</span>
+<span id="cb3-22"></span>
+<span id="cb3-23">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># divergence of flux gives the rate of change at each node (Eq. 10)</span></span>
+<span id="cb3-24">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq_len</span>(n)) {</span>
+<span id="cb3-25">      dq_dz <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (q[i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> q[i]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> dz[i]</span>
+<span id="cb3-26">      dtheta_dt[i] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>dq_dz</span>
+<span id="cb3-27">    }</span>
+<span id="cb3-28"></span>
+<span id="cb3-29">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(dtheta_dt)</span>
+<span id="cb3-30">  })</span>
+<span id="cb3-31">}</span></code></pre></div></div>
+</div>
+<p>A small wrapper integrates the system and returns a long-format tibble, and a helper plots <img src="https://latex.codecogs.com/png.latex?%5Ctheta"> at each depth over time:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">solve_soil <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(times, rates, state, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rk4"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"theta"</span>) {</span>
+<span id="cb4-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ode</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> state, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">times =</span> times, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">func =</span> rates, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">parms =</span> params, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> method) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb4-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as_tibble</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb4-4">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pivot_longer</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>time, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names_to =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"depth"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values_to =</span> output) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb4-5">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">depth =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.integer</span>(depth)))</span>
+<span id="cb4-6">}</span>
+<span id="cb4-7"></span>
+<span id="cb4-8">plot_solution <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(solution) {</span>
+<span id="cb4-9">  solution <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb4-10">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> time, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> theta, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> depth)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-11">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-12">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"time (yr)"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expression</span>(theta), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"node"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-13">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>()</span>
+<span id="cb4-14">}</span>
+<span id="cb4-15"></span>
+<span id="cb4-16">n <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span></span>
+<span id="cb4-17">state <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rep</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2533</span>, n)</span></code></pre></div></div>
+</div>
+</section>
+<section id="the-instability" class="level2">
+<h2 class="anchored" data-anchor-id="the-instability">The instability</h2>
+<p>Now integrate with the classic explicit Runge–Kutta solver (<code>rk4</code>) at a time step of <img src="https://latex.codecogs.com/png.latex?10%5E%7B-4%7D"> yr — about an hour, which sounds harmlessly small:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">fail <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">solve_soil</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">times =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e-3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e-4</span>),</span>
+<span id="cb5-2">                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rates =</span> rates, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">state =</span> state, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rk4"</span>)</span>
+<span id="cb5-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot_solution</span>(fail)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div id="fig-rk4-fail" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rk4-fail-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://traitecoevo.github.io/overstorey/posts/2025-07-29-richards-equation-instability/index_files/figure-html/fig-rk4-fail-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rk4-fail-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Explicit RK4 at Δt = 1e-4 yr. The solution explodes within two steps — moisture overshoots saturation, goes negative, then becomes <code>NaN</code> (gaps in the lines).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>It detonates almost immediately. Printing the first few steps for the top nodes shows the runaway in numbers: a steady start, then values flung well past the physical range, then <code>NaN</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">fail <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb6-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(depth <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb6-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pivot_wider</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names_from =</span> depth, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values_from =</span> theta, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names_prefix =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"node "</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb6-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 4
+  time      `node 1`  `node 2`  `node 3`  
+  &lt;deSolve&gt; &lt;deSolve&gt; &lt;deSolve&gt; &lt;deSolve&gt; 
+1 0e+00     0.2533000 0.2533000  0.2533000
+2 1e-04     0.2531335 0.2544907  0.2527162
+3 2e-04     0.1836168 0.5842660 -0.1377172
+4 3e-04           NaN       NaN        NaN</code></pre>
+</div>
+</div>
+<p>This is not a bug in the right-hand side — the rates are continuous and correct. It’s the explicit integrator amplifying tiny errors faster than the dynamics damp them, the hallmark of a <strong>stiff</strong> system.</p>
+<p>The reflex fix is to shrink the step. At <img src="https://latex.codecogs.com/png.latex?10%5E%7B-5%7D"> yr (~5 minutes) RK4 <em>does</em> stay stable:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">ok <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">solve_soil</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">times =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e-2</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e-5</span>),</span>
+<span id="cb8-2">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rates =</span> rates, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">state =</span> state, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rk4"</span>)</span>
+<span id="cb8-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot_solution</span>(ok)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div id="fig-rk4-ok" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rk4-ok-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://traitecoevo.github.io/overstorey/posts/2025-07-29-richards-equation-instability/index_files/figure-html/fig-rk4-ok-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rk4-ok-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Explicit RK4 at Δt = 1e-5 yr stays stable — but this is only the first hundredth of a year, and already cost 1000 steps. A full year needs 100,000.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The infiltration front is smooth and physical — but look at the cost. That figure covers just <img src="https://latex.codecogs.com/png.latex?1/100"> of a year and already took 1000 steps. Integrating a single year would need 100,000 explicit steps, and a forest simulation runs for centuries. This is not a viable solver for the model.</p>
+</section>
+<section id="the-fix-an-implicit-solver" class="level2">
+<h2 class="anchored" data-anchor-id="the-fix-an-implicit-solver">The fix: an implicit solver</h2>
+<p>Stiffness is solved by <em>implicit</em> methods, which evaluate the right-hand side at the end of the step and so remain stable at large step sizes. <code>deSolve</code>’s <code>lsoda</code> switches automatically between stiff and non-stiff modes. Swapping it in — and taking a step of <img src="https://latex.codecogs.com/png.latex?0.1"> yr, ten thousand times larger than the one RK4 needed — integrates the whole year cleanly:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">stable <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">solve_soil</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">times =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>),</span>
+<span id="cb9-2">                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rates =</span> rates, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">state =</span> state, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lsoda"</span>)</span>
+<span id="cb9-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot_solution</span>(stable)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div id="fig-lsoda" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lsoda-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://traitecoevo.github.io/overstorey/posts/2025-07-29-richards-equation-instability/index_files/figure-html/fig-lsoda-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lsoda-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Implicit LSODA at Δt = 0.1 yr integrates a full year in ~10 steps with no instability.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Same right-hand side, same parameters, same initial condition — the only change is the solver, and the instability is gone. That is the clean experimental proof that the problem was stiffness all along.</p>
+</section>
+<section id="why-this-happens" class="level2">
+<h2 class="anchored" data-anchor-id="why-this-happens">Why this happens</h2>
+<p>The Richards equation is a nonlinear, degenerate elliptic–parabolic PDE. As Farthing &amp; Ogden (2017) put it, it is “degenerate” because its strongly nonlinear coefficients approach zero in parts of the solution domain. Here the conductivity <img src="https://latex.codecogs.com/png.latex?K(%5Ctheta)%20%5Cpropto%20%5Ctheta%5E%7B%5C,2n_%5Cpsi+3%7D"> spans many orders of magnitude across the profile: with <img src="https://latex.codecogs.com/png.latex?n_%5Cpsi%20=%204.8"> that exponent is about <img src="https://latex.codecogs.com/png.latex?12.6">, so a modest moisture gradient produces an enormous spread of local timescales between nodes. Fast nodes set the stability limit of an explicit step; slow nodes set how long you must integrate. The ratio between them <em>is</em> the stiffness, and it forces explicit methods into impractically tiny steps.</p>
+</section>
+<section id="takeaways-for-the-soil-water-work" class="level2">
+<h2 class="anchored" data-anchor-id="takeaways-for-the-soil-water-work">Takeaways for the soil-water work</h2>
+<ul>
+<li>The instability is intrinsic to the discretised Richards equation, not to our implementation — it reproduced identically in C++ and R.</li>
+<li>Explicit Runge–Kutta is the wrong tool. The model needs an implicit / adaptive stiff solver (LSODA, or a BDF-type method) if we keep the full Richards profile.</li>
+<li>If a stiff solver proves awkward to embed in the strategy’s inner loop, the discussion explores cheaper alternatives — a single- or two-layer bucket model, or a Kirchhoff-transform linearisation (Ross 2003) — that sidestep the stiffness rather than solving it.</li>
+</ul>
+<p>The next step for TF24 soil water is to decide between embedding an implicit solver and adopting a reduced-order bucket model; this experiment is what ruled out the naive explicit route.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li>Farthing, M. W. &amp; Ogden, F. L. (2017). Numerical solution of Richards’ equation: a review of advances and challenges. <em>Soil Science Society of America Journal</em>, 81(6), 1257–1269.</li>
+<li>Ireson, A. M. et al.&nbsp;(2023). The finite volume method for solving the Richards equation. <em>Hydrology and Earth System Sciences</em>.</li>
+<li>Ross, P. J. (2003). Modeling soil water and solute transport — fast, simplified numerical solutions. <em>Agronomy Journal</em>, 95(6), 1352–1361.</li>
+<li><a href="https://github.com/traitecoevo/plant/discussions/444">traitecoevo/plant discussion #444 — Problem modelling soil water with Richards Equation</a>. ```</li>
+</ul>
+
+
+</section>
+
+ ]]></description>
+  <category>tf24</category>
+  <category>soil-water</category>
+  <category>numerics</category>
+  <category>experimental</category>
+  <guid>https://traitecoevo.github.io/overstorey/posts/2025-07-29-richards-equation-instability/</guid>
+  <pubDate>Tue, 29 Jul 2025 00:00:00 GMT</pubDate>
+</item>
+<item>
   <title>Prototyping a soil water-balance bucket model</title>
   <link>https://traitecoevo.github.io/overstorey/posts/2024-05-22-water-bucket-model/</link>
   <description><![CDATA[ 
