@@ -70,7 +70,7 @@ jobs:
 
       # Publish the refreshed pages + a diff summary as a reviewable artifact.
       - name: Upload preview artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: refreshed-figures-${{ inputs.plant-ref }}
           path: |
