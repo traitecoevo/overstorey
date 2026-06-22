@@ -451,29 +451,52 @@ A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
 <p>The <code>Leaf</code> function creates a <code>Leaf</code> object, which contains most of the internal functions which are used when calculating the photosynthetic assimilation and water use of a unit of leaf area when using <code>TF24</code>. We initialise the <code>Leaf</code> object with a set of traits.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sw <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcmax_25 =</span> <span class="dv">6</span>,                  <span class="co">#  umol m^-2 s^-1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcmax_25 =</span> <span class="dv">96</span>,                 <span class="co">#  umol m^-2 s^-1</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">c =</span> <span class="fl">2.680147</span>,                  <span class="co"># unitless</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">b =</span> <span class="fl">3.898245</span>,                  <span class="co"># -MPa</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">psi_crit =</span> <span class="fl">5.870283</span>,           <span class="co"># -MPa</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta1 =</span> <span class="dv">20000</span>,                 <span class="co"># hydraulic cost for Bartlett method umol m^-3 s^-1</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta2 =</span> <span class="fl">1.5</span>,                   <span class="co"># exponent for effect of hydraulic risk  (unitless)</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">jmax_25 =</span> <span class="fl">157.44</span>,              <span class="co">#  maximum electron transport rate umol m^-2 s^-1</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">hk_s =</span> <span class="dv">4</span>,                      <span class="co"># maximum hydraulic-dependent sapwood turnover rate yr ^ -1</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">a =</span> <span class="fl">0.30</span>,                      <span class="co"># quantum yield of photosynthetic electron transport  (mol mol^-1)</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_elec_trans =</span> <span class="fl">0.7</span>,    <span class="co"># curvature factor for the light response curve  (unitless)</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_colim =</span> <span class="fl">0.99</span>,        <span class="co"># curvature factor for the colimited photosythnthesis equatiom</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">GSS_tol_abs =</span> <span class="fl">1e-3</span>,            <span class="co">#  ???</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">vulnerability_curve_ncontrol =</span> <span class="dv">100</span>,  <span class="co"># ????</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_abs_tol =</span> <span class="fl">1e-3</span>,             <span class="co"># ???</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_niter =</span> <span class="dv">1000</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>leaf <span class="ot">&lt;-</span> <span class="fu">Leaf</span>(<span class="at">vcmax=</span> sw<span class="sc">$</span>vcmax_25, <span class="at">b =</span> sw<span class="sc">$</span>b, <span class="at">c =</span> sw<span class="sc">$</span>c, <span class="at">psi_crit =</span> sw<span class="sc">$</span>psi_crit,</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>             <span class="at">beta2 =</span> sw<span class="sc">$</span>beta2, <span class="at">jmax_25 =</span> sw<span class="sc">$</span>jmax_25, <span class="at">hk_s =</span> sw<span class="sc">$</span>hk_s, <span class="at">a =</span> sw<span class="sc">$</span>a, <span class="at">curv_fact_elec_trans =</span> sw<span class="sc">$</span>curv_fact_elec_trans, <span class="at">curv_fact_colim =</span> sw<span class="sc">$</span>curv_fact_colim, <span class="at">GSS_tol_abs =</span> sw<span class="sc">$</span>GSS_tol_abs, <span class="at">vulnerability_curve_ncontrol =</span> sw<span class="sc">$</span>vulnerability_curve_ncontrol, <span class="at">ci_abs_tol =</span> sw<span class="sc">$</span>ci_abs_tol, <span class="at">ci_niter =</span> sw<span class="sc">$</span>ci_niter)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_c =</span> <span class="fl">2.680147</span>,              <span class="co"># unitless</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_b =</span> <span class="fl">3.898245</span>,              <span class="co"># -MPa</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_psi_crit =</span> <span class="fl">5.870283</span>,       <span class="co"># -MPa </span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta1 =</span> <span class="dv">20000</span>,                 <span class="co"># hydraulic cost for Bartlett method umol m^-3 s^-1</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta2 =</span> <span class="fl">1.5</span>,                   <span class="co"># exponent for effect of hydraulic risk  (unitless)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">jmax_25 =</span> <span class="fl">157.44</span>,              <span class="co">#  maximum electron transport rate umol m^-2 s^-1</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">hk_s =</span> <span class="dv">4</span>,                      <span class="co"># maximum hydraulic-dependent sapwood turnover rate yr ^ -1</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">a =</span> <span class="fl">0.30</span>,                      <span class="co"># quantum yield of photosynthetic electron transport  (mol mol^-1)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_elec_trans =</span> <span class="fl">0.7</span>,    <span class="co"># curvature factor for the light response curve  (unitless)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_colim =</span> <span class="fl">0.99</span>,        <span class="co"># curvature factor for the colimited photosythnthesis equatiom</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">GSS_tol_abs =</span> <span class="fl">1e-3</span>,            <span class="co">#  ???</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">vulnerability_curve_ncontrol =</span> <span class="dv">100</span>,  <span class="co"># ????</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_abs_tol =</span> <span class="fl">1e-3</span>,             <span class="co"># ???</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_niter =</span> <span class="dv">1000</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">g1_TF24 =</span> <span class="fl">7.5</span>,                <span class="co"># cost parameter for TF24 profit model umol m^-2 s^-1</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_R_H =</span> <span class="fl">3.4e2</span>,             <span class="co">#proportionality constant between minimum horizontal (intraleyer) root hydraulic resistance and C_r^-1 in [MPa * s * (mol C) / (mol H2O)]</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_R_V =</span> <span class="fl">9.4e3</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>leaf <span class="ot">&lt;-</span> <span class="fu">Leaf</span>(<span class="at">vcmax =</span> sw<span class="sc">$</span>vcmax_25, <span class="at">b =</span> sw<span class="sc">$</span>b, <span class="at">c =</span> sw<span class="sc">$</span>c, <span class="at">psi_crit =</span> sw<span class="sc">$</span>psi_crit,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>             <span class="at">root_c =</span> sw<span class="sc">$</span>root_c, <span class="at">root_b =</span> sw<span class="sc">$</span>root_b, <span class="at">root_psi_crit =</span> sw<span class="sc">$</span>root_psi_crit,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>             <span class="at">beta2 =</span> sw<span class="sc">$</span>beta2, <span class="at">jmax_25 =</span> sw<span class="sc">$</span>jmax_25, <span class="at">hk_s =</span> sw<span class="sc">$</span>hk_s, <span class="at">a =</span> sw<span class="sc">$</span>a, <span class="at">curv_fact_elec_trans =</span> sw<span class="sc">$</span>curv_fact_elec_trans, <span class="at">curv_fact_colim =</span> sw<span class="sc">$</span>curv_fact_colim, <span class="at">GSS_tol_abs =</span> sw<span class="sc">$</span>GSS_tol_abs, <span class="at">vulnerability_curve_ncontrol =</span> sw<span class="sc">$</span>vulnerability_curve_ncontrol, <span class="at">ci_abs_tol =</span> sw<span class="sc">$</span>ci_abs_tol, <span class="at">ci_niter =</span> sw<span class="sc">$</span>ci_niter,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>               <span class="at">g1_TF24 =</span> sw<span class="sc">$</span>g1_TF24, <span class="at">beta_R_H =</span> sw<span class="sc">$</span>beta_R_H, <span class="at">beta_R_V =</span> sw<span class="sc">$</span>beta_R_V)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We also need to set a series of variables which describe the environmment and physiology of the plant at a given time using the <code>set_physiology</code> function. Whereas the traits set using the <code>Leaf</code> function describe a species’ strategy and do not vary over time, the variables set in <code>set_physiology</code> do vary. This becomes more relevant for when we dynamically running an individual plant or forest. For now, we will set some constants, based on plant height.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">set_physiology</span>(<span class="at">PPFD =</span> <span class="dv">1000</span>, <span class="at">psi_soil =</span> <span class="dv">0</span>, <span class="at">leaf_specific_conductance_max =</span> <span class="fl">4.8e-05</span>, <span class="at">atm_vpd =</span> <span class="dv">2</span>, <span class="at">ca =</span> <span class="dv">40</span>, <span class="at">sapwood_volume_per_leaf_area =</span> <span class="fl">1.8e-04</span>, <span class="at">rho =</span> <span class="dv">608</span>, <span class="at">a_bio =</span> <span class="fl">0.0245</span>, <span class="at">leaf_temp =</span> <span class="dv">25</span>, <span class="at">atm_o2_kpa =</span> <span class="dv">21</span>, <span class="at">atm_kpa =</span> <span class="fl">101.3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  psi_soil <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  soil_depth <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">0.5</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  mass_root_prop_ <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  area_leaf_ <span class="ot">=</span> <span class="fl">0.05</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  PPFD <span class="ot">=</span> <span class="dv">1000</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  leaf_specific_conductance_max <span class="ot">=</span> <span class="fl">4.8e-05</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  atm_vpd <span class="ot">=</span> <span class="dv">2</span> </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  ca <span class="ot">=</span> <span class="dv">40</span> </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  sapwood_volume_per_leaf_area <span class="ot">=</span> <span class="fl">1.8e-04</span> </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  rho <span class="ot">=</span> <span class="dv">608</span> </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  a_bio <span class="ot">=</span> <span class="fl">0.0245</span> </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  leaf_temp_ <span class="ot">=</span> <span class="dv">25</span> </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  atm_o2_kpa_ <span class="ot">=</span> <span class="dv">21</span> </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  atm_kpa_ <span class="ot">=</span> <span class="fl">101.3</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">set_physiology</span>(<span class="at">area_leaf =</span> area_leaf_, <span class="at">mass_root_prop =</span> mass_root_prop_, <span class="at">rho =</span> <span class="dv">608</span>, <span class="at">a_bio =</span> <span class="fl">0.0245</span>, <span class="at">PPFD =</span> PPFD, <span class="at">psi_soil =</span> psi_soil, <span class="at">soil_depth =</span> soil_depth, <span class="at">leaf_specific_conductance_max =</span> leaf_specific_conductance_max, <span class="at">atm_vpd =</span> atm_vpd, <span class="at">ca =</span> ca, <span class="at">sapwood_volume_per_leaf_area =</span> sapwood_volume_per_leaf_area, <span class="at">leaf_temp =</span> leaf_temp_, <span class="at">atm_o2_kpa =</span> atm_o2_kpa_, <span class="at">atm_kpa =</span> atm_kpa_)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Set some <span class="math inline">\(C_i\)</span> values.</p>
 <div class="cell">
@@ -489,6 +512,13 @@ A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> C_i, <span class="at">y =</span> assim))<span class="sc">+</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">colour =</span> limit, <span class="at">group =</span> limit)) <span class="sc">+</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 <p>As can be seen in the plot, <span class="math inline">\(A\)</span> increases with <span class="math inline">\(C_i\)</span> regardless of whether it is rubisco or light-limited. However, the most-limiting rate changes as <span class="math inline">\(C_i\)</span> increases, which can be captured using a smoothing function (see paper for details.)</p>
 <div class="cell">
@@ -496,11 +526,18 @@ A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">A_j =</span> <span class="fu">map_dbl</span>(C_i, leaf<span class="sc">$</span>assim_electron_limited),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">A_c =</span> <span class="fu">map_dbl</span>(C_i, leaf<span class="sc">$</span>assim_rubisco_limited)) <span class="sc">%&gt;%</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">A_net =</span> <span class="fu">map_dbl</span>(C_i, leaf<span class="sc">$</span>assim_colimited)) <span class="sc">%&gt;%</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">A_net_plus_R_d =</span> A_net <span class="sc">+</span> leaf<span class="sc">$</span>R_d_) <span class="sc">%&gt;%</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(A_j, A_c,A_net, A_net_plus_R_d), <span class="at">names_to =</span> <span class="st">"rate"</span>, <span class="at">values_to =</span> <span class="st">"assim"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">A_net_no_R_d =</span> A_net <span class="sc">+</span> leaf<span class="sc">$</span>R_d_) <span class="sc">%&gt;%</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(A_j, A_c,A_net, A_net_no_R_d), <span class="at">names_to =</span> <span class="st">"rate"</span>, <span class="at">values_to =</span> <span class="st">"assim"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> C_i, <span class="at">y =</span> assim))<span class="sc">+</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">colour =</span> rate, <span class="at">group =</span> rate)) <span class="sc">+</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 <p>The A_net function also includes a carbon deduction associated with dark respiration, so we can add this back on to show correspondence between the A_net curve and A_c/Aj.</p>
 </section>
@@ -523,16 +560,26 @@ k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> psi_stem, <span class="at">y =</span> conductance)) <span class="sc">+</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 <p><span class="math inline">\(b~(MPa)\)</span> and <span class="math inline">\(c~(unitless)\)</span> are the sensitivity and shape parameters of the hydraulic vulnerability curve. <span class="math inline">\(b\)</span> is calculated as:</p>
-<p><span class="math display">\[b = \frac{p_{50}}{-log(1-\frac{50}{100}^{\frac{1}{c}})},\]</span> where <span class="math inline">\(p_{50}\)</span> is the <span class="math inline">\(\psi_l\)</span> at which 50% of hydraulic conductance is lost. <span class="math inline">\(c\)</span> can be calculated if two hydraulic vulnerability (i.e.&nbsp;<span class="math inline">\(p_{x}\)</span>) values are known. Instead, we use an empirical value for <span class="math inline">\(c\)</span> obtained from Austraits.</p>
+<p><span class="math display">\[b = \frac{p_{50}}{-log(1-\frac{50}{100}^{\frac{1}{c}})},\]</span></p>
+<p>where <span class="math inline">\(p_{50}\)</span> is the <span class="math inline">\(\psi_l\)</span> at which 50% of hydraulic conductance is lost. <span class="math inline">\(c\)</span> can be calculated if two hydraulic vulnerability (i.e.&nbsp;<span class="math inline">\(p_{x}\)</span>) values are known. Instead, we use an empirical value for <span class="math inline">\(c\)</span> obtained from Austraits.</p>
 <p><span class="math inline">\(p_{50}\)</span>, in turn, is calculated from an empirical relaitonship between <span class="math inline">\(p_50\)</span> and the hydraulic conductivity of the xylem pathway, where more conductive stems lose conductivity at a less negative water potential (Liu et al.&nbsp;2019):</p>
 <p><span class="math display">\[p_{50} = 1.73\frac{K_s}{2}^{-0.72}\]</span></p>
 <p><span class="math inline">\(k_{l,max}\)</span> is the maximum hydraulic conductance achievable by the plant at <span class="math inline">\(\psi_l = 0\)</span> and is calculated as:</p>
 <p><span class="math display">\[k_{l,max} = \frac{K_s\theta}{h\eta_c},\]</span></p>
 <p>where <span class="math inline">\(\theta~(m^2~sapwood~m^{-2}~leaf~area)\)</span> is the huber value (described in <code>TF24</code>), <span class="math inline">\(h\)</span> is the height of the plant and <span class="math inline">\(eta_c~(unitless)[0,1]\)</span> (described in <code>TF24</code>) is the average relative position of leaves in the canopy. Input traits required to parameterise these equations beyond those required in <code>TF24</code> are therefore: <span class="math inline">\(K_s\)</span>, <span class="math inline">\(\theta\)</span> and <span class="math inline">\(c\)</span>, with the remaining traits being handled by the <code>TF24</code> hyperparameterisation function. <span class="math inline">\(h\)</span> is the height of the plant, and is therefore resolved dynamically when running <code>plant</code></p>
 <p>The total volume of water transpiring through a given unit area of leaf is given by the following equation:</p>
-<p><span id="eq-e-supply"><span class="math display">\[E_{supply} = \int^{\psi_l}_{\psi_s}k_l(\psi)\delta\psi  \tag{8}\]</span></span></p>
+<p><span id="eq-e-supply"><span class="math display">\[
+E_{supply} = \int^{\psi_l}_{\psi_s}k_l(\psi)\delta\psi
+\tag{8}\]</span></span></p>
 <p>Again, visualising this below, the water supplied for transpiration is equivalent to the area under the curve between the soil water potential (<span class="math inline">\(\psi_s~(-MPa)\)</span>) and the xylem water potential (<span class="math inline">\(\psi_l~(-MPa)\)</span>).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>data <span class="sc">%&gt;%</span></span>
@@ -544,22 +591,42 @@ k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">1.2</span>, <span class="at">y =</span> <span class="fl">4.8e-05</span>, <span class="at">label =</span> <span class="fu">expression</span>(psi[s]), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">2.2</span>, <span class="at">y =</span> <span class="fl">4.8e-05</span>, <span class="at">label =</span> <span class="fu">expression</span>(psi[l]), <span class="at">col =</span> <span class="st">"red"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 <p>Or, put another way, for a given <span class="math inline">\(\psi_s\)</span>, this is the <span class="math inline">\(E_{supply}\)</span> that could be achieved as <span class="math inline">\(psi_l\)</span> becomes more negative. It can be seen that <span class="math inline">\(E_{supply}\)</span> slowly tapers off as <span class="math inline">\(psi_s\)</span> increases, owing to the shape of the hydraulic vulnerability curve. This is important as it implies declining marginal returns to transpired water as <span class="math inline">\(psi_stem\)</span> becomes increasingly negative.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>data <span class="sc">%&gt;%</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">E_supply =</span> <span class="fu">map_dbl</span>(psi_stem, leaf<span class="sc">$</span>transpiration_full_integration)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">E_supply =</span> <span class="fu">map2_dbl</span>(psi_stem, psi_soil, leaf<span class="sc">$</span>transpiration_full_integration)) <span class="sc">%&gt;%</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> psi_stem, <span class="at">y =</span> E_supply)) <span class="sc">+</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> psi_soil, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 <p>We assume an upper critical limit to <span class="math inline">\(\psi_l\)</span> beyond which catastrophic xylem failure would occur, <span class="math inline">\(\psi_{crit}\)</span>. Here, <span class="math inline">\(psi_{crit}\)</span> is assumed to the <span class="math inline">\(\psi_l\)</span> at which 95% of conductance is lost.</p>
 <p>Recall from the <code>Revenue</code> section that <span class="math inline">\(g_c\)</span> is required in order to determine the <span class="math inline">\(A\)</span>. We can take advantage of the robust assumption that plants optimally allocate water transport resources to ensure that <span class="math inline">\(E_{supply}\)</span>, that is, the water transpired from the soil to the canopy, is equivalent to <span class="math inline">\(E_{demand}\)</span>, which is the atmospheric demand for water. In other words, we assume:</p>
 <p><span class="math display">\[E_{supply} = E_{demand}\]</span></p>
 <p><span class="math inline">\(E_{demand}\)</span> is calculated according to the following equation:</p>
-<p><span id="eq-e-demand"><span class="math display">\[E_{demand} = \frac{g_sD}{P_{atm}}, \tag{9}\]</span></span></p>
+<p><span class="math display">\[
+E_{demand} = \frac{g_sD}{P_{atm}},
+\]</span> {#eq-e-demand}</p>
 <p>where <span class="math inline">\(D~(kPa)\)</span> is the atmospheric vapour pressure deficit. For simplicity, we assume that it is the atmospheric VPD, not the leaf-to-atmoshpere VPD, which emerges from variation in leaf temperature relative to air temperature, that drives <span class="math inline">\(E_demand\)</span>, although we acknolwedge that this could have important consequences for stomatal behaviour. From the equation above, it is clear to see that all else being held equal, <span class="math inline">\(E_{demand}\)</span> increases when either the <span class="math inline">\(g_s\)</span> or <span class="math inline">\(D\)</span> increases. The key point here is that, all else being equal, in order for the assimilation of carbon into the leaf to increase via an increase in <span class="math inline">\(g_s\)</span>, there must be an increase in <span class="math inline">\(E_{demand}\)</span>, which in turns requires an increasingly negative <span class="math inline">\(\psi_l\)</span>, which, in turn, means that there is further drop in hydraulic conductance. This captures the inherent trade-off of stomatal conductance between greater assimilation and a higher risk of xylem damage.</p>
-<p>To represent the risk of xylem damage as a cost in units of carbon, we calculate <span class="math inline">\(H~(\psi_l)\)</span> (from the profit equation) as: <span id="eq-hydraulic-cost"><span class="math display">\[H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}. \tag{10}\]</span></span> Here, <span class="math inline">\(z~(m^3~sapwood~m^{-2}~leaf~area)\)</span> is the sapwood volume per leaf area, <span class="math inline">\(b_1(\mu mol~m^{-2}~s^{-1})\)</span> is the carbon cost per unit of conductivity lost and <span class="math inline">\(b^2~(unitless)\)</span> is a shape parameter. The second term in the brackets is the proportion of conductivity remaining at a <span class="math inline">\(\psi_l\)</span>, such that <span class="math inline">\(H=0\)</span> when <span class="math inline">\(\psi_l = 0\)</span>.</p>
+<p>To represent the risk of xylem damage as a cost in units of carbon, we calculate <span class="math inline">\(H~(\psi_l)\)</span> (from the profit equation) as: <span id="eq-hydraulic-cost"><span class="math display">\[
+H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
+\tag{9}\]</span></span></p>
+<p>Here, <span class="math inline">\(z~(m^3~sapwood~m^{-2}~leaf~area)\)</span> is the sapwood volume per leaf area, <span class="math inline">\(b_1(\mu mol~m^{-2}~s^{-1})\)</span> is the carbon cost per unit of conductivity lost and <span class="math inline">\(b^2~(unitless)\)</span> is a shape parameter. The second term in the brackets is the proportion of conductivity remaining at a <span class="math inline">\(\psi_l\)</span>, such that <span class="math inline">\(H=0\)</span> when <span class="math inline">\(\psi_l = 0\)</span>.</p>
 <p><span class="math inline">\(z\)</span> is calculated based on the size of the tree and <span class="math inline">\(theta\)</span>, representing the total amount of sapwood supplying transpiration:</p>
 <p><span class="math display">\[z = \frac{\theta*h}{\eta_c}\]</span></p>
 </section>
@@ -568,7 +635,7 @@ k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
 <p>The relative forms of the <span class="math inline">\(R\)</span> and <span class="math inline">\(H\)</span> curves in relation to <span class="math inline">\(\psi_l\)</span> means that a single <span class="math inline">\(psi_l\)</span> which maximises profit emerges. Let’s demonstrate this below, graphically.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(psi_stem) {</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  leaf<span class="sc">$</span><span class="fu">set_leaf_states_rates_from_psi_stem</span>(psi_stem)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  leaf<span class="sc">$</span><span class="fu">set_leaf_states_rates_from_psi_stem</span>(psi_stem, psi_soil)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  R <span class="ot">=</span> leaf<span class="sc">$</span>assim_colimited_</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  H <span class="ot">=</span> leaf<span class="sc">$</span><span class="fu">hydraulic_cost_TF</span>(psi_stem)</span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  P <span class="ot">=</span> R<span class="sc">-</span>H</span>
@@ -587,11 +654,18 @@ k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
 <span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">colour =</span> name, <span class="at">group =</span> name)) <span class="sc">+</span></span>
 <span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
 <span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fl">2.05</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 <p>That’s a pretty complicated way to do it though. We can just automatically calculated these values using a given profit funciton. For example, the in-built profit funciton in <code>TF24</code> is the <code>profit_psi_stem_TF</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(psi_stem){</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(psi_stem)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(psi_stem, psi_soil)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">H =</span> leaf<span class="sc">$</span>hydraulic_cost_, <span class="at">R =</span> leaf<span class="sc">$</span>assim_colimited_, <span class="at">P =</span> R<span class="sc">-</span>H)</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
@@ -605,6 +679,13 @@ k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> psi_stem, <span class="at">y =</span> value)) <span class="sc">+</span></span>
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">colour =</span> name, <span class="at">group =</span> name)) <span class="sc">+</span></span>
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 </section>
 <section id="optimising-profit" class="level1">
@@ -635,8 +716,8 @@ k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> (<span class="fu">abs</span>(bound_b <span class="sc">-</span> bound_a) <span class="sc">&gt;</span> delta_crit) {</span>
 <span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  profit_at_c <span class="ot">=</span> leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(bound_c);</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  profit_at_d <span class="ot">=</span> leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(bound_d);</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  profit_at_c <span class="ot">=</span> leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(bound_c, psi_soil);</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  profit_at_d <span class="ot">=</span> leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(bound_d, psi_soil);</span>
 <span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (profit_at_c <span class="sc">&gt;</span> profit_at_d) {</span>
 <span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>        bound_b <span class="ot">=</span> bound_d;</span>
@@ -649,17 +730,26 @@ k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
 <span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>      }</span>
 <span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>(<span class="at">opt_psi_stem =</span> ((bound_b <span class="sc">+</span> bound_a) <span class="sc">/</span> <span class="dv">2</span>))</span>
-<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>(<span class="at">profit =</span> leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(opt_psi_stem))</span>
-<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>(<span class="at">transpiration =</span> leaf<span class="sc">$</span>transpiration_)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>(<span class="at">opt_psi_stem =</span> ((bound_b <span class="sc">+</span> bound_a) <span class="sc">/</span> <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.895207</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(<span class="at">profit =</span> leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(opt_psi_stem, psi_soil))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 15.77304</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>(<span class="at">transpiration =</span> leaf<span class="sc">$</span>transpiration_)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7.629592e-05</code></pre>
+</div>
 </div>
 <section id="validation-against-the-compiled-implementation" class="level2">
 <h2 class="anchored" data-anchor-id="validation-against-the-compiled-implementation">Validation against the compiled implementation</h2>
 <p>The chunk below is an internal validation step: it re-runs the optimisation through the compiled <code>TF24</code> C++ <code>Leaf</code> object and checks the result matches the manual golden-section search above. It is disabled here (<code>eval: false</code>) because it is a self-consistency check on the implementation rather than an illustration of the theory.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">optimise_psi_stem_TF</span>()</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>profit_</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>transpiration_</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">optimise_psi_stem_TF</span>()</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>profit_</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>transpiration_</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
