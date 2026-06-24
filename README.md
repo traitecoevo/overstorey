@@ -4,6 +4,22 @@ Quarto documentation site for [`plant`](https://github.com/traitecoevo/plant):
 user guides, theory, and a version-pinned notebook. The API reference stays
 on the package's pkgdown site; this repo is the narrative layer.
 
+## The plant model family
+
+Overstorey is the documentation repository in a three-repo family, with work
+coordinated on a shared [project board](https://github.com/orgs/traitecoevo/projects/5)
+("Plant model development"):
+
+| Repository | Role |
+|---|---|
+| [**plant**](https://github.com/traitecoevo/plant) | Core C++/R model: size- and trait-structured demography, the SCM solver, and the physiological strategies (FF16, TF24, …). |
+| [**plant.assembly**](https://github.com/traitecoevo/plant.assembly) | Evolutionary community assembly on top of `plant` — invasion fitness, demographic equilibria, and selection gradients. |
+| [**overstorey**](https://github.com/traitecoevo/overstorey) | The narrative documentation / field guide site — user guides, theory, worked reproductions (this repo). |
+
+Issues from all three repositories feed into the
+[project board](https://github.com/orgs/traitecoevo/projects/5), which is the
+single place to see what is planned, in progress, or done across the family.
+
 ## Why this exists
 The vignette set had outgrown its format. This splits docs into:
 - **Guides** — task-oriented walkthroughs (migrated from vignettes)
@@ -47,3 +63,23 @@ renv::init()            # snapshot current env -> renv.lock
 renv::snapshot()        # after adding packages
 ```
 Then commit `renv.lock`. For the badge helper: `install.packages(c("htmltools","digest","here"))`.
+
+## Reporting issues
+
+Documentation requests, corrections and feedback are welcome via the
+[GitHub issue tracker](https://github.com/traitecoevo/overstorey/issues). New
+issues are automatically added to the
+[project board](https://github.com/orgs/traitecoevo/projects/5) with status
+**Backlog**.
+
+To keep the board sortable, please:
+
+1. **Apply one type label** — the three repositories share the same set:
+   `bug` (something is broken), `task` (a discrete piece of work — the default
+   for docs), or `epic` (a larger capability spanning several tasks).
+2. **Prefix the title with a theme tag** in square brackets. Most work here is
+   `[documentation]`; use another existing theme where it fits, or `[other]`:
+
+   `[documentation]` · `[TF24 hydraulics]` · `[TF24 allometry]` · `[TF24 nsc]` ·
+   `[acclimation]` · `[simplify interface]` · `[evol assembly]` · `[Env drivers]` ·
+   `[speed]` · `[patch variations]` · `[other]`
