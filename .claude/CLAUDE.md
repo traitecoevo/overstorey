@@ -114,3 +114,38 @@ renv::snapshot()
 quarto render --cache-refresh    # LOCALLY only, then eyeball figure diffs
 git add renv.lock _freeze/ && git commit
 ```
+
+## Issue & project-board conventions
+
+Development across `plant`, `plant.assembly`, and `overstorey` is tracked on a
+shared [project board](https://github.com/orgs/traitecoevo/projects/5). New issues
+are auto-added to the board with status **Backlog** by a workflow, so you do not
+need to set status manually.
+
+When opening an issue (including whenever the user asks you to create one), always:
+
+- **Set exactly one type label.** Only three labels exist in these repos — do not
+  invent new ones:
+  - `bug` — an existing feature not functioning as intended
+  - `task` — a discrete task needed for a feature (the default — most docs work)
+  - `epic` — a new feature or capability, usually an umbrella over several tasks
+- **Prefix the title with a theme tag** in square brackets so the board sorts
+  cleanly. Most issues in this repo are `[documentation]`; reuse another existing
+  theme where it fits, or fall back to `[other]`:
+
+  | Tag | Scope |
+  |---|---|
+  | `[documentation]` | Documenting model capabilities (guides, theory, reproductions) |
+  | `[TF24 hydraulics]` | Hydraulics component of the TF24 strategy |
+  | `[TF24 allometry]` | Flexible allometry for the TF24 model |
+  | `[TF24 nsc]` | Non-structural carbohydrate storage in TF24 |
+  | `[acclimation]` | Acclimation of leaf and other traits |
+  | `[simplify interface]` | Consistent interface to the plant & plant.assembly models |
+  | `[evol assembly]` | Evolutionary assembly linking plant to plant.assembly |
+  | `[Env drivers]` | Driving the model with environmental drivers |
+  | `[speed]` | Performance — making the model run faster |
+  | `[patch variations]` | Multiple patch setups (multi-patch, stochastic metapopulation, continuous patch) |
+  | `[other]` | Anything not covered above |
+
+Create issues with `gh issue create -R traitecoevo/overstorey
+--title "[documentation] …" --label task` (swap in `bug`/`epic` as appropriate).
