@@ -299,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="follow-ups-outside-this-repo" class="level2">
 <h2 class="anchored" data-anchor-id="follow-ups-outside-this-repo">Follow-ups outside this repo</h2>
 <ul>
-<li><strong><code>plant.assembly</code></strong> still calls the removed helpers (<code>build_schedule()</code>, <code>run_scm_collect()</code>) in <code>R/community_plant.R</code> and <code>scripts/example/ESA.Rmd</code>. These need the same migration: <code>build_schedule(p, ctrl = ctrl)</code> → <code>run_scm(p, ctrl = ctrl, refine_schedule = TRUE)$parameters</code>, and <code>run_scm_collect(x)</code> → <code>run_scm(x, collect = TRUE)</code>.</li>
+<li><strong><code>regnans</code></strong> still calls the removed helpers (<code>build_schedule()</code>, <code>run_scm_collect()</code>) in <code>R/community_plant.R</code> and <code>scripts/example/ESA.Rmd</code>. These need the same migration: <code>build_schedule(p, ctrl = ctrl)</code> → <code>run_scm(p, ctrl = ctrl, refine_schedule = TRUE)$parameters</code>, and <code>run_scm_collect(x)</code> → <code>run_scm(x, collect = TRUE)</code>.</li>
 </ul>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
