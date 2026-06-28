@@ -150,3 +150,12 @@ When opening an issue (including whenever the user asks you to create one), alwa
 
 Create issues with `gh issue create -R traitecoevo/overstorey
 --title "[documentation] …" --label task` (swap in `bug`/`epic` as appropriate).
+
+## Cross-package context
+
+This repo is part of the **plant family** in the `traitecoevo` org (the narrative documentation site for plant). For
+cross-package orientation — how the family fits together, dependency direction,
+source-of-truth rules, and the shared label/board conventions — see
+**[`plant-meta`](https://github.com/traitecoevo/plant-meta)** (start with its
+`AGENTS.md`). Don't restate family-wide concerns here; link to plant-meta and
+keep this file about `overstorey`-local matters.
