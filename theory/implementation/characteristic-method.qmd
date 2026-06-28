@@ -266,6 +266,6 @@ Solving for offspring production in metacommunities with multiple species is
 significantly harder, because there is no generally applicable method for
 multi-dimensional root finding. In `plant`, we have therefore implemented
 several different approaches, which are available via the package
-[{plant.assembly}](https://github.com/traitecoevo/plant.assembly).
+[{regnans}](https://github.com/traitecoevo/regnans).
 
 ## References

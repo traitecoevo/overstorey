@@ -74,7 +74,7 @@ out <- run_scm(x, collect = TRUE)
 
 ## Follow-ups outside this repo
 
-- **`plant.assembly`** still calls the removed helpers (`build_schedule()`,
+- **`regnans`** still calls the removed helpers (`build_schedule()`,
   `run_scm_collect()`) in `R/community_plant.R` and `scripts/example/ESA.Rmd`.
   These need the same migration:
   `build_schedule(p, ctrl = ctrl)` → `run_scm(p, ctrl = ctrl, refine_schedule = TRUE)$parameters`,

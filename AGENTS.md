@@ -117,7 +117,7 @@ git add renv.lock _freeze/ && git commit
 
 ## Issue & project-board conventions
 
-Development across `plant`, `plant.assembly`, and `overstorey` is tracked on a
+Development across `plant`, `regnans`, and `overstorey` is tracked on a
 shared [project board](https://github.com/orgs/traitecoevo/projects/5). New issues
 are auto-added to the board with **no Status** — that's the triage queue. A maintainer
 sets Status (e.g. Backlog) during triage, so you don't need to set it yourself.
@@ -140,8 +140,8 @@ When opening an issue (including whenever the user asks you to create one), alwa
   | `[TF24 allometry]` | Flexible allometry for the TF24 model |
   | `[TF24 nsc]` | Non-structural carbohydrate storage in TF24 |
   | `[acclimation]` | Acclimation of leaf and other traits |
-  | `[simplify interface]` | Consistent interface to the plant & plant.assembly models |
-  | `[evol assembly]` | Evolutionary assembly linking plant to plant.assembly |
+  | `[simplify interface]` | Consistent interface to the plant & regnans models |
+  | `[evol assembly]` | Evolutionary assembly linking plant to regnans |
   | `[Env drivers]` | Driving the model with environmental drivers |
   | `[speed]` | Performance — making the model run faster |
   | `[patch variations]` | Multiple patch setups (multi-patch, stochastic metapopulation, continuous patch) |
