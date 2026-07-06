@@ -1,0 +1,177 @@
+---
+title: "The big picture"
+---
+::: {.eyebrow}
+theory · start here
+:::
+
+If you are meeting `plant` for the first time, start here. This page gives you
+the mental model — what the model tracks, how the pieces fit together, and where
+each idea shows up in the code — without any equations. When you want the maths,
+the [gentle maths primer](maths-primer.qmd) builds up the equations one step at a
+time, and the [size-structured PDE](size-structured-pde.qmd) page has the full
+treatment.
+
+## What `plant` models
+
+`plant` is a simulator for **forests of competing plants**. Given a set of plant
+*strategies* (ways of being a plant — cheap fast-growing leaves, dense slow wood,
+and so on), it works out how a patch of ground fills with vegetation over time,
+how those plants shade and out-compete one another, and which strategies can
+persist in the long run.
+
+The trick is that it builds everything **from the bottom up**. Nothing about the
+forest is assumed in advance: stand structure, size distributions, and
+coexistence all *emerge* from the growth, death, and seeding of individual
+plants.
+
+## Three nested scales
+
+The model is organised as three scales nested inside one another. Each scale is
+built out of the one below it.
+
+```{mermaid}
+flowchart TD
+  subgraph M["🌍 Metacommunity — patches of every age, linked by dispersing seeds"]
+    subgraph P["🌳 Patch — competing individuals sharing one light environment"]
+      I["🌱 Individual — grows, dies, sets seed"]
+    end
+  end
+```
+
+- **Individual** — a single plant with a set of traits and a size (its height).
+  It takes in light, grows, risks dying, and produces seeds.
+- **Patch** — a small area of ground where many individuals grow together. They
+  compete by shading one another, so every plant in the patch shares one common
+  **light environment**. A disturbance (fire, storm, landslide…) can wipe a patch
+  clean and reset it to bare ground.
+- **Metacommunity** — the whole landscape: a large collection of patches, each at
+  a different age since its last disturbance, all connected because seeds
+  disperse freely between them.
+
+A key simplification makes this tractable: because seeds mix across the whole
+landscape, **one patch followed through its entire life stands in for the whole
+metacommunity**. Simulating a single patch from bare ground to old age, and
+knowing how common patches of each age are, is enough to describe everything.
+
+## Two halves: biology and bookkeeping
+
+Internally, `plant` separates cleanly into two parts.
+
+```{mermaid}
+flowchart LR
+  subgraph S["Strategy — the biology"]
+    direction TB
+    s1["a plant's size<br/>+ its light environment"] --> s2["growth, death,<br/>seed rates"]
+  end
+  subgraph D["Demographic core — the bookkeeping"]
+    direction TB
+    d1["rates, tracked<br/>over time"] --> d2["how the whole<br/>population changes"]
+  end
+  S -->|"rates plug in"| D
+  models["FF16 · K93 · TF24"] -.->|"pick one"| S
+```
+
+- The **strategy** is the biology. Given a plant's size and the light it
+  experiences, it returns three instantaneous rates: how fast the plant grows,
+  how likely it is to die, and how many seeds it makes. This is where the
+  photosynthesis, carbon budgets, and hydraulics live. `plant` ships with three
+  strategies — [FF16](models/ff16.qmd), [K93](models/k93.qmd), and
+  [TF24](models/tf24.qmd) — and you can [write your own](../contributing/implementing-a-strategy.qmd).
+- The **demographic core** is the bookkeeping. It knows nothing about
+  photosynthesis; it just takes those rates and integrates them over time to work
+  out how a population of plants grows, thins, and reproduces. Swap the strategy
+  and you swap the biology; the bookkeeping stays the same.
+
+This split is why the [theory](index.qmd) is organised into *Core* (the
+bookkeeping, shared by everything) and *Models* (the strategies).
+
+## What the model actually tracks
+
+Inside a patch, `plant` does not follow every individual plant separately.
+Instead it tracks a **size distribution**: how many plants of each height are
+present in the patch at a given age. Early on the distribution is a crowd of tiny
+seedlings; as the patch ages it spreads out, thins, and a few tall winners pull
+ahead.
+
+The clever part is *how* it follows that distribution. Rather than chopping
+height into fixed bins, `plant` tracks a handful of **cohorts** — groups of
+plants that germinated at the same moment — and lets each one ride its own growth
+trajectory upward. Each cohort is a moving point on the height axis, carrying a
+"how many plants are here" density with it. This is the *characteristic method*,
+and it is what makes the model both accurate and fast. (The
+[characteristic method](implementation/characteristic-method.qmd) and
+[node-spacing](implementation/node-spacing.qmd) pages cover the machinery.)
+
+## Competition is a feedback loop
+
+Everything interesting in `plant` comes from one feedback loop. Plants deploy
+leaf area; leaf area casts shade; shade changes the light every plant
+experiences; and that light feeds straight back into how fast each plant grows
+and how likely it is to survive.
+
+```{mermaid}
+flowchart LR
+  A["Plants deploy<br/>leaf area"] --> B["Canopy casts shade —<br/>the light environment"]
+  B --> C["Less light below<br/>slows growth,<br/>raises mortality"]
+  C --> D["Size distribution<br/>shifts: some win,<br/>some die"]
+  D --> A
+```
+
+This loop is what produces **self-thinning** (crowded stands lose stems as they
+grow), **succession** (the mix of winners changes over time), and the vertical
+canopy structure of a real forest — none of it built in by hand.
+
+## Paying for itself: the birth-rate loop
+
+There is one more loop, at the landscape scale. Seeds produced in patches
+disperse across the whole metacommunity and rain back down to start new plants.
+For the metacommunity to be at equilibrium, a strategy must **pay for itself**:
+the seeds it exports over a patch's lifetime must match the seeds arriving to
+sustain it.
+
+`plant` finds that balance by solving a fixed point — guessing a seed-arrival
+rate, running a patch to see how many seeds come back out, and adjusting until
+the two agree.
+
+```{mermaid}
+flowchart LR
+  A["Guess a seed-<br/>arrival rate"] --> B["Run one patch<br/>through its whole life"]
+  B --> C["Count the seeds<br/>it exports"]
+  C --> Q{"exported =<br/>assumed?"}
+  Q -->|"no"| E["Adjust the rate"]
+  E --> B
+  Q -->|"yes"| F["Equilibrium —<br/>the strategy<br/>pays for itself"]
+```
+
+This is exactly what happens when you call `run_scm(..., refine_schedule = TRUE)`
+in the guides. Once you can find that self-consistent birth rate, you can ask the
+deeper question `plant` was built for: *which strategies can invade, coexist, or
+win?* — the subject of the [adaptive dynamics](adaptive-dynamics.qmd) page.
+
+## From idea to code
+
+Each concept above has a direct counterpart in the package:
+
+| Idea | In `plant` | Guide |
+|------|-----------|-------|
+| Pick a strategy & its biology | `scm_base_parameters("FF16")`, `add_strategies()` | [Strategies & traits](../guides/strategies.qmd) |
+| Set the light / rainfall environment | `Environment()` | [Extrinsic drivers](../guides/extrinsic-drivers.qmd) |
+| Grow a single plant | `FF16_Individual()` | [Your first individual](../guides/first-individual.qmd) |
+| Run a patch through its life | `run_scm()` | [Patch dynamics](../guides/patch-dynamics.qmd) |
+| Find the birth rate that balances | `run_scm(..., refine_schedule = TRUE)` | [Self-thinning](../guides/self-thinning.qmd) |
+| Tidy & expand the outputs | `collect = TRUE`, `expand_state()` | [Example analysis](../guides/example-analysis.qmd) |
+
+## Where to go next
+
+Pick the path that matches what you want to do:
+
+- **I want to run it.** Head to the [guides](../guides/index.qmd) — start with
+  [your first individual](../guides/first-individual.qmd), then
+  [patch dynamics](../guides/patch-dynamics.qmd).
+- **I want to understand the equations.** Read the
+  [gentle maths primer](maths-primer.qmd) next, then the full
+  [size-structured PDE](size-structured-pde.qmd) and
+  [adaptive dynamics](adaptive-dynamics.qmd) pages.
+- **I want a strategy's biology.** See the [models overview](models/index.qmd)
+  and the [assimilation & hydraulics](assimilation-hydraulics.qmd) page.

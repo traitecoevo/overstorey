@@ -13,6 +13,12 @@ scattered across papers and vignettes.
 
 The demographic and physiological machinery shared by every strategy.
 
+New here? Start with the two orientation pages, then dive into the details.
+
+- [The big picture](overview.qmd) — the mental model in plain language, no
+  equations. **Start here.**
+- [The maths, gently](maths-primer.qmd) — the core equations built up one step
+  at a time.
 - [The size-structured PDE](size-structured-pde.qmd) — demography of
   individuals, patches, and metacommunities.
 - [Assimilation & hydraulics](assimilation-hydraulics.qmd) — the leaf-level

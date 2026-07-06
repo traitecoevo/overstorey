@@ -1,0 +1,187 @@
+---
+title: "The maths, gently"
+---
+::: {.eyebrow}
+theory · start here
+:::
+
+This page introduces the equations behind `plant` slowly, one idea at a time, for
+readers who want to understand the maths but find the
+[size-structured PDE](size-structured-pde.qmd) page heavy going. It covers the
+same system of equations — just built up gradually, with every symbol explained
+in words. Once this feels comfortable, that page has the full derivations,
+boundary conditions, and appendices.
+
+If you have not yet read [the big picture](overview.qmd), do that first; this page
+puts equations on the concepts introduced there.
+
+## The symbols you will meet
+
+Only a handful of symbols do most of the work. Keep this list nearby:
+
+| Symbol | Means | In words |
+|--------|-------|----------|
+| $x$ | traits | *what kind* of plant (e.g. its leaf mass per area) |
+| $H$ | height | *how big* a plant is — the model's measure of size |
+| $a$ | patch age | time since the patch was last cleared by disturbance |
+| $E_a$ | light environment | how much light reaches each height in a patch of age $a$ |
+| $g,\ d,\ f$ | rates | **g**rowth, **d**eath, and **f**ecundity (seed) rates |
+| $N$ | size-density | how many plants of each height are present |
+| $P$ | patch-age density | how common patches of each age are |
+| $Y_x$ | seed rain | rate at which seeds of strategy $x$ arrive in a patch |
+
+A note on integrals: an integral $\int$ here just means "add up continuously over
+time (or over height)." Whenever you see one, read it as a running total.
+
+## Step 1 — one plant, three running totals
+
+Start with a single plant of traits $x$ that germinated at patch age $a_0$. The
+strategy gives us its three rates at any moment — growth $g$, death $d$, and
+fecundity $f$ — each depending on the plant's current height and the light it
+sees. Everything about the individual is a running total of these rates.
+
+**Its height** is its starting height plus all the growth it has accumulated:
+
+$$
+H(a) = H_0 + \int_{a_0}^{a} g \, {\rm d}a'.
+$$
+
+**Its chance of still being alive** falls off as death accumulates. Survival is
+the germination probability times the exponential of *minus* the total death risk
+so far:
+
+$$
+S_{\rm I}(a) = S_{\rm G} \, \exp\!\left(- \int_{a_0}^{a} d \, {\rm d}a'\right).
+$$
+
+The exponential is the standard way to turn a running risk into a survival
+probability: no risk yet means survival $1$; as risk piles up, survival decays
+towards $0$.
+
+**Its total seeds so far** add up fecundity over time — but only counting plants
+that are still alive to produce them, hence the survival factor:
+
+$$
+\tilde{R}(a) = \int_{a_0}^{a} f \, S_{\rm I}(a') \, {\rm d}a'.
+$$
+
+That is the whole life of one plant: grow, survive, seed — three integrals of the
+rates the strategy hands us.
+
+## Step 2 — from one plant to a distribution
+
+A patch holds many plants, so instead of tracking them individually we track a
+**size-density distribution** $N(H \mid x, a)$: at patch age $a$, how many plants
+of traits $x$ have height $H$. Picture it as a curve over height whose shape
+changes as the patch ages.
+
+Two things move that curve, and they map onto the two rates that are *not* about
+reproduction:
+
+```{mermaid}
+flowchart LR
+  G["growth g<br/>pushes plants up<br/>the height axis"] --> N["the size<br/>distribution<br/>N(H | x, a)"]
+  D["death d<br/>removes plants<br/>at each height"] --> N
+```
+
+Written as an equation, this is the model's central **partial differential
+equation (PDE)**:
+
+$$
+\frac{\partial N}{\partial a} = \underbrace{-\, d \, N}_{\text{deaths remove plants}} \;\underbrace{-\, \frac{\partial}{\partial H}\big(g \, N\big)}_{\text{growth carries plants upward}}.
+$$
+
+Read it as a conveyor belt. Growth $g$ carries plants along the height axis (the
+second term is the *flow* of that belt); death $d$ removes a fraction of them
+wherever they are (the first term). The left-hand side is simply how the
+distribution changes as the patch gets older.
+
+New plants enter at the bottom of the height axis. The rate they enter is set by
+how many seeds arrive and how fast the smallest plants grow — this is the PDE's
+**boundary condition**, and it is where the seed rain $Y_x$ (Step 4) comes in.
+
+## Step 3 — competition through shade
+
+The rates $g$ and $d$ are not fixed: they depend on light, and light depends on
+all the other plants. `plant` uses a shading law borrowed from optics (Beer's
+law): light falls off exponentially with the amount of leaf area stacked above
+you.
+
+$$
+E_a(z) = \exp\!\left(-k_{\rm I} \times (\text{leaf area above height } z)\right).
+$$
+
+Here $z$ is a height in the canopy, $E_a(z)$ is the fraction of open-sky light
+reaching it, and $k_{\rm I}$ is an extinction coefficient (how strongly leaves
+block light). More leaves overhead → smaller $E_a(z)$ → deeper shade below.
+
+This closes the feedback loop from [the big picture](overview.qmd): the
+distribution $N$ determines the leaf area, the leaf area sets the light $E_a$, and
+the light feeds back into the growth and death rates that reshape $N$.
+
+## Step 4 — patches have ages
+
+Zoom out to the landscape. Disturbances strike patches at random, so at any
+moment the landscape contains patches of every age. $P(a)$ describes how common
+patches of age $a$ are, and it decays as older patches keep getting knocked back
+to age zero:
+
+$$
+\frac{{\rm d}P}{{\rm d}a} = -\, d_{\rm P}(a) \, P(a),
+$$
+
+where $d_{\rm P}(a)$ is the chance a patch of age $a$ is disturbed. If that chance
+is constant, old patches are simply rarer and rarer (an exponential
+distribution). `plant`'s default instead lets the disturbance risk *rise* with
+age — young patches usually survive, old ones almost never do — which gives a
+**Weibull** distribution. Either way, the whole thing is summarised by one
+number: $\bar{a}$, the mean interval between disturbances.
+
+## Step 5 — the seed rain must balance
+
+Now the two scales meet. Across the whole landscape, a strategy's total seed
+output is found by adding up the seeds made in every patch, weighted by how common
+patches of that age are:
+
+$$
+Y_x = \int_0^\infty \int_0^\infty P(a) \, S_{\rm D} \, f \, N \, {\rm d}H \, {\rm d}a.
+$$
+
+The inner integral adds seed production over all plant heights in a patch; the
+outer integral averages over patches of all ages; $S_{\rm D}$ is the fraction of
+seeds surviving dispersal.
+
+Here is the catch: the seed rain $Y_x$ *feeds the patches* (Step 2's boundary
+condition) **and** *comes out of them* (the equation above). At equilibrium the
+two must be the same number. Finding that self-consistent value is the central
+numerical task in `plant` — a fixed-point solve, exactly the loop drawn in
+[the big picture](overview.qmd).
+
+## Step 6 — reading off the answers
+
+Once the patch dynamics and the equilibrium seed rain are known, any quantity you
+care about is an average over the size distribution, weighted by how common each
+patch age is. Schematically, for some quantity $w$ (density, biomass, mortality…):
+
+$$
+\text{landscape average of } w = \int_0^\infty \int_0^\infty P(a) \, N \, w \; {\rm d}H \, {\rm d}a.
+$$
+
+Total stem density, leaf area, biomass, and the size–density (self-thinning)
+relationship all come out of this one weighted-integral pattern — see the
+[emergent properties](../guides/emergent-properties.qmd) guide for it in action.
+
+## Where to go next
+
+You now have the skeleton of the whole model. To go deeper:
+
+- The full [size-structured PDE](size-structured-pde.qmd) page — every equation
+  above with its derivation, boundary conditions, and the Weibull appendix.
+- [Assimilation & hydraulics](assimilation-hydraulics.qmd) — where the growth,
+  death, and fecundity rates ($g$, $d$, $f$) actually come from.
+- [Adaptive dynamics](adaptive-dynamics.qmd) — using the balanced seed rain to
+  define invasion fitness and evolutionary endpoints.
+- The implementation pages — how these integrals and the PDE are actually solved:
+  [the characteristic method](implementation/characteristic-method.qmd),
+  [ODE stepping](implementation/ode-stepping.qmd), and
+  [node spacing](implementation/node-spacing.qmd).
