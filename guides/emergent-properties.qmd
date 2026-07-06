@@ -24,7 +24,7 @@ We'll work with a single species at birth rate close to demographic equilibrium:
 library(plant)
 
 p0 <- scm_base_parameters("FF16")
-p <- expand_parameters(trait_matrix(0.0825, "lma"), p0, birth_rate_list = 17.31)
+p <- add_strategies(p0, trait_matrix(0.0825, "lma"), birth_rate = 17.31)
 patch <- run_scm(p, refine_schedule = TRUE)$parameters
 result <- run_scm(patch, collect = TRUE)
 ```
@@ -48,7 +48,7 @@ sdd_matrix <- function(species_data, var) {
 }
 
 # Light extinction coefficient used when weighting leaf area into competition.
-k_I <- patch$strategies[[1]]$k_I
+k_I <- patch$strategies[[1]]$pars$k_I
 ```
 
 # Node densities

@@ -29,20 +29,21 @@ Grow a stand of plants with the default parameters of the `plant` "FF16" model:
 #| label: grow-stand
 p0 <- scm_base_parameters("FF16")
 
-p0$strategy_default$recruitment_decay <- 5
+p0$strategy_default$pars$recruitment_decay <- 5
 #stops seeds continuing to come into the stand from early on to isolate first "group" of plants that emerges around the same time
 
-p0$control$schedule_eps <- 0.005
-# more refined scheduling
+ctrl <- Control()
+ctrl$schedule_eps <- 0.005
+# more refined scheduling (schedule_eps is a Control field, not a Parameters one)
 
 lma_trait <- trait_matrix(0.1457419, "lma")
 
-p1 <- expand_parameters(p0, trait_matrix = lma_trait)
+p1 <- add_strategies(p0, lma_trait)
 
-stand_results <- run_scm(p1, refine_schedule = TRUE)$parameters
+stand_results <- run_scm(p1, ctrl = ctrl, refine_schedule = TRUE)$parameters
 # creates a schedule for time steps when running the model, with many "steps" early on and fewer as the stand ages and doesn't change as rapidly
 
-out <- run_scm(stand_results, collect = TRUE)
+out <- run_scm(stand_results, ctrl = ctrl, collect = TRUE)
 # run the SCM model
 ```
 
