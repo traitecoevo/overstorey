@@ -22,8 +22,12 @@ system creates a smooth function that interpolates the control points:
 
 ## Rainfall
 
-Rainfall is handled inside `TF24_Environment`, and is set upon construction. If nothing is passed to the `Environment()` constructor, rainfall
-will default to a value of `1`:
+Rainfall is handled inside `TF24_Environment`, and is set upon construction.
+Rainfall drives the soil-water balance that the [TF24](../theory/models/tf24.qmd)
+strategy couples growth to, via the leaf-level water economy described in
+[Assimilation & hydraulics](../theory/assimilation-hydraulics.qmd). If nothing is
+passed to the `Environment()` constructor, rainfall will default to a value of
+`1`:
 
 ```{r}
 env <- Environment("TF24")
@@ -63,7 +67,9 @@ env$extrinsic_drivers_evaluate_range("rainfall", c(5, 1.2, 78.345))
 
 ## Birth rates
 
-Per species birth rates are set via the `add_strategies()` function. Each object in the list is either a constant number or an embedded list with `x` and `y` control points. There must be the same number of items in the list as there are species:
+Per species birth rates set the seed rain arriving into each patch — the
+boundary condition of the [size-structured PDE](../theory/size-structured-pde.qmd)
+that the solver integrates. They are set via the `add_strategies()` function. Each object in the list is either a constant number or an embedded list with `x` and `y` control points. There must be the same number of items in the list as there are species:
 
 ```{r}
 p0 <- scm_base_parameters("TF24")

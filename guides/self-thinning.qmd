@@ -9,7 +9,7 @@ In a recently cleared stand, a new cohort of saplings will emerge and start to g
 
 This process of growth-dependent mortality is known as "self-thinning", and can be equally understood as a size-density relationship, essentially resulting from the growth, survival and reproductive processes of the evolving stand, with the "self-thinning line" (STL) being an emergent outcome. Self-thinning is a widely documented empirical phenomenon, observed in many forest types around the world.
 
-The STL is thought to be constant across stands, though there is conflicting evidence on the generality of the "law" across species, environments and stand types. The typical STL can be captured in `plant` by using the output of a stand simulation to determine mean size and mean density, per unit area and parameterised by time, which are plotted on a double-log scale and show a typically linear trajectory.
+The STL is thought to be constant across stands, though there is conflicting evidence on the generality of the "law" across species, environments and stand types. The typical STL can be captured in `plant` by using the output of a stand simulation to determine mean size and mean density, per unit area and parameterised by time, which are plotted on a double-log scale and show a typically linear trajectory. Here we grow an [FF16](../theory/models/ff16.qmd) stand and integrate over the size distribution tracked by the [size-structured PDE](../theory/size-structured-pde.qmd); the STL is not imposed — it emerges from the growth and mortality of the individuals.
 
 ```{r}
 #| label: load-libraries
@@ -23,7 +23,10 @@ library(ggplot2)
 plant_log_console()
 ```
 
-Grow a stand of plants with the default parameters of the `plant` "FF16" model:
+Grow a stand of plants with the default parameters of the `plant` "FF16" model.
+We refine the node introduction schedule (via `schedule_eps` and
+`refine_schedule = TRUE`) so the fast early dynamics are well resolved — see
+[The node-spacing algorithm](../theory/implementation/node-spacing.qmd):
 
 ```{r}
 #| label: grow-stand

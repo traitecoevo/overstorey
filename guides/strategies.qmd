@@ -55,7 +55,9 @@ code](https://github.com/traitecoevo/plant/blob/master/src/ff16_strategy.cpp),
 but only really for converting from leaf area to leaf mass (leaf
 mass being leaf area multiplied by leaf mass per unit leaf area).
 However, as a component of the leaf economic spectrum we imagine
-LMA as affecting a number of other components of the model.
+LMA as affecting a number of other components of the model — see
+[FF16](../theory/models/ff16.qmd) for the trait trade-offs this
+functional-balance model builds in.
 
 We capture this through what we call a "hyper-parameterisation";
 additional parameters and functions that mean that changing one
@@ -166,7 +168,9 @@ Control()
 The `Control()` defaults are the pragmatic, fast-ish settings used for
 essentially all of plant's runs (`control()` is a lowercase alias for the same
 constructor). When you need a high-accuracy run, `control_accurate()` tightens
-the ODE and schedule tolerances. We can see which fields it changes:
+the ODE and schedule tolerances (see [ODE stepping & control](../theory/implementation/ode-stepping.qmd)
+and [The node-spacing algorithm](../theory/implementation/node-spacing.qmd)). We
+can see which fields it changes:
 
 ```{r}
 ctrl_accurate <- control_accurate()

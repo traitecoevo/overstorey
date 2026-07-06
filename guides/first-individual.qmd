@@ -14,7 +14,8 @@ This guide walks through modelling the dynamics of a single individual: how to
 construct one, compute its rates, grow it through time and to a target size,
 and compare growth trajectories across traits and light environments. It also
 reproduces the analysis behind Fig. 2 of the manuscript. Throughout we use the
-`FF16` strategy, describing the Falster-FitzJohn model of light competition in
+[`FF16`](../theory/models/ff16.qmd) strategy, describing the Falster-FitzJohn
+model of light competition in
 forest stands; however an equivalent `Individual` component of the model is
 present in all strategies. For the differential equations that underpin these
 dynamics, see [Size-structured PDE](../theory/size-structured-pde.qmd).
@@ -81,7 +82,9 @@ env <- fixed_environment(1.0)
 ```
 
 In the FF16 model, the `compute_rates` method computes net mass production for
-the individual, and from that demographic rates:
+the individual — its leaf-level carbon budget, described in
+[Assimilation & hydraulics](../theory/assimilation-hydraulics.qmd) — and from
+that its demographic rates:
 
 ```{r}
 indv$ode_rates

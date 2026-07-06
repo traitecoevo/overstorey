@@ -126,8 +126,8 @@ signif(t[c(1, 10, 50, 100, 142)], 1)
 higher temporal resolution is needed to resolve early patch development, where
 small differences are magnified through competitive feedbacks. Our patch ran
 for 105 yrs, but the solver spent half the recorded steps exploring the first
-year alone. More on timing can be found in the
-[node scheduling algorithm](https://traitecoevo.github.io/plant/articles/node_spacing.html).
+year alone. More on timing can be found in
+[The node-spacing algorithm](../theory/implementation/node-spacing.qmd).
 
 Nodes are introduced at each time-step, except the last. At time step $i$, the
 rows of `h` record the height of all previously introduced nodes in the patch:
@@ -179,8 +179,10 @@ matplot(t, h, lty=1, col=util_colour_set_opacity("black", 0.25), type="l",
         las=1, xlab="Time (years)", ylab="Height (m)")
 ```
 
-The light environment is stored over each time step, meaning that we can also
-plot how it changes during patch development:
+The light environment — canopy openness as a function of height — is stored over
+each time step; see [Canopy & light-environment models](../theory/implementation/canopy-models.qmd)
+for how it is computed from the leaf area above. This means we can also plot how
+it changes during patch development:
 
 ```{r}
 #| label: plot-light-environment

@@ -6,12 +6,12 @@ example
 :::
 
 This is the flagship end-to-end example: set up parameters, run a patch with
-the size-structured model, then summarise, integrate, and interpolate the
-results.
+the [size-structured model](../theory/size-structured-pde.qmd), then summarise,
+integrate, and interpolate the results.
 
 ::: {.callout-note}
 ## Running the `TF24` model needs a configured soil-water environment
-The `TF24` strategy couples plant growth to a multi-layer soil-water balance,
+The [`TF24`](../theory/models/tf24.qmd) strategy couples plant growth to a multi-layer soil-water balance,
 so — unlike `FF16` — it cannot run against a bare `Environment("TF24")`. The
 soil column must be given a number of layers and an initial moisture state, and
 the rainfall driver must keep the mean high enough that a layer never dries to
@@ -229,7 +229,7 @@ data_long %>%
 
 ## Interpolate to specific times
 
-The node spacing algorithim determines the optimum introduction times for characterstics, which means that the time values associated with steps may not correspond to known times that we might like to extract information about. For example, what the total amount of biomass per $m^2$ will be at 50 years. By doing this, it also means that we can integrate between defined times. Let's work with our results again by running a patch again and then tidying.
+The [node-spacing algorithm](../theory/implementation/node-spacing.qmd) determines the optimum introduction times for the [characteristics](../theory/implementation/characteristic-method.qmd), which means that the time values associated with steps may not correspond to known times that we might like to extract information about. For example, what the total amount of biomass per $m^2$ will be at 50 years. By doing this, it also means that we can integrate between defined times. Let's work with our results again by running a patch again and then tidying.
 
 ```{r}
 #| label: rerun-patch
