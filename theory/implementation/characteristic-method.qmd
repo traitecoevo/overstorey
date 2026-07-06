@@ -241,12 +241,16 @@ population. A new spline is constructed for each time step.
 The accuracy of the spline interpolation depends on the number of points used in
 its construction and on their placement along the size axis. We select the
 number and locations of points via an adaptive algorithm. Starting with an
-initial set of 33 points, we assess how much each point contributes to the
+initial set of `light_availability_spline_nbase` points (17 by default), we
+assess how much each point contributes to the
 accuracy of the spline fit at the location of each node, first via exact
 calculation, and second by linearly interpolating from adjacent nodes. The
-absolute difference in these values is compared to the control parameter
-`light_availability_spline_tol`. If the error is greater than this tolerance,
-the interval is bisected and the process repeated (see
+absolute difference in these values is compared to the spline tolerance
+`light_availability_spline_tol` (default `1e-4`). Note that this is a property of
+the light spline configured on the *environment* (e.g. `FF16_Environment`), not a
+field of the `Control` object. If the error is greater than this tolerance,
+the interval is bisected and the process repeated, up to
+`light_availability_spline_max_depth` (16 by default) levels (see
 [adaptive_interpolator.h](https://github.com/traitecoevo/plant/blob/master/inst/include/plant/adaptive_interpolator.h)
 for details).
 

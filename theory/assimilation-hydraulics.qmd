@@ -1,7 +1,7 @@
 ---
 title: "Assimilation & hydraulics"
 execute:
-  eval: true
+  eval: false
 ---
 ::: {.eyebrow}
 theory
@@ -46,7 +46,7 @@ At a broad level, the TF24 strategy module includes additional processes which c
 
 The strategy will enable several new parameters to be considered:
 
-- `vcmax`: the maximum rate carboxylation ($\mu mol~m^{-2}~s^{-1}$)
+- `vcmax_25`: the maximum rate of carboxylation at 25 °C ($\mu mol~m^{-2}~s^{-1}$)
 - `p_50`: The leaf water potential ($\psi_l$) at which 50% of conductivity is lost
 - `K_s`: The maximum hydraulic conductivity ($kg~m^{-2}~s^{-1}~MPa^{-1})$
 - `c`: Shape parameter for the hydraulic vulnerability curve (unitless)
