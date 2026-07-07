@@ -73,7 +73,8 @@ curve*.
 TF24 treats stomatal/hydraulic behaviour as quasi-steady-state: at every ODE
 step it re-solves the profit-maximisation problem from scratch, using a
 golden-section search over root-collar water potential to find the $\psi$
-that maximises profit $P(\psi_l)$ (@eq-profit). This assumes the plant's
+that maximises the profit $P(\psi_l)$ defined on the
+[assimilation & hydraulics](../assimilation-hydraulics.qmd#eq-profit) page. This assumes the plant's
 hydraulic operating point adjusts instantaneously to its physical and
 environmental optimum at every instant — a reasonable simplification, but one
 that leaves no room for a plant that is still adjusting.

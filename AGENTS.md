@@ -86,6 +86,28 @@ force-refresh them — only the manual, targeted `refresh.yml` may, and
   `renv.lock` lags `plant`'s `develop`, so watch for drift in documented model
   surface (strategies, parameters, defaults) when the pin is bumped.
 
+### Previewing an unmerged branch (no `plant` build)
+
+On a feature branch, unchanged pages still render from committed freeze, but any
+page whose source you edited goes stale under `freeze: auto` and re-executes —
+so a page with a `library(plant)` chunk or an inline helper (e.g.
+`plant_version_badge()`) fails without `plant` installed.
+
+- **To preview prose/layout without `plant`:** temporarily flip the global
+  switch to `freeze: true`, render, then revert — it renders every page from the
+  committed freeze, running no R:
+  ```bash
+  sed -i '' 's/  freeze: auto/  freeze: true/' _quarto.yml
+  quarto render && git checkout _quarto.yml
+  ```
+  This shows new prose against last-frozen output; it does **not** validate
+  edited code chunks (new code, stale output). Never commit the flip.
+- **Do not use `quarto render --no-execute`** — it still evaluates inline
+  `` `r …` `` and errors on it rather than falling back to the freeze.
+- **Before merge/publish**, re-execute the changed R pages for real
+  (`renv::restore()` to get `plant`, then `quarto render <page>`) and commit the
+  refreshed `_freeze/`; `pr-checks` freeze-consistency gates the PR on it.
+
 ## Constraints
 
 - **Don't invent paper-specific values.** Every paper parameter, DOI, figure
