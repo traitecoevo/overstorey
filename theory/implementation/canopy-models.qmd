@@ -5,6 +5,30 @@ title: "Canopy & light-environment models"
 implementation
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The big picture](../overview.qmd) and [the FF16 model](../models/ff16.qmd). Read those first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+Picture a forest from above: tall trees catch the sun first, and everything
+shorter sits in their shade. The lower a leaf sits, the more leaf area there
+is above it blocking the light, so less and less sunlight reaches it. That
+simple fact -- shade builds up with height -- is the whole idea behind a
+canopy or light-environment model. Rather than tracking every leaf
+individually, the model builds a profile: at each height in the forest, how
+much of the open-sky light actually gets through. Near the top, almost all of
+it does. Lower down, less does, because it has been filtered by the crowns
+above. This profile is shared by every plant in the patch: each one reads
+from it to work out how much light its own leaves receive, and each one also
+adds to it, since its own leaves cast shade on whatever grows beneath them.
+So a plant's growth is never just about its own size or strategy -- it also
+depends on the light environment its neighbours create by growing above or
+beside it. Some versions of the model track this shading in fine detail
+through each individual crown; others simplify it to make the calculation
+faster, at some cost in accuracy. The rest of this page makes this precise.
+
 This page documents the canopy / shading models that `plant` implements: what
 the six models are, how each computes the light environment a plant experiences,
 the realism-versus-speed tradeoff between them, and why the perfect-plasticity

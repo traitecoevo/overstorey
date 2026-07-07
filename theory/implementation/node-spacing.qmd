@@ -5,6 +5,19 @@ title: "The node-spacing algorithm"
 implementation
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The size-structured PDE](../size-structured-pde.qmd) and [the method of characteristics](characteristic-method.qmd). Read those first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+`plant` never tracks a continuous size distribution directly. Instead it approximates that distribution with a finite collection of cohorts, each one a single representative individual standing in for all the plants born at roughly the same moment. As those cohorts grow and thin over time, the model has to decide two things: when to add a new cohort to the population, and how to space the existing ones so the whole collection still traces out the size distribution faithfully.
+
+This is a genuine trade-off. Add too few cohorts, or space them too coarsely, and the model smooths over real structure in the population, missing the sharp features that matter for growth and competition. Add too many, or space them too finely, and the simulation grinds through far more bookkeeping than the answer warrants, most of it spent refining regions that were already accurate enough. The art of the node-spacing algorithm is finding, at every point in a patch's development, the smallest set of cohorts that keeps the approximation error below a chosen tolerance, and no smaller.
+
+The rest of this page makes this precise.
+
 ## Background
 
 As described in the [size-structured PDE](../size-structured-pde.qmd) page,

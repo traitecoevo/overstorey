@@ -5,6 +5,19 @@ title: "The characteristic method"
 implementation
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The size-structured PDE](../size-structured-pde.qmd). Read it first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+Imagine trying to track how a whole population of plants of different sizes changes over time. You could try to solve for the entire size distribution at once, on a fixed grid of sizes, updating every point as time moves forward. That turns out to be hard, because growth constantly shuffles plants from one size to another, and the equation describing this shuffling is a partial differential equation with both space and time mixed together.
+
+The method of characteristics takes a different route. Instead of watching the grid, you follow individual plants, or cohorts of plants that started life together, as they grow. Each one traces a path through time as its size changes, and along that path you can also track how many individuals remain, and how their local density evolves. Because you are moving with the plant rather than watching it pass through fixed points, the awkward partial differential equation collapses into an ordinary differential equation for each trajectory. These are far easier to solve, one step at a time, with a standard numerical stepper.
+
+The rest of this page makes this precise.
+
 Here we describe the overall numerical approach used to solve the dynamics in
 the plant model. Make sure you've read the
 [size-structured PDE](../size-structured-pde.qmd) document describing the system

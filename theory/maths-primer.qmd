@@ -9,8 +9,9 @@ This page introduces the equations behind `plant` slowly, one idea at a time, fo
 readers who want to understand the maths but find the
 [size-structured PDE](size-structured-pde.qmd) page heavy going. It covers the
 same system of equations — just built up gradually, with every symbol explained
-in words. Once this feels comfortable, that page has the full derivations,
-boundary conditions, and appendices.
+in words. Once this feels comfortable, [the maths, worked through](from-primer-to-pde.qmd)
+pushes these same equations through one small numerical example, and then that
+page has the full derivations, boundary conditions, and appendices.
 
 If you have not yet read [the big picture](overview.qmd), do that first; this page
 puts equations on the concepts introduced there. We build up in seven steps:
@@ -308,6 +309,9 @@ weighted-integral pattern — see the
 
 You now have the skeleton of the whole model. To go deeper:
 
+- [The maths, worked through](from-primer-to-pde.qmd) — the gentlest next step:
+  the same equations pushed through one small numerical example, one plant at a
+  time, before the abstract treatment.
 - The full [size-structured PDE](size-structured-pde.qmd) page — every equation
   above with its derivation, boundary conditions, and the Weibull appendix.
 - [Assimilation & hydraulics](assimilation-hydraulics.qmd) and the

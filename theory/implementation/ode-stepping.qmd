@@ -5,6 +5,32 @@ title: "ODE stepping & control"
 implementation
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The size-structured PDE](../size-structured-pde.qmd) and [the method of characteristics](characteristic-method.qmd). Read those first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+Once you've written the model down as a set of ordinary differential
+equations, the job of the solver is simple to describe even if the mechanics
+are intricate: start from the current state and march forward in time, one
+small step at a time, building up the future from the present. The question
+that makes this hard is how big each step should be. Take steps that are too
+large and the solution drifts away from the truth, accumulating error you
+can't see until it's too late. Take steps that are too small and you waste
+enormous amounts of computation grinding through periods where nothing much
+is changing. The solver used here resolves this by adapting as it goes. At
+every step it takes a trial step forward, then checks how much that step
+disagrees with a slightly more careful version of the same step. That
+disagreement is a proxy for the error being made. When the disagreement is
+small, the solver grows more confident and takes a longer stride next time.
+When it's large, the solver backs off and takes a shorter, more cautious
+step. The result is a trajectory through time that spends its effort where
+growth and mortality are changing quickly, and coasts through the quiet
+periods, all while keeping the error in each step below a chosen tolerance.
+The rest of this page makes this precise.
+
 `plant` casts the entire patch as a system of ordinary differential equations
 (ODEs) and steps it through time with classic ODE methods. (For details on the
 equations themselves see the [size-structured PDE](../size-structured-pde.qmd)

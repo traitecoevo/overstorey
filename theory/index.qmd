@@ -19,6 +19,8 @@ New here? Start with the two orientation pages, then dive into the details.
   equations. **Start here.**
 - [The maths, gently](maths-primer.qmd) — the core equations built up one step
   at a time.
+- [The maths, worked through](from-primer-to-pde.qmd) — the same equations pushed
+  through one small numerical example, bridging the primer and the full PDE.
 - [The size-structured PDE](size-structured-pde.qmd) — demography of
   individuals, patches, and metacommunities.
 - [Assimilation & hydraulics](assimilation-hydraulics.qmd) — the leaf-level

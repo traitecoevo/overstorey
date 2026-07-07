@@ -6,6 +6,30 @@ subtitle: "Kohyama 1993 — the forest architecture hypothesis for the stable co
 model
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The big picture](../overview.qmd). Read it first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+Imagine a forest where every tree of a given size behaves the same way,
+regardless of species. A tree's diameter alone tells you roughly how fast it
+grows, how likely it is to die, and how many offspring it produces, once you
+also account for how much basal area — a proxy for crowding — sits above it
+in the canopy. That is the whole idea behind the K93 model: growth,
+mortality, and fecundity are simple, size-dependent rules shaped by
+competition from larger neighbours, not by any species-specific strategy.
+
+This is a deliberately different starting point from the trait-based FF16
+model described elsewhere in this documentation. FF16 asks what an
+individual plant should do given its own physiological traits, such as leaf
+economics or wood density, and derives vital rates from first principles.
+K93 instead asks what pattern of vital rates, fitted directly to size and
+competition, allows many species to coexist in a stand over the long run. It
+is a statistical description of a forest rather than a mechanistic model of
+a plant. The rest of this page makes this precise.
+
 This document outlines the `K93` physiological model used in the `plant`
 package. This model was first described, and has primarily been developed,
 elsewhere, in particular in @Kohyama-1993. The model's equations are presented

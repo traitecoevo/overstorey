@@ -6,6 +6,31 @@ title: "FF16"
 model
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The big picture](../overview.qmd) and [The maths, gently](../maths-primer.qmd). Read those first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+Every plant carries a set of traits -- things like how it builds leaves, how
+dense its wood is, how it allocates mass to different tissues -- and a
+current size. FF16 takes those two ingredients, together with the light
+available to the plant, and turns them into rates: how fast it grows taller,
+how fast it produces seeds, and how likely it is to die. The engine
+underneath all three rates is the same: the plant captures carbon through
+photosynthesis, spends some of that income on maintaining and replacing its
+existing tissues, and what's left over is net production it can invest in
+new growth. A larger plant with more leaf area can capture more light, but
+it also carries more tissue to maintain, so the model tracks how that
+balance shifts as the plant gets bigger. Traits shape the balance too: a
+plant built for fast height growth channels production differently than one
+built to survive shade or drought. Once you know how much a plant produces
+and how it chooses to allocate that production, growth, reproduction, and
+mortality all follow as natural consequences of the same underlying
+physiology, rather than as separate, disconnected assumptions.
+The rest of this page makes this precise.
+
 This document outlines the core physiological model used in the `plant`
 package. This model has primarily been developed elsewhere, in particular in
 @Falster-2011. The model's equations are presented here not as original findings,

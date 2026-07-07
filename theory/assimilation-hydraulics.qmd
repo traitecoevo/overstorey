@@ -7,6 +7,29 @@ execute:
 theory
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [the FF16 model](models/ff16.qmd) and [The maths, gently](maths-primer.qmd). Read those first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+A leaf makes its living by opening tiny pores, called stomata, to let carbon
+dioxide in from the air. Every time it does this, water vapour escapes the
+same way. That escaping water has to be replaced, and pulling replacement
+water up from the soil through the plant's internal plumbing has a cost: it
+draws the water column in the stem tighter, and if pulled too hard, that
+plumbing can fail. So a leaf faces a trade-off. Opening the pores wider lets
+in more carbon dioxide, which means more sugar produced through
+photosynthesis, but it also draws more water, straining the plumbing and
+raising the risk of damage further. Opening them less protects the plumbing
+but starves the leaf of carbon dioxide, so it makes less sugar. Somewhere
+between "shut" and "wide open" sits a setting that gets the most net benefit:
+the sugar gained minus the cost of running and protecting the water supply.
+This page treats the leaf as if it always finds that best setting, a
+convenient shorthand for describing how carbon gain responds to sun, air
+dryness, and water availability. The rest of this page makes this precise.
+
 ::: {.callout-warning}
 ## Code not executed — needs updating to the current `Leaf()` API
 The worked examples on this page were written against an earlier `Leaf()`

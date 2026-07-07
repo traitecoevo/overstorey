@@ -5,6 +5,33 @@ title: "The size-structured PDE"
 theory
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The big picture](overview.qmd) and [The maths, gently](maths-primer.qmd). Read those first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+A forest is really just a lot of individual plants, each growing taller,
+sometimes dying, and sometimes producing seeds. This page shows how to
+track all of that at once, rather than one plant at a time. Instead of
+following every individual, we track how many plants there are at each
+height, and describe how that whole size distribution changes as time
+passes. Growth pushes plants toward taller sizes, so the size distribution
+slides steadily upward. Death removes plants along the way, so the
+distribution also thins out as it slides. New seedlings arrive at the
+bottom, topping the distribution up from below. Because taller plants
+shade shorter ones, the amount of light available at any height depends
+on everyone growing above it, which in turn affects how fast plants below
+grow, survive, and reproduce. Zooming out further, patches of forest are
+themselves born from disturbance and age over time, so the whole
+metacommunity is a mix of patches at different ages, each with its own
+size distribution, all summed together to get the big picture. Running
+totals, like cumulative growth or cumulative seed output, are the natural
+way to describe all of this.
+
+The rest of this page makes this precise.
+
 This page outlines the demographic machinery used to model size-structured
 populations in the `plant` package. We outline the system of equations being
 solved for individual plants, patches of competing plants, and the age
