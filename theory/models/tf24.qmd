@@ -34,9 +34,16 @@ diameter, and tissue pools, and how those feed the
 
 ## Soil water and root uptake
 
-TF24's hydraulics terminate at the root collar. The supply side — soil water
-balance and multi-layer root water uptake — has been prototyped and
-benchmarked separately; those explorations live in the notebook:
+TF24's hydraulics terminate at the root collar. The supply side — the soil
+water balance and multi-layer root water uptake that feed water to it — is
+documented on its own core theory page:
+
+- **[Soil water & root uptake](../soil-water.qmd)** — the multi-layer bucket
+  model, infiltration and drainage, the retention curve, and the root-collar
+  solve that couples soil moisture into the leaf model.
+
+The original prototyping and benchmarking of this machinery lives in the
+notebook:
 
 - [The AWRA soil-water bucket model](../../posts/index.qmd) <!-- TODO: point at the migrated awra-soil-water post slug once created -->
 - [Multi-layer root water uptake](../../posts/index.qmd) <!-- TODO: point at the migrated root-water-uptake post slug -->
@@ -50,3 +57,79 @@ machinery). A full strategy-level write-up — the exact coupling of the leaf
 model into whole-plant growth, and the complete TF24 parameter set — is still
 **TODO** and should be supplied by the model authors rather than guessed.
 :::
+
+## TF24f: acclimation lag instead of instantaneous re-optimisation
+
+TF24f is a variant of TF24, not a different physiology. It subclasses
+`TF24_Strategy` and reuses TF24's leaf model, its xylem vulnerability curve,
+and its soil-water coupling untouched — every carbon-income and
+water-transport calculation is exactly the one described on
+[Assimilation & hydraulics](../assimilation-hydraulics.qmd). The one thing
+TF24f changes is *how the plant finds its operating point on the profit
+curve*.
+
+TF24 treats stomatal/hydraulic behaviour as quasi-steady-state: at every ODE
+step it re-solves the profit-maximisation problem from scratch, using a
+golden-section search over root-collar water potential to find the $\psi$
+that maximises profit $P(\psi_l)$ (@eq-profit). This assumes the plant's
+hydraulic operating point adjusts instantaneously to its physical and
+environmental optimum at every instant — a reasonable simplification, but one
+that leaves no room for a plant that is still adjusting.
+
+TF24f relaxes that assumption. It adds a sixth ODE state,
+`opt_root_psi_state`, that tracks the plant's *current* root-collar water
+potential and lets it climb toward the profit-maximising optimum by gradient
+ascent, rather than jumping straight to it:
+
+$$
+\frac{d\psi}{dt} = k_{\text{acclim}} \cdot \frac{dP}{d\psi}
+$$
+
+Instead of a golden-section search, TF24f's leaf-solve step evaluates profit
+at the *tracked* $\psi$ and hands the local profit gradient
+$dP/d\psi$ back to the ODE system, which integrates the state forward. The
+tracked state is seeded at the true optimum at establishment, so there is no
+birth transient — the lag only shows up once the environment moves the
+optimum away from where the plant is sitting.
+
+The gradient itself can be computed two ways, controlled by
+`use_ad_gradient`:
+
+- **`use_ad_gradient = true`** (the default) — an exact gradient,
+  `Leaf::dprofit_droot_collar_psi`, built from forward-mode automatic
+  differentiation of the photosynthesis/cost algebra, the implicit-function
+  theorem applied at the $\psi_l \to C_i$ root-find, and analytic spline
+  derivatives for the transport terms.
+- **`use_ad_gradient = false`** — a finite-difference approximation, stepping
+  $\psi$ by `psi_fd_step` (MPa) and differencing profit either side.
+
+`k_acclim` is the acclimation-rate knob, and it is what makes TF24f a family
+of behaviours rather than a single alternative to TF24:
+
+| | Small `k_acclim` | Large `k_acclim` |
+|---|---|---|
+| Behaviour | slow, lagged tracking of the optimum | tight tracking — approaches TF24's instantaneous optimum |
+| Interpretation | a real acclimation delay in stomatal/hydraulic adjustment | quasi-steady-state recovered as a limiting case |
+| Cost | — | cheaper: no per-step search, just one gradient evaluation |
+| Risk | plant can be caught away from the optimum by fast environmental change | stiff ODE state; may demand a smaller integration step |
+
+### TF24 vs TF24f
+
+| | TF24 | TF24f |
+|---|---|---|
+| Operating-point solve | golden-section search for the profit optimum, every step | gradient-ascent relaxation toward the optimum, tracked as an ODE state |
+| Assumption | instantaneous (quasi-steady-state) acclimation | finite acclimation lag, set by `k_acclim` |
+| Extra state | — | `opt_root_psi_state` (6th ODE state) |
+| Gradient source | not needed (search only evaluates profit) | `Leaf::dprofit_droot_collar_psi` (AD) or finite difference (`psi_fd_step`) |
+| Physiology, hydraulics, soil coupling | shared | shared (inherited unchanged from TF24) |
+| Bit-for-bit match to TF24 | — | no — by design, it tracks rather than reproduces the optimum |
+
+Reach for TF24f when the question is about *dynamics of acclimation* — how
+quickly a plant's stomatal/hydraulic behaviour can respond to a shifting
+environment — rather than assuming it is always instantaneously optimal, or
+when running many individuals/steps makes TF24's per-step search the
+bottleneck and a large `k_acclim` is an acceptable stand-in for the
+instantaneous optimum. Stick with TF24 when the quasi-steady-state assumption
+is the thing you want (no extra state, no acclimation-rate parameter to
+choose), or when you need results that match TF24 exactly rather than
+approach it as $k_{\text{acclim}} \to \infty$.

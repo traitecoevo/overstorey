@@ -65,7 +65,7 @@ This is the documentation for the Leaf model within the `TF24` strategy.
 
 # Introduction
 
-At a broad level, the TF24 strategy module includes additional processes which capture plant-soil water feedbacks driven by precipitation. A critical subcompontent of this module is a physiological stomatal optimisation sub-model which determines how plants assimilate carbon and transpire water dynamically in response to water availability, vapour pressure deficit, leaf temperature (still to be implemented), in a trait-dependent manner. This stomatal optimisation model is described below. The other components of the TF24 strategy, such as the soil water submodule, are discussed elsewhere.
+At a broad level, the TF24 strategy module includes additional processes which capture plant-soil water feedbacks driven by precipitation. A critical subcompontent of this module is a physiological stomatal optimisation sub-model which determines how plants assimilate carbon and transpire water dynamically in response to water availability, vapour pressure deficit, leaf temperature (still to be implemented), in a trait-dependent manner. This stomatal optimisation model is described below. The other components of the TF24 strategy, such as the soil water submodule, are discussed on the [Soil water & root uptake](soil-water.qmd) page.
 
 The strategy will enable several new parameters to be considered:
 
@@ -81,6 +81,18 @@ For the most part, these traits, in combination with traits from `TF24`, determi
 # Profitmax
 
 Plants are known to vary the aperture of their stomata, which control the rate of conductance of $H_2O$ for $CO_2$, in response to environmental stimuli including the amount of available soil moisture. But how do plants determine the optimum rate of exchange? Multiple theoretical frameworks exist to address this question, but currently `TF24` employs the `profitmax` model. The profitmax models states that the optimum stomatal conductance is the point at which profits, $P~(\mu mol~m^{-2}~s^{-1})$, is maximised.
+
+::: {.callout-note}
+## A second stomatal model lives in the code, but is dormant
+
+The `Leaf` submodel also carries an implementation of the Medlyn *et al.* (2011)
+stomatal-conductance model — an empirical $g_1$ formulation (`medlyn_model_gs`,
+with settable `g0`/`g1` and a soil-moisture stress factor $\beta$ derived from
+the wilting point and field capacity). It is **not** on the default `TF24`
+compute path, which optimises $\psi_l$ directly via `profitmax`. It exists as a
+comparison/exploration tool, so treat any Medlyn-style $g_1$ behaviour as
+opt-in, not the model's default stomatal response.
+:::
 
 $P (\mu mol~m^{-2}~s^{-1})$ is the difference between photosynthetic revenue, $A~(\mu mol~m^{-2}~s^{-1})$ and the costs,$C~(\mu mol~m^{-2}~s^{-1})$ required to maintain the transpirational pathway which supplies water for transpiration through the stomates:
 
