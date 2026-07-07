@@ -376,7 +376,7 @@ $$ {#eq-flux-1}
 The first two terms describe the flux in and out of the considered size interval
 through growth, while the last term describes losses through mortality.
 The change in the density of individuals within this size interval during a time
-step $\Delta $a is thus
+step $\Delta a$ is thus
 $$
 \begin{array}{ll} N(H, a + \Delta a)\Delta H - N(H, a)\Delta H = &g(H - 0.5 \Delta H, a) \, N(H - 0.5 \Delta H, a)\Delta a \\ & - g(H + 0.5 \Delta H, a) \, N(H + 0.5 \Delta H, a)\Delta a\\& - d (H, a) \, N(H, a)\Delta H\Delta a.
 \end{array}
