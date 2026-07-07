@@ -13,7 +13,7 @@ individual's size and light environment into instantaneous growth, fecundity,
 and mortality rates. The [size-structured PDE](../size-structured-pde.qmd)
 machinery is strategy-agnostic; swapping the strategy swaps the biology.
 
-Three strategies are documented here:
+Four strategies are documented here:
 
 - **[FF16](ff16.qmd)** — the default trait-based model (Falster *et al.* 2016).
   Growth follows a functional-balance allocation scheme driven by leaf
@@ -25,6 +25,9 @@ Three strategies are documented here:
 - **[TF24](tf24.qmd)** — extends the leaf model with explicit stomatal
   optimisation and plant hydraulics, choosing conductance to maximise carbon
   profit net of hydraulic cost.
+- **[TF24f](tf24.qmd)** — a fast-acclimating variant of TF24 that lets the
+  leaf's optimal state track a changing environment with a lag instead of
+  re-solving it each step (documented alongside TF24).
 
 To implement your own, see
 [implementing a new strategy](../../contributing/implementing-a-strategy.qmd).

@@ -105,7 +105,7 @@ flowchart LR
     d1["rates, tracked<br/>over time"] --> d2["how the whole<br/>population changes"]
   end
   S -->|"rates plug in"| D
-  models["FF16 · K93 · TF24"] -.->|"pick one"| S
+  models["FF16 · K93 · TF24 · TF24f"] -.->|"pick one"| S
 ```
 
 - The **strategy** is the biology. Given a plant's size and the light it
@@ -146,9 +146,9 @@ individual in the model. The [FF16 page](models/ff16.qmd) and the
 [assimilation & hydraulics](assimilation-hydraulics.qmd) page give the full
 detail.
 
-### Meet the three strategies
+### Meet the strategies
 
-`plant` ships with three interchangeable strategies:
+`plant` ships with a small family of interchangeable strategies:
 
 - **[FF16](models/ff16.qmd)** — the default. A detailed, trait-based carbon
   economy (the one sketched above). Start here unless you have a reason not to.
@@ -159,6 +159,10 @@ detail.
   **hydraulics** and stomatal behaviour: the plant chooses how much to open its
   stomata to balance carbon gain against the risk of drying out. Use it when
   water and drought matter.
+- **[TF24f](models/tf24.qmd)** — a faster variant of TF24. Instead of re-solving
+  the leaf's optimal state from scratch at every step, it lets that state
+  *acclimate* over time, tracking a changing environment with a short lag. Same
+  hydraulics, cheaper to run.
 
 You can also [write your own](../contributing/implementing-a-strategy.qmd) — the
 demographic core will run it unchanged.

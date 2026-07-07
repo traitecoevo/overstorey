@@ -101,7 +101,7 @@ $$ {#eq-tilder1}
 is the plant's cumulative seed output, from its birth at patch age
 $a = a_0$ until patch age $a$.
 
-The notational complexity required in @eq-size-@eq-tilder1 potentially obscures an important point: these equations are simply the general, non-linear solutions to
+The notational complexity required in Eqs. [-@eq-size]--[-@eq-tilder1] potentially obscures an important point: these equations are simply the general, non-linear solutions to
 integrating growth, mortality, and fecundity over time.
 
 ## Patches of competing plants {#sec-patches-of-competing-plants}
@@ -111,7 +111,7 @@ patch is described by the size-density distribution $N(H | x, a)$ of plants
 with traits $x$ and height $H$. In a finite-sized patch, $N$ is described by a
 collection of points, each indicating the height of one individual, whereas in a very (infinitely) large patch,
 $N$ is a continuous function. In either case, the demographic
-behaviour of the plants within the patch is given by @eq-size-@eq-tilder1. Integrating the dynamics over time is complicated by-
+behaviour of the plants within the patch is given by Eqs. [-@eq-size]--[-@eq-tilder1]. Integrating the dynamics over time is complicated by-
 two other factors: (i) plants interact, thereby altering $E_a$ with
 age, and (ii) new individuals may establish, expanding the system of
 equations.
@@ -212,7 +212,7 @@ connectivity via dispersal between all patches in the habitat, allowing
 empty patches to be quickly re-colonised. Such a system can be modelled
 as a metapopulation (for a single species) or metacommunity (for multiple
 species). The dynamics of such a metacommunity are described by the
-PDEs in @eq-pde-@eq-agepde4.
+PDEs in Eqs. [-@eq-pde]--[-@eq-agepde4].
 
 The offspring production of each species in the metacommunity is given by the rate at which seeds are produced across all patches,
 $$
@@ -220,7 +220,7 @@ Y_x  = \int_0^{\infty} \int_0^{\infty} P(a) \, S_{\rm D} \, f(x, H, E_a) \, N(H 
 $$ {#eq-seed-rain}
 where $S_{\rm D}$ is the survival probability of seeds during dispersal.
 
-A convenient feature of @eq-pde - @eq-agepde4 is that
+A convenient feature of Eqs. [-@eq-pde]--[-@eq-agepde4] is that
 the dynamics of a single patch scale up to give the dynamics of the
 entire metacommunity. Note that the rate $Y_x$ at which offspring of individuals with traits $x$ arrive from the
 disperser pool is constant when the metacommunity is at
@@ -231,7 +231,7 @@ difference between them being their ages.
 
 To model the temporal dynamics of an archetypal patch, we need only a
 value for $Y_x$. The numerical challenge is therefore to find the
-right value for $Y_x$, by solving @eq-bc1-@eq-seed-rain simultaneously, for all species with traits $x$ in the metacommunity.
+right value for $Y_x$, by solving Eqs. [-@eq-bc1]--[-@eq-seed-rain] simultaneously, for all species with traits $x$ in the metacommunity.
 
 ## Emergent properties of metacommunities {#sec-emergent-properties}
 

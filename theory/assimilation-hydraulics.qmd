@@ -35,7 +35,7 @@ dryness, and water availability. The rest of this page makes this precise.
 ::: {.callout-warning}
 ## Code not executed — needs updating to the current `Leaf()` API
 The worked examples on this page were written against an earlier `Leaf()`
-constructor. In the installed `plant` (2.0.0.9001) the leaf model gained an
+constructor. In the installed `plant` ({{< var plant.version >}}) the leaf model gained an
 explicit root-hydraulics parameter set, so the seed call
 `Leaf(vcmax = ..., ...)` now fails: `vcmax` is renamed `vcmax_25`, and
 `root_c`, `root_b`, `root_psi_crit` (plus `beta2`, `jmax_25`, `hk_s`, …) are
