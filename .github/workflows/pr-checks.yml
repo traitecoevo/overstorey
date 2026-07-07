@@ -50,3 +50,26 @@ jobs:
           packages: any::yaml
       - name: No unfilled reproductions
         run: Rscript R/check_reproductions.R
+
+  # The theory-page version stamp (_variables.yml) is derived from the plant
+  # pin in renv.lock. Regenerate it and fail if the committed copy is stale, so
+  # bumping the pin can't silently leave the docs stamping an old version.
+  variables-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: r-lib/actions/setup-r@v2
+        with: { use-public-rspm: true }
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: any::jsonlite
+      - name: _variables.yml matches renv.lock
+        run: |
+          Rscript R/sync_plant_vars.R
+          if ! git diff --quiet -- _variables.yml; then
+            echo "::error::_variables.yml is out of date with renv.lock's plant pin."
+            echo "Run 'Rscript R/sync_plant_vars.R' and commit the result."
+            git --no-pager diff -- _variables.yml
+            exit 1
+          fi
+          echo "_variables.yml is consistent with renv.lock."

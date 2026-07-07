@@ -6,6 +6,8 @@ toc: false
 the model, from the ground up
 :::
 
+{{< include _plant-stamp.qmd >}}
+
 What `plant` actually solves, and why. Consolidates material currently
 scattered across papers and vignettes.
 

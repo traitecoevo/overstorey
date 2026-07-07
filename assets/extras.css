@@ -86,3 +86,17 @@ mjx-container, .math, .math.inline, .math.display {
 @media (prefers-reduced-motion: reduce) {
   .btn-sun:hover, .btn-ghost:hover { transform: none; }
 }
+
+/* Version stamp on theory pages. Values come from _variables.yml (regenerated
+   from renv.lock by R/sync_plant_vars.R) and render via {{< var >}}, so they
+   work even on non-executing pages. Greens match the palette above. */
+.plant-stamp {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  border-left: 3px solid #6fa384;
+  padding: 0.35rem 0 0.35rem 0.85rem;
+  margin: 0 0 1.6rem;
+  color: #4f6152;
+}
+.plant-stamp strong { color: #123026; }
+.plant-stamp code { font-size: 0.9em; }

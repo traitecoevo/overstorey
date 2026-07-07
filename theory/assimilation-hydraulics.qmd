@@ -7,6 +7,8 @@ execute:
 theory
 :::
 
+{{< include _plant-stamp.qmd >}}
+
 ::: {.callout-note}
 ## Prerequisites
 This page builds on [the FF16 model](models/ff16.qmd) and [The maths, gently](maths-primer.qmd). Read those first if the notation here is unfamiliar.
