@@ -26,23 +26,17 @@ environment", it means the `TF24_Environment`, not the shared base class.
 
 ## The idea first
 
-A plant's leaves are only half the story. Every drop of water a leaf
-transpires has to come from somewhere, and that somewhere is a patch of soil
-with a finite, replenishable supply. The [assimilation & hydraulics
-page](assimilation-hydraulics.qmd) starts the story partway through: it hands
-you a soil water potential $\psi_s$ and shows how the plant turns that number,
-together with sunlight and air dryness, into a rate of carbon gain and a rate
+A plant's leaves are only half the story. We also need to model the dynamics of water transport in the soil. 
+The [assimilation & hydraulics page](assimilation-hydraulics.qmd) starts the story partway through: it hands
+you a soil water potential $\psi_s$ and shows how that translates into a rate of carbon gain and a rate
 of water loss. This page fills in where that number comes from.
 
 Picture the soil beneath a patch as a stack of buckets, one on top of the
-other. Rain fills the top bucket; once it is full, the excess runs off rather
-than soaking in. Whatever does soak in trickles down into the bucket below,
-some of it lost as deep drainage from the very bottom. Meanwhile every plant
-rooted in the patch is drawing water out of whichever buckets its roots reach,
+other. Rain fills the top bucket; once it is approaching saturation, it drains more rapidly to the layer below. This continues sequentially for each layer, before draining into deep drainage from the bottom layer. 
+Meanwhile every plant rooted in the patch is drawing water out of whichever buckets its roots reach,
 in proportion to how wet those buckets are and how far the roots have to pull
 against gravity to reach the root collar. The wetter a bucket, the less
-suction it takes to pull water out of it; the drier, the more a root's own
-plumbing resists. Both the buckets' fullness and their resistance change the
+suction it takes to pull water out of it. Both the buckets' fullness and the resistance of the roots in that layer change the
 water potential the plant actually experiences at its root collar — and *that*
 combined number, not a flat single-layer average, is what feeds into the leaf
 model described elsewhere.
@@ -156,8 +150,7 @@ numerical failure mode this closes off.
 Every layer's moisture state feeds the leaf model as a potential
 $\psi_{{\rm soil},i} = \psi_{\rm soil}(\theta_i)$ via @eq-retention. But a
 plant with roots spread across several layers does not experience $N$
-separate potentials — it experiences one, at its root collar, and it is the
-root system's job to reconcile the difference.
+separate potentials — it experiences one, at its root collar.
 
 Picture each layer connected to the root collar by its own pipe. Layer $i$'s
 pipe has a horizontal segment, resisting the movement of water from the soil
