@@ -7,8 +7,6 @@ execute:
 theory
 :::
 
-{{< include _plant-stamp.qmd >}}
-
 ::: {.callout-note}
 ## Prerequisites
 This page builds on [Assimilation & hydraulics](assimilation-hydraulics.qmd)

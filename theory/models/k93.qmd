@@ -6,8 +6,6 @@ subtitle: "Kohyama 1993 — the forest architecture hypothesis for the stable co
 model
 :::
 
-{{< include ../_plant-stamp.qmd >}}
-
 ::: {.callout-note}
 ## Prerequisites
 This page builds on [The big picture](../overview.qmd). Read it first if the notation here is unfamiliar.

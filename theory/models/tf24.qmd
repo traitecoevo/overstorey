@@ -5,8 +5,6 @@ title: "TF24"
 model
 :::
 
-{{< include ../_plant-stamp.qmd >}}
-
 TF24 is the hydraulically-explicit strategy. It keeps the trait-based
 functional-balance growth and allocation machinery of [FF16](ff16.qmd) but
 replaces FF16's fixed light-use efficiency with a mechanistic leaf model: at

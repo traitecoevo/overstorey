@@ -6,8 +6,6 @@ toc: false
 theory · the physiological strategies
 :::
 
-{{< include ../_plant-stamp.qmd >}}
-
 A *strategy* in `plant` is a self-contained set of functions that turn an
 individual's size and light environment into instantaneous growth, fecundity,
 and mortality rates. The [size-structured PDE](../size-structured-pde.qmd)

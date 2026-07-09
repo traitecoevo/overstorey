@@ -1,13 +1,8 @@
 name: Model drift watch (scheduled)
 
-# Weekly early-warning, two independent jobs:
-#   drift    — re-run reproduction posts against plant master HEAD and report
-#              which figures move.
-#   coverage — diff plant develop HEAD's public surface (strategies, ODE
-#              states, parameters, exports) against a committed baseline
-#              manifest, flagging features the docs may not cover yet.
-# Both are purely informational: they publish/commit nothing, so develop-pinned
-# history and the freeze are untouched.
+# Weekly early-warning: re-run all reproduction posts against plant's
+# current master HEAD and report which figures move. Does NOT publish or
+# commit — purely informational, so develop-pinned history is untouched.
 
 on:
   schedule:
@@ -61,38 +56,4 @@ jobs:
           path: |
             drift-report.md
             _freeze/
-          retention-days: 30
-
-  # Docs-vs-model coverage: does plant's live surface still match what the docs
-  # were reconciled against? Lightweight — no render, just plant + R.
-  coverage:
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: r-lib/actions/setup-r@v2
-        with: { use-public-rspm: true }
-      - uses: r-lib/actions/setup-renv@v2
-
-      # Check against develop HEAD — where new features land first, so drift
-      # shows up here before it ever reaches a release.
-      - name: Install plant @ develop HEAD
-        run: Rscript -e 'renv::install("traitecoevo/plant@develop")'
-
-      - name: Coverage drift report
-        run: |
-          Rscript R/coverage_check.R > coverage-report.md || true
-          cat coverage-report.md >> "$GITHUB_STEP_SUMMARY"
-
-      # Ship the manifest too: on the first run (no committed baseline) the
-      # script writes one, and this makes it downloadable to commit.
-      - name: Upload coverage report + manifest
-        uses: actions/upload-artifact@v6
-        with:
-          name: coverage-report
-          path: |
-            coverage-report.md
-            R/coverage-manifest.json
           retention-days: 30

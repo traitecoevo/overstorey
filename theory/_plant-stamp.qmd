@@ -1,7 +1,0 @@
-<!-- Version stamp partial. Included by the version-sensitive theory pages via
-     {{< include _plant-stamp.qmd >}} (or ../_plant-stamp.qmd from models/).
-     Values come from _variables.yml, regenerated from renv.lock by
-     R/sync_plant_vars.R — do not hard-code a version here. -->
-::: {.plant-stamp}
-Describes **plant {{< var plant.version >}}** ({{< var plant.build >}} · commit [`{{< var plant.sha >}}`]({{< var plant.commit_url >}})). `plant` gains features continuously, so a newer build may add behaviour these pages don't yet cover — see the [pipeline](/develop.qmd) for how the docs track the model.
-:::
