@@ -105,7 +105,7 @@ We can now create a second function called `run_mypatch` which takes a number of
 run_mypatch <- function(
   traits =  trait_matrix(c(0.07), c("lma")),
   birth_rate_list = c(10, 10),
-  B_lf1 = 1,
+  B_lf1 = 0.009,
   p0 = base_parameters(),
   optimise_schedule = FALSE,
   latitude = 28.182
