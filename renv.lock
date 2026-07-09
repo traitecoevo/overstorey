@@ -2548,6 +2548,49 @@
       "NeedsCompilation": "no",
       "Repository": "CRAN"
     },
+    "odelia": {
+      "Package": "odelia",
+      "Version": "0.1.0",
+      "Source": "GitHub",
+      "Type": "Package",
+      "Title": "ODE Solver with Automatic Differentiation, in C++ Header Files",
+      "Authors@R": "c( person(\"Daniel\", \"Falster\", , \"daniel.falster@unsw.edu.au\", c(\"aut\", \"cre\"),  comment = c(ORCID = \"0000-0002-9814-092X\")), person(\"Richard\", \"FitzJohn\", , \"\", \"aut\"), person(\"Andrew\", \"O'Reilly-Nugent\", , \"\", \"aut\") )",
+      "Maintainer": "Daniel Falster <daniel.falster@unsw.edu.au>",
+      "Description": "odelia provides an ODE solver in C++ header files, using an adaptive-step Runge-Kutta 4-5 method, with an interface to R via Rcpp. ODE systems can be templated on their scalar type to support automatic differentiation, enabling exact gradients for parameter fitting.",
+      "Depends": [
+        "R (>= 4.2.0)"
+      ],
+      "Imports": [
+        "Rcpp (>= 1.0.10)",
+        "R6 (>= 2.5.1)",
+        "dplyr (>= 1.1.0)",
+        "tibble (>= 3.1.0)"
+      ],
+      "Suggests": [
+        "here",
+        "knitr",
+        "rmarkdown",
+        "testthat (>= 3.0.0)",
+        "withr"
+      ],
+      "LinkingTo": [
+        "Rcpp"
+      ],
+      "VignetteBuilder": "knitr",
+      "Encoding": "UTF-8",
+      "License": "AGPL (>= 3)",
+      "URL": "https://github.com/traitecoevo/odelia, https://traitecoevo.github.io/odelia/",
+      "BugReports": "https://github.com/traitecoevo/odelia/issues",
+      "RoxygenNote": "7.3.3",
+      "Config/testthat/edition": "3",
+      "Author": "Daniel Falster [aut, cre] (ORCID: <https://orcid.org/0000-0002-9814-092X>), Richard FitzJohn [aut], Andrew O'Reilly-Nugent [aut]",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "traitecoevo",
+      "RemoteRepo": "odelia",
+      "RemoteRef": "master",
+      "RemoteSha": "c9ae31bfedffd711555b07708febb4ed6968f661"
+    },
     "plant": {
       "Package": "plant",
       "Version": "2.0.0.9001",
@@ -2605,8 +2648,8 @@
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "plant",
-      "RemoteRef": "81cfeab16a049478ca0ff81f1239b78221c49ebb",
-      "RemoteSha": "81cfeab16a049478ca0ff81f1239b78221c49ebb"
+      "RemoteRef": "develop",
+      "RemoteSha": "96941d3b1082cdd645325b34e3af1ef44616bc97"
     },
     "prettyunits": {
       "Package": "prettyunits",
