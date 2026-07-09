@@ -259,6 +259,24 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The big picture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, gently</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, worked through</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
@@ -267,6 +285,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -363,7 +387,8 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#model-description" id="toc-model-description" class="nav-link active" data-scroll-target="#model-description">Model description</a>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#model-description" id="toc-model-description" class="nav-link" data-scroll-target="#model-description">Model description</a>
   <ul class="collapse">
   <li><a href="#growth" id="toc-growth" class="nav-link" data-scroll-target="#growth">Growth</a></li>
   <li><a href="#fecundity" id="toc-fecundity" class="nav-link" data-scroll-target="#fecundity">Fecundity</a></li>
@@ -405,8 +430,26 @@ window.Quarto = {
 <div class="eyebrow">
 <p>model</p>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../../theory/overview.html">The big picture</a>. Read it first if the notation here is unfamiliar.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p>Imagine a forest where every tree of a given size behaves the same way, regardless of species. A tree’s diameter alone tells you roughly how fast it grows, how likely it is to die, and how many offspring it produces, once you also account for how much basal area — a proxy for crowding — sits above it in the canopy. That is the whole idea behind the K93 model: growth, mortality, and fecundity are simple, size-dependent rules shaped by competition from larger neighbours, not by any species-specific strategy.</p>
+<p>This is a deliberately different starting point from the trait-based FF16 model described elsewhere in this documentation. FF16 asks what an individual plant should do given its own physiological traits, such as leaf economics or wood density, and derives vital rates from first principles. K93 instead asks what pattern of vital rates, fitted directly to size and competition, allows many species to coexist in a stand over the long run. It is a statistical description of a forest rather than a mechanistic model of a plant. The rest of this page makes this precise.</p>
 <p>This document outlines the <code>K93</code> physiological model used in the <code>plant</code> package. This model was first described, and has primarily been developed, elsewhere, in particular in <span class="citation" data-cites="Kohyama-1993">Kohyama (<a href="#ref-Kohyama-1993" role="doc-biblioref">1993</a>)</span>. The model’s equations are presented here not as original findings, but rather so that users can understand the full system of equations being solved within <code>plant</code>.</p>
 <p>The purpose of a physiological model in <code>plant</code> is to take a plant’s current size, light environment, and physiological parameters as inputs, and return its growth, mortality, and fecundity rates. In the <code>K93</code> physiological model, these vital rates are all estimated using simple phenomenological equations, as functions of diameter and competition.</p>
+</section>
 <section id="model-description" class="level1">
 <h1>Model description</h1>
 <section id="growth" class="level2">

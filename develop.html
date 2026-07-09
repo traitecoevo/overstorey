@@ -311,7 +311,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="ci-topology" class="level2">
 <h2 class="anchored" data-anchor-id="ci-topology">CI topology</h2>
 <p>Four workflows, each with one job:</p>
-<p><strong><code>publish.yml</code></strong> — on push to <code>main</code>. Plain <code>quarto render</code>, honours all freezes, deploys. Fast and deterministic. <em>Never</em> runs <code>--cache-refresh</code>.</p>
+<p><strong><code>publish.yml</code></strong> — on push to <code>master</code>. Plain <code>quarto render</code>, honours all freezes, deploys. Fast and deterministic. <em>Never</em> runs <code>--cache-refresh</code>.</p>
 <p><strong><code>pr-checks.yml</code></strong> — on PR. Two guards:</p>
 <ul>
 <li><em>freeze consistency</em>: renders without allowing new execution; if a source changed but its <code>_freeze/</code> wasn’t updated, the build fails, forcing the author to <code>quarto render</code> locally and commit the freeze.</li>

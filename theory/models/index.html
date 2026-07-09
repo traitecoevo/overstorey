@@ -175,6 +175,24 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The big picture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, gently</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, worked through</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
@@ -183,6 +201,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -301,11 +325,12 @@ ul.task-list li input[type="checkbox"] {
 <p>theory · the physiological strategies</p>
 </div>
 <p>A <em>strategy</em> in <code>plant</code> is a self-contained set of functions that turn an individual’s size and light environment into instantaneous growth, fecundity, and mortality rates. The <a href="../../theory/size-structured-pde.html">size-structured PDE</a> machinery is strategy-agnostic; swapping the strategy swaps the biology.</p>
-<p>Three strategies are documented here:</p>
+<p>Four strategies are documented here:</p>
 <ul>
 <li><strong><a href="../../theory/models/ff16.html">FF16</a></strong> — the default trait-based model (Falster <em>et al.</em> 2016). Growth follows a functional-balance allocation scheme driven by leaf photosynthesis; four traits (LMA, wood density, seed mass, maximum height) hyper-parameterise a whole strategy.</li>
 <li><strong><a href="../../theory/models/k93.html">K93</a></strong> — Kohyama’s 1993 model, where growth, fecundity, and mortality are direct functions of stem diameter and stand basal area. A compact example of a non-physiological strategy.</li>
 <li><strong><a href="../../theory/models/tf24.html">TF24</a></strong> — extends the leaf model with explicit stomatal optimisation and plant hydraulics, choosing conductance to maximise carbon profit net of hydraulic cost.</li>
+<li><strong><a href="../../theory/models/tf24.html">TF24f</a></strong> — a fast-acclimating variant of TF24 that lets the leaf’s optimal state track a changing environment with a lag instead of re-solving it each step (documented alongside TF24).</li>
 </ul>
 <p>To implement your own, see <a href="../../contributing/implementing-a-strategy.html">implementing a new strategy</a>.</p>
 

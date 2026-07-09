@@ -328,140 +328,184 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">FF16_Strategy</span>()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(s)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "lma"                    "rho"                    "hmat"                   "omega"                  "eta"                    "theta"                  "a_l1"                  
- [8] "a_l2"                   "a_r1"                   "a_b1"                   "r_s"                    "r_b"                    "r_r"                    "r_l"                   
-[15] "a_y"                    "a_bio"                  "k_l"                    "k_b"                    "k_s"                    "k_r"                    "a_p1"                  
-[22] "a_p2"                   "a_f3"                   "a_f1"                   "a_f2"                   "S_D"                    "a_d0"                   "d_I"                   
-[29] "a_dG1"                  "a_dG2"                  "k_I"                    "recruitment_decay"      "control"                "collect_all_auxiliary"  "birth_rate_x"          
-[36] "birth_rate_y"           "is_variable_birth_rate"</code></pre>
+<pre><code>[1] "pars"                   "control"                "collect_all_auxiliary" 
+[4] "birth_rate_x"           "birth_rate_y"           "is_variable_birth_rate"</code></pre>
 </div>
 </div>
 <p>The strategy object here is a special object of class FF16_Strategy. In contrast with most of the “reference” objects used by <code>plant</code>, this is simply a list with a class attribute. Some validation will be done on the parameters every time it is passed into the C++ bits of the model.</p>
-<p>All parameters except for <code>control</code> are floating point (decimal) numbers:</p>
+<p>The physiological parameters now live in the nested <code>pars</code> element (the top-level strategy also carries <code>control</code>, birth-rate settings, and a few flags). All of the <code>pars</code> values are floating point (decimal) numbers:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unlist</span>(s[<span class="fu">names</span>(s) <span class="sc">!=</span> <span class="st">"control"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unlist</span>(s<span class="sc">$</span>pars)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                   lma                    rho                   hmat                  omega                    eta                  theta                   a_l1                   a_l2 
-          1.978791e-01           6.080000e+02           1.659587e+01           3.800000e-05           1.200000e+01           2.141786e-04           5.440000e+00           3.060000e-01 
-                  a_r1                   a_b1                    r_s                    r_b                    r_r                    r_l                    a_y                  a_bio 
-          7.000000e-02           1.700000e-01           6.598684e+00           1.319737e+01           2.170000e+02           1.984545e+02           7.000000e-01           2.450000e-02 
-                   k_l                    k_b                    k_s                    k_r                   a_p1                   a_p2                   a_f3                   a_f1 
-          4.565855e-01           2.000000e-01           2.000000e-01           1.000000e+00           1.511778e+02           2.047162e-01           1.140000e-04           1.000000e+00 
-                  a_f2                    S_D                   a_d0                    d_I                  a_dG1                  a_dG2                    k_I      recruitment_decay 
-          5.000000e+01           2.500000e-01           1.000000e-01           1.000000e-02           5.500000e+00           2.000000e+01           5.000000e-01           0.000000e+00 
- collect_all_auxiliary           birth_rate_y is_variable_birth_rate 
-          0.000000e+00           1.000000e+00           0.000000e+00 </code></pre>
+<pre><code>              lma               rho              hmat             omega 
+     1.978791e-01      6.080000e+02      1.659587e+01      3.800000e-05 
+              eta             theta              a_l1              a_l2 
+     1.200000e+01      2.141786e-04      5.440000e+00      3.060000e-01 
+             a_r1              a_b1               r_s               r_b 
+     7.000000e-02      1.700000e-01      6.598684e+00      1.319737e+01 
+              r_r               r_l               a_y             a_bio 
+     2.170000e+02      1.984545e+02      7.000000e-01      2.450000e-02 
+              k_l               k_b               k_s               k_r 
+     4.565855e-01      2.000000e-01      2.000000e-01      1.000000e+00 
+             a_p1              a_p2              a_f3              a_f1 
+     1.511778e+02      2.047162e-01      1.140000e-04      1.000000e+00 
+             a_f2               S_D              a_d0               d_I 
+     5.000000e+01      2.500000e-01      1.000000e-01      1.000000e-02 
+            a_dG1             a_dG2               k_I recruitment_decay 
+     5.500000e+00      2.000000e+01      5.000000e-01      0.000000e+00 </code></pre>
 </div>
 </div>
 <p>All of these parameters can be directly changed. For example, we can double the leaf mass per unit leaf area (lma) value:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>s<span class="sc">$</span>lma <span class="ot">&lt;-</span> s<span class="sc">$</span>lma <span class="sc">*</span> <span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>s<span class="sc">$</span>pars<span class="sc">$</span>lma <span class="ot">&lt;-</span> s<span class="sc">$</span>pars<span class="sc">$</span>lma <span class="sc">*</span> <span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>and then from this construct a plant:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pl <span class="ot">&lt;-</span> <span class="fu">FF16_Individual</span>(s)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>pl<span class="sc">$</span>strategy<span class="sc">$</span>lma</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>pl<span class="sc">$</span>strategy<span class="sc">$</span>pars<span class="sc">$</span>lma</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.3957582</code></pre>
 </div>
 </div>
-<p><code>lma</code> affects a few places in the model; see <a href="https://github.com/traitecoevo/plant/blob/master/src/ff16_strategy.cpp">the source code</a>, but only really for converting from leaf area to leaf mass (leaf mass being leaf area multiplied by leaf mass per unit leaf area). However, as a component of the leaf economic spectrum we imagine LMA as affecting a number of other components of the model.</p>
+<p><code>lma</code> affects a few places in the model; see <a href="https://github.com/traitecoevo/plant/blob/master/src/ff16_strategy.cpp">the source code</a>, but only really for converting from leaf area to leaf mass (leaf mass being leaf area multiplied by leaf mass per unit leaf area). However, as a component of the leaf economic spectrum we imagine LMA as affecting a number of other components of the model — see <a href="../theory/models/ff16.html">FF16</a> for the trait trade-offs this functional-balance model builds in.</p>
 <p>We capture this through what we call a “hyper-parameterisation”; additional parameters and functions that mean that changing one parameter might affect a number of other lower-level parameters. Our default hyper-parameterisation is via the <code>FF16_hyperpar</code> function:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>FF16_hyperpar</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>function (m, s, filter = TRUE) 
-{
-    with_default &lt;- function(name, default_value = s[[name]]) {
-        rep_len(if (name %in% colnames(m)) 
-            m[, name]
-        else default_value, nrow(m))
+<pre><code>function(m, s, filter=TRUE) {
+    with_default &lt;- function(name, default_value=s$pars[[name]]) {
+      rep_len(if (name %in% colnames(m)) m[, name] else default_value,
+              nrow(m))
     }
-    lma &lt;- with_default("lma")
-    rho &lt;- with_default("rho")
-    omega &lt;- with_default("omega")
-    narea &lt;- with_default("narea", narea)
-    k_I &lt;- s$k_I
-    k_l &lt;- B_kl1 * (lma/lma_0)^(-B_kl2)
-    d_I &lt;- B_dI1 * (rho/rho_0)^(-B_dI2)
-    k_s &lt;- B_ks1 * (rho/rho_0)^(-B_ks2)
-    r_s &lt;- B_rs1/rho
-    r_b &lt;- B_rb1/rho
+    lma       &lt;- with_default("lma")
+    rho       &lt;- with_default("rho")
+    omega     &lt;- with_default("omega")
+    narea     &lt;- with_default("narea", narea)
+
+    ## Light extinction coefficient: source from the strategy so the
+    ## assimilation integral below stays consistent with the canopy
+    ## model, rather than carrying a separate hard-coded default here.
+    k_I       &lt;- s$pars$k_I
+
+    ## lma / leaf turnover relationship:
+    k_l   &lt;- B_kl1 * (lma / lma_0) ^ (-B_kl2)
+
+    ## rho / mortality relationship:
+    d_I  &lt;- B_dI1 * (rho / rho_0) ^ (-B_dI2)
+
+    ## rho / wood turnover relationship:
+    k_s  &lt;- B_ks1 *  (rho / rho_0) ^ (-B_ks2)
+
+    ## rho / sapwood respiration relationship:
+
+    ## Respiration rates are per unit mass, so this next line has the
+    ## effect of holding constant the respiration rate per unit volume.
+    ## So respiration rates per unit mass vary with rho, respiration
+    ## rates per unit volume don't.
+    r_s &lt;- B_rs1 / rho
+    # bark respiration follows from sapwood
+    r_b &lt;- B_rb1 / rho
+
+    ## omega / accessory cost relationship
     a_f3 &lt;- B_f1 * omega
-    assimilation_rectangular_hyperbolae &lt;- function(I, Amax, 
-        theta, QY) {
-        x &lt;- QY * I + Amax
-        (x - sqrt(x^2 - 4 * theta * QY * I * Amax))/(2 * theta)
+
+    ## Narea, photosynthesis, respiration
+
+    assimilation_rectangular_hyperbolae &lt;- function(I, Amax, theta, QY) {
+      x &lt;- QY * I + Amax
+      (x - sqrt(x^2 - 4 * theta * QY * I * Amax)) / (2 * theta)
     }
+
+    ## Photosynthesis  [mol CO2 / m2 / yr]
     approximate_annual_assimilation &lt;- function(narea, latitude) {
-        E &lt;- seq(0, 1, by = 0.02)
-        D &lt;- seq(0, 365/2, length.out = 10000)
-        I &lt;- PAR_given_solar_angle(solar_angle(D, latitude = abs(latitude)))
-        Amax &lt;- B_lf1 * (narea/narea_0)^B_lf5
-        theta &lt;- B_lf2
-        QY &lt;- B_lf3
-        AA &lt;- NA * E
-        for (i in seq_len(length(E))) {
-            AA[i] &lt;- 2 * trapezium(D, assimilation_rectangular_hyperbolae(k_I * 
-                I * E[i], Amax, theta, QY))
-        }
-        if (all(diff(AA) &lt; 1e-08)) {
-            ret &lt;- c(dplyr::last(AA), 0)
-            names(ret) &lt;- c("p1", "p2")
-        }
-        else {
-            fit &lt;- nls(AA ~ p1 * E/(p2 + E), data.frame(E = E, 
-                AA = AA), start = list(p1 = 100, p2 = 0.2))
-            ret &lt;- coef(fit)
-        }
-        ret
+      E &lt;- seq(0, 1, by=0.02)
+      ## Only integrate over half year, as solar path is symmetrical
+      D &lt;- seq(0, 365/2, length.out = 10000)
+      I &lt;- PAR_given_solar_angle(solar_angle(D, latitude = abs(latitude)))
+
+      Amax &lt;- B_lf1 * (narea/narea_0) ^  B_lf5
+      theta &lt;- B_lf2
+      QY &lt;- B_lf3
+
+      AA &lt;- NA * E
+
+      for (i in seq_len(length(E))) {
+        AA[i] &lt;- 2 * trapezium(D, assimilation_rectangular_hyperbolae(
+                                    k_I * I * E[i], Amax, theta, QY))
+      }
+      if(all(diff(AA) &lt; 1E-8)) {
+        # line fitting will fail if all have are zero, or potentially same value
+        ret &lt;- c(dplyr::last(AA), 0)
+        names(ret) &lt;- c("p1","p2")
+      } else {
+        fit &lt;- nls(AA ~ p1 * E/(p2 + E), data.frame(E = E, AA = AA), start = list(p1 = 100, p2 = 0.2))
+        ret &lt;- coef(fit)
+      }
+      ret
     }
+
+    # Guard against narea having length zero (e.g. an empty trait matrix),
+    # in which case trapezium() fails.
     a_p1 &lt;- a_p2 &lt;- 0 * narea
     if (length(narea) &gt; 0) {
-        i &lt;- match(narea, unique(narea))
-        y &lt;- vapply(unique(narea), approximate_annual_assimilation, 
-            numeric(2), latitude)
-        a_p1 &lt;- y["p1", i]
-        a_p2 &lt;- y["p2", i]
+      i &lt;- match(narea, unique(narea))
+      y &lt;- vapply(unique(narea), approximate_annual_assimilation,
+                  numeric(2), latitude)
+      a_p1  &lt;- y["p1", i]
+      a_p2  &lt;- y["p2", i]
     }
-    r_l &lt;- B_lf4 * narea/lma
-    extra &lt;- cbind(k_l, d_I, k_s, r_s, r_b, a_f3, a_p1, a_p2, 
-        r_l)
+
+    ## Respiration rates are per unit mass, so convert to mass-based
+    ## rate by dividing with lma
+    ## So respiration rates per unit mass vary with lma, while
+    ## respiration rates per unit area don't.
+    r_l  &lt;- B_lf4 * narea / lma
+
+    extra &lt;- cbind(k_l,                # lma
+                   d_I, k_s, r_s, r_b, # rho
+                   a_f3,               # omega
+                   a_p1, a_p2,         # narea
+                   r_l)                # lma, narea
+
     overlap &lt;- intersect(colnames(m), colnames(extra))
     if (length(overlap) &gt; 0L) {
-        stop("Attempt to overwrite generated parameters: ", paste(overlap, 
-            collapse = ", "))
+      stop("Attempt to overwrite generated parameters: ",
+           paste(overlap, collapse=", "))
     }
-    if (any(is.infinite(extra))) {
-        stop("Attempt to use infinite value in derived parameters: ", 
-            paste(colnames(extra)[is.infinite(extra)], collapse = ", "))
+
+    ## Check for infitinte values - these cause issues
+    if(any(is.infinite(extra))) {
+      stop("Attempt to use infinite value in derived parameters: ",
+           paste(colnames(extra)[is.infinite(extra)], collapse=", "))
     }
+
+    ## Filter extra so that any column where all numbers are with eps
+    ## of the default strategy are not replaced:
     if (filter) {
-        if (nrow(extra) == 0L) {
-            extra &lt;- NULL
+      if (nrow(extra) == 0L) {
+        extra &lt;- NULL
+      } else {
+        pos &lt;- diff(apply(extra, 2, range)) == 0
+        if (any(pos)) {
+          eps &lt;- sqrt(.Machine$double.eps)
+          x1 &lt;- extra[1, pos]
+          x2 &lt;- unlist(s$pars[names(x1)])
+          drop &lt;- abs(x1 - x2) &lt; eps &amp; abs(1 - x1/x2) &lt; eps
+          if (any(drop)) {
+            keep &lt;- setdiff(colnames(extra), names(drop)[drop])
+            extra &lt;- extra[, keep, drop=FALSE]
+          }
         }
-        else {
-            pos &lt;- diff(apply(extra, 2, range)) == 0
-            if (any(pos)) {
-                eps &lt;- sqrt(.Machine$double.eps)
-                x1 &lt;- extra[1, pos]
-                x2 &lt;- unlist(s[names(x1)])
-                drop &lt;- abs(x1 - x2) &lt; eps &amp; abs(1 - x1/x2) &lt; 
-                  eps
-                if (any(drop)) {
-                  keep &lt;- setdiff(colnames(extra), names(drop)[drop])
-                  extra &lt;- extra[, keep, drop = FALSE]
-                }
-            }
-        }
+      }
     }
+
     if (!is.null(extra)) {
-        m &lt;- cbind(m, extra)
+      m &lt;- cbind(m, extra)
     }
     m
-}
-&lt;bytecode: 0x8b95b32d8&gt;
-&lt;environment: 0x8b95ae2a8&gt;</code></pre>
+  }
+&lt;bytecode: 0x1185a99a8&gt;
+&lt;environment: 0x11859ffa8&gt;</code></pre>
 </div>
 </div>
 <p>You will rarely need to call this function directly (see below) but note how setting of lma affects parameters <code>k_l</code>, <code>a_p1</code> and <code>r_l</code></p>
@@ -493,7 +537,7 @@ p1 0.1 1.466783 151.1778 392.7</code></pre>
 [2,] 500.0</code></pre>
 </div>
 </div>
-<p>To make use of the hyper-parameterisation, the preferred way of setting parameters is through the utility functions <code>strategy</code> and <code>strategy_list</code>. These take a <code>Parameters</code> object:</p>
+<p>To make use of the hyper-parameterisation, the preferred way of setting parameters is through the utility functions <code>generate_strategy</code> and <code>add_strategies</code>. These take a <code>Parameters</code> object:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">FF16_Parameters</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -501,18 +545,24 @@ p1 0.1 1.466783 151.1778 392.7</code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(p)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "patch_area"                  "n_patches"                   "patch_type"                  "max_patch_lifetime"          "strategies"                  "strategy_default"           
-[7] "node_schedule_times_default" "node_schedule_times"         "ode_times"                  </code></pre>
+<pre><code> [1] "patch_area"                  "n_patches"                  
+ [3] "patch_type"                  "max_patch_lifetime"         
+ [5] "strategies"                  "strategy_default"           
+ [7] "node_schedule_times_default" "node_schedule_times"        
+ [9] "ode_times"                   "initial_state"              
+[11] "n_initial_cohorts"           "initial_node_times"         
+[13] "initial_patch_density"       "initial_pr_patch_survival"  
+[15] "initial_time"               </code></pre>
 </div>
 </div>
-<p>and it comes pre-set with the hyper-parameterisation function:</p>
+<p>The default hyper-parameterisation function associated with a <code>Parameters</code> object is retrieved with <code>param_hyperpar()</code>:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(p<span class="sc">$</span>hyperpar, FF16_hyperpar)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">param_hyperpar</span>(p), FF16_hyperpar)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] FALSE</code></pre>
+<pre><code>[1] TRUE</code></pre>
 </div>
 </div>
-<p><code>k_I</code> is the light extinction coefficient, <code>disturbance_mean_interval</code> is the mean disturbance interval. The <code>strategy_default</code> member is a Strategy:</p>
+<p><code>max_patch_lifetime</code> sets the patch disturbance interval (in years). The physiological parameters (including <code>k_I</code>, the light extinction coefficient) now live on the strategy under <code>pars</code>; the <code>strategy_default</code> member is the Strategy that all others are built from:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(p<span class="sc">$</span>strategy_default)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -521,10 +571,10 @@ p1 0.1 1.466783 151.1778 392.7</code></pre>
 </div>
 <p>This is the Strategy object that all others will be built from by difference. Running</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">strategy_list</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.1</span>, <span class="st">"lma"</span>), p, <span class="at">birth_rate_list =</span> <span class="dv">1</span>)[[<span class="dv">1</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">generate_strategy</span>(p, <span class="fu">trait_matrix</span>(<span class="fl">0.1</span>, <span class="st">"lma"</span>), <span class="at">birth_rate =</span> <span class="dv">1</span>)[[<span class="dv">1</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>will create a strategy <code>s</code> where lma is set but also all the parameters that <em>depend</em> on lma.</p>
-<p>The function <code>strategy_list</code> can be used to create a list of strategies:</p>
+<p>The function <code>generate_strategy</code> can be used to create a list of strategies:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>lma <span class="ot">&lt;-</span> <span class="fu">trait_matrix</span>(<span class="fu">seq</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="at">length.out=</span><span class="dv">5</span>), <span class="st">"lma"</span>)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">FF16_hyperpar</span>(<span class="fu">trait_matrix</span>(lma, <span class="st">"lma"</span>), s)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -536,7 +586,7 @@ p1 0.1 1.466783 151.1778 392.7</code></pre>
 [4,] 0.4 0.13703875  98.175
 [5,] 0.5 0.09356799  78.540</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ss <span class="ot">&lt;-</span> <span class="fu">strategy_list</span>(lma, p, <span class="at">birth_rate_list =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ss <span class="ot">&lt;-</span> <span class="fu">generate_strategy</span>(p, lma, <span class="at">birth_rate =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(ss)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 5</code></pre>
@@ -544,31 +594,110 @@ p1 0.1 1.466783 151.1778 392.7</code></pre>
 </div>
 <p>We can then use standard R commands to extract variable from this list</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>lma)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>lma)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.1 0.2 0.3 0.4 0.5</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>k_l)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>k_l)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1.46678341 0.44833712 0.22412414 0.13703875 0.09356799</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>a_p1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>a_p1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 151.1778 151.1778 151.1778 151.1778 151.1778</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>r_l)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>r_l)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 392.700 196.350 130.900  98.175  78.540</code></pre>
 </div>
 </div>
-<p>In addition to the physiological parameters there are large number of “control” parameters that affect the behaviour of the various numerical algorithms used (note that in contrast to the physiological parameters these have a variety of types)</p>
+<p>In addition to the physiological parameters there are a large number of “control” parameters that affect the behaviour of the various numerical algorithms used (note that in contrast to the physiological parameters these have a variety of types). These live in a separate <code>Control</code> object rather than on the <code>Parameters</code>:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>p<span class="sc">$</span>control</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Control</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
+<pre><code>$function_integration_rule
+[1] 21
+
+$shading_model
+[1] ""
+
+$ppa_layer_optical_depth
+[1] 0.5
+
+$ppa_layer_smoothing
+[1] 0.3
+
+$offspring_production_tol
+[1] 1e-08
+
+$offspring_production_iterations
+[1] 1000
+
+$node_gradient_eps
+[1] 1e-06
+
+$node_gradient_direction
+[1] -1
+
+$node_gradient_richardson
+[1] FALSE
+
+$node_gradient_richardson_depth
+[1] 4
+
+$ode_step_size_initial
+[1] 1e-06
+
+$ode_step_size_min
+[1] 1e-06
+
+$ode_step_size_max
+[1] 5
+
+$ode_tol_rel
+[1] 1e-04
+
+$ode_tol_abs
+[1] 1e-04
+
+$ode_a_y
+[1] 1
+
+$ode_a_dydt
+[1] 0
+
+$fixed_time_step
+[1] 0
+
+$schedule_nsteps
+[1] 20
+
+$schedule_eps
+[1] 0.02
+
+$schedule_verbose
+[1] FALSE
+
+$save_RK45_cache
+[1] FALSE
+
+$GSS_tol_abs
+[1] 0.001
+
+$vulnerability_curve_ncontrol
+[1] 100
+
+$ci_abs_tol
+[1] 0.001
+
+$ci_niter
+[1] 1000
+
+attr(,"class")
+[1] "Control"</code></pre>
 </div>
 </div>
-<p>The <code>Control()</code> defaults are the pragmatic, fast-ish settings used for essentially all of plant’s runs (<code>control()</code> is a lowercase alias for the same constructor). When you need a high-accuracy run, <code>control_accurate()</code> tightens the ODE and schedule tolerances. We can see which fields it changes:</p>
+<p>The <code>Control()</code> defaults are the pragmatic, fast-ish settings used for essentially all of plant’s runs (<code>control()</code> is a lowercase alias for the same constructor). When you need a high-accuracy run, <code>control_accurate()</code> tightens the ODE and schedule tolerances (see <a href="../theory/implementation/ode-stepping.html">ODE stepping &amp; control</a> and <a href="../theory/implementation/node-spacing.html">The node-spacing algorithm</a>). We can see which fields it changes:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>ctrl_accurate <span class="ot">&lt;-</span> <span class="fu">control_accurate</span>()</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>ctrl_accurate[<span class="fu">unlist</span>(<span class="fu">control</span>()) <span class="sc">!=</span> <span class="fu">unlist</span>(ctrl_accurate)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>

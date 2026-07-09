@@ -65,6 +65,20 @@ mjx-container, .math, .math.inline, .math.display {
 .feature-row { max-width: 1080px; margin: 0 auto 2rem; gap: 1.5rem; }
 .feature-row h3 { font-size: 1.05rem; color: #0b1f17; margin-bottom: 0.4rem; }
 
+/* Mermaid diagrams: Quarto derives the subgraph (cluster) background from a
+   mid-green tint (--mermaid-fg-color--lightest), which leaves the dark-green
+   cluster title unreadable — green text on a green box. Pin the cluster fill
+   to a near-white green and force the title text dark. Node-only diagrams have
+   no clusters, so they are unaffected. Loaded after the theme, so this wins
+   over the generated --mermaid-* variables. */
+:root {
+  --mermaid-fg-color--lightest: #eef6f0;   /* subgraph background */
+  --mermaid-fg-color--lighter:  #6fa384;   /* subgraph border */
+}
+.mermaid .cluster rect { fill: #eef6f0; stroke: #6fa384; }
+.mermaid .cluster span,
+.mermaid .cluster .nodeLabel { color: #123026; }   /* subgraph title text */
+
 @media (max-width: 768px) {
   .hero-grid { grid-template-columns: 1fr; }
   .hero-fig { order: -1; }

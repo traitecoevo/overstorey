@@ -238,6 +238,24 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The big picture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, gently</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, worked through</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
@@ -246,6 +264,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -342,7 +366,8 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a>
   <ul class="collapse">
   <li><a href="#light-interception-and-why-it-matters" id="toc-light-interception-and-why-it-matters" class="nav-link" data-scroll-target="#light-interception-and-why-it-matters">Light interception, and why it matters</a></li>
   <li><a href="#realism-versus-speed" id="toc-realism-versus-speed" class="nav-link" data-scroll-target="#realism-versus-speed">Realism versus speed</a></li>
@@ -395,12 +420,29 @@ window.Quarto = {
 <div class="eyebrow">
 <p>implementation</p>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../../theory/overview.html">The big picture</a> and <a href="../../theory/models/ff16.html">the FF16 model</a>. Read those first if the notation here is unfamiliar.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p>Picture a forest from above: tall trees catch the sun first, and everything shorter sits in their shade. The lower a leaf sits, the more leaf area there is above it blocking the light, so less and less sunlight reaches it. That simple fact – shade builds up with height – is the whole idea behind a canopy or light-environment model. Rather than tracking every leaf individually, the model builds a profile: at each height in the forest, how much of the open-sky light actually gets through. Near the top, almost all of it does. Lower down, less does, because it has been filtered by the crowns above. This profile is shared by every plant in the patch: each one reads from it to work out how much light its own leaves receive, and each one also adds to it, since its own leaves cast shade on whatever grows beneath them. So a plant’s growth is never just about its own size or strategy – it also depends on the light environment its neighbours create by growing above or beside it. Some versions of the model track this shading in fine detail through each individual crown; others simplify it to make the calculation faster, at some cost in accuracy. The rest of this page makes this precise.</p>
 <p>This page documents the canopy / shading models that <code>plant</code> implements: what the six models are, how each computes the light environment a plant experiences, the realism-versus-speed tradeoff between them, and why the perfect-plasticity approximation (PPA) requires smoothing to run in <code>plant</code>’s adaptive solver. It is an implementation reference for the current code.</p>
 <!-- out-of-scope: the full model comparison — demographic equilibrium, invasion
      (mutant) fitness, the box-competition fitness comparison, the evolutionary
      attractor / singular-strategy / selection-gradient analysis from
      DunFalster 2026 — belongs in the paper reproduction, not this reference
      page. See the pointer at the foot of this page. -->
+</section>
 <section id="background" class="level1">
 <h1>Background</h1>
 <section id="light-interception-and-why-it-matters" class="level2">
@@ -655,13 +697,13 @@ Figure&nbsp;3: Vertical profile of cumulative leaf area above each height, at se
 </tr>
 <tr class="odd">
 <td style="text-align: left;">crown-centre</td>
-<td style="text-align: right;">0.041</td>
-<td style="text-align: right;">0.65</td>
+<td style="text-align: right;">0.042</td>
+<td style="text-align: right;">0.67</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">ppa</td>
-<td style="text-align: right;">0.204</td>
-<td style="text-align: right;">3.24</td>
+<td style="text-align: right;">0.207</td>
+<td style="text-align: right;">3.29</td>
 </tr>
 </tbody>
 </table>
@@ -688,22 +730,22 @@ Figure&nbsp;3: Vertical profile of cumulative leaf area above each height, at se
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">deep-crown</td>
-<td style="text-align: right;">1.581</td>
+<td style="text-align: right;">1.593</td>
 <td style="text-align: right;">1.00</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">mean-light</td>
-<td style="text-align: right;">1.557</td>
-<td style="text-align: right;">0.98</td>
+<td style="text-align: right;">1.572</td>
+<td style="text-align: right;">0.99</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">crown-centre</td>
-<td style="text-align: right;">0.934</td>
+<td style="text-align: right;">0.937</td>
 <td style="text-align: right;">0.59</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">ppa</td>
-<td style="text-align: right;">1.062</td>
+<td style="text-align: right;">1.060</td>
 <td style="text-align: right;">0.67</td>
 </tr>
 </tbody>

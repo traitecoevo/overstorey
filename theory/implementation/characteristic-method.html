@@ -224,6 +224,24 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The big picture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, gently</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, worked through</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
@@ -232,6 +250,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -328,7 +352,8 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#approach-for-specific-equations" id="toc-approach-for-specific-equations" class="nav-link active" data-scroll-target="#approach-for-specific-equations">Approach for specific equations</a>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#approach-for-specific-equations" id="toc-approach-for-specific-equations" class="nav-link" data-scroll-target="#approach-for-specific-equations">Approach for specific equations</a>
   <ul class="collapse">
   <li><a href="#sec-size" id="toc-sec-size" class="nav-link" data-scroll-target="#sec-size">Size</a></li>
   <li><a href="#sec-survival" id="toc-sec-survival" class="nav-link" data-scroll-target="#sec-survival">Survival</a></li>
@@ -372,11 +397,30 @@ window.Quarto = {
 <div class="eyebrow">
 <p>implementation</p>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../../theory/size-structured-pde.html">The size-structured PDE</a>. Read it first if the notation here is unfamiliar.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p>Imagine trying to track how a whole population of plants of different sizes changes over time. You could try to solve for the entire size distribution at once, on a fixed grid of sizes, updating every point as time moves forward. That turns out to be hard, because growth constantly shuffles plants from one size to another, and the equation describing this shuffling is a partial differential equation with both space and time mixed together.</p>
+<p>The method of characteristics takes a different route. Instead of watching the grid, you follow individual plants, or cohorts of plants that started life together, as they grow. Each one traces a path through time as its size changes, and along that path you can also track how many individuals remain, and how their local density evolves. Because you are moving with the plant rather than watching it pass through fixed points, the awkward partial differential equation collapses into an ordinary differential equation for each trajectory. These are far easier to solve, one step at a time, with a standard numerical stepper.</p>
+<p>The rest of this page makes this precise.</p>
 <p>Here we describe the overall numerical approach used to solve the dynamics in the plant model. Make sure you’ve read the <a href="../../theory/size-structured-pde.html">size-structured PDE</a> document describing the system of equations to be solved before reading this document.</p>
 <p>Our approach to solving for the size-density distribution is based on the characteristic method <span class="citation" data-cites="Angulo-2004 Angulo-2014 Angulo-2016">(<a href="#ref-Angulo-2004" role="doc-biblioref">O. Angulo &amp; López-Marcos, 2004</a>; <a href="#ref-Angulo-2014" role="doc-biblioref">O. Angulo, López-Marcos, &amp; López-Marcos, 2014</a>, <a href="#ref-Angulo-2016" role="doc-biblioref">2016</a>)</span>. We initially started using the Escalator Boxcar Train technique <span class="citation" data-cites="Deroos-1988 Deroos-1997 Deroos-1992">(<a href="#ref-Deroos-1988" role="doc-biblioref">De Roos, 1988</a>; <a href="#ref-Deroos-1992" role="doc-biblioref">De Roos, Diekmann, &amp; Metz, 1992</a>; <a href="#ref-Deroos-1997" role="doc-biblioref">De Roos, Taljapurkar, &amp; Caswell, 1997</a>)</span>, but then switched to using the characteristic method.</p>
 <p>When simulating an individual plant, or the development of a patch, we need to solve for the size, survival, and seed output of individual plants. When solving for the size-density distribution in a large patch, we also need to estimate the average abundance of individuals. Each of these problems is formulated as an initial-value ODE problem (IVP), which can be solved using an ODE stepper.</p>
 <p>All of the IVPs outlined below must be stepped through time. For this, <code>plant</code> uses an embedded implementation of the Runge-Kutta Cash-Karp 4-5 algorithm <span class="citation" data-cites="Cash-1990">(<a href="#ref-Cash-1990" role="doc-biblioref">Cash &amp; Karp, 1990</a>)</span>, with adaptive time step. The code is built into the model, based on code ported directly from the <a href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a> <span class="citation" data-cites="Galassi-2009">(<a href="#ref-Galassi-2009" role="doc-biblioref">Galassi, 2009</a>)</span>. The accuracy of the solver is controlled by two control parameters for relative and absolute accuracy, <code>ode_tol_rel</code> and <code>ode_tol_abs</code>. See <a href="../../theory/implementation/ode-stepping.html">ODE stepping</a> for details of the stepper.</p>
 <p>Recast as a set of ODEs, the equations to be solved are as follows.</p>
+</section>
 <section id="approach-for-specific-equations" class="level2">
 <h2 class="anchored" data-anchor-id="approach-for-specific-equations">Approach for specific equations</h2>
 <section id="sec-size" class="level3">
@@ -464,7 +508,7 @@ N(H_0 | x, a_0) = \exp( - y(a)).
 <p>Calculating the canopy openness <span class="math inline">\(E_a(z)\)</span> at a given height <span class="math inline">\(z\)</span> in a patch of age <span class="math inline">\(a\)</span> requires that we integrate over the size-density distribution (the light equation on the <a href="../../theory/size-structured-pde.html">size-structured PDE</a> page). This integration is performed using the trapezium rule, within the function <code>area_leaf_above</code> in <a href="https://github.com/traitecoevo/plant/blob/master/inst/include/plant/species.h">species.h</a>. The main factor controlling the accuracy of the integration is the spacing of nodes. The node introduction times determining the spacing of nodes are adaptively refined as described above. This implies that also the trapezium integration within the <code>area_leaf_above</code> function is adaptively refined via <code>SCM::refine_schedule()</code> (exposed in R as <code>run_scm(refine_schedule = TRUE)</code>). See <a href="../../theory/implementation/node-spacing.html">node spacing</a> for detail.</p>
 <p>The cost of calculating <span class="math inline">\(E_a(z)\)</span> linearly increases with the number of nodes in the metacommunity. Since the same calculation must be repeated for every node, the overall computational cost of a step increases as <span class="math inline">\(O(k^2 )\)</span>, where <span class="math inline">\(k\)</span> is the total number of nodes across all species. This disproportionate increase in computational cost with the number of nodes is highly undesirable.</p>
 <p>We reduce the computational cost from <span class="math inline">\(O(k^2)\)</span> to <span class="math inline">\(O(k)\)</span> by approximating <span class="math inline">\(E_a(z)\)</span> with a spline. The light equation describes a function monotonically increasing with size. This function is easily approximated using a piecewise continuous spline fitted to a limited number of points. Once fitted, the spline can be used to estimate any additional evaluations of competitive effect. Since spline evaluations are computationally cheaper than integrating over the size-density distribution, this approach reduces the overall cost of stepping the resident population. A new spline is constructed for each time step.</p>
-<p>The accuracy of the spline interpolation depends on the number of points used in its construction and on their placement along the size axis. We select the number and locations of points via an adaptive algorithm. Starting with an initial set of 33 points, we assess how much each point contributes to the accuracy of the spline fit at the location of each node, first via exact calculation, and second by linearly interpolating from adjacent nodes. The absolute difference in these values is compared to the control parameter <code>light_availability_spline_tol</code>. If the error is greater than this tolerance, the interval is bisected and the process repeated (see <a href="https://github.com/traitecoevo/plant/blob/master/inst/include/plant/adaptive_interpolator.h">adaptive_interpolator.h</a> for details).</p>
+<p>The accuracy of the spline interpolation depends on the number of points used in its construction and on their placement along the size axis. We select the number and locations of points via an adaptive algorithm. Starting with an initial set of <code>light_availability_spline_nbase</code> points (17 by default), we assess how much each point contributes to the accuracy of the spline fit at the location of each node, first via exact calculation, and second by linearly interpolating from adjacent nodes. The absolute difference in these values is compared to the spline tolerance <code>light_availability_spline_tol</code> (default <code>1e-4</code>). Note that this is a property of the light spline configured on the <em>environment</em> (e.g.&nbsp;<code>FF16_Environment</code>), not a field of the <code>Control</code> object. If the error is greater than this tolerance, the interval is bisected and the process repeated, up to <code>light_availability_spline_max_depth</code> (16 by default) levels (see <a href="https://github.com/traitecoevo/plant/blob/master/inst/include/plant/adaptive_interpolator.h">adaptive_interpolator.h</a> for details).</p>
 </section>
 <section id="sec-integrating-over-light-environment" class="level3">
 <h3 class="anchored" data-anchor-id="sec-integrating-over-light-environment">Integration over light environment</h3>

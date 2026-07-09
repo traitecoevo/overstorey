@@ -259,6 +259,24 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The big picture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, gently</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, worked through</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
@@ -267,6 +285,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -363,7 +387,8 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#the-rungekutta-45-ode-stepper" id="toc-the-rungekutta-45-ode-stepper" class="nav-link active" data-scroll-target="#the-rungekutta-45-ode-stepper">The Runge–Kutta 45 ODE stepper</a></li>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#the-rungekutta-45-ode-stepper" id="toc-the-rungekutta-45-ode-stepper" class="nav-link" data-scroll-target="#the-rungekutta-45-ode-stepper">The Runge–Kutta 45 ODE stepper</a></li>
   <li><a href="#setup-of-templated-ode-solver-in-c" id="toc-setup-of-templated-ode-solver-in-c" class="nav-link" data-scroll-target="#setup-of-templated-ode-solver-in-c">Setup of templated ODE solver in C++</a>
   <ul class="collapse">
   <li><a href="#solving-an-entire-patch" id="toc-solving-an-entire-patch" class="nav-link" data-scroll-target="#solving-an-entire-patch">Solving an entire patch</a></li>
@@ -413,7 +438,24 @@ window.Quarto = {
 <div class="eyebrow">
 <p>implementation</p>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../../theory/size-structured-pde.html">The size-structured PDE</a> and <a href="../../theory/implementation/characteristic-method.html">the method of characteristics</a>. Read those first if the notation here is unfamiliar.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p>Once you’ve written the model down as a set of ordinary differential equations, the job of the solver is simple to describe even if the mechanics are intricate: start from the current state and march forward in time, one small step at a time, building up the future from the present. The question that makes this hard is how big each step should be. Take steps that are too large and the solution drifts away from the truth, accumulating error you can’t see until it’s too late. Take steps that are too small and you waste enormous amounts of computation grinding through periods where nothing much is changing. The solver used here resolves this by adapting as it goes. At every step it takes a trial step forward, then checks how much that step disagrees with a slightly more careful version of the same step. That disagreement is a proxy for the error being made. When the disagreement is small, the solver grows more confident and takes a longer stride next time. When it’s large, the solver backs off and takes a shorter, more cautious step. The result is a trajectory through time that spends its effort where growth and mortality are changing quickly, and coasts through the quiet periods, all while keeping the error in each step below a chosen tolerance. The rest of this page makes this precise.</p>
 <p><code>plant</code> casts the entire patch as a system of ordinary differential equations (ODEs) and steps it through time with classic ODE methods. (For details on the equations themselves see the <a href="../../theory/size-structured-pde.html">size-structured PDE</a> page.) This page first describes the Runge–Kutta solver and the <code>Control()</code> parameters that govern it, then works through the trade-off between the default <strong>adaptive</strong> stepper and a <strong>fixed-step</strong> forward-Euler mode using a work–precision diagram.</p>
+</section>
 <section id="the-rungekutta-45-ode-stepper" class="level1">
 <h1>The Runge–Kutta 45 ODE stepper</h1>
 <p>The <code>plant</code> model uses an explicit Runge-Kutta ODE stepper to integrate the ordinary differential equations that describe the system. Specifically, we use the Runge-Kutta Cash-Karp 4-5 (RK45) algorithm, with adaptive time step.</p>
@@ -433,8 +475,8 @@ window.Quarto = {
 <section id="setup-of-templated-ode-solver-in-c" class="level1">
 <h1>Setup of templated ODE solver in C++</h1>
 <p>The characteristic method used to solve density requires regular introduction of new nodes, which entails a resizing of the ODE system as the system progresses. To make this play nicely with the ODE stepping, Rich FitzJohn designed a custom ODE solver class based on the RK45 method. The code is built into the model, with some details ported from the <a href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a> <span class="citation" data-cites="Galassi-2009">(<a href="#ref-Galassi-2009" role="doc-biblioref">Galassi, 2009</a>)</span>.</p>
-<p>The main interface is described in the class <code>plant::ode::Solver</code> described in the file <code>ode_solver.h</code>. (See folder <code>inst/include/plant/ode_solver</code> where this and related class are implemented.) The class is established using a template <code>System</code> class, meaning you can effectively cast any variety of classes as an ODE Solver. (In a similar way, you can create a vector of any variety of data types.)</p>
-<p>From <code>ode_solver.h</code>:</p>
+<p>The main interface is the class <code>odelia::ode::Solver</code>. The solver has been extracted from <code>plant</code> into a standalone <code>odelia</code> library, so it no longer lives under <code>inst/include/plant/</code>; <code>plant</code> pulls it in via <code>#include &lt;odelia/ode_solver.hpp&gt;</code> (see <code>scm.h</code>). The class is established using a template <code>System</code> class, meaning you can effectively cast any variety of classes as an ODE Solver. (In a similar way, you can create a vector of any variety of data types.)</p>
+<p>From odelia’s <code>ode_solver.hpp</code>:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">class</span> System<span class="op">&gt;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Solver <span class="op">{</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
@@ -443,15 +485,16 @@ window.Quarto = {
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <section id="solving-an-entire-patch" class="level2">
 <h2 class="anchored" data-anchor-id="solving-an-entire-patch">Solving an entire patch</h2>
-<p>The main solver for our system is the class <code>SCM</code>, (in the file <code>sch.h</code>). This creates an ode solver based on patch type. Simultaneously, the class <code>SCM</code> owns an actual instance of the patch, which contains species and environment.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">patch_type</span> patch<span class="op">;</span>                 <span class="er"># Instance of patch</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ode<span class="op">::</span>Solver<span class="op">&lt;</span><span class="dt">patch_type</span><span class="op">&gt;</span> solver<span class="op">;</span>   <span class="er"># ODE solver</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>All we need to do to advance the system is make calls like the following. These advance the system, using the patch to estimate rates of change. Moreover, we can take steps of a specified fixed size, or an adaptive step where the solver determines the spacing.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>solver<span class="op">.</span>advance_fixed<span class="op">(</span>patch<span class="op">,</span> e<span class="op">.</span>times<span class="op">);</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>solver<span class="op">.</span>advance_adaptive<span class="op">(</span>patch<span class="op">,</span> e<span class="op">.</span>time_end<span class="op">());</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The main solver for our system is the class <code>SCM</code>, (in the file <code>scm.h</code>). This creates an ode solver based on patch type. Simultaneously, the class <code>SCM</code> owns an actual instance of the patch, which contains species and environment.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">patch_type</span> patch<span class="op">;</span>                        <span class="er"># Instance of patch</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>odelia<span class="op">::</span>ode<span class="op">::</span>Solver<span class="op">&lt;</span><span class="dt">patch_type</span><span class="op">&gt;</span> solver<span class="op">;</span>  <span class="er"># ODE solver (owns the system)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>All we need to do to advance the system is make calls like the following. These advance the system, using the patch to estimate rates of change. Moreover, we can take steps of a specified fixed size, or an adaptive step where the solver determines the spacing. Note that the solver now <em>owns</em> the system, so these calls no longer take the patch as an argument — they operate on the system the solver already holds:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>solver<span class="op">.</span>advance_fixed<span class="op">(</span>e<span class="op">.</span>times<span class="op">);</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>solver<span class="op">.</span>advance_adaptive<span class="op">({</span>solver<span class="op">.</span>time<span class="op">(),</span> e<span class="op">.</span>time_end<span class="op">()});</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A third method, <code>solver.advance_euler(...)</code>, backs the fixed-step forward-Euler mode (<code>fixed_time_step</code>, discussed below).</p>
 <p>In the background, the solver then passes information (rates of change, states) between the actual patch (which contains all the biological information informing rates of change) and ode solver (which uses the RK45 math to calculate future states from rates of change).</p>
 <p>Additionally, we have the following function, which resizes the ODE system after a node has been introduced.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>solver<span class="op">.</span>set_state_from_system<span class="op">(</span>patch<span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>solver<span class="op">.</span>set_state_from_system<span class="op">()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>For the above to work, the patch class (see <code>patch.h</code>) must have some essential functions used by the ODE system.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// * ODE interface</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Caluclate size of ode system (number of equations).</span></span>
@@ -474,15 +517,19 @@ window.Quarto = {
 </section>
 <section id="solving-individuals-and-other-systems" class="level2">
 <h2 class="anchored" data-anchor-id="solving-individuals-and-other-systems">Solving individuals and other systems</h2>
-<p>As templated C++, we can use the <code>ode::Solver</code> class to step any “system” that has the requisite functions. In addition to patches, we also use the ode solver to run individual plants, given an environment. This is achieved by introducing a wrapper class <code>ode::Runner</code> (in <code>ode_runner.h</code>), which according to its author simplifies <em>“the difficulty of ownership semantics around the solver and object.”</em></p>
-<p>Like the <code>Solver</code> class, the <code>Runner</code> class is templated, meaning we can setup a variety of systems.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> T<span class="op">&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Runner <span class="op">{</span></span>
+<p>As templated C++, we can use the <code>odelia::ode::Solver</code> class to step any “system” that has the requisite functions. In addition to patches, we also use the ode solver to run individual plants, given an environment. This is achieved by introducing a wrapper class <code>plant::tools::IndividualRunner</code> (in <code>individual_runner.h</code>), which handles the ownership semantics around the solver and the object it steps.</p>
+<p>Like the patch system, <code>IndividualRunner</code> is templated — on a strategy <code>T</code> and an environment <code>E</code> — so we can set up a variety of systems.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> T<span class="op">,</span> <span class="kw">typename</span> E<span class="op">&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> IndividualRunner <span class="op">{</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  Runner<span class="op">(</span>T <span class="va">obj_</span><span class="op">,</span> OdeControl control<span class="op">)</span> <span class="op">:</span> obj<span class="op">(</span><span class="va">obj_</span><span class="op">),</span> solver<span class="op">(</span>obj<span class="op">,</span> control<span class="op">)</span> <span class="op">{}</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The class <code>plant::tools::IndividualRunner</code> uses this approach to create a system for stepping individual plants to a given size. This is available via the R functions <code>grow_individual_...</code>, which in turn uses the <code>OdeRunner</code>.</p>
-<p>The test suite also shows how to use the OdeRunner to step the classic Lorenz system.</p>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  IndividualRunner<span class="op">(</span>Individual<span class="op">&lt;</span>T<span class="op">,</span>E<span class="op">&gt;</span> <span class="va">individual_</span><span class="op">,</span> E <span class="va">environment_</span><span class="op">)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span> individual<span class="op">(</span><span class="va">individual_</span><span class="op">),</span> environment<span class="op">(</span><span class="va">environment_</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    individual<span class="op">.</span>compute_rates<span class="op">(</span>environment<span class="op">);</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ... ode_size(), ode_time(), ode_state(), ode_rates(), set_ode_state() ...</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>IndividualRunner</code> provides exactly the <code>ode_size()</code>/<code>ode_state()</code>/<code>ode_rates()</code>/ <code>set_ode_state()</code> interface the solver expects, so it can be handed to an <code>odelia::ode::Solver</code> to step an individual plant to a given size. This is available via the R functions <code>grow_individual_...</code>, which in turn use <code>IndividualRunner</code>.</p>
+<p>The test suite also shows how to drive the solver directly on the classic Lorenz system (see <code>tests/testthat/test-ode-euler.R</code>).</p>
 </section>
 </section>
 <section id="controls-on-ode-stepping" class="level1">
@@ -496,7 +543,7 @@ window.Quarto = {
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"FF16"</span>)</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>p0<span class="sc">$</span>max_patch_lifetime <span class="ot">&lt;-</span> <span class="dv">5</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">expand_parameters</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), p0)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(p0, <span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>))</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Controls on numerical methods</span></span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
@@ -607,8 +654,9 @@ $ode_a_dydt
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>result2<span class="sc">$</span>ode_times</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7
-[50] 4.8 4.9 5.0</code></pre>
+<pre><code> [1] 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.2 1.3 1.4 1.5 1.6 1.7
+[20] 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6
+[39] 3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0</code></pre>
 </div>
 </div>
 </section>
@@ -656,7 +704,7 @@ $ode_a_dydt
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"FF16"</span>)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>p0<span class="sc">$</span>max_patch_lifetime <span class="ot">&lt;-</span> <span class="dv">60</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">expand_parameters</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), p0, <span class="at">birth_rate_list =</span> <span class="fl">1.0</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(p0, <span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), <span class="at">birth_rate =</span> <span class="fl">1.0</span>)</span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"FF16"</span>)</span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>ctrl_adaptive <span class="ot">&lt;-</span> <span class="fu">Control</span>()                       <span class="co"># fixed_time_step = 0</span></span>

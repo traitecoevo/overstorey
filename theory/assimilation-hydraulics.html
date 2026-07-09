@@ -67,7 +67,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../theory/adaptive-dynamics.html" rel="next">
+<link href="../theory/soil-water.html" rel="next">
 <link href="../theory/size-structured-pde.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -210,7 +210,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -239,6 +239,24 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../theory/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The big picture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, gently</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, worked through</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
@@ -247,6 +265,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -343,7 +367,8 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#profitmax" id="toc-profitmax" class="nav-link" data-scroll-target="#profitmax">Profitmax</a></li>
   <li><a href="#revenue" id="toc-revenue" class="nav-link" data-scroll-target="#revenue">Revenue</a></li>
   <li><a href="#cost" id="toc-cost" class="nav-link" data-scroll-target="#cost">Cost</a></li>
@@ -358,7 +383,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Assimilation &amp; hydraulics</h1>
 </div>
@@ -380,6 +405,22 @@ window.Quarto = {
 <div class="eyebrow">
 <p>theory</p>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../theory/models/ff16.html">the FF16 model</a> and <a href="../theory/maths-primer.html">The maths, gently</a>. Read those first if the notation here is unfamiliar.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p>A leaf makes its living by opening tiny pores, called stomata, to let carbon dioxide in from the air. Every time it does this, water vapour escapes the same way. That escaping water has to be replaced, and pulling replacement water up from the soil through the plant’s internal plumbing has a cost: it draws the water column in the stem tighter, and if pulled too hard, that plumbing can fail. So a leaf faces a trade-off. Opening the pores wider lets in more carbon dioxide, which means more sugar produced through photosynthesis, but it also draws more water, straining the plumbing and raising the risk of damage further. Opening them less protects the plumbing but starves the leaf of carbon dioxide, so it makes less sugar. Somewhere between “shut” and “wide open” sits a setting that gets the most net benefit: the sugar gained minus the cost of running and protecting the water supply. This page treats the leaf as if it always finds that best setting, a convenient shorthand for describing how carbon gain responds to sun, air dryness, and water availability. The rest of this page makes this precise.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -395,12 +436,13 @@ window.Quarto = {
 </div>
 <p>This leaf-level carbon/water economy is the heart of the <a href="../theory/models/tf24.html">TF24 strategy</a>: it determines how a unit of leaf area assimilates carbon and transpires water in response to the surrounding environment. The model maximises <em>profit</em> — photosynthetic revenue minus the hydraulic cost of supplying transpired water — by optimising the leaf xylem water potential.</p>
 <p>This is the documentation for the Leaf model within the <code>TF24</code> strategy.</p>
+</section>
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>At a broad level, the TF24 strategy module includes additional processes which capture plant-soil water feedbacks driven by precipitation. A critical subcompontent of this module is a physiological stomatal optimisation sub-model which determines how plants assimilate carbon and transpire water dynamically in response to water availability, vapour pressure deficit, leaf temperature (still to be implemented), in a trait-dependent manner. This stomatal optimisation model is described below. The other components of the TF24 strategy, such as the soil water submodule, are discussed elsewhere.</p>
+<p>At a broad level, the TF24 strategy module includes additional processes which capture plant-soil water feedbacks driven by precipitation. A critical subcompontent of this module is a physiological stomatal optimisation sub-model which determines how plants assimilate carbon and transpire water dynamically in response to water availability, vapour pressure deficit, leaf temperature (still to be implemented), in a trait-dependent manner. This stomatal optimisation model is described below. The other components of the TF24 strategy, such as the soil water submodule, are discussed on the <a href="../theory/soil-water.html">Soil water &amp; root uptake</a> page.</p>
 <p>The strategy will enable several new parameters to be considered:</p>
 <ul>
-<li><code>vcmax</code>: the maximum rate carboxylation (<span class="math inline">\(\mu mol~m^{-2}~s^{-1}\)</span>)</li>
+<li><code>vcmax_25</code>: the maximum rate of carboxylation at 25 °C (<span class="math inline">\(\mu mol~m^{-2}~s^{-1}\)</span>)</li>
 <li><code>p_50</code>: The leaf water potential (<span class="math inline">\(\psi_l\)</span>) at which 50% of conductivity is lost</li>
 <li><code>K_s</code>: The maximum hydraulic conductivity (<span class="math inline">\(kg~m^{-2}~s^{-1}~MPa^{-1})\)</span></li>
 <li><code>c</code>: Shape parameter for the hydraulic vulnerability curve (unitless)</li>
@@ -412,6 +454,19 @@ window.Quarto = {
 <section id="profitmax" class="level1">
 <h1>Profitmax</h1>
 <p>Plants are known to vary the aperture of their stomata, which control the rate of conductance of <span class="math inline">\(H_2O\)</span> for <span class="math inline">\(CO_2\)</span>, in response to environmental stimuli including the amount of available soil moisture. But how do plants determine the optimum rate of exchange? Multiple theoretical frameworks exist to address this question, but currently <code>TF24</code> employs the <code>profitmax</code> model. The profitmax models states that the optimum stomatal conductance is the point at which profits, <span class="math inline">\(P~(\mu mol~m^{-2}~s^{-1})\)</span>, is maximised.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>A second stomatal model lives in the code, but is dormant
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>Leaf</code> submodel also carries an implementation of the Medlyn <em>et al.</em> (2011) stomatal-conductance model — an empirical <span class="math inline">\(g_1\)</span> formulation (<code>medlyn_model_gs</code>, with settable <code>g0</code>/<code>g1</code> and a soil-moisture stress factor <span class="math inline">\(\beta\)</span> derived from the wilting point and field capacity). It is <strong>not</strong> on the default <code>TF24</code> compute path, which optimises <span class="math inline">\(\psi_l\)</span> directly via <code>profitmax</code>. It exists as a comparison/exploration tool, so treat any Medlyn-style <span class="math inline">\(g_1\)</span> behaviour as opt-in, not the model’s default stomatal response.</p>
+</div>
+</div>
 <p><span class="math inline">\(P (\mu mol~m^{-2}~s^{-1})\)</span> is the difference between photosynthetic revenue, <span class="math inline">\(A~(\mu mol~m^{-2}~s^{-1})\)</span> and the costs,<span class="math inline">\(C~(\mu mol~m^{-2}~s^{-1})\)</span> required to maintain the transpirational pathway which supplies water for transpiration through the stomates:</p>
 <p><span id="eq-profit"><span class="math display">\[
 P~(\psi_l) = A~(\psi_l) - C~(\psi_l).
@@ -512,13 +567,6 @@ A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> C_i, <span class="at">y =</span> assim))<span class="sc">+</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">colour =</span> limit, <span class="at">group =</span> limit)) <span class="sc">+</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
 </div>
 <p>As can be seen in the plot, <span class="math inline">\(A\)</span> increases with <span class="math inline">\(C_i\)</span> regardless of whether it is rubisco or light-limited. However, the most-limiting rate changes as <span class="math inline">\(C_i\)</span> increases, which can be captured using a smoothing function (see paper for details.)</p>
 <div class="cell">
@@ -531,13 +579,6 @@ A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> C_i, <span class="at">y =</span> assim))<span class="sc">+</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">colour =</span> rate, <span class="at">group =</span> rate)) <span class="sc">+</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
 </div>
 <p>The A_net function also includes a carbon deduction associated with dark respiration, so we can add this back on to show correspondence between the A_net curve and A_c/Aj.</p>
 </section>
@@ -560,13 +601,6 @@ k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> psi_stem, <span class="at">y =</span> conductance)) <span class="sc">+</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
 </div>
 <p><span class="math inline">\(b~(MPa)\)</span> and <span class="math inline">\(c~(unitless)\)</span> are the sensitivity and shape parameters of the hydraulic vulnerability curve. <span class="math inline">\(b\)</span> is calculated as:</p>
 <p><span class="math display">\[b = \frac{p_{50}}{-log(1-\frac{50}{100}^{\frac{1}{c}})},\]</span></p>
@@ -591,13 +625,6 @@ E_{supply} = \int^{\psi_l}_{\psi_s}k_l(\psi)\delta\psi
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">1.2</span>, <span class="at">y =</span> <span class="fl">4.8e-05</span>, <span class="at">label =</span> <span class="fu">expression</span>(psi[s]), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">2.2</span>, <span class="at">y =</span> <span class="fl">4.8e-05</span>, <span class="at">label =</span> <span class="fu">expression</span>(psi[l]), <span class="at">col =</span> <span class="st">"red"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
 </div>
 <p>Or, put another way, for a given <span class="math inline">\(\psi_s\)</span>, this is the <span class="math inline">\(E_{supply}\)</span> that could be achieved as <span class="math inline">\(psi_l\)</span> becomes more negative. It can be seen that <span class="math inline">\(E_{supply}\)</span> slowly tapers off as <span class="math inline">\(psi_s\)</span> increases, owing to the shape of the hydraulic vulnerability curve. This is important as it implies declining marginal returns to transpired water as <span class="math inline">\(psi_stem\)</span> becomes increasingly negative.</p>
 <div class="cell">
@@ -607,13 +634,6 @@ E_{supply} = \int^{\psi_l}_{\psi_s}k_l(\psi)\delta\psi
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> psi_soil, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
 </div>
 <p>We assume an upper critical limit to <span class="math inline">\(\psi_l\)</span> beyond which catastrophic xylem failure would occur, <span class="math inline">\(\psi_{crit}\)</span>. Here, <span class="math inline">\(psi_{crit}\)</span> is assumed to the <span class="math inline">\(\psi_l\)</span> at which 95% of conductance is lost.</p>
 <p>Recall from the <code>Revenue</code> section that <span class="math inline">\(g_c\)</span> is required in order to determine the <span class="math inline">\(A\)</span>. We can take advantage of the robust assumption that plants optimally allocate water transport resources to ensure that <span class="math inline">\(E_{supply}\)</span>, that is, the water transpired from the soil to the canopy, is equivalent to <span class="math inline">\(E_{demand}\)</span>, which is the atmospheric demand for water. In other words, we assume:</p>
@@ -654,13 +674,6 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
 <span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">colour =</span> name, <span class="at">group =</span> name)) <span class="sc">+</span></span>
 <span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
 <span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fl">2.05</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
 </div>
 <p>That’s a pretty complicated way to do it though. We can just automatically calculated these values using a given profit funciton. For example, the in-built profit funciton in <code>TF24</code> is the <code>profit_psi_stem_TF</code>.</p>
 <div class="cell">
@@ -679,13 +692,6 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> psi_stem, <span class="at">y =</span> value)) <span class="sc">+</span></span>
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">colour =</span> name, <span class="at">group =</span> name)) <span class="sc">+</span></span>
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
 </div>
 </section>
 <section id="optimising-profit" class="level1">
@@ -730,26 +736,17 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
 <span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>      }</span>
 <span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>(<span class="at">opt_psi_stem =</span> ((bound_b <span class="sc">+</span> bound_a) <span class="sc">/</span> <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2.895207</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(<span class="at">profit =</span> leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(opt_psi_stem, psi_soil))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 15.77304</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>(<span class="at">transpiration =</span> leaf<span class="sc">$</span>transpiration_)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 7.629592e-05</code></pre>
-</div>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>(<span class="at">opt_psi_stem =</span> ((bound_b <span class="sc">+</span> bound_a) <span class="sc">/</span> <span class="dv">2</span>))</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>(<span class="at">profit =</span> leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(opt_psi_stem, psi_soil))</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>(<span class="at">transpiration =</span> leaf<span class="sc">$</span>transpiration_)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="validation-against-the-compiled-implementation" class="level2">
 <h2 class="anchored" data-anchor-id="validation-against-the-compiled-implementation">Validation against the compiled implementation</h2>
 <p>The chunk below is an internal validation step: it re-runs the optimisation through the compiled <code>TF24</code> C++ <code>Leaf</code> object and checks the result matches the manual golden-section search above. It is disabled here (<code>eval: false</code>) because it is a self-consistency check on the implementation rather than an illustration of the theory.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">optimise_psi_stem_TF</span>()</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>profit_</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>transpiration_</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">optimise_psi_stem_TF</span>()</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>profit_</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>transpiration_</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
@@ -1164,8 +1161,8 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../theory/adaptive-dynamics.html" class="pagination-link" aria-label="Adaptive dynamics">
-        <span class="nav-page-text">Adaptive dynamics</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../theory/soil-water.html" class="pagination-link" aria-label="Soil water &amp; root uptake">
+        <span class="nav-page-text">Soil water &amp; root uptake</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

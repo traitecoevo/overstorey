@@ -328,7 +328,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>guide</p>
 </div>
 <p>Any <code>plant</code> model defines a strategy that implements a system of equations describing the change of one or more characteristics (state variables) of individuals. These individuals are aggregated as nodes of different ages that compete within a patch.</p>
-<p>This guide walks through modelling the dynamics of a single individual: how to construct one, compute its rates, grow it through time and to a target size, and compare growth trajectories across traits and light environments. It also reproduces the analysis behind Fig. 2 of the manuscript. Throughout we use the <code>FF16</code> strategy, describing the Falster-FitzJohn model of light competition in forest stands; however an equivalent <code>Individual</code> component of the model is present in all strategies. For the differential equations that underpin these dynamics, see <a href="../theory/size-structured-pde.html">Size-structured PDE</a>.</p>
+<p>This guide walks through modelling the dynamics of a single individual: how to construct one, compute its rates, grow it through time and to a target size, and compare growth trajectories across traits and light environments. It also reproduces the analysis behind Fig. 2 of the manuscript. Throughout we use the <a href="../theory/models/ff16.html"><code>FF16</code></a> strategy, describing the Falster-FitzJohn model of light competition in forest stands; however an equivalent <code>Individual</code> component of the model is present in all strategies. For the differential equations that underpin these dynamics, see <a href="../theory/size-structured-pde.html">Size-structured PDE</a>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -407,7 +407,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">fixed_environment</span>(<span class="fl">1.0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>In the FF16 model, the <code>compute_rates</code> method computes net mass production for the individual, and from that demographic rates:</p>
+<p>In the FF16 model, the <code>compute_rates</code> method computes net mass production for the individual — its leaf-level carbon budget, described in <a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a> — and from that its demographic rates:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>indv<span class="sc">$</span>ode_rates</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -424,7 +424,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>indv<span class="sc">$</span>ode_names</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "height"         "mortality"      "fecundity"      "area_heartwood" "mass_heartwood"</code></pre>
+<pre><code>[1] "height"         "mortality"      "fecundity"      "area_heartwood"
+[5] "mass_heartwood"</code></pre>
 </div>
 </div>
 <p>There is also a function to directly access particular rates:</p>
@@ -539,15 +540,16 @@ Figure&nbsp;2: Internal ODE solver (line) against the deSolve result (grey point
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create a sequence from the initial size to height at maturity</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>indv <span class="ot">&lt;-</span> <span class="fu">FF16_Individual</span>()</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>heights <span class="ot">&lt;-</span> <span class="fu">seq</span>(indv<span class="sc">$</span><span class="fu">state</span>(<span class="st">"height"</span>), indv<span class="sc">$</span>strategy<span class="sc">$</span>hmat, <span class="at">length.out=</span><span class="dv">20</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>heights <span class="ot">&lt;-</span> <span class="fu">seq</span>(indv<span class="sc">$</span><span class="fu">state</span>(<span class="st">"height"</span>), indv<span class="sc">$</span>strategy<span class="sc">$</span>pars<span class="sc">$</span>hmat, <span class="at">length.out=</span><span class="dv">20</span>)</span>
 <span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">grow_individual_to_size</span>(indv, heights, <span class="st">"height"</span>, env)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This returns a vector of times; this is when the heights were achieved</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>time</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1]  0.000000  1.545681  2.523393  3.365033  4.155087  4.926508  5.696593  6.476387  7.274127  8.096757  8.950785  9.842785 10.779771 11.769706 12.821689 13.946774 15.158668 16.476692 17.957500
-[20] 20.137320</code></pre>
+<pre><code> [1]  0.000000  1.545681  2.523393  3.365033  4.155087  4.926508  5.696593
+ [8]  6.476387  7.274127  8.096757  8.950785  9.842785 10.779771 11.769706
+[15] 12.821689 13.946774 15.158668 16.476692 17.957500 20.137320</code></pre>
 </div>
 </div>
 <p>A matrix of states, showing the state of related characteristics:</p>
@@ -557,10 +559,10 @@ Figure&nbsp;2: Internal ODE solver (line) against the deSolve result (grey point
 <pre><code>        height  mortality    fecundity area_heartwood mass_heartwood
 [1,] 0.3441948 0.00000000 0.000000e+00   0.000000e+00   0.000000e+00
 [2,] 1.1995465 0.01545682 7.754892e-20   1.280271e-07   6.544158e-05
-[3,] 2.0548958 0.02523396 5.654011e-18   9.826616e-07   8.617440e-04
-[4,] 2.9102485 0.03365038 2.252986e-16   3.837305e-06   4.790943e-03
-[5,] 3.7656006 0.04155098 6.750246e-15   1.081677e-05   1.755419e-02
-[6,] 4.6209512 0.04926531 1.710259e-13   2.510437e-05   5.019027e-02</code></pre>
+[3,] 2.0548958 0.02523396 5.654090e-18   9.826615e-07   8.617440e-04
+[4,] 2.9102485 0.03365038 2.253268e-16   3.837305e-06   4.790943e-03
+[5,] 3.7656006 0.04155098 6.750303e-15   1.081677e-05   1.755419e-02
+[6,] 4.6209512 0.04926531 1.710477e-13   2.510437e-05   5.019027e-02</code></pre>
 </div>
 </div>
 <p>And a list of individualss</p>
@@ -614,14 +616,14 @@ Figure&nbsp;2: Internal ODE solver (line) against the deSolve result (grey point
 </div>
 <p>Then we can use the <code>params</code> object to set a low LMA (“fast growth”) and a high LMA (“low growth”) species:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">trait_matrix</span>(<span class="fu">c</span>(<span class="fl">0.0825</span>, <span class="fl">0.2625</span>), <span class="st">"lma"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>     <span class="fu">strategy_list</span>(params, <span class="at">birth_rate_list =</span> <span class="dv">1</span>)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">generate_strategy</span>(params, <span class="fu">trait_matrix</span>(<span class="fu">c</span>(<span class="fl">0.0825</span>, <span class="fl">0.2625</span>), <span class="st">"lma"</span>),</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">birth_rate =</span> <span class="dv">1</span>)</span>
 <span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>s1 <span class="ot">&lt;-</span> s[[<span class="dv">1</span>]]</span>
 <span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> s[[<span class="dv">2</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>In the FF16 model, LMA is related to leaf turnover (<code>k_l</code>) and the ratio of dark respiration to leaf mass (<code>r_l</code>):</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(s, <span class="st">`</span><span class="at">[</span><span class="st">`</span>, <span class="fu">c</span>(<span class="st">"lma"</span>, <span class="st">"k_l"</span>, <span class="st">"r_l"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(s, <span class="cf">function</span>(x) x<span class="sc">$</span>pars[<span class="fu">c</span>(<span class="st">"lma"</span>, <span class="st">"k_l"</span>, <span class="st">"r_l"</span>)])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 [[1]]$lma
@@ -652,8 +654,8 @@ Figure&nbsp;2: Internal ODE solver (line) against the deSolve result (grey point
 </div>
 <p>Then, collect information of their characteristic variables over a sequence of heights. Note that range of heights are different for the two Individuals because they have different starting heights. The lower LMA of s1 allows it to achieve a greater initial height for given seed mass.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>heights1 <span class="ot">&lt;-</span> <span class="fu">seq</span>(indv1<span class="sc">$</span><span class="fu">state</span>(<span class="st">"height"</span>), s1<span class="sc">$</span>hmat, <span class="at">length.out=</span><span class="dv">100</span>L)</span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>heights2 <span class="ot">&lt;-</span> <span class="fu">seq</span>(indv2<span class="sc">$</span><span class="fu">state</span>(<span class="st">"height"</span>), s2<span class="sc">$</span>hmat, <span class="at">length.out=</span><span class="dv">100</span>L)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>heights1 <span class="ot">&lt;-</span> <span class="fu">seq</span>(indv1<span class="sc">$</span><span class="fu">state</span>(<span class="st">"height"</span>), s1<span class="sc">$</span>pars<span class="sc">$</span>hmat, <span class="at">length.out=</span><span class="dv">100</span>L)</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>heights2 <span class="ot">&lt;-</span> <span class="fu">seq</span>(indv2<span class="sc">$</span><span class="fu">state</span>(<span class="st">"height"</span>), s2<span class="sc">$</span>pars<span class="sc">$</span>hmat, <span class="at">length.out=</span><span class="dv">100</span>L)</span>
 <span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">&lt;-</span> <span class="fu">grow_individual_to_height</span>(indv1, heights1, env,</span>
 <span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">time_max=</span><span class="dv">100</span>, <span class="at">warn=</span><span class="cn">FALSE</span>, <span class="at">filter=</span><span class="cn">TRUE</span>)</span>
@@ -722,7 +724,7 @@ Figure&nbsp;4: Height trajectories for both species in high (black) and low (red
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setNames</span>(indv<span class="sc">$</span>ode_state, indv<span class="sc">$</span>ode_names)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        height      mortality      fecundity area_heartwood mass_heartwood 
-  8.412120e+00   7.797210e-02   9.998839e-08   3.403727e-04   1.262008e+00 </code></pre>
+  8.412120e+00   7.797210e-02   9.998969e-08   3.403727e-04   1.262008e+00 </code></pre>
 </div>
 </div>
 <p>And the set of <em>rate</em> variables</p>
@@ -905,7 +907,7 @@ Figure&nbsp;7: Height growth rate against canopy openness; the filled point mark
 <span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>y_seed <span class="ot">&lt;-</span> <span class="fu">g</span>(openness, indv_seed)</span>
 <span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>indv_adult <span class="ot">&lt;-</span> <span class="fu">FF16_Individual</span>(s1)</span>
-<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>indv_adult<span class="sc">$</span><span class="fu">set_state</span>(<span class="st">"height"</span>, indv_adult<span class="sc">$</span>strategy<span class="sc">$</span>hmat <span class="sc">/</span> <span class="dv">2</span>)</span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>indv_adult<span class="sc">$</span><span class="fu">set_state</span>(<span class="st">"height"</span>, indv_adult<span class="sc">$</span>strategy<span class="sc">$</span>pars<span class="sc">$</span>hmat <span class="sc">/</span> <span class="dv">2</span>)</span>
 <span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a>y_adult <span class="ot">&lt;-</span> <span class="fu">g</span>(openness, indv_adult)</span>
 <span id="cb77-9"><a href="#cb77-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb77-10"><a href="#cb77-10" aria-hidden="true" tabindex="-1"></a>cols_height <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#31a354"</span>, <span class="st">"black"</span>)</span>
@@ -934,7 +936,7 @@ Figure&nbsp;8: Height growth rate against canopy openness for a seedling and an 
 <span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>y2_seed <span class="ot">&lt;-</span> <span class="fu">g</span>(openness, indv2_seed)</span>
 <span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>indv2_adult <span class="ot">&lt;-</span> <span class="fu">FF16_Individual</span>(s2)</span>
-<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>indv2_adult<span class="sc">$</span><span class="fu">set_state</span>(<span class="st">"height"</span>, indv2_adult<span class="sc">$</span>strategy<span class="sc">$</span>hmat <span class="sc">/</span> <span class="dv">2</span>)</span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>indv2_adult<span class="sc">$</span><span class="fu">set_state</span>(<span class="st">"height"</span>, indv2_adult<span class="sc">$</span>strategy<span class="sc">$</span>pars<span class="sc">$</span>hmat <span class="sc">/</span> <span class="dv">2</span>)</span>
 <span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>y2_adult <span class="ot">&lt;-</span> <span class="fu">g</span>(openness, indv2_adult)</span>
 <span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>ymax <span class="ot">&lt;-</span> <span class="fu">max</span>(ymax, y2_seed[, <span class="dv">2</span>], y2_adult[, <span class="dv">2</span>])</span>

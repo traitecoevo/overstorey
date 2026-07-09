@@ -210,6 +210,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The big picture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, gently</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, worked through</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
@@ -218,6 +236,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -314,7 +338,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a></li>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a></li>
   <li><a href="#node-introduction-times" id="toc-node-introduction-times" class="nav-link" data-scroll-target="#node-introduction-times">Node introduction times</a></li>
   <li><a href="#estimating-error-in-node-spacing" id="toc-estimating-error-in-node-spacing" class="nav-link" data-scroll-target="#estimating-error-in-node-spacing">Estimating error in node spacing</a></li>
   <li><a href="#individual-offspring-production-contributions" id="toc-individual-offspring-production-contributions" class="nav-link" data-scroll-target="#individual-offspring-production-contributions">Individual offspring production contributions</a></li>
@@ -348,6 +373,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="eyebrow">
 <p>implementation</p>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../../theory/size-structured-pde.html">The size-structured PDE</a> and <a href="../../theory/implementation/characteristic-method.html">the method of characteristics</a>. Read those first if the notation here is unfamiliar.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p><code>plant</code> never tracks a continuous size distribution directly. Instead it approximates that distribution with a finite collection of cohorts, each one a single representative individual standing in for all the plants born at roughly the same moment. As those cohorts grow and thin over time, the model has to decide two things: when to add a new cohort to the population, and how to space the existing ones so the whole collection still traces out the size distribution faithfully.</p>
+<p>This is a genuine trade-off. Add too few cohorts, or space them too coarsely, and the model smooths over real structure in the population, missing the sharp features that matter for growth and competition. Add too many, or space them too finely, and the simulation grinds through far more bookkeeping than the answer warrants, most of it spent refining regions that were already accurate enough. The art of the node-spacing algorithm is finding, at every point in a patch’s development, the smallest set of cohorts that keeps the approximation error below a chosen tolerance, and no smaller.</p>
+<p>The rest of this page makes this precise.</p>
+</section>
 <section id="background" class="level2">
 <h2 class="anchored" data-anchor-id="background">Background</h2>
 <p>As described in the <a href="../../theory/size-structured-pde.html">size-structured PDE</a> page, the spacing of nodes can affect the accuracy of integration over the size-density distribution. <code>plant</code> uses an adaptive algorithm to build an appropriately spaced node schedule with the desired accuracy at every time point, using as few nodes as possible.</p>
@@ -368,7 +412,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ncores <span class="ot">&lt;-</span> <span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">1</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"FF16"</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">expand_parameters</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), p0, <span class="at">birth_rate_list =</span> <span class="dv">20</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(p0, <span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), <span class="at">birth_rate =</span> <span class="dv">20</span>)</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>times_default <span class="ot">&lt;-</span> p<span class="sc">$</span>node_schedule_times[[<span class="dv">1</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -439,15 +483,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>offspring_production_default <span class="ot">&lt;-</span> <span class="fu">run_with_times</span>(p, times_default)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Time to solve: 0.12"</code></pre>
+<pre><code>[1] "Time to solve: 0.15"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>offspring_production_2x <span class="ot">&lt;-</span> <span class="fu">run_with_times</span>(p, times_2x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Time to solve: 0.24"</code></pre>
+<pre><code>[1] "Time to solve: 0.27"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>offspring_production_4x <span class="ot">&lt;-</span> <span class="fu">run_with_times</span>(p, times_4x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Time to solve: 0.74"</code></pre>
+<pre><code>[1] "Time to solve: 0.83"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>node_range <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">length</span>(times_default), <span class="fu">length</span>(times_2x),</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">length</span>(times_4x))</span>

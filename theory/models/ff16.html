@@ -224,6 +224,24 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The big picture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, gently</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, worked through</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
@@ -232,6 +250,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -328,7 +352,8 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#growth" id="toc-growth" class="nav-link" data-scroll-target="#growth">Growth</a>
   <ul class="collapse">
   <li><a href="#leaf-photosynthesis" id="toc-leaf-photosynthesis" class="nav-link" data-scroll-target="#leaf-photosynthesis">Leaf photosynthesis</a></li>
@@ -383,7 +408,24 @@ window.Quarto = {
 <div class="eyebrow">
 <p>model</p>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../../theory/overview.html">The big picture</a> and <a href="../../theory/maths-primer.html">The maths, gently</a>. Read those first if the notation here is unfamiliar.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p>Every plant carries a set of traits – things like how it builds leaves, how dense its wood is, how it allocates mass to different tissues – and a current size. FF16 takes those two ingredients, together with the light available to the plant, and turns them into rates: how fast it grows taller, how fast it produces seeds, and how likely it is to die. The engine underneath all three rates is the same: the plant captures carbon through photosynthesis, spends some of that income on maintaining and replacing its existing tissues, and what’s left over is net production it can invest in new growth. A larger plant with more leaf area can capture more light, but it also carries more tissue to maintain, so the model tracks how that balance shifts as the plant gets bigger. Traits shape the balance too: a plant built for fast height growth channels production differently than one built to survive shade or drought. Once you know how much a plant produces and how it chooses to allocate that production, growth, reproduction, and mortality all follow as natural consequences of the same underlying physiology, rather than as separate, disconnected assumptions. The rest of this page makes this precise.</p>
 <p>This document outlines the core physiological model used in the <code>plant</code> package. This model has primarily been developed elsewhere, in particular in <span class="citation" data-cites="Falster-2011">Falster, Brännström, Dieckmann, &amp; Westoby (<a href="#ref-Falster-2011" role="doc-biblioref">2011</a>)</span>. The model’s equations are presented here not as original findings, but rather so that users can understand the full system of equations being solved within <code>plant</code>.</p>
+</section>
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
 <p>The purpose of a physiological model in <code>plant</code> is to take a plant’s current size, light environment, and physiological parameters as inputs, and return its growth, mortality, and fecundity rates. In the <code>FF16</code> physiological model, these vital rates are all derived from the rate at which living biomass is produced by the plant, which in turn is calculated based on well-understood physiology (see <a href="#fig-phys" class="quarto-xref">Figure&nbsp;1</a>). Various physiological parameters influence demographic outcomes. Varying these parameters allows accounting for species differences, potentially via traits. Tables summarize the units and definitions of all variables, parameters, and hyper-parameters used in the material below.</p>

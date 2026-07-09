@@ -346,13 +346,13 @@ Note
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"FF16"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">expand_parameters</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), p0, <span class="at">birth_rate_list =</span> <span class="fl">17.31</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(p0, <span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>), <span class="at">birth_rate =</span> <span class="fl">17.31</span>)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>patch <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p, <span class="at">refine_schedule =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>parameters</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(patch, <span class="at">collect =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="node-densities" class="level1">
 <h1>Node densities</h1>
-<p>There was a bit of hassle in <a href="https://traitecoevo.github.io/plant/articles/patch.html">Patches vignette</a> in plotting all trajectories along with a couple of lines corresponding to focal years. We’re going to do the same thing here:</p>
+<p>There was a bit of hassle in the <a href="../guides/patch-dynamics.html">patch dynamics guide</a> in plotting all trajectories along with a couple of lines corresponding to focal years. We’re going to do the same thing here:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>closest <span class="ot">&lt;-</span> <span class="cf">function</span>(t, time) {</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">which.min</span>(<span class="fu">abs</span>(time <span class="sc">-</span> t))</span>
@@ -371,7 +371,7 @@ Note
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>height      <span class="ot">&lt;-</span> <span class="fu">sdd_matrix</span>(species_1, <span class="st">"height"</span>)</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>log_density <span class="ot">&lt;-</span> <span class="fu">sdd_matrix</span>(species_1, <span class="st">"log_density"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>As with height in the <a href="https://traitecoevo.github.io/plant/articles/patch.html">Patches vignette</a>, node density is a matrix of time and node identity. However, to show the profiles for a given time slice using <code>matplot</code> it is convenient to have each column be the state of the system at a given time, so here each row is a node and each column is a time step:</p>
+<p>As with height in the <a href="../guides/patch-dynamics.html">patch dynamics guide</a>, node density is a matrix of time and node identity. However, to show the profiles for a given time slice using <code>matplot</code> it is convenient to have each column be the state of the system at a given time, so here each row is a node and each column is a time step:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>density <span class="ot">&lt;-</span> <span class="fu">exp</span>(log_density)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(height, density, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">lty=</span><span class="dv">1</span>,</span>
@@ -386,7 +386,7 @@ Note
 </div>
 </div>
 </div>
-<p>Note that the densities here can be <em>extremely</em> low, and yet individuals within the nodes continue to grow in size; this is the “<a href="http://en.wikipedia.org/wiki/Lotka-Volterra_equation">atto-fox problem</a>”, though here we drop down as low as 8 yocto individuals / m / metre squared (a yocto-x being 1 millionth of an atto-x). <em>Anyway</em>….</p>
+<p>Note that the densities here can be <em>extremely</em> low, and yet individuals within the nodes continue to grow in size; this is the “<a href="http://en.wikipedia.org/wiki/Lotka-Volterra_equation">atto-fox problem</a>”, though here we drop down as low as 10 yocto individuals / m / metre squared (a yocto-x being 1 millionth of an atto-x). <em>Anyway</em>….</p>
 <p>The trajectories are easier to understand if a few are highlighted.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>xlim <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">max</span>(height, <span class="at">na.rm=</span><span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.05</span>)</span>
@@ -407,11 +407,11 @@ Note
 </div>
 </div>
 </div>
-<p>Early on there is a low density “dip” caused by self thinning (5 years). As the stand develops that dip broadens and deepens and moves forward in height (these very low density nodes are still traveling the characteristic equations of the SCM). Later on (20 years) additional an second wave of recruitment gives a second pulse of high density (around 4 m tall), which can be seen traveling along in the 40 year profile to about 13 m. When the patch is very old the stand approaches a stable age distribution, though a very narrow window of “missing” heights exists just below the top of the canopy.</p>
+<p>Early on there is a low density “dip” caused by self thinning (5 years). As the stand develops that dip broadens and deepens and moves forward in height (these very low density nodes are still traveling the <a href="../theory/implementation/characteristic-method.html">characteristic equations</a> of the SCM). Later on (20 years) additional an second wave of recruitment gives a second pulse of high density (around 4 m tall), which can be seen traveling along in the 40 year profile to about 13 m. When the patch is very old the stand approaches a stable age distribution, though a very narrow window of “missing” heights exists just below the top of the canopy.</p>
 </section>
 <section id="leaf-area" class="level1">
 <h1>Leaf area</h1>
-<p>It’s also possible see where the leaf area in the patch is coming from; a profile of leaf area with respect to height. The collected output records the leaf area (<code>competition_effect</code>) of an individual in each node, which we weight by node density and the light extinction coefficient <code>k_I</code> to get each node’s contribution to patch competition:</p>
+<p>It’s also possible see where the leaf area in the patch is coming from; a profile of leaf area with respect to height. The collected output records the leaf area (<code>competition_effect</code>) of an individual in each node, which we weight by node density and the light extinction coefficient <code>k_I</code> (see <a href="../theory/implementation/canopy-models.html">Canopy &amp; light-environment models</a>) to get each node’s contribution to patch competition:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>species_1 <span class="ot">&lt;-</span> species_1 <span class="sc">|&gt;</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">leaf_area =</span> k_I <span class="sc">*</span> density <span class="sc">*</span> competition_effect)</span>
@@ -436,7 +436,7 @@ Note
 </section>
 <section id="growth-rate" class="level1">
 <h1>Growth rate</h1>
-<p>Finally, we can see where height growth rate is concentrated in the population. This differs from the profile in the <a href="https://traitecoevo.github.io/plant/articles/individuals.html">Individuals vignette</a> because it is reduced depending on the light environment, but that environment is the one constructed by the individual itself.</p>
+<p>Finally, we can see where height growth rate is concentrated in the population. This differs from the profile in the <a href="../guides/first-individual.html">first individual guide</a> because it is reduced depending on the light environment, but that environment is the one constructed by the individual itself.</p>
 <p>The collected output records node state rather than instantaneous rates, so here we approximate each node’s height growth rate by finite differences along its trajectory (the change in height between successive time steps):</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> result<span class="sc">$</span>steps<span class="sc">$</span>time</span>

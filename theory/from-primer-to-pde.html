@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Overstorey – Adaptive dynamics</title>
+<title>Overstorey – The maths, worked through</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -23,27 +23,7 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -52,8 +32,8 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../theory/models/index.html" rel="next">
-<link href="../theory/soil-water.html" rel="prev">
+<link href="../theory/size-structured-pde.html" rel="next">
+<link href="../theory/maths-primer.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -195,7 +175,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/adaptive-dynamics.html">Adaptive dynamics</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/from-primer-to-pde.html">The maths, worked through</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -236,7 +216,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+  <a href="../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">The maths, worked through</span></a>
   </div>
 </li>
@@ -260,7 +240,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link active">
+  <a href="../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Adaptive dynamics</span></a>
   </div>
 </li>
@@ -352,17 +332,22 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#sec-invasion-fitness" id="toc-sec-invasion-fitness" class="nav-link active" data-scroll-target="#sec-invasion-fitness">Invasion fitness</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#a-toy-strategy" id="toc-a-toy-strategy" class="nav-link active" data-scroll-target="#a-toy-strategy">A toy strategy</a></li>
+  <li><a href="#step-1-one-plant-as-three-running-totals" id="toc-step-1-one-plant-as-three-running-totals" class="nav-link" data-scroll-target="#step-1-one-plant-as-three-running-totals">Step 1 — one plant, as three running totals</a></li>
+  <li><a href="#step-2-from-one-plant-to-a-distribution" id="toc-step-2-from-one-plant-to-a-distribution" class="nav-link" data-scroll-target="#step-2-from-one-plant-to-a-distribution">Step 2 — from one plant to a distribution</a></li>
+  <li><a href="#step-3-why-following-cohorts-is-the-easy-way" id="toc-step-3-why-following-cohorts-is-the-easy-way" class="nav-link" data-scroll-target="#step-3-why-following-cohorts-is-the-easy-way">Step 3 — why following cohorts is the easy way</a></li>
+  <li><a href="#step-4-closing-the-light-loop-once" id="toc-step-4-closing-the-light-loop-once" class="nav-link" data-scroll-target="#step-4-closing-the-light-loop-once">Step 4 — closing the light loop, once</a></li>
+  <li><a href="#step-5-one-patch-among-many" id="toc-step-5-one-patch-among-many" class="nav-link" data-scroll-target="#step-5-one-patch-among-many">Step 5 — one patch among many</a></li>
+  <li><a href="#now-you-are-ready" id="toc-now-you-are-ready" class="nav-link" data-scroll-target="#now-you-are-ready">Now you are ready</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/adaptive-dynamics.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/from-primer-to-pde.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/adaptive-dynamics.html">Adaptive dynamics</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/from-primer-to-pde.html">The maths, worked through</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Adaptive dynamics</h1>
+<h1 class="title">The maths, worked through</h1>
 </div>
 
 
@@ -380,43 +365,195 @@ window.Quarto = {
 
 
 <div class="eyebrow">
-<p>theory</p>
+<p>theory · bridge</p>
 </div>
-<p>This page builds on the demographic machinery developed for the <a href="../theory/size-structured-pde.html">size-structured PDE</a> to estimate the fitness of rare mutant phenotypes and so reason about evolutionary endpoints in a trait-, size-, and patch-structured metacommunity. The approach for calculating fitness implemented here follows <span class="citation" data-cites="Falster-2015">Falster, Brännström, Westoby, &amp; Dieckmann (<a href="#ref-Falster-2015" role="doc-biblioref">2015</a>)</span>.</p>
-<section id="sec-invasion-fitness" class="level1">
-<h1>Invasion fitness</h1>
-<p>We now consider how to estimate the fitness of a rare mutant individual with traits <span class="math inline">\(x^\prime\)</span> growing in the light environment of a resident community with traits <span class="math inline">\(x\)</span>. We focus on phenotype-dependent components of fitness – describing the aggregate consequences of a given set of traits for growth, fecundity, and mortality – taking into account the non-linear effects of competition, but ignoring the underlying genetic basis for trait inheritance and expression. We also adhere to standard conventions in such analyses by assuming that the mutant phenotype is sufficiently rare to have a negligible effect on the light environment where it is growing <span class="citation" data-cites="Geritz-1998">(<a href="#ref-Geritz-1998" role="doc-biblioref">Geritz, Kisdi, Meszéna, &amp; Metz, 1998</a>)</span>. The approach for calculating fitness implemented here follows the approach described by <span class="citation" data-cites="Falster-2015">Falster et al. (<a href="#ref-Falster-2015" role="doc-biblioref">2015</a>)</span>.</p>
-<p>In general, invasion fitness is defined as the long-term per capita growth rate of a rare mutant phenotype in the environment determined by a resident phenotype <span class="citation" data-cites="Metz-1992">(<a href="#ref-Metz-1992" role="doc-biblioref">Metz, Nisbet, &amp; Geritz, 1992</a>)</span>. Calculating per capita growth rates, however, is particularly challenging in a structured metacommunity model <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>. As an alternative measure of invasion fitness in metacommunities, we can use the basic reproduction ratio measuring the expected number of new dispersers arising from a single dispersal event. For metacommunities at demographic equilibrium, evolutionary inferences made using basic reproduction ratios are equivalent to those made using per capita growth rates <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>.</p>
-<p>We denote by <span class="math inline">\(R\left(x^\prime, x\right)\)</span> the basic reproduction ratio of individuals with traits <span class="math inline">\(x^\prime\)</span> growing in the competitive light environment of the resident traits <span class="math inline">\(x\)</span>. Recalling that patches of age <span class="math inline">\(a\)</span> have frequency-density <span class="math inline">\(P(a)\)</span> in the landscape (the equilibrium patch-age distribution derived on the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page), it follows that any seed with traits <span class="math inline">\(x^\prime\)</span> has a probability of <span class="math inline">\(P(a)\)</span> of landing in a patch of age <span class="math inline">\(a\)</span>. The basic reproduction ratio for individuals with traits <span class="math inline">\(x^\prime\)</span> is then <span id="eq-invfit"><span class="math display">\[
-R\left(x^\prime,x\right) = \int _0^{\infty} P\left(a\right) \, \tilde{R}\left(x^\prime, a, \infty \right) \, {\rm d}a ,
-\tag{1}\]</span></span> where <span class="math inline">\(\tilde{R}\left(x^\prime, a_0, a \right)\)</span> is the expected number of dispersing offspring produced by a single dispersing seed with traits <span class="math inline">\(x^\prime\)</span> arriving in a patch of age <span class="math inline">\(a_0\)</span> up until age <span class="math inline">\(a\)</span> <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>. In turn, <span class="math inline">\(\tilde{R}\left(x^\prime, a,\infty\right)\)</span> is calculated by integrating an individual’s fecundity over the expected lifetime of a patch, taking into account competitive shading from residents with traits <span class="math inline">\(x\)</span>, the individual’s probability of surviving, and its traits, <span id="eq-tilder"><span class="math display">\[
-\tilde{R}(x^\prime, a_0, \infty) = \int_{a_0}^{\infty} S_{\rm D} \, f(x^\prime, H(x^\prime, a_0, a), E_{a}) \, S_{\rm I} (x^\prime, a_0, a) \, S_{\rm P} (a_0, a) \, {\rm d} a.
-\tag{2}\]</span></span> Here <span class="math inline">\(S_{\rm I}\)</span> is the individual survival probability and <span class="math inline">\(S_{\rm P}\)</span> the patch survival probability, both defined on the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../theory/maths-primer.html">The maths, gently</a>. It is the stepping stone between that primer and the full <a href="../theory/size-structured-pde.html">size-structured PDE</a>: same equations, now put to work on one deliberately tiny example.</p>
+</div>
+</div>
+<p>The <a href="../theory/maths-primer.html">primer</a> gave you the equations in words; the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page gives them in full, with derivations and boundary conditions. In between sits a gap that is easy to underestimate: it is one thing to <em>read</em> <span class="math inline">\(H(a) = H_0 + \int g\,{\rm d}a\)</span> and quite another to feel what it does. This page closes that gap the way most people actually learn a model — by pushing a handful of numbers through it.</p>
+<p>We will follow one plant, then two, then let them shade each other, then zoom out to the landscape — using the <em>same symbols</em> as the primer at every step. The numbers here are <strong>toy values chosen for arithmetic, not FF16 outputs</strong>; the point is the shape of the calculation, not the figures.</p>
+<section id="a-toy-strategy" class="level2">
+<h2 class="anchored" data-anchor-id="a-toy-strategy">A toy strategy</h2>
+<p>Give our plant three constant rates and two survival numbers. Real models make these depend on size and light (that is what the <a href="../theory/models/ff16.html">FF16</a> page is for) — holding them fixed just lets us do the sums by hand:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Toy value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(g\)</span></td>
+<td>growth rate (height)</td>
+<td><span class="math inline">\(0.5\ {\rm m\,yr^{-1}}\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(d\)</span></td>
+<td>death rate</td>
+<td><span class="math inline">\(0.05\ {\rm yr^{-1}}\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(f\)</span></td>
+<td>fecundity</td>
+<td><span class="math inline">\(2\ {\rm seeds\,yr^{-1}}\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(H_0\)</span></td>
+<td>height at birth</td>
+<td><span class="math inline">\(0.4\ {\rm m}\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(S_{\rm G}\)</span></td>
+<td>germination survival</td>
+<td><span class="math inline">\(0.25\)</span></td>
+</tr>
+</tbody>
+</table>
 </section>
-<section id="references" class="level1">
-
-
+<section id="step-1-one-plant-as-three-running-totals" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-one-plant-as-three-running-totals">Step 1 — one plant, as three running totals</h2>
+<p>The primer said a plant’s whole life is three running totals of these rates (<a href="../theory/maths-primer.html">Step 2 there</a>). With the rates held constant, each integral collapses to something you can evaluate directly.</p>
+<p><strong>Height</strong> — cumulative growth, <span class="math inline">\(H(a) = H_0 + \int_{0}^{a} g\,{\rm d}a' = H_0 + g\,a\)</span>:</p>
+<p><span class="math display">\[
+H(a) = 0.4 + 0.5\,a.
+\]</span></p>
+<p><strong>Survival</strong> — germination survival discounted by accumulated death risk, <span class="math inline">\(S_{\rm I}(a) = S_{\rm G}\,\exp(-\int_0^a d\,{\rm d}a') = S_{\rm G}\,e^{-d a}\)</span>:</p>
+<p><span class="math display">\[
+S_{\rm I}(a) = 0.25\,e^{-0.05\,a}.
+\]</span></p>
+<p><strong>Lifetime seeds so far</strong> — fecundity added up, but only over plants still alive, <span class="math inline">\(\tilde R(a) = \int_0^a f\,S_{\rm I}(a')\,{\rm d}a'\)</span>. Doing the integral of the exponential gives <span class="math inline">\(\tilde R(a) = \tfrac{f\,S_{\rm G}}{d}\big(1 - e^{-d a}\big)\)</span>:</p>
+<p><span class="math display">\[
+\tilde R(a) = 10\,\big(1 - e^{-0.05\,a}\big).
+\]</span></p>
+<p>Read across a few patch ages and the abstract integrals become a life history:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">patch age <span class="math inline">\(a\)</span></th>
+<th style="text-align: center;">height <span class="math inline">\(H\)</span> (m)</th>
+<th style="text-align: center;">survival <span class="math inline">\(S_{\rm I}\)</span></th>
+<th style="text-align: center;">cumulative seeds <span class="math inline">\(\tilde R\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.4</td>
+<td style="text-align: center;">0.250</td>
+<td style="text-align: center;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">2.9</td>
+<td style="text-align: center;">0.195</td>
+<td style="text-align: center;">2.21</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">5.4</td>
+<td style="text-align: center;">0.152</td>
+<td style="text-align: center;">3.93</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">20</td>
+<td style="text-align: center;">10.4</td>
+<td style="text-align: center;">0.092</td>
+<td style="text-align: center;">6.32</td>
+</tr>
+</tbody>
+</table>
+<p>The plant climbs steadily, its survivorship decays, and its seed tally rises fast early then flattens as fewer of its kind are left to reproduce. Three integrals, three columns.</p>
+</section>
+<section id="step-2-from-one-plant-to-a-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-from-one-plant-to-a-distribution">Step 2 — from one plant to a distribution</h2>
+<p>Now germinate a <strong>second</strong> cohort five years after the first. At any later patch age <span class="math inline">\(a\)</span> it has had five fewer years to grow, so its height is <span class="math inline">\(H_0 + g\,(a - 5)\)</span>. Line the two cohorts up at <span class="math inline">\(a = 20\)</span>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>cohort</th>
+<th style="text-align: center;">born at <span class="math inline">\(a_0\)</span></th>
+<th style="text-align: center;">height at <span class="math inline">\(a=20\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;"><span class="math inline">\(0.4 + 0.5(20) = 10.4\ {\rm m}\)</span></td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;"><span class="math inline">\(0.4 + 0.5(15) = 7.9\ {\rm m}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Those two heights, each carrying a density, are two samples of the <strong>size-density distribution</strong> <span class="math inline">\(N(H \mid x, a)\)</span> the primer introduced in <a href="../theory/maths-primer.html">Step 3</a>. Add a cohort every few years and the samples fill in a curve over height — and because growth keeps carrying every cohort upward while death thins each one, the whole curve slides toward larger <span class="math inline">\(H\)</span> and flattens as it goes. That sliding, thinning curve <em>is</em> what the central PDE</p>
+<p><span class="math display">\[
+\frac{\partial N}{\partial a} = -\,d\,N \;-\; \frac{\partial}{\partial H}\big(g\,N\big)
+\]</span></p>
+<p>describes in one line. We have just built it by hand, one cohort at a time.</p>
+</section>
+<section id="step-3-why-following-cohorts-is-the-easy-way" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-why-following-cohorts-is-the-easy-way">Step 3 — why following cohorts is the easy way</h2>
+<p>Watch what happens to a single cohort’s density as it rides upward. The primer’s characteristic equation (<a href="../theory/maths-primer.html">Step 4</a>) was</p>
+<p><span class="math display">\[
+\frac{{\rm d}}{{\rm d}a}\ln N = -\left(d + \frac{\partial g}{\partial H}\right).
+\]</span></p>
+<p>Our toy growth is <em>constant</em>, so <span class="math inline">\(\partial g/\partial H = 0\)</span> and the second term vanishes. The cohort’s density then obeys</p>
+<p><span class="math display">\[
+\frac{{\rm d}}{{\rm d}a}\ln N = -d
+\qquad\Longrightarrow\qquad
+N(a) = N(a_0)\,e^{-d\,(a - a_0)},
+\]</span></p>
+<p>exactly mirroring the survival curve from Step 1 — sensible, since with no stretching or bunching the only thing changing a cohort’s density is death. The moment growth varies with height (as it does in any real strategy), the <span class="math inline">\(\partial g/\partial H\)</span> term switches on and cohorts bunch up where growth slows and spread out where it speeds up. Seeing the clean special case first makes the general term easy to place when you meet it on the <a href="../theory/size-structured-pde.html">full PDE page</a>.</p>
+<p>The boundary condition is where new cohorts enter. At the smallest height the flux of plants must equal the arriving seedlings, <span class="math inline">\(g(H_0)\,N(H_0) = Y_x\,S_{\rm G}\)</span> — that is what fixes the density each new cohort starts with.</p>
+</section>
+<section id="step-4-closing-the-light-loop-once" class="level2">
+<h2 class="anchored" data-anchor-id="step-4-closing-the-light-loop-once">Step 4 — closing the light loop, once</h2>
+<p>So far the rates were fixed. In the real model <span class="math inline">\(g\)</span> and <span class="math inline">\(d\)</span> depend on light, and light depends on the plants themselves. Take one turn around that loop by hand. Cohort A (10.4 m) sits above cohort B (7.9 m), so A’s leaves shade B. If the canopy above B holds a leaf area of, say, <span class="math inline">\(L = 2\)</span>, then by the primer’s Beer’s-law shading (<a href="../theory/maths-primer.html">Step 5</a>) the light reaching B is</p>
+<p><span class="math display">\[
+E_a = \exp(-k_{\rm I}\,L) = \exp(-0.5 \times 2) \approx 0.37.
+\]</span></p>
+<p>B is growing in about a third of full light. Feed that back in and B’s <em>realised</em> growth rate is lower than our toy <span class="math inline">\(0.5\)</span> — so it climbs more slowly than the table in Step 1 assumed, the gap to A widens, and the shading deepens further. That mutual feedback, resolved not once but to a consistent state, is the competition the <a href="../theory/size-structured-pde.html">full PDE page</a> solves properly.</p>
+</section>
+<section id="step-5-one-patch-among-many" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-one-patch-among-many">Step 5 — one patch among many</h2>
+<p>Finally, zoom out. Everything above lived inside a single patch of age <span class="math inline">\(a\)</span>. The landscape holds patches of every age, weighted by how common each age is — <span class="math inline">\(P(a)\propto S_{\rm P}(a) = \exp(-\lambda a^2)\)</span> for <code>plant</code>’s default rising disturbance risk (<a href="../theory/maths-primer.html">Step 6</a>). Every landscape-level number is our per-patch quantity averaged under that weight, and the seed rain that patches <em>produce</em> must equal the seed rain that <em>feeds</em> their boundary condition — the fixed point <span class="math inline">\(Y_x = \Phi(Y_x)\)</span>. Our toy <span class="math inline">\(\tilde R\)</span> was one seed’s contribution to that balance, from one cohort, in one patch.</p>
+</section>
+<section id="now-you-are-ready" class="level2">
+<h2 class="anchored" data-anchor-id="now-you-are-ready">Now you are ready</h2>
+<p>You have now assembled the whole model from the bottom up with real numbers: three integrals per plant, cohorts stacking into a distribution, a characteristic equation that is just those integrals viewed from the plant’s moving frame, a shading loop, and a landscape average pinned by a fixed point. The <a href="../theory/size-structured-pde.html">size-structured PDE</a> page takes it from here with the full derivations:</p>
+<ul>
+<li>the PDE and its boundary condition, derived rather than assembled;</li>
+<li>the method of characteristics in general, with the <span class="math inline">\(\partial g/\partial H\)</span> term carrying its full weight;</li>
+<li>the patch-age distribution and the Weibull appendix;</li>
+<li>the seed-rain fixed point for one and for many competing strategies.</li>
+</ul>
+<p>Where the rates <span class="math inline">\(g\)</span>, <span class="math inline">\(d\)</span>, and <span class="math inline">\(f\)</span> actually come from is the subject of the <a href="../theory/models/ff16.html">FF16</a> and <a href="../theory/assimilation-hydraulics.html">assimilation &amp; hydraulics</a> pages; how all these integrals are stepped numerically is the <a href="../theory/implementation/index.html">implementation</a> section.</p>
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
-<div id="ref-Falster-2015" class="csl-entry" role="listitem">
-Falster, D. S., Brännström, Åke, Westoby, M., &amp; Dieckmann, U. (2015). Multi-trait eco-evolutionary dynamics explain niche diversity and evolved neutrality in forests. <em>bioRxiv</em>, 014605. doi:<a href="https://doi.org/10.1101/014605">10.1101/014605</a>
-</div>
-<div id="ref-Geritz-1998" class="csl-entry" role="listitem">
-Geritz, S. A. H., Kisdi, É., Meszéna, G., &amp; Metz, J. A. J. (1998). Evolutionarily singular strategies and the adaptive growth and branching of the evolutionary tree. <em>Evolutionary Ecology</em>, <em>12</em>(1), 35–57. doi:<a href="https://doi.org/10.1023/A:1006554906681">10.1023/A:1006554906681</a>
-</div>
-<div id="ref-Gyllenberg-2001" class="csl-entry" role="listitem">
-Gyllenberg, M., &amp; Metz, J. A. J. (2001). On fitness in structured metapopulations. <em>Journal of Mathematical Biology</em>, <em>43</em>(6), 545–560.
-</div>
-<div id="ref-Metz-2001" class="csl-entry" role="listitem">
-Metz, J. A. J., &amp; Gyllenberg, M. (2001). How should we define fitness in structured metapopulation models? <span>Including</span> an application to the calculation of evolutionarily stable dispersal strategies. <em>Proceedings of the Royal Society of London - Series B: Biological Sciences</em>, <em>268</em>(1466), 499–508.
-</div>
-<div id="ref-Metz-1992" class="csl-entry" role="listitem">
-Metz, J. A. J., Nisbet, R. M., &amp; Geritz, S. A. H. (1992). How should we define ’fitness’ for general ecological scenarios? <em>Trends in Ecology and Evolution</em>, <em>7</em>(6), 198–202. doi:<a href="https://doi.org/10.1016/0169-5347(92)90073-K">10.1016/0169-5347(92)90073-K</a>
-</div>
-</div></section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -819,13 +956,13 @@ Metz, J. A. J., Nisbet, R. M., &amp; Geritz, S. A. H. (1992). How should we defi
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../theory/soil-water.html" class="pagination-link" aria-label="Soil water &amp; root uptake">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Soil water &amp; root uptake</span>
+      <a href="../theory/maths-primer.html" class="pagination-link" aria-label="The maths, gently">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The maths, gently</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../theory/models/index.html" class="pagination-link" aria-label="Models">
-        <span class="nav-page-text">Models</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../theory/size-structured-pde.html" class="pagination-link" aria-label="The size-structured PDE">
+        <span class="nav-page-text">The size-structured PDE</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -837,7 +974,7 @@ Metz, J. A. J., Nisbet, R. M., &amp; Geritz, S. A. H. (1992). How should we defi
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/adaptive-dynamics.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/from-primer-to-pde.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item">

@@ -53,7 +53,7 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../theory/assimilation-hydraulics.html" rel="next">
-<link href="../theory/index.html" rel="prev">
+<link href="../theory/from-primer-to-pde.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -195,7 +195,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">The size-structured PDE</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">The size-structured PDE</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -224,6 +224,24 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../theory/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The big picture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, gently</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, worked through</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
@@ -232,6 +250,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -328,7 +352,8 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#sec-system-dynamics" id="toc-sec-system-dynamics" class="nav-link active" data-scroll-target="#sec-system-dynamics">Metacommunity dynamics</a>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#sec-system-dynamics" id="toc-sec-system-dynamics" class="nav-link" data-scroll-target="#sec-system-dynamics">Metacommunity dynamics</a>
   <ul class="collapse">
   <li><a href="#sec-individual-plants" id="toc-sec-individual-plants" class="nav-link" data-scroll-target="#sec-individual-plants">Individual plants</a></li>
   <li><a href="#sec-patches-of-competing-plants" id="toc-sec-patches-of-competing-plants" class="nav-link" data-scroll-target="#sec-patches-of-competing-plants">Patches of competing plants</a></li>
@@ -352,7 +377,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">The size-structured PDE</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">The size-structured PDE</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">The size-structured PDE</h1>
 </div>
@@ -374,6 +399,23 @@ window.Quarto = {
 <div class="eyebrow">
 <p>theory</p>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../theory/overview.html">The big picture</a> and <a href="../theory/maths-primer.html">The maths, gently</a>. Read those first if the notation here is unfamiliar.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p>A forest is really just a lot of individual plants, each growing taller, sometimes dying, and sometimes producing seeds. This page shows how to track all of that at once, rather than one plant at a time. Instead of following every individual, we track how many plants there are at each height, and describe how that whole size distribution changes as time passes. Growth pushes plants toward taller sizes, so the size distribution slides steadily upward. Death removes plants along the way, so the distribution also thins out as it slides. New seedlings arrive at the bottom, topping the distribution up from below. Because taller plants shade shorter ones, the amount of light available at any height depends on everyone growing above it, which in turn affects how fast plants below grow, survive, and reproduce. Zooming out further, patches of forest are themselves born from disturbance and age over time, so the whole metacommunity is a mix of patches at different ages, each with its own size distribution, all summed together to get the big picture. Running totals, like cumulative growth or cumulative seed output, are the natural way to describe all of this.</p>
+<p>The rest of this page makes this precise.</p>
 <p>This page outlines the demographic machinery used to model size-structured populations in the <code>plant</code> package. We outline the system of equations being solved for individual plants, patches of competing plants, and the age structure of patches across a metacommunity. These equations were primarily developed elsewhere, in particular in <span class="citation" data-cites="Falster-2011">Falster, Brännström, Dieckmann, &amp; Westoby (<a href="#ref-Falster-2011" role="doc-biblioref">2011</a>)</span> and <span class="citation" data-cites="Falster-2015">Falster, Brännström, Westoby, &amp; Dieckmann (<a href="#ref-Falster-2015" role="doc-biblioref">2015</a>)</span>, following general principles laid out in <span class="citation" data-cites="Deroos-1997">De Roos, Taljapurkar, &amp; Caswell (<a href="#ref-Deroos-1997" role="doc-biblioref">1997</a>)</span>, <span class="citation" data-cites="Kohyama-1993">Kohyama (<a href="#ref-Kohyama-1993" role="doc-biblioref">1993</a>)</span>, and <span class="citation" data-cites="Moorcroft-2001">Moorcroft, Hurtt, &amp; Pacala (<a href="#ref-Moorcroft-2001" role="doc-biblioref">2001</a>)</span>. They are presented here so that users can understand the full system of equations being solved within <code>plant</code>.</p>
 <p>The companion page on <a href="../theory/adaptive-dynamics.html">adaptive dynamics</a> builds on this machinery to define invasion fitness and evolutionary endpoints.</p>
 <p><a href="#tbl-definitions" class="quarto-xref">Table&nbsp;1</a> provides a list of names and definitions used throughout this page.</p>
@@ -567,6 +609,7 @@ Table&nbsp;1: Variable names and definitions in the demographic model of the <co
 </div>
 </figure>
 </div>
+</section>
 <section id="sec-system-dynamics" class="level1">
 <h1>Metacommunity dynamics</h1>
 <p>The following material is written assuming there exists a physiological sub-model that takes as inputs a plant’s traits <span class="math inline">\(x\)</span>, height <span class="math inline">\(H\)</span>, and light environment <span class="math inline">\(E_a\)</span>, and returns rates of growth, mortality, and fecundity. The physiological model must describe how much leaf area the plant contributes to shading other plants in the patch. Specifically, the physiological model is responsible for calculating the following variables from <a href="#tbl-definitions" class="quarto-xref">Table&nbsp;1</a>: <span class="math inline">\(A_{\rm l}(H)\)</span>, <span class="math inline">\(Q(z, H)\)</span>, <span class="math inline">\(H_0(x)\)</span>, <span class="math inline">\(g(x, H, E_a)\)</span>, <span class="math inline">\(f(x, H, E_a)\)</span>, <span class="math inline">\(d(x, H, E_a)\)</span>, and <span class="math inline">\(S_{\rm G} (x, H_0, E_{{\rm a}0})\)</span>. All are other variables in <a href="#tbl-definitions" class="quarto-xref">Table&nbsp;1</a> are calculated in the demographic model using the equations provided below.</p>
@@ -579,11 +622,11 @@ S_{\rm I} (x, a_0, a) = S_{\rm G} (x, H_0, E_{{\rm a}0}) \, \exp\left(- \int_{a_
 \tag{2}\]</span></span> is the probability of plant survival within the patch, where <span class="math inline">\(S_{\rm G} (x, H_0, E_{{\rm a}0})\)</span> is the probability a seed germinates successfully, and <span id="eq-tilder1"><span class="math display">\[
 \tilde{R}(x, a_0, a) = \int_{a_0}^{a} f(x, H(x, a_0, a^\prime), E_{a^\prime}) \, S_{\rm I} (x, a_0, a^\prime) \, {\rm d} a^\prime
 \tag{3}\]</span></span> is the plant’s cumulative seed output, from its birth at patch age <span class="math inline">\(a = a_0\)</span> until patch age <span class="math inline">\(a\)</span>.</p>
-<p>The notational complexity required in <a href="#eq-size" class="quarto-xref">Equation&nbsp;1</a><a href="#eq-tilder1" class="quarto-xref">3</a> potentially obscures an important point: these equations are simply the general, non-linear solutions to integrating growth, mortality, and fecundity over time.</p>
+<p>The notational complexity required in Eqs. <a href="#eq-size" class="quarto-xref">1</a>–<a href="#eq-tilder1" class="quarto-xref">3</a> potentially obscures an important point: these equations are simply the general, non-linear solutions to integrating growth, mortality, and fecundity over time.</p>
 </section>
 <section id="sec-patches-of-competing-plants" class="level2">
 <h2 class="anchored" data-anchor-id="sec-patches-of-competing-plants">Patches of competing plants</h2>
-<p>We now consider a patch of competing plants. At any age <span class="math inline">\(a\)</span>, the patch is described by the size-density distribution <span class="math inline">\(N(H | x, a)\)</span> of plants with traits <span class="math inline">\(x\)</span> and height <span class="math inline">\(H\)</span>. In a finite-sized patch, <span class="math inline">\(N\)</span> is described by a collection of points, each indicating the height of one individual, whereas in a very (infinitely) large patch, <span class="math inline">\(N\)</span> is a continuous function. In either case, the demographic behaviour of the plants within the patch is given by <a href="#eq-size" class="quarto-xref">Equation&nbsp;1</a><a href="#eq-tilder1" class="quarto-xref">3</a>. Integrating the dynamics over time is complicated by- two other factors: (i) plants interact, thereby altering <span class="math inline">\(E_a\)</span> with age, and (ii) new individuals may establish, expanding the system of equations.</p>
+<p>We now consider a patch of competing plants. At any age <span class="math inline">\(a\)</span>, the patch is described by the size-density distribution <span class="math inline">\(N(H | x, a)\)</span> of plants with traits <span class="math inline">\(x\)</span> and height <span class="math inline">\(H\)</span>. In a finite-sized patch, <span class="math inline">\(N\)</span> is described by a collection of points, each indicating the height of one individual, whereas in a very (infinitely) large patch, <span class="math inline">\(N\)</span> is a continuous function. In either case, the demographic behaviour of the plants within the patch is given by Eqs. <a href="#eq-size" class="quarto-xref">1</a>–<a href="#eq-tilder1" class="quarto-xref">3</a>. Integrating the dynamics over time is complicated by- two other factors: (i) plants interact, thereby altering <span class="math inline">\(E_a\)</span> with age, and (ii) new individuals may establish, expanding the system of equations.</p>
 <p>In the current version of <code>plant</code>, plants interact by shading one another. Following standards biophysical principles, we let the canopy openness <span class="math inline">\(E_a(z)\)</span> at height <span class="math inline">\(z\)</span> in a patch of age <span class="math inline">\(a\)</span> decline exponentially with the total amount of leaf area above <span class="math inline">\(z\)</span>, <span id="eq-light"><span class="math display">\[
 E_a(z) = \exp \left(-k_{\rm I} \sum_{i = 1}^{K} \int_{0}^{\infty} A_{\rm l}(H) \, Q(z, H) \, N(H | x_i, a) \, {\rm d}H \right),
 \tag{4}\]</span></span> where <span class="math inline">\(A_{\rm l}(H)\)</span> is the total leaf area of a plant with height <span class="math inline">\(H\)</span>, <span class="math inline">\(Q(z, H)\)</span> is the fraction of this leaf area situated above height <span class="math inline">\(z\)</span> for plants of height <span class="math inline">\(H\)</span>, <span class="math inline">\(k_{\rm I}\)</span> is the light extinction coefficient, and <span class="math inline">\(K\)</span> is the number of species in the metacommunity.</p>
@@ -617,12 +660,12 @@ P(0) = \frac1{\int_0^\infty S_{\rm P} (0, a) {\rm d}a}
 </section>
 <section id="sec-trait-size-patch-structured" class="level2">
 <h2 class="anchored" data-anchor-id="sec-trait-size-patch-structured">Trait-, size-, and patch-structured metacommunities</h2>
-<p>We consider a large area of habitat where: (i) disturbances (such as fires, storms, landslides, floods, or disease outbreaks) strike patches of the habitat on a stochastic basis, killing all individuals within the affected patches; (ii) individuals compete for resources within patches, with a spatial scale of competitive interactions that renders negligible such interactions between individuals in adjacent patches; and (iii) there is high connectivity via dispersal between all patches in the habitat, allowing empty patches to be quickly re-colonised. Such a system can be modelled as a metapopulation (for a single species) or metacommunity (for multiple species). The dynamics of such a metacommunity are described by the PDEs in <a href="#eq-pde" class="quarto-xref">Equation&nbsp;5</a><a href="#eq-agepde4" class="quarto-xref">12</a>.</p>
+<p>We consider a large area of habitat where: (i) disturbances (such as fires, storms, landslides, floods, or disease outbreaks) strike patches of the habitat on a stochastic basis, killing all individuals within the affected patches; (ii) individuals compete for resources within patches, with a spatial scale of competitive interactions that renders negligible such interactions between individuals in adjacent patches; and (iii) there is high connectivity via dispersal between all patches in the habitat, allowing empty patches to be quickly re-colonised. Such a system can be modelled as a metapopulation (for a single species) or metacommunity (for multiple species). The dynamics of such a metacommunity are described by the PDEs in Eqs. <a href="#eq-pde" class="quarto-xref">5</a>–<a href="#eq-agepde4" class="quarto-xref">12</a>.</p>
 <p>The offspring production of each species in the metacommunity is given by the rate at which seeds are produced across all patches, <span id="eq-seed-rain"><span class="math display">\[
 Y_x  = \int_0^{\infty} \int_0^{\infty} P(a) \, S_{\rm D} \, f(x, H, E_a) \, N(H | x, a) \, {\rm d} H \, {\rm d} a,
 \tag{13}\]</span></span> where <span class="math inline">\(S_{\rm D}\)</span> is the survival probability of seeds during dispersal.</p>
-<p>A convenient feature of <a href="#eq-pde" class="quarto-xref">Equation&nbsp;5</a> - <a href="#eq-agepde4" class="quarto-xref">Equation&nbsp;12</a> is that the dynamics of a single patch scale up to give the dynamics of the entire metacommunity. Note that the rate <span class="math inline">\(Y_x\)</span> at which offspring of individuals with traits <span class="math inline">\(x\)</span> arrive from the disperser pool is constant when the metacommunity is at equilibrium. Combined with the assumption that all patches have the same initial (empty) size-density distribution after a disturbance, the assumption of constant birth rates ensures that all patches show the same temporal behaviour, the only difference between them being their ages.</p>
-<p>To model the temporal dynamics of an archetypal patch, we need only a value for <span class="math inline">\(Y_x\)</span>. The numerical challenge is therefore to find the right value for <span class="math inline">\(Y_x\)</span>, by solving <a href="#eq-bc1" class="quarto-xref">Equation&nbsp;6</a><a href="#eq-seed-rain" class="quarto-xref">13</a> simultaneously, for all species with traits <span class="math inline">\(x\)</span> in the metacommunity.</p>
+<p>A convenient feature of Eqs. <a href="#eq-pde" class="quarto-xref">5</a>–<a href="#eq-agepde4" class="quarto-xref">12</a> is that the dynamics of a single patch scale up to give the dynamics of the entire metacommunity. Note that the rate <span class="math inline">\(Y_x\)</span> at which offspring of individuals with traits <span class="math inline">\(x\)</span> arrive from the disperser pool is constant when the metacommunity is at equilibrium. Combined with the assumption that all patches have the same initial (empty) size-density distribution after a disturbance, the assumption of constant birth rates ensures that all patches show the same temporal behaviour, the only difference between them being their ages.</p>
+<p>To model the temporal dynamics of an archetypal patch, we need only a value for <span class="math inline">\(Y_x\)</span>. The numerical challenge is therefore to find the right value for <span class="math inline">\(Y_x\)</span>, by solving Eqs. <a href="#eq-bc1" class="quarto-xref">6</a>–<a href="#eq-seed-rain" class="quarto-xref">13</a> simultaneously, for all species with traits <span class="math inline">\(x\)</span> in the metacommunity.</p>
 </section>
 <section id="sec-emergent-properties" class="level2">
 <h2 class="anchored" data-anchor-id="sec-emergent-properties">Emergent properties of metacommunities</h2>
@@ -677,39 +720,36 @@ S_{\rm P}(0, a) = \exp(-\lambda a^\psi), \, P(0) = \frac{\psi \lambda^{\frac1{\p
 </section>
 <section id="sec-derivation-size-structured" class="level2">
 <h2 class="anchored" data-anchor-id="sec-derivation-size-structured">Derivation of PDE describing size-structured dynamics</h2>
-To model the metacommunity, we use a PDE describing the dynamics for a thin slice <span class="math inline">\(\Delta H\)</span>. This PDE can be derived as follows, following <span class="citation" data-cites="Deroos-1997">De Roos et al. (<a href="#ref-Deroos-1997" role="doc-biblioref">1997</a>)</span>. Note that in this sub-section the dependencies on the traits <span class="math inline">\(x\)</span> are deliberately not made explicit. Assuming that all rates are constant within the interval <span class="math inline">\(\Delta H\)</span>, the total number of individuals within the interval spanned by <span class="math inline">\([H - 0.5\Delta H, H + 0.5\Delta H)\)</span> is <span class="math inline">\(N(H, a)\Delta H\)</span>. The flux of individuals in and out of this size interval can be expressed as <span id="eq-flux-1"><span class="math display">\[
+<p>To model the metacommunity, we use a PDE describing the dynamics for a thin slice <span class="math inline">\(\Delta H\)</span>. This PDE can be derived as follows, following <span class="citation" data-cites="Deroos-1997">De Roos et al. (<a href="#ref-Deroos-1997" role="doc-biblioref">1997</a>)</span>. Note that in this sub-section the dependencies on the traits <span class="math inline">\(x\)</span> are deliberately not made explicit. Assuming that all rates are constant within the interval <span class="math inline">\(\Delta H\)</span>, the total number of individuals within the interval spanned by <span class="math inline">\([H - 0.5\Delta H, H + 0.5\Delta H)\)</span> is <span class="math inline">\(N(H, a)\Delta H\)</span>. The flux of individuals in and out of this size interval can be expressed as <span id="eq-flux-1"><span class="math display">\[
 \begin{array}{ll} &amp;g(H - 0.5 \Delta H, a) \, N(H - 0.5 \Delta H, a) - g(H + 0.5 \Delta H, a) \, N(H + 0.5 \Delta H, a) \\ &amp; - d (H, a) \, N(H, a)\Delta H\\ \end{array}.
-\tag{27}\]</span></span> The first two terms describe the flux in and out of the considered size interval through growth, while the last term describes losses through mortality. The change in the density of individuals within this size interval during a time step $<span class="math inline">\(a is thus\)</span>$
-<span class="math display">\[\begin{array}{ll} N(H, a + \Delta a)\Delta H - N(H, a)\Delta H = &amp;g(H - 0.5 \Delta H, a) \, N(H - 0.5 \Delta H, a)\Delta a \\ &amp; - g(H + 0.5 \Delta H, a) \, N(H + 0.5 \Delta H, a)\Delta a\\&amp; - d (H, a) \, N(H, a)\Delta H\Delta a.
-\end{array}\]</span>
-<span class="math display">\[ {#eq-flux-2}
-By rearranging, we obtain
-\]</span>
-<span class="math display">\[\begin{array}{ll}
+\tag{27}\]</span></span> The first two terms describe the flux in and out of the considered size interval through growth, while the last term describes losses through mortality. The change in the density of individuals within this size interval during a time step <span class="math inline">\(\Delta a\)</span> is thus <span id="eq-flux-2"><span class="math display">\[
+\begin{array}{ll} N(H, a + \Delta a)\Delta H - N(H, a)\Delta H = &amp;g(H - 0.5 \Delta H, a) \, N(H - 0.5 \Delta H, a)\Delta a \\ &amp; - g(H + 0.5 \Delta H, a) \, N(H + 0.5 \Delta H, a)\Delta a\\&amp; - d (H, a) \, N(H, a)\Delta H\Delta a.
+\end{array}
+\tag{28}\]</span></span> By rearranging, we obtain <span id="eq-flux-3"><span class="math display">\[
+\begin{array}{ll}
 \frac{N(H, a + \Delta a) - N(H, a)}{\Delta a} = &amp; - d (H, a) \, N(H, a) \\
 &amp; - \frac{g(H + 0.5 \Delta H, a) \, N(H + 0.5 \Delta H, a) - g(H - 0.5 \Delta H, a) \, N(H - 0.5 \Delta H, a)}{\Delta H}.
-\end{array}\]</span>
-<p><span class="math display">\[ {#eq-flux-3}
-The left-hand side above corresponds to the derivative of $N$ as $\Delta a\to 0$.
-For thin slices, $\Delta H \to 0$, this yields
-\]</span> N(H, a) = - d (H, a) , N(H, a) - (g(H, a) , N(H, a)). $$ {#eq-pde-app}</p>
+\end{array}
+\tag{29}\]</span></span> The left-hand side above corresponds to the derivative of <span class="math inline">\(N\)</span> as <span class="math inline">\(\Delta a\to 0\)</span>. For thin slices, <span class="math inline">\(\Delta H \to 0\)</span>, this yields <span id="eq-pde-app"><span class="math display">\[
+\frac{\partial}{\partial a} N(H, a) = - d (H, a) \, N(H, a) - \frac{\partial}{\partial H} (g(H, a) \, N(H, a)).
+\tag{30}\]</span></span></p>
 <p>To complete the model, this PDE must be supplemented with boundary conditions that specify the density at the lower end of heights for all <span class="math inline">\(a\)</span>, as well as the initial distribution <span class="math inline">\(N(H,0)\)</span>. The former is derived by integrating the PDE with respect to <span class="math inline">\(H\)</span> over the interval <span class="math inline">\((H_{0}, H_{\infty} )\)</span>, yielding <span id="eq-partial-a"><span class="math display">\[
 \frac{\partial}{\partial a} \int _{H_{0} }^{H_{\infty}}N(H, a) \, {\rm d} H = g(H_{0} , a) \, N(H_{0} , a) - g(H_{\infty}, a) \, N(H_{\infty}, a) - \int _{H_{0} }^{H_{\infty}}d (H, a) \, N(H, a) \, {\rm d} H.
-\tag{28}\]</span></span> The left-hand size above is evidently the rate of change of the total density of individuals in the population, while the right-hand side is the population’s total death rate. Further, we can assume that <span class="math inline">\(N(H_{\infty}, a) = 0\)</span>. Thus, to balance total births and deaths, <span class="math inline">\(g(H_{0} , a) \, N(H_{0} , a)\)</span> must equal the population’s total birth rate <span class="math inline">\(B\)</span>, yielding the boundary condition <span id="eq-g0"><span class="math display">\[
+\tag{31}\]</span></span> The left-hand size above is evidently the rate of change of the total density of individuals in the population, while the right-hand side is the population’s total death rate. Further, we can assume that <span class="math inline">\(N(H_{\infty}, a) = 0\)</span>. Thus, to balance total births and deaths, <span class="math inline">\(g(H_{0} , a) \, N(H_{0} , a)\)</span> must equal the population’s total birth rate <span class="math inline">\(B\)</span>, yielding the boundary condition <span id="eq-g0"><span class="math display">\[
 g(H_{0} , a) \, N(H_{0} , a) = B.
-\tag{29}\]</span></span></p>
+\tag{32}\]</span></span></p>
 </section>
 <section id="sec-converting-density" class="level2">
 <h2 class="anchored" data-anchor-id="sec-converting-density">Converting density from one size unit to another</h2>
 <p>The quantification of size-density depends on the chosen size unit (<a href="#eq-pde" class="quarto-xref">Equation&nbsp;5</a>). Thus, what if we want to express size-density with respect to another size unit? A relation between the two corresponding values of size-density can be derived by noting that the total density of individuals within a given size range must be equal. We consider a situation in which size-density is expressed in units of size <span class="math inline">\(M\)</span>, but we want it in units of size <span class="math inline">\(H\)</span>. First, we require a one-to-one function that translates the first size unit into the second, <span class="math inline">\(H = \hat{H}(M)\)</span>. Then the following must hold <span id="eq-n-conversion"><span class="math display">\[
 \int_{M_1}^{M_2} N(M | x, a) \, {\rm d}M = \int_{\hat{H}(M_1)}^{\hat{H}(M_2)} N^\prime(H | x, a) \, {\rm d}H .
-\tag{30}\]</span></span> For very small size intervals, this equation is equivalent to <span id="eq-n-conversion2"><span class="math display">\[
+\tag{33}\]</span></span> For very small size intervals, this equation is equivalent to <span id="eq-n-conversion2"><span class="math display">\[
 \left(M_2 - M_1 \right) \, N(M_1 | x, a) = \left( \hat{H}(M_2) - \hat{H}(M_1)\right) \, N^\prime(\hat{H}(M_1) | x, a).
-\tag{31}\]</span></span> Rearranging gives <span id="eq-n-conversion3"><span class="math display">\[
+\tag{34}\]</span></span> Rearranging gives <span id="eq-n-conversion3"><span class="math display">\[
 N^\prime(\hat{H}(M_1) | x, a) = N(M_1 | x, a) \, \frac{M_2 - M_1}{\hat{H}(M_2) - \hat{H}(M_1)}.
-\tag{32}\]</span></span> Noting that the second term on the right-hand side is simply the definition of <span class="math inline">\(\frac{{\rm d} M}{{\rm d} H}\)</span> evaluated at <span class="math inline">\(M_1\)</span>, we have <span id="eq-n-conversion4"><span class="math display">\[
+\tag{35}\]</span></span> Noting that the second term on the right-hand side is simply the definition of <span class="math inline">\(\frac{{\rm d} M}{{\rm d} H}\)</span> evaluated at <span class="math inline">\(M_1\)</span>, we have <span id="eq-n-conversion4"><span class="math display">\[
 N^\prime(H | x, a) = N(M | x, a) \, \frac{{\rm d} M}{{\rm d} H}.
-\tag{33}\]</span></span></p>
+\tag{36}\]</span></span></p>
 
 
 
@@ -1141,8 +1181,8 @@ Moorcroft, P. R., Hurtt, G. C., &amp; Pacala, S. W. (2001). A method for scaling
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../theory/index.html" class="pagination-link" aria-label="Theory">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Theory</span>
+      <a href="../theory/from-primer-to-pde.html" class="pagination-link" aria-label="The maths, worked through">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The maths, worked through</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

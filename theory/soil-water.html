@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Overstorey – Adaptive dynamics</title>
+<title>Overstorey – Soil water &amp; root uptake</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -23,27 +23,7 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -52,8 +32,8 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../theory/models/index.html" rel="next">
-<link href="../theory/soil-water.html" rel="prev">
+<link href="../theory/adaptive-dynamics.html" rel="next">
+<link href="../theory/assimilation-hydraulics.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -195,7 +175,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/adaptive-dynamics.html">Adaptive dynamics</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/soil-water.html">Soil water &amp; root uptake</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -254,13 +234,13 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+  <a href="../theory/soil-water.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link active">
+  <a href="../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Adaptive dynamics</span></a>
   </div>
 </li>
@@ -352,17 +332,24 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#sec-invasion-fitness" id="toc-sec-invasion-fitness" class="nav-link active" data-scroll-target="#sec-invasion-fitness">Invasion fitness</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#sec-layers" id="toc-sec-layers" class="nav-link" data-scroll-target="#sec-layers">The soil column: N layers, one bucket each</a></li>
+  <li><a href="#sec-infiltration" id="toc-sec-infiltration" class="nav-link" data-scroll-target="#sec-infiltration">Infiltration and runoff</a></li>
+  <li><a href="#sec-drainage" id="toc-sec-drainage" class="nav-link" data-scroll-target="#sec-drainage">Gravitational drainage</a></li>
+  <li><a href="#sec-retention" id="toc-sec-retention" class="nav-link" data-scroll-target="#sec-retention">From moisture to potential: the retention curve</a></li>
+  <li><a href="#sec-plant-coupling" id="toc-sec-plant-coupling" class="nav-link" data-scroll-target="#sec-plant-coupling">Coupling to the plant: root-collar water potential</a></li>
+  <li><a href="#sec-diagnostics" id="toc-sec-diagnostics" class="nav-link" data-scroll-target="#sec-diagnostics">Diagnostics: cumulative fluxes</a></li>
+  <li><a href="#sec-limitation" id="toc-sec-limitation" class="nav-link" data-scroll-target="#sec-limitation">Current limitation: only light can be pinned</a></li>
+  <li><a href="#where-this-leads" id="toc-where-this-leads" class="nav-link" data-scroll-target="#where-this-leads">Where this leads</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/adaptive-dynamics.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/soil-water.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/adaptive-dynamics.html">Adaptive dynamics</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/soil-water.html">Soil water &amp; root uptake</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Adaptive dynamics</h1>
+<h1 class="title">Soil water &amp; root uptake</h1>
 </div>
 
 
@@ -382,41 +369,119 @@ window.Quarto = {
 <div class="eyebrow">
 <p>theory</p>
 </div>
-<p>This page builds on the demographic machinery developed for the <a href="../theory/size-structured-pde.html">size-structured PDE</a> to estimate the fitness of rare mutant phenotypes and so reason about evolutionary endpoints in a trait-, size-, and patch-structured metacommunity. The approach for calculating fitness implemented here follows <span class="citation" data-cites="Falster-2015">Falster, Brännström, Westoby, &amp; Dieckmann (<a href="#ref-Falster-2015" role="doc-biblioref">2015</a>)</span>.</p>
-<section id="sec-invasion-fitness" class="level1">
-<h1>Invasion fitness</h1>
-<p>We now consider how to estimate the fitness of a rare mutant individual with traits <span class="math inline">\(x^\prime\)</span> growing in the light environment of a resident community with traits <span class="math inline">\(x\)</span>. We focus on phenotype-dependent components of fitness – describing the aggregate consequences of a given set of traits for growth, fecundity, and mortality – taking into account the non-linear effects of competition, but ignoring the underlying genetic basis for trait inheritance and expression. We also adhere to standard conventions in such analyses by assuming that the mutant phenotype is sufficiently rare to have a negligible effect on the light environment where it is growing <span class="citation" data-cites="Geritz-1998">(<a href="#ref-Geritz-1998" role="doc-biblioref">Geritz, Kisdi, Meszéna, &amp; Metz, 1998</a>)</span>. The approach for calculating fitness implemented here follows the approach described by <span class="citation" data-cites="Falster-2015">Falster et al. (<a href="#ref-Falster-2015" role="doc-biblioref">2015</a>)</span>.</p>
-<p>In general, invasion fitness is defined as the long-term per capita growth rate of a rare mutant phenotype in the environment determined by a resident phenotype <span class="citation" data-cites="Metz-1992">(<a href="#ref-Metz-1992" role="doc-biblioref">Metz, Nisbet, &amp; Geritz, 1992</a>)</span>. Calculating per capita growth rates, however, is particularly challenging in a structured metacommunity model <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>. As an alternative measure of invasion fitness in metacommunities, we can use the basic reproduction ratio measuring the expected number of new dispersers arising from a single dispersal event. For metacommunities at demographic equilibrium, evolutionary inferences made using basic reproduction ratios are equivalent to those made using per capita growth rates <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>.</p>
-<p>We denote by <span class="math inline">\(R\left(x^\prime, x\right)\)</span> the basic reproduction ratio of individuals with traits <span class="math inline">\(x^\prime\)</span> growing in the competitive light environment of the resident traits <span class="math inline">\(x\)</span>. Recalling that patches of age <span class="math inline">\(a\)</span> have frequency-density <span class="math inline">\(P(a)\)</span> in the landscape (the equilibrium patch-age distribution derived on the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page), it follows that any seed with traits <span class="math inline">\(x^\prime\)</span> has a probability of <span class="math inline">\(P(a)\)</span> of landing in a patch of age <span class="math inline">\(a\)</span>. The basic reproduction ratio for individuals with traits <span class="math inline">\(x^\prime\)</span> is then <span id="eq-invfit"><span class="math display">\[
-R\left(x^\prime,x\right) = \int _0^{\infty} P\left(a\right) \, \tilde{R}\left(x^\prime, a, \infty \right) \, {\rm d}a ,
-\tag{1}\]</span></span> where <span class="math inline">\(\tilde{R}\left(x^\prime, a_0, a \right)\)</span> is the expected number of dispersing offspring produced by a single dispersing seed with traits <span class="math inline">\(x^\prime\)</span> arriving in a patch of age <span class="math inline">\(a_0\)</span> up until age <span class="math inline">\(a\)</span> <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>. In turn, <span class="math inline">\(\tilde{R}\left(x^\prime, a,\infty\right)\)</span> is calculated by integrating an individual’s fecundity over the expected lifetime of a patch, taking into account competitive shading from residents with traits <span class="math inline">\(x\)</span>, the individual’s probability of surviving, and its traits, <span id="eq-tilder"><span class="math display">\[
-\tilde{R}(x^\prime, a_0, \infty) = \int_{a_0}^{\infty} S_{\rm D} \, f(x^\prime, H(x^\prime, a_0, a), E_{a}) \, S_{\rm I} (x^\prime, a_0, a) \, S_{\rm P} (a_0, a) \, {\rm d} a.
-\tag{2}\]</span></span> Here <span class="math inline">\(S_{\rm I}\)</span> is the individual survival probability and <span class="math inline">\(S_{\rm P}\)</span> the patch survival probability, both defined on the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a> and <a href="../theory/models/tf24.html">the TF24 model</a>. Read those first for the leaf-level profit-maximisation model that this page supplies with soil water.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Scope: TF24 and TF24f only
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Only the hydraulically-explicit strategies — <code>TF24</code> and <code>TF24f</code> — carry a soil water balance. <code>FF16</code> and <code>K93</code> are light-only: their <code>Environment</code> tracks canopy openness and nothing below ground. Everywhere this page says “the environment”, it means the <code>TF24_Environment</code>, not the shared base class.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p>A plant’s leaves are only half the story. We also need to model the dynamics of water transport in the soil. The <a href="../theory/assimilation-hydraulics.html">assimilation &amp; hydraulics page</a> starts the story partway through: it hands you a soil water potential <span class="math inline">\(\psi_s\)</span> and shows how that translates into a rate of carbon gain and a rate of water loss. This page fills in where that number comes from.</p>
+<p>Picture the soil beneath a patch as a stack of buckets, one on top of the other. Rain fills the top bucket; once it is approaching saturation, it drains more rapidly to the layer below. This continues sequentially for each layer, before draining into deep drainage from the bottom layer. Meanwhile every plant rooted in the patch is drawing water out of whichever buckets its roots reach, in proportion to how wet those buckets are and how far the roots have to pull against gravity to reach the root collar. The wetter a bucket, the less suction it takes to pull water out of it. Both the buckets’ fullness and the resistance of the roots in that layer change the water potential the plant actually experiences at its root collar — and <em>that</em> combined number, not a flat single-layer average, is what feeds into the leaf model described elsewhere.</p>
+<p>The rest of this page makes this precise.</p>
 </section>
-<section id="references" class="level1">
-
-
+<section id="sec-layers" class="level2">
+<h2 class="anchored" data-anchor-id="sec-layers">The soil column: N layers, one bucket each</h2>
+<p>The soil beneath a patch is discretised into <span class="math inline">\(N\)</span> layers (<code>soil_number_of_depths</code>, default <span class="math inline">\(N = 5\)</span>), stacked from the surface to a total depth of <code>depth</code> (default 1.5 m). Layer <span class="math inline">\(i\)</span> has thickness <span class="math inline">\(\Delta z_i\)</span> (<code>dz</code>, all equal by default: <code>depth</code> <span class="math inline">\(/ N\)</span>), a lower boundary depth <span class="math inline">\(z_i\)</span>, and a midpoint depth <span class="math inline">\(\bar z_i\)</span> (<code>z_mid</code>) that the root-uptake model in <a href="#sec-plant-coupling" class="quarto-xref">Section&nbsp;6</a> treats as the depth from which that layer’s water is actually drawn.</p>
+<p>Each layer carries one state variable, its volumetric soil moisture <span class="math inline">\(\theta_i\)</span> (m<span class="math inline">\(^3\)</span> water m<span class="math inline">\(^{-3}\)</span> soil), bounded above by the saturated moisture content <span class="math inline">\(\theta_{\rm sat}\)</span> (<code>soil_moist_sat</code>, default 0.428). The mass balance for layer <span class="math inline">\(i\)</span> is</p>
+<p><span id="eq-layer-balance"><span class="math display">\[
+\frac{{\rm d}\theta_i}{{\rm d}t} = \frac{q_{{\rm in},i} - q_{{\rm out},i} - u_i}{\Delta z_i},
+\tag{1}\]</span></span></p>
+<p>where <span class="math inline">\(q_{{\rm in},i}\)</span> is the water flowing into the layer from above, <span class="math inline">\(q_{{\rm out},i}\)</span> is gravitational drainage out of the layer’s base, and <span class="math inline">\(u_i\)</span> is the sum of root water uptake by every plant rooted in layer <span class="math inline">\(i\)</span> (the <code>resource_depletion</code> vector passed in from the patch). <a href="#sec-infiltration" class="quarto-xref">Section&nbsp;3</a> and <a href="#sec-drainage" class="quarto-xref">Section&nbsp;4</a> give <span class="math inline">\(q_{{\rm in}}\)</span> and <span class="math inline">\(q_{{\rm out}}\)</span>; <a href="#sec-plant-coupling" class="quarto-xref">Section&nbsp;6</a> gives <span class="math inline">\(u\)</span>.</p>
+</section>
+<section id="sec-infiltration" class="level2">
+<h2 class="anchored" data-anchor-id="sec-infiltration">Infiltration and runoff</h2>
+<p>Water enters the top layer (<span class="math inline">\(i = 0\)</span>) as rainfall, but not all of it: as the top layer approaches saturation, an increasing share runs off rather than infiltrating. Infiltration follows a saturation-excess form,</p>
+<p><span id="eq-infiltration"><span class="math display">\[
+q_{{\rm in},0} = P\left[1 - a_{\rm infil}\left(\frac{\theta_0}{\theta_{\rm sat}}\right)^{b_{\rm infil}}\right]^{+},
+\tag{2}\]</span></span></p>
+<p>where <span class="math inline">\(P\)</span> is the rainfall rate (an extrinsic driver, <code>rainfall</code>, evaluated at the current time), <span class="math inline">\([\,\cdot\,]^+\)</span> denotes the term is floored at zero (no negative infiltration), <span class="math inline">\(a_{\rm infil}\)</span> is a switch (0 = no runoff ever, 1 = runoff scales fully with the saturation-excess term) and <span class="math inline">\(b_{\rm infil}\)</span> controls how sharply runoff increases as the layer approaches saturation. For every layer below the surface, <span class="math inline">\(q_{{\rm in},i}\)</span> is simply the drainage flux leaving the layer above, <span class="math inline">\(q_{{\rm out},i-1}\)</span> — water passed straight down the column, layer to layer.</p>
+</section>
+<section id="sec-drainage" class="level2">
+<h2 class="anchored" data-anchor-id="sec-drainage">Gravitational drainage</h2>
+<p>Water leaves the base of each layer at a rate set by the layer’s unsaturated hydraulic conductivity, which rises steeply with moisture content following the Clapp &amp; Hornberger (1978) form, as parameterised by Zeng &amp; Decker (2009, their Eq. 5):</p>
+<p><span id="eq-drainage"><span class="math display">\[
+q_{{\rm out},i} = K(\theta_i) = K_{\rm sat}\left(\frac{\theta_i}{\theta_{\rm sat}}\right)^{2n_\psi + 3},
+\tag{3}\]</span></span></p>
+<p>where <span class="math inline">\(K_{\rm sat}\)</span> (<code>K_sat</code>) is the saturated hydraulic conductivity and <span class="math inline">\(n_\psi\)</span> (<code>n_psi</code>) is the same retention-curve shape parameter used in <a href="#eq-retention" class="quarto-xref">Equation&nbsp;4</a> below. This is the same function used for every layer, <code>soil_K_from_soil_theta</code>; a layer’s own outflow becomes the next layer’s inflow, and the outflow of the deepest layer is lost from the column entirely as deep drainage.</p>
+<p>This is a first-order, single-direction bucket scheme: drainage only ever moves down the column, never up. There is no capillary rise or lateral flow between layers in the soil water balance itself — the only place water moves “against gravity” is inside the plant, in the root-to-collar hydraulic path of <a href="#sec-plant-coupling" class="quarto-xref">Section&nbsp;6</a>.</p>
+</section>
+<section id="sec-retention" class="level2">
+<h2 class="anchored" data-anchor-id="sec-retention">From moisture to potential: the retention curve</h2>
+<p>Plants do not respond to volumetric moisture directly; they respond to the water potential <span class="math inline">\(\psi\)</span> it corresponds to. The soil water retention curve converts between the two,</p>
+<p><span id="eq-retention"><span class="math display">\[
+\psi_{\rm soil}(\theta) = \frac{a_\psi}{10^6}\left(\frac{\theta}{\theta_{\rm sat}}\right)^{-n_\psi},
+\tag{4}\]</span></span></p>
+<p>(<code>psi_from_soil_moist</code>; the <span class="math inline">\(10^6\)</span> converts the coefficient <span class="math inline">\(a_\psi\)</span> from Pa to MPa, the unit used throughout the leaf model), with <span class="math inline">\(a_\psi\)</span> (<code>a_psi</code>) and <span class="math inline">\(n_\psi\)</span> (<code>n_psi</code>) shape parameters of the same retention curve family as <a href="#eq-drainage" class="quarto-xref">Equation&nbsp;3</a>. As a layer dries (<span class="math inline">\(\theta \to 0\)</span>), <span class="math inline">\(\psi_{\rm soil} \to \infty\)</span>: the drier the soil, the harder a root has to pull to extract any more water. The inverse, <code>soil_moist_from_psi</code>, is the same relationship solved for <span class="math inline">\(\theta\)</span> given <span class="math inline">\(\psi\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Residual-moisture floor
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(\psi_{\rm soil}(\theta)\)</span> diverges as <span class="math inline">\(\theta \to 0\)</span>, and the drainage rate <a href="#eq-drainage" class="quarto-xref">Equation&nbsp;3</a> is undefined for <span class="math inline">\(\theta &lt; 0\)</span> — both of which an explicit, fixed-step solver can produce transiently at the edges of a drought. <code>plant</code> guards against this with a residual moisture floor, <code>soil_moist_residual</code> (default <span class="math inline">\(10^{-2}\)</span> m<span class="math inline">\(^3\)</span> m<span class="math inline">\(^{-3}\)</span>): a layer at or below this floor is not dried any further by <a href="#eq-layer-balance" class="quarto-xref">Equation&nbsp;1</a> (only rewetting is allowed), and <span class="math inline">\(\psi_{\rm soil}\)</span> is evaluated at <span class="math inline">\(\max(\theta, \theta_r)\)</span> rather than at <span class="math inline">\(\theta\)</span> itself, so the retention curve stays finite even for an already-depleted layer. This floor sits well below any realistic operating moisture, so it leaves non-drought runs unaffected; see issue #485 for the numerical failure mode this closes off.</p>
+</div>
+</div>
+</section>
+<section id="sec-plant-coupling" class="level2">
+<h2 class="anchored" data-anchor-id="sec-plant-coupling">Coupling to the plant: root-collar water potential</h2>
+<p>Every layer’s moisture state feeds the leaf model as a potential <span class="math inline">\(\psi_{{\rm soil},i} = \psi_{\rm soil}(\theta_i)\)</span> via <a href="#eq-retention" class="quarto-xref">Equation&nbsp;4</a>. But a plant with roots spread across several layers does not experience <span class="math inline">\(N\)</span> separate potentials — it experiences one, at its root collar.</p>
+<p>Picture each layer connected to the root collar by its own pipe. Layer <span class="math inline">\(i\)</span>’s pipe has a horizontal segment, resisting the movement of water from the soil into the root (<span class="math inline">\(r_{{\rm R},H,i}\)</span>), and a vertical segment, resisting the movement of water up through the root axis to the collar (<span class="math inline">\(r_{{\rm R},V,i}\)</span>, which accumulates with depth, since water drawn from a deep layer must pass through the resistance of every shallower layer’s root segment on its way up). Both resistances scale with how much root carbon the plant has invested horizontally and vertically in that layer. The horizontal resistance is further inflated by a root vulnerability curve — structurally the same exponential form as the stem vulnerability curve on the <a href="../theory/assimilation-hydraulics.html">assimilation &amp; hydraulics page</a>, but parameterised separately for roots (<code>root_c</code>, <code>root_b</code>, <code>root_psi_crit</code>) — so a root losing conductance under water stress becomes proportionately harder for water to pass through.</p>
+<p>For a candidate root-collar potential <span class="math inline">\(P_{x,r}\)</span> and layer potential <span class="math inline">\(\psi_{{\rm soil},i}\)</span>, the water drawn from layer <span class="math inline">\(i\)</span> (per unit plant leaf area) is</p>
+<p><span id="eq-layer-uptake"><span class="math display">\[
+E_i = \frac{\left(\psi_{{\rm soil},i} - P_{x,r} - g\,\bar z_i\right)}{r_{{\rm R},i}},
+\tag{5}\]</span></span></p>
+<p>where <span class="math inline">\(r_{{\rm R},i} = r_{{\rm R},H,i} + r_{{\rm R},V,i}\)</span> is the layer’s total resistance and <span class="math inline">\(g\,\bar z_i\)</span> is the gravitational head that must be overcome to lift water from the layer’s midpoint depth <span class="math inline">\(\bar z_i\)</span> up to the collar, with <span class="math inline">\(g\)</span> = <code>gravity_head</code> = <span class="math inline">\(9.8\times10^{-3}\)</span> MPa m<span class="math inline">\(^{-1}\)</span>. (Two special cases are handled exactly rather than through this general form: if <span class="math inline">\(P_{x,r} = \psi_{{\rm soil},i}\)</span> the layer is driven purely by gravity, and if the potential gradient exactly balances the gravitational head, <span class="math inline">\(E_i = 0\)</span>.) Because the root vulnerability curve is non-linear in <span class="math inline">\(\psi\)</span>, the horizontal resistance in <a href="#eq-layer-uptake" class="quarto-xref">Equation&nbsp;5</a> is not evaluated at a single point but as the <em>mean</em> fractional conductivity over the potential interval spanned between the soil and the collar — i.e.&nbsp;<span class="math inline">\(r_{{\rm R},H,i}\)</span> scales with the span of that interval divided by the integral of the vulnerability curve across it, rather than the vulnerability curve evaluated once.</p>
+<p>Summing <span class="math inline">\(E_i\)</span> over layers gives the total water the root system can supply at a given <span class="math inline">\(P_{x,r}\)</span>. The root-collar potential is then found — alongside the leaf xylem potential <span class="math inline">\(\psi_l\)</span>, by the same profit-maximising solve described in <a href="../theory/assimilation-hydraulics.html">assimilation &amp; hydraulics</a> — as the value that reconciles this soil-side supply with the demand implied by the optimal stomatal conductance: the water reaching the collar from the soil must equal the water the root-to-leaf hydraulic path is carrying onward. In other words, <span class="math inline">\(\psi_{{\rm soil},i}\)</span> (one per layer, from this page) plus the gravity head and root vulnerability curves above are exactly the “downstream water potential” the leaf model’s cost function needs; solving for <span class="math inline">\(P_{x,r}\)</span> is the missing link between the soil water balance and the leaf-level profit-maximisation.</p>
+</section>
+<section id="sec-diagnostics" class="level2">
+<h2 class="anchored" data-anchor-id="sec-diagnostics">Diagnostics: cumulative fluxes</h2>
+<p>Alongside the <span class="math inline">\(N\)</span> moisture states, the environment tracks four cumulative auxiliary states (<code>aux_num</code> = 4) that integrate, rather than instantaneously report, the water balance:</p>
+<ul>
+<li>cumulative rainfall <span class="math inline">\(\int P\,{\rm d}t\)</span>;</li>
+<li>cumulative infiltration <span class="math inline">\(\int q_{{\rm in},0}\,{\rm d}t\)</span>;</li>
+<li>cumulative deep drainage, the outflow lost from the bottom of the column, <span class="math inline">\(\int q_{{\rm out},N-1}\,{\rm d}t\)</span>;</li>
+<li>cumulative total root uptake, <span class="math inline">\(\int \sum_i u_i\,{\rm d}t\)</span>.</li>
+</ul>
+<p>These are running totals in the same spirit as the cumulative growth and seed output tracked for individual plants on the <a href="../theory/size-structured-pde.html">size-structured PDE page</a> — a convenient way to audit the water budget of a run (rain in, runoff and drainage out, uptake removed) without re-deriving it from the instantaneous rates.</p>
+</section>
+<section id="sec-limitation" class="level2">
+<h2 class="anchored" data-anchor-id="sec-limitation">Current limitation: only light can be pinned</h2>
+<p><code>set_fixed_environment()</code> lets a user pin the light environment to a fixed value, useful for isolating a plant’s response to light alone. There is no equivalent for soil water: the water balance of <a href="#eq-layer-balance" class="quarto-xref">Equation&nbsp;1</a> always runs dynamically, driven by rainfall and uptake, with no way to hold <span class="math inline">\(\psi_{\rm soil}\)</span> constant at a chosen value. This is a known gap (<code>TODO(#476)</code>, tracked against the shared <code>Environment</code> machinery) rather than a deliberate modelling choice — see <code>ff16_environment.h</code> for where the same TODO is recorded.</p>
+</section>
+<section id="where-this-leads" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-leads">Where this leads</h2>
+<p>The per-layer potentials, root-collar solve, and cumulative fluxes on this page are the supply side of the water economy; <a href="../theory/assimilation-hydraulics.html">assimilation &amp; hydraulics</a> is the demand side, where the plant decides how much of that supply to draw on by optimising leaf xylem potential against the profit it buys in carbon. Together the two pages are the whole of TF24’s water story; see <a href="../theory/models/tf24.html">the TF24 model page</a> for how that story fits into the rest of the strategy.</p>
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
-<div id="ref-Falster-2015" class="csl-entry" role="listitem">
-Falster, D. S., Brännström, Åke, Westoby, M., &amp; Dieckmann, U. (2015). Multi-trait eco-evolutionary dynamics explain niche diversity and evolved neutrality in forests. <em>bioRxiv</em>, 014605. doi:<a href="https://doi.org/10.1101/014605">10.1101/014605</a>
-</div>
-<div id="ref-Geritz-1998" class="csl-entry" role="listitem">
-Geritz, S. A. H., Kisdi, É., Meszéna, G., &amp; Metz, J. A. J. (1998). Evolutionarily singular strategies and the adaptive growth and branching of the evolutionary tree. <em>Evolutionary Ecology</em>, <em>12</em>(1), 35–57. doi:<a href="https://doi.org/10.1023/A:1006554906681">10.1023/A:1006554906681</a>
-</div>
-<div id="ref-Gyllenberg-2001" class="csl-entry" role="listitem">
-Gyllenberg, M., &amp; Metz, J. A. J. (2001). On fitness in structured metapopulations. <em>Journal of Mathematical Biology</em>, <em>43</em>(6), 545–560.
-</div>
-<div id="ref-Metz-2001" class="csl-entry" role="listitem">
-Metz, J. A. J., &amp; Gyllenberg, M. (2001). How should we define fitness in structured metapopulation models? <span>Including</span> an application to the calculation of evolutionarily stable dispersal strategies. <em>Proceedings of the Royal Society of London - Series B: Biological Sciences</em>, <em>268</em>(1466), 499–508.
-</div>
-<div id="ref-Metz-1992" class="csl-entry" role="listitem">
-Metz, J. A. J., Nisbet, R. M., &amp; Geritz, S. A. H. (1992). How should we define ’fitness’ for general ecological scenarios? <em>Trends in Ecology and Evolution</em>, <em>7</em>(6), 198–202. doi:<a href="https://doi.org/10.1016/0169-5347(92)90073-K">10.1016/0169-5347(92)90073-K</a>
-</div>
-</div></section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -819,13 +884,13 @@ Metz, J. A. J., Nisbet, R. M., &amp; Geritz, S. A. H. (1992). How should we defi
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../theory/soil-water.html" class="pagination-link" aria-label="Soil water &amp; root uptake">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Soil water &amp; root uptake</span>
+      <a href="../theory/assimilation-hydraulics.html" class="pagination-link" aria-label="Assimilation &amp; hydraulics">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Assimilation &amp; hydraulics</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../theory/models/index.html" class="pagination-link" aria-label="Models">
-        <span class="nav-page-text">Models</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../theory/adaptive-dynamics.html" class="pagination-link" aria-label="Adaptive dynamics">
+        <span class="nav-page-text">Adaptive dynamics</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -837,7 +902,7 @@ Metz, J. A. J., Nisbet, R. M., &amp; Geritz, S. A. H. (1992). How should we defi
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/adaptive-dynamics.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/soil-water.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item">
