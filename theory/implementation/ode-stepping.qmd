@@ -5,6 +5,32 @@ title: "ODE stepping & control"
 implementation
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The size-structured PDE](../size-structured-pde.qmd) and [the method of characteristics](characteristic-method.qmd). Read those first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+Once you've written the model down as a set of ordinary differential
+equations, the job of the solver is simple to describe even if the mechanics
+are intricate: start from the current state and march forward in time, one
+small step at a time, building up the future from the present. The question
+that makes this hard is how big each step should be. Take steps that are too
+large and the solution drifts away from the truth, accumulating error you
+can't see until it's too late. Take steps that are too small and you waste
+enormous amounts of computation grinding through periods where nothing much
+is changing. The solver used here resolves this by adapting as it goes. At
+every step it takes a trial step forward, then checks how much that step
+disagrees with a slightly more careful version of the same step. That
+disagreement is a proxy for the error being made. When the disagreement is
+small, the solver grows more confident and takes a longer stride next time.
+When it's large, the solver backs off and takes a shorter, more cautious
+step. The result is a trajectory through time that spends its effort where
+growth and mortality are changing quickly, and coasts through the quiet
+periods, all while keeping the error in each step below a chosen tolerance.
+The rest of this page makes this precise.
+
 `plant` casts the entire patch as a system of ordinary differential equations
 (ODEs) and steps it through time with classic ODE methods. (For details on the
 equations themselves see the [size-structured PDE](../size-structured-pde.qmd)
@@ -67,13 +93,15 @@ ODE solver class based on the RK45 method. The code is built into the model, wit
 some details ported from the
 [GNU Scientific Library](http://www.gnu.org/software/gsl/) [@Galassi-2009].
 
-The main interface is described in the class `plant::ode::Solver` described in
-the file `ode_solver.h`. (See folder `inst/include/plant/ode_solver` where this
-and related class are implemented.) The class is established using a template
-`System` class, meaning you can effectively cast any variety of classes as an ODE
-Solver. (In a similar way, you can create a vector of any variety of data types.)
+The main interface is the class `odelia::ode::Solver`. The solver has been
+extracted from `plant` into a standalone `odelia` library, so it no longer lives
+under `inst/include/plant/`; `plant` pulls it in via
+`#include <odelia/ode_solver.hpp>` (see `scm.h`). The class is established using a
+template `System` class, meaning you can effectively cast any variety of classes
+as an ODE Solver. (In a similar way, you can create a vector of any variety of
+data types.)
 
-From `ode_solver.h`:
+From odelia's `ode_solver.hpp`:
 
 ```cpp
 template <class System>
@@ -86,24 +114,29 @@ public:
 
 ## Solving an entire patch
 
-The main solver for our system is the class `SCM`, (in the file `sch.h`). This
+The main solver for our system is the class `SCM`, (in the file `scm.h`). This
 creates an ode solver based on patch type. Simultaneously, the class `SCM` owns
 an actual instance of the patch, which contains species and environment.
 
 ```cpp
-patch_type patch;                 # Instance of patch
-ode::Solver<patch_type> solver;   # ODE solver
+patch_type patch;                        # Instance of patch
+odelia::ode::Solver<patch_type> solver;  # ODE solver (owns the system)
 ```
 
 All we need to do to advance the system is make calls like the following. These
 advance the system, using the patch to estimate rates of change. Moreover, we can
 take steps of a specified fixed size, or an adaptive step where the solver
-determines the spacing.
+determines the spacing. Note that the solver now *owns* the system, so these
+calls no longer take the patch as an argument — they operate on the system the
+solver already holds:
 
 ```cpp
-solver.advance_fixed(patch, e.times);
-solver.advance_adaptive(patch, e.time_end());
+solver.advance_fixed(e.times);
+solver.advance_adaptive({solver.time(), e.time_end()});
 ```
+
+A third method, `solver.advance_euler(...)`, backs the fixed-step forward-Euler
+mode (`fixed_time_step`, discussed below).
 
 In the background, the solver then passes information (rates of change, states)
 between the actual patch (which contains all the biological information informing
@@ -114,7 +147,7 @@ Additionally, we have the following function, which resizes the ODE system after
 a node has been introduced.
 
 ```cpp
-solver.set_state_from_system(patch)
+solver.set_state_from_system()
 ```
 
 For the above to work, the patch class (see `patch.h`) must have some essential
@@ -146,30 +179,36 @@ versa.
 
 ## Solving individuals and other systems
 
-As templated C++, we can use the `ode::Solver` class to step any "system" that
-has the requisite functions. In addition to patches, we also use the ode solver
-to run individual plants, given an environment. This is achieved by introducing a
-wrapper class `ode::Runner` (in `ode_runner.h`), which according to its author
-simplifies _"the difficulty of ownership semantics around the solver and
-object."_
+As templated C++, we can use the `odelia::ode::Solver` class to step any "system"
+that has the requisite functions. In addition to patches, we also use the ode
+solver to run individual plants, given an environment. This is achieved by
+introducing a wrapper class `plant::tools::IndividualRunner` (in
+`individual_runner.h`), which handles the ownership semantics around the solver
+and the object it steps.
 
-Like the `Solver` class, the `Runner` class is templated, meaning we can setup a
-variety of systems.
+Like the patch system, `IndividualRunner` is templated — on a strategy `T` and an
+environment `E` — so we can set up a variety of systems.
 
 ```cpp
-template <typename T>
-class Runner {
+template <typename T, typename E>
+class IndividualRunner {
 public:
-  Runner(T obj_, OdeControl control) : obj(obj_), solver(obj, control) {}
+  IndividualRunner(Individual<T,E> individual_, E environment_)
+    : individual(individual_), environment(environment_) {
+    individual.compute_rates(environment);
+  }
+  // ... ode_size(), ode_time(), ode_state(), ode_rates(), set_ode_state() ...
 };
 ```
 
-The class `plant::tools::IndividualRunner` uses this approach to create a system
-for stepping individual plants to a given size. This is available via the R
-functions `grow_individual_...`, which in turn uses the `OdeRunner`.
+`IndividualRunner` provides exactly the `ode_size()`/`ode_state()`/`ode_rates()`/
+`set_ode_state()` interface the solver expects, so it can be handed to an
+`odelia::ode::Solver` to step an individual plant to a given size. This is
+available via the R functions `grow_individual_...`, which in turn use
+`IndividualRunner`.
 
-The test suite also shows how to use the OdeRunner to step the classic Lorenz
-system.
+The test suite also shows how to drive the solver directly on the classic Lorenz
+system (see `tests/testthat/test-ode-euler.R`).
 
 # Controls on ODE stepping
 
@@ -186,7 +225,7 @@ library(plant)
 p0 <- scm_base_parameters("FF16")
 p0$max_patch_lifetime <- 5
 
-p <- expand_parameters(trait_matrix(0.0825, "lma"), p0)
+p <- add_strategies(p0, trait_matrix(0.0825, "lma"))
 
 # Controls on numerical methods
 ctrl <- Control()
@@ -372,7 +411,7 @@ A *daily* step is therefore `fixed_time_step = 1 / 365`.
 p0 <- scm_base_parameters("FF16")
 p0$max_patch_lifetime <- 60
 
-p <- expand_parameters(trait_matrix(0.0825, "lma"), p0, birth_rate_list = 1.0)
+p <- add_strategies(p0, trait_matrix(0.0825, "lma"), birth_rate = 1.0)
 env <- Environment("FF16")
 
 ctrl_adaptive <- Control()                       # fixed_time_step = 0

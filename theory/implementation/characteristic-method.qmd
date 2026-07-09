@@ -5,6 +5,19 @@ title: "The characteristic method"
 implementation
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The size-structured PDE](../size-structured-pde.qmd). Read it first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+Imagine trying to track how a whole population of plants of different sizes changes over time. You could try to solve for the entire size distribution at once, on a fixed grid of sizes, updating every point as time moves forward. That turns out to be hard, because growth constantly shuffles plants from one size to another, and the equation describing this shuffling is a partial differential equation with both space and time mixed together.
+
+The method of characteristics takes a different route. Instead of watching the grid, you follow individual plants, or cohorts of plants that started life together, as they grow. Each one traces a path through time as its size changes, and along that path you can also track how many individuals remain, and how their local density evolves. Because you are moving with the plant rather than watching it pass through fixed points, the awkward partial differential equation collapses into an ordinary differential equation for each trajectory. These are far easier to solve, one step at a time, with a standard numerical stepper.
+
+The rest of this page makes this precise.
+
 Here we describe the overall numerical approach used to solve the dynamics in
 the plant model. Make sure you've read the
 [size-structured PDE](../size-structured-pde.qmd) document describing the system
@@ -241,12 +254,16 @@ population. A new spline is constructed for each time step.
 The accuracy of the spline interpolation depends on the number of points used in
 its construction and on their placement along the size axis. We select the
 number and locations of points via an adaptive algorithm. Starting with an
-initial set of 33 points, we assess how much each point contributes to the
+initial set of `light_availability_spline_nbase` points (17 by default), we
+assess how much each point contributes to the
 accuracy of the spline fit at the location of each node, first via exact
 calculation, and second by linearly interpolating from adjacent nodes. The
-absolute difference in these values is compared to the control parameter
-`light_availability_spline_tol`. If the error is greater than this tolerance,
-the interval is bisected and the process repeated (see
+absolute difference in these values is compared to the spline tolerance
+`light_availability_spline_tol` (default `1e-4`). Note that this is a property of
+the light spline configured on the *environment* (e.g. `FF16_Environment`), not a
+field of the `Control` object. If the error is greater than this tolerance,
+the interval is bisected and the process repeated, up to
+`light_availability_spline_max_depth` (16 by default) levels (see
 [adaptive_interpolator.h](https://github.com/traitecoevo/plant/blob/master/inst/include/plant/adaptive_interpolator.h)
 for details).
 

@@ -1,0 +1,182 @@
+---
+title: "The maths, worked through"
+---
+::: {.eyebrow}
+theory · bridge
+:::
+
+::: {.callout-note}
+## Prerequisites
+This page builds on [The maths, gently](maths-primer.qmd). It is the stepping
+stone between that primer and the full [size-structured PDE](size-structured-pde.qmd):
+same equations, now put to work on one deliberately tiny example.
+:::
+
+The [primer](maths-primer.qmd) gave you the equations in words; the
+[size-structured PDE](size-structured-pde.qmd) page gives them in full, with
+derivations and boundary conditions. In between sits a gap that is easy to
+underestimate: it is one thing to *read* $H(a) = H_0 + \int g\,{\rm d}a$ and
+quite another to feel what it does. This page closes that gap the way most
+people actually learn a model — by pushing a handful of numbers through it.
+
+We will follow one plant, then two, then let them shade each other, then zoom
+out to the landscape — using the *same symbols* as the primer at every step. The
+numbers here are **toy values chosen for arithmetic, not FF16 outputs**; the
+point is the shape of the calculation, not the figures.
+
+## A toy strategy
+
+Give our plant three constant rates and two survival numbers. Real models make
+these depend on size and light (that is what the [FF16](models/ff16.qmd) page is
+for) — holding them fixed just lets us do the sums by hand:
+
+| Symbol | Meaning | Toy value |
+|--------|---------|-----------|
+| $g$ | growth rate (height) | $0.5\ {\rm m\,yr^{-1}}$ |
+| $d$ | death rate | $0.05\ {\rm yr^{-1}}$ |
+| $f$ | fecundity | $2\ {\rm seeds\,yr^{-1}}$ |
+| $H_0$ | height at birth | $0.4\ {\rm m}$ |
+| $S_{\rm G}$ | germination survival | $0.25$ |
+
+## Step 1 — one plant, as three running totals
+
+The primer said a plant's whole life is three running totals of these rates
+([Step 2 there](maths-primer.qmd)). With the rates held constant, each integral
+collapses to something you can evaluate directly.
+
+**Height** — cumulative growth, $H(a) = H_0 + \int_{0}^{a} g\,{\rm d}a' = H_0 + g\,a$:
+
+$$
+H(a) = 0.4 + 0.5\,a.
+$$
+
+**Survival** — germination survival discounted by accumulated death risk,
+$S_{\rm I}(a) = S_{\rm G}\,\exp(-\int_0^a d\,{\rm d}a') = S_{\rm G}\,e^{-d a}$:
+
+$$
+S_{\rm I}(a) = 0.25\,e^{-0.05\,a}.
+$$
+
+**Lifetime seeds so far** — fecundity added up, but only over plants still alive,
+$\tilde R(a) = \int_0^a f\,S_{\rm I}(a')\,{\rm d}a'$. Doing the integral of the
+exponential gives $\tilde R(a) = \tfrac{f\,S_{\rm G}}{d}\big(1 - e^{-d a}\big)$:
+
+$$
+\tilde R(a) = 10\,\big(1 - e^{-0.05\,a}\big).
+$$
+
+Read across a few patch ages and the abstract integrals become a life history:
+
+| patch age $a$ | height $H$ (m) | survival $S_{\rm I}$ | cumulative seeds $\tilde R$ |
+|:---:|:---:|:---:|:---:|
+| 0  | 0.4  | 0.250 | 0.00 |
+| 5  | 2.9  | 0.195 | 2.21 |
+| 10 | 5.4  | 0.152 | 3.93 |
+| 20 | 10.4 | 0.092 | 6.32 |
+
+The plant climbs steadily, its survivorship decays, and its seed tally rises fast
+early then flattens as fewer of its kind are left to reproduce. Three integrals,
+three columns.
+
+## Step 2 — from one plant to a distribution
+
+Now germinate a **second** cohort five years after the first. At any later patch
+age $a$ it has had five fewer years to grow, so its height is
+$H_0 + g\,(a - 5)$. Line the two cohorts up at $a = 20$:
+
+| cohort | born at $a_0$ | height at $a=20$ |
+|--------|:---:|:---:|
+| A | 0 | $0.4 + 0.5(20) = 10.4\ {\rm m}$ |
+| B | 5 | $0.4 + 0.5(15) = 7.9\ {\rm m}$ |
+
+Those two heights, each carrying a density, are two samples of the
+**size-density distribution** $N(H \mid x, a)$ the primer introduced in
+[Step 3](maths-primer.qmd). Add a cohort every few years and the samples fill in
+a curve over height — and because growth keeps carrying every cohort upward while
+death thins each one, the whole curve slides toward larger $H$ and flattens as it
+goes. That sliding, thinning curve *is* what the central PDE
+
+$$
+\frac{\partial N}{\partial a} = -\,d\,N \;-\; \frac{\partial}{\partial H}\big(g\,N\big)
+$$
+
+describes in one line. We have just built it by hand, one cohort at a time.
+
+## Step 3 — why following cohorts is the easy way
+
+Watch what happens to a single cohort's density as it rides upward. The primer's
+characteristic equation ([Step 4](maths-primer.qmd)) was
+
+$$
+\frac{{\rm d}}{{\rm d}a}\ln N = -\left(d + \frac{\partial g}{\partial H}\right).
+$$
+
+Our toy growth is *constant*, so $\partial g/\partial H = 0$ and the second term
+vanishes. The cohort's density then obeys
+
+$$
+\frac{{\rm d}}{{\rm d}a}\ln N = -d
+\qquad\Longrightarrow\qquad
+N(a) = N(a_0)\,e^{-d\,(a - a_0)},
+$$
+
+exactly mirroring the survival curve from Step 1 — sensible, since with no
+stretching or bunching the only thing changing a cohort's density is death. The
+moment growth varies with height (as it does in any real strategy), the
+$\partial g/\partial H$ term switches on and cohorts bunch up where growth slows
+and spread out where it speeds up. Seeing the clean special case first makes the
+general term easy to place when you meet it on the [full PDE page](size-structured-pde.qmd).
+
+The boundary condition is where new cohorts enter. At the smallest height the
+flux of plants must equal the arriving seedlings,
+$g(H_0)\,N(H_0) = Y_x\,S_{\rm G}$ — that is what fixes the density each new cohort
+starts with.
+
+## Step 4 — closing the light loop, once
+
+So far the rates were fixed. In the real model $g$ and $d$ depend on light, and
+light depends on the plants themselves. Take one turn around that loop by hand.
+Cohort A (10.4 m) sits above cohort B (7.9 m), so A's leaves shade B. If the
+canopy above B holds a leaf area of, say, $L = 2$, then by the primer's Beer's-law
+shading ([Step 5](maths-primer.qmd)) the light reaching B is
+
+$$
+E_a = \exp(-k_{\rm I}\,L) = \exp(-0.5 \times 2) \approx 0.37.
+$$
+
+B is growing in about a third of full light. Feed that back in and B's *realised*
+growth rate is lower than our toy $0.5$ — so it climbs more slowly than the table
+in Step 1 assumed, the gap to A widens, and the shading deepens further. That
+mutual feedback, resolved not once but to a consistent state, is the competition
+the [full PDE page](size-structured-pde.qmd) solves properly.
+
+## Step 5 — one patch among many
+
+Finally, zoom out. Everything above lived inside a single patch of age $a$. The
+landscape holds patches of every age, weighted by how common each age is —
+$P(a)\propto S_{\rm P}(a) = \exp(-\lambda a^2)$ for `plant`'s default rising
+disturbance risk ([Step 6](maths-primer.qmd)). Every landscape-level number is our
+per-patch quantity averaged under that weight, and the seed rain that patches
+*produce* must equal the seed rain that *feeds* their boundary condition —
+the fixed point $Y_x = \Phi(Y_x)$. Our toy $\tilde R$ was one seed's contribution
+to that balance, from one cohort, in one patch.
+
+## Now you are ready
+
+You have now assembled the whole model from the bottom up with real numbers:
+three integrals per plant, cohorts stacking into a distribution, a
+characteristic equation that is just those integrals viewed from the plant's
+moving frame, a shading loop, and a landscape average pinned by a fixed point.
+The [size-structured PDE](size-structured-pde.qmd) page takes it from here with
+the full derivations:
+
+- the PDE and its boundary condition, derived rather than assembled;
+- the method of characteristics in general, with the $\partial g/\partial H$ term
+  carrying its full weight;
+- the patch-age distribution and the Weibull appendix;
+- the seed-rain fixed point for one and for many competing strategies.
+
+Where the rates $g$, $d$, and $f$ actually come from is the subject of the
+[FF16](models/ff16.qmd) and [assimilation & hydraulics](assimilation-hydraulics.qmd)
+pages; how all these integrals are stepped numerically is the
+[implementation](implementation/index.qmd) section.

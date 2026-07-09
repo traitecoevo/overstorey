@@ -14,7 +14,8 @@ This guide walks through modelling the dynamics of a single individual: how to
 construct one, compute its rates, grow it through time and to a target size,
 and compare growth trajectories across traits and light environments. It also
 reproduces the analysis behind Fig. 2 of the manuscript. Throughout we use the
-`FF16` strategy, describing the Falster-FitzJohn model of light competition in
+[`FF16`](../theory/models/ff16.qmd) strategy, describing the Falster-FitzJohn
+model of light competition in
 forest stands; however an equivalent `Individual` component of the model is
 present in all strategies. For the differential equations that underpin these
 dynamics, see [Size-structured PDE](../theory/size-structured-pde.qmd).
@@ -81,7 +82,9 @@ env <- fixed_environment(1.0)
 ```
 
 In the FF16 model, the `compute_rates` method computes net mass production for
-the individual, and from that demographic rates:
+the individual — its leaf-level carbon budget, described in
+[Assimilation & hydraulics](../theory/assimilation-hydraulics.qmd) — and from
+that its demographic rates:
 
 ```{r}
 indv$ode_rates
@@ -217,7 +220,7 @@ size.  So, for height:
 ```{r}
 # create a sequence from the initial size to height at maturity
 indv <- FF16_Individual()
-heights <- seq(indv$state("height"), indv$strategy$hmat, length.out=20)
+heights <- seq(indv$state("height"), indv$strategy$pars$hmat, length.out=20)
 res <- grow_individual_to_size(indv, heights, "height", env)
 ```
 
@@ -264,8 +267,8 @@ params <- scm_base_parameters("FF16")
 Then we can use the `params` object to set a low LMA ("fast growth") and a high LMA ("low growth") species:
 
 ```{r}
-s <- trait_matrix(c(0.0825, 0.2625), "lma") %>%
-     strategy_list(params, birth_rate_list = 1)
+s <- generate_strategy(params, trait_matrix(c(0.0825, 0.2625), "lma"),
+                       birth_rate = 1)
 s1 <- s[[1]]
 s2 <- s[[2]]
 ```
@@ -274,7 +277,7 @@ In the FF16 model, LMA is related to leaf turnover (`k_l`) and
 the ratio of dark respiration to leaf mass (`r_l`):
 
 ```{r}
-lapply(s, `[`, c("lma", "k_l", "r_l"))
+lapply(s, function(x) x$pars[c("lma", "k_l", "r_l")])
 ```
 
 We use these specific strategies to create Individuals:
@@ -293,8 +296,8 @@ initial height for given seed mass.
 ```{r}
 #| label: fig-trajectories
 #| fig-cap: "Height trajectories of a low-LMA and a high-LMA species in full light."
-heights1 <- seq(indv1$state("height"), s1$hmat, length.out=100L)
-heights2 <- seq(indv2$state("height"), s2$hmat, length.out=100L)
+heights1 <- seq(indv1$state("height"), s1$pars$hmat, length.out=100L)
+heights2 <- seq(indv2$state("height"), s2$pars$hmat, length.out=100L)
 
 dat1 <- grow_individual_to_height(indv1, heights1, env,
                              time_max=100, warn=FALSE, filter=TRUE)
@@ -519,7 +522,7 @@ indv_seed <- FF16_Individual(s1)
 y_seed <- g(openness, indv_seed)
 
 indv_adult <- FF16_Individual(s1)
-indv_adult$set_state("height", indv_adult$strategy$hmat / 2)
+indv_adult$set_state("height", indv_adult$strategy$pars$hmat / 2)
 y_adult <- g(openness, indv_adult)
 
 cols_height <- c("#31a354", "black")
@@ -541,7 +544,7 @@ indv2_seed <- FF16_Individual(s2)
 y2_seed <- g(openness, indv2_seed)
 
 indv2_adult <- FF16_Individual(s2)
-indv2_adult$set_state("height", indv2_adult$strategy$hmat / 2)
+indv2_adult$set_state("height", indv2_adult$strategy$pars$hmat / 2)
 y2_adult <- g(openness, indv2_adult)
 
 ymax <- max(ymax, y2_seed[, 2], y2_adult[, 2])

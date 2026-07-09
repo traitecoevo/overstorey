@@ -84,8 +84,12 @@ website:
         - theory/index.qmd
         - section: "Core"
           contents:
+            - theory/overview.qmd
+            - theory/maths-primer.qmd
+            - theory/from-primer-to-pde.qmd
             - theory/size-structured-pde.qmd
             - theory/assimilation-hydraulics.qmd
+            - theory/soil-water.qmd
             - theory/adaptive-dynamics.qmd
         - section: "Models"
           contents:

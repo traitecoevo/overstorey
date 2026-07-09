@@ -13,10 +13,21 @@ scattered across papers and vignettes.
 
 The demographic and physiological machinery shared by every strategy.
 
+New here? Start with the two orientation pages, then dive into the details.
+
+- [The big picture](overview.qmd) — the mental model in plain language, no
+  equations. **Start here.**
+- [The maths, gently](maths-primer.qmd) — the core equations built up one step
+  at a time.
+- [The maths, worked through](from-primer-to-pde.qmd) — the same equations pushed
+  through one small numerical example, bridging the primer and the full PDE.
 - [The size-structured PDE](size-structured-pde.qmd) — demography of
   individuals, patches, and metacommunities.
 - [Assimilation & hydraulics](assimilation-hydraulics.qmd) — the leaf-level
   carbon and water economy.
+- [Soil water & root uptake](soil-water.qmd) — where transpired water comes
+  from: the multi-layer soil balance and the root-collar solve that feeds it
+  to the leaf model.
 - [Adaptive dynamics](adaptive-dynamics.qmd) — invasion fitness and
   evolutionary endpoints.
 
@@ -28,7 +39,8 @@ set of growth, fecundity, and mortality functions. See the
 
 - [FF16](models/ff16.qmd) — the trait-based functional-balance model.
 - [K93](models/k93.qmd) — Kohyama's basal-area competition model.
-- [TF24](models/tf24.qmd) — the hydraulically-coupled leaf model.
+- [TF24](models/tf24.qmd) — the hydraulically-coupled leaf model, plus its
+  TF24f acclimation-lag variant.
 
 ## Implementation {#implementation}
 

@@ -20,10 +20,16 @@ system creates a smooth function that interpolates the control points:
 
 [![Example of polynomial interpolation](../assets/Interpolation_example_polynomial.svg){width="400"}](https://en.wikipedia.org/wiki/Polynomial_interpolation)
 
+Under the hood, every driver is stored under a name (`"rainfall"`, `"ca"`, `"birth_rate"`, ...) as either a constant value or a spline built from `x`/`y` control points — the same two-case `Function` object regardless of which driver it backs. By default a spline will not extrapolate past the range of its control points (evaluating outside that range is an error); this can be relaxed with an extrapolation toggle. The rest of this guide walks through setting drivers of both kinds, starting with `rainfall` and then covering the rest of the set.
+
 ## Rainfall
 
-Rainfall is handled inside `TF24_Environment`, and is set upon construction. If nothing is passed to `make_environment`, rainfall
-will default to a value of `1`:
+Rainfall is handled inside `TF24_Environment`, and is set upon construction.
+Rainfall drives the soil-water balance that the [TF24](../theory/models/tf24.qmd)
+strategy couples growth to, via the leaf-level water economy described in
+[Assimilation & hydraulics](../theory/assimilation-hydraulics.qmd). If nothing is
+passed to the `Environment()` constructor, rainfall will default to a value of
+`1`:
 
 ```{r}
 env <- Environment("TF24")
@@ -61,9 +67,79 @@ We can also evaluate the function at a list of times, and get a list of rainfall
 env$extrinsic_drivers_evaluate_range("rainfall", c(5, 1.2, 78.345))
 ```
 
+## The full climate driver set
+
+`rainfall` is one of a whole family of named drivers that [TF24](../theory/models/tf24.qmd)
+(and its acclimation variant, TF24f) register on the environment via
+`extrinsic_drivers_set_constant()` at construction time, with the defaults
+below:
+
+| Driver         | Meaning                                    | TF24 default |
+|----------------|---------------------------------------------|:-------------:|
+| `PPFD`         | Photosynthetic photon flux density, i.e. light ($\mu$mol m$^{-2}$ s$^{-1}$) | `1800` |
+| `rainfall`     | Rainfall, driving the soil-water balance    | `1` |
+| `atm_vpd`      | Atmospheric vapour-pressure deficit (kPa)   | `1` |
+| `ca`           | Atmospheric CO$_2$ partial pressure (Pa — so the default `40` is $\approx$ 400 ppm) | `40` |
+| `leaf_temp`    | Leaf temperature ($^\circ$C)                | `25` |
+| `atm_o2_kpa`   | Atmospheric O$_2$ partial pressure (kPa)    | `21` |
+| `atm_kpa`      | Atmospheric pressure (kPa)                  | `100.5` |
+
+Alongside these, `birth_rate` is a further named driver — set per species
+rather than on the environment — covered in [Birth rates](#birth-rates) below.
+
+Each of these is configured exactly the same way as `rainfall` above: a
+constant with `extrinsic_drivers_set_constant()`, or a time-varying spline
+with `extrinsic_drivers_set_variable()`. For example, to hold CO2 fixed at a
+different concentration than the TF24 default:
+
+```{r}
+#| eval: false
+env <- Environment("TF24")
+env$extrinsic_drivers_set_constant("ca", 60)
+```
+
+... or to drive it with a spline over time, passing `x`/`y` control points the
+same way as the sinusoidal rainfall example:
+
+```{r}
+#| eval: false
+x_pts <- seq(0, 200, 1)
+ca_ramp <- list(
+  x = x_pts,
+  y = 40 + 0.2 * x_pts   # a rising atmospheric CO2 trajectory
+)
+env <- Environment("TF24")
+env$extrinsic_drivers_set_variable("ca", ca_ramp$x, ca_ramp$y)
+env$extrinsic_drivers_evaluate("ca", 100)
+```
+
+Because every driver shares this same constant-or-spline mechanism, the same
+recipe covers any climate-forced scenario: a steadily rising `ca` spline for
+a CO2 ramp, a `rainfall` spline that dips and stays low for a drought pulse,
+or a `leaf_temp` spline for a warming trajectory. For instance, a drought
+pulse superimposed on an otherwise steady rainfall regime might look like:
+
+```{r}
+#| eval: false
+x_pts <- seq(0, 200, 1)
+drought_y <- ifelse(x_pts >= 80 & x_pts <= 120, 0.1, 1)
+env <- Environment("TF24")
+env$extrinsic_drivers_set_variable("rainfall", x_pts, drought_y)
+```
+
+Only the TF24 and TF24f strategies read the atmospheric/leaf drivers
+(`atm_vpd`, `ca`, `leaf_temp`, `atm_o2_kpa`, `atm_kpa`) and couple them into
+the leaf-level water economy described in
+[Assimilation & hydraulics](../theory/assimilation-hydraulics.qmd). FF16 and
+K93 are light-only strategies: they read `PPFD` (light) and `birth_rate`, but
+setting the other climate drivers on their environment has no effect on
+growth.
+
 ## Birth rates
 
-Per species birth rates are set via the `expand_parameters()` function. Each object in the list is either a constant number or an embedded list with `x` and `y` control points. There must be the same number of items in the list as there are species:
+Per species birth rates set the seed rain arriving into each patch — the
+boundary condition of the [size-structured PDE](../theory/size-structured-pde.qmd)
+that the solver integrates. They are set via the `add_strategies()` function. Each object in the list is either a constant number or an embedded list with `x` and `y` control points. There must be the same number of items in the list as there are species:
 
 ```{r}
 p0 <- scm_base_parameters("TF24")
@@ -78,9 +154,9 @@ birth_rates <- list(
     species2 = 3.14
   )
 
-p1 <- expand_parameters(lmas, p0, TF24_hyperpar,
-          keep_existing_strategies = FALSE,
-          birth_rate_list = birth_rates)
+p1 <- add_strategies(p0, lmas, TF24_hyperpar,
+          keep_existing = FALSE,
+          birth_rate = birth_rates)
 
 # TF24 needs a configured soil-water environment: layered soil with an initial
 # moisture state and a rainfall driver whose mean stays above zero. A bare

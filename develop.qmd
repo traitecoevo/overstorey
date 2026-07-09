@@ -29,7 +29,7 @@ are explicit and reviewed.
 
 Four workflows, each with one job:
 
-**`publish.yml`** — on push to `main`. Plain `quarto render`, honours all
+**`publish.yml`** — on push to `master`. Plain `quarto render`, honours all
 freezes, deploys. Fast and deterministic. *Never* runs `--cache-refresh`.
 
 **`pr-checks.yml`** — on PR. Two guards:

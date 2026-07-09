@@ -1,4 +1,4 @@
-# CLAUDE.md — overstorey
+# AGENTS.md — overstorey
 
 **Overstorey** (repo: `traitecoevo/overstorey`) is the Quarto documentation
 site for [`plant`](https://github.com/traitecoevo/plant),
@@ -8,11 +8,12 @@ persistent context for Claude Code sessions. Read it, plus `develop.qmd` and
 
 ## Status
 
-The scaffold exists but **nothing has been rendered or verified** — it was
-built in an environment with no R or Quarto. The first job in any fresh
-session is to make `quarto preview` work and fix what breaks. Do not assume
-SCSS, the animated hero, or the inline badge helpers render correctly until
-proven.
+The site is established and publishes from `master` via committed `_freeze/`
+(see [CI workflows](#ci-workflows)). Guides, Theory, Adaptively (posts), and
+Reproductions are all populated and rendering. Routine work is now content
+maintenance and keeping pages current with `plant`, not scaffolding. `quarto
+preview` works locally without a `plant` build for any page you are not
+re-executing, because freezes are committed.
 
 ## What the site is
 
@@ -73,19 +74,39 @@ Develop-pinned posts are tied to a moving commit. Routine CI must never
 force-refresh them — only the manual, targeted `refresh.yml` may, and
 `drift-watch.yml` runs against master and commits nothing.
 
-## Tasks, in order
+## Working on the site
 
-1. Env setup: `renv::init()`, install `plant` + helper deps (`htmltools`,
-   `digest`, `here`), generate `renv.lock`.
-2. `quarto preview`, fix render errors. Watch: `assets/plant.scss`, the
-   animated canopy hero in `index.qmd`, and whether inline `` `r badge()` ``
-   calls render. The freeze-consistency step uses `--no-execute-daemon`,
-   which varies by Quarto version — verify it behaves as `develop.qmd`
-   claims and adjust if not.
-3. Verify `R/check_reproductions.R` and `R/select_targets.R`
-   against real post front matter.
-4. Migrate the heaviest existing `.Rmd` vignettes into the guide/theory
-   stubs (knitr chunk engine is compatible; let freeze cache slow runs).
+- `quarto preview` renders locally. Because `_freeze/` is committed and
+  `freeze: auto` is set, pages you are **not** re-executing render without a
+  working `plant` build; you only need `plant` (+ its deps) to re-run a page
+  whose source you changed.
+- When you change a page that executes R, re-render it and **commit the updated
+  `_freeze/` alongside the source** (and `renv.lock` if the pin moved).
+- Keeping docs current with `plant` is the standing task: the pin in
+  `renv.lock` lags `plant`'s `develop`, so watch for drift in documented model
+  surface (strategies, parameters, defaults) when the pin is bumped.
+
+### Previewing an unmerged branch (no `plant` build)
+
+On a feature branch, unchanged pages still render from committed freeze, but any
+page whose source you edited goes stale under `freeze: auto` and re-executes —
+so a page with a `library(plant)` chunk or an inline helper (e.g.
+`plant_version_badge()`) fails without `plant` installed.
+
+- **To preview prose/layout without `plant`:** temporarily flip the global
+  switch to `freeze: true`, render, then revert — it renders every page from the
+  committed freeze, running no R:
+  ```bash
+  sed -i '' 's/  freeze: auto/  freeze: true/' _quarto.yml
+  quarto render && git checkout _quarto.yml
+  ```
+  This shows new prose against last-frozen output; it does **not** validate
+  edited code chunks (new code, stale output). Never commit the flip.
+- **Do not use `quarto render --no-execute`** — it still evaluates inline
+  `` `r …` `` and errors on it rather than falling back to the freeze.
+- **Before merge/publish**, re-execute the changed R pages for real
+  (`renv::restore()` to get `plant`, then `quarto render <page>`) and commit the
+  refreshed `_freeze/`; `pr-checks` freeze-consistency gates the PR on it.
 
 ## Constraints
 

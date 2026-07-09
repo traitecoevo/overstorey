@@ -5,6 +5,33 @@ title: "The size-structured PDE"
 theory
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The big picture](overview.qmd) and [The maths, gently](maths-primer.qmd). Read those first if the notation here is unfamiliar.
+:::
+
+## The idea first
+
+A forest is really just a lot of individual plants, each growing taller,
+sometimes dying, and sometimes producing seeds. This page shows how to
+track all of that at once, rather than one plant at a time. Instead of
+following every individual, we track how many plants there are at each
+height, and describe how that whole size distribution changes as time
+passes. Growth pushes plants toward taller sizes, so the size distribution
+slides steadily upward. Death removes plants along the way, so the
+distribution also thins out as it slides. New seedlings arrive at the
+bottom, topping the distribution up from below. Because taller plants
+shade shorter ones, the amount of light available at any height depends
+on everyone growing above it, which in turn affects how fast plants below
+grow, survive, and reproduce. Zooming out further, patches of forest are
+themselves born from disturbance and age over time, so the whole
+metacommunity is a mix of patches at different ages, each with its own
+size distribution, all summed together to get the big picture. Running
+totals, like cumulative growth or cumulative seed output, are the natural
+way to describe all of this.
+
+The rest of this page makes this precise.
+
 This page outlines the demographic machinery used to model size-structured
 populations in the `plant` package. We outline the system of equations being
 solved for individual plants, patches of competing plants, and the age
@@ -74,7 +101,7 @@ $$ {#eq-tilder1}
 is the plant's cumulative seed output, from its birth at patch age
 $a = a_0$ until patch age $a$.
 
-The notational complexity required in @eq-size-@eq-tilder1 potentially obscures an important point: these equations are simply the general, non-linear solutions to
+The notational complexity required in Eqs. [-@eq-size]--[-@eq-tilder1] potentially obscures an important point: these equations are simply the general, non-linear solutions to
 integrating growth, mortality, and fecundity over time.
 
 ## Patches of competing plants {#sec-patches-of-competing-plants}
@@ -84,7 +111,7 @@ patch is described by the size-density distribution $N(H | x, a)$ of plants
 with traits $x$ and height $H$. In a finite-sized patch, $N$ is described by a
 collection of points, each indicating the height of one individual, whereas in a very (infinitely) large patch,
 $N$ is a continuous function. In either case, the demographic
-behaviour of the plants within the patch is given by @eq-size-@eq-tilder1. Integrating the dynamics over time is complicated by-
+behaviour of the plants within the patch is given by Eqs. [-@eq-size]--[-@eq-tilder1]. Integrating the dynamics over time is complicated by-
 two other factors: (i) plants interact, thereby altering $E_a$ with
 age, and (ii) new individuals may establish, expanding the system of
 equations.
@@ -185,7 +212,7 @@ connectivity via dispersal between all patches in the habitat, allowing
 empty patches to be quickly re-colonised. Such a system can be modelled
 as a metapopulation (for a single species) or metacommunity (for multiple
 species). The dynamics of such a metacommunity are described by the
-PDEs in @eq-pde-@eq-agepde4.
+PDEs in Eqs. [-@eq-pde]--[-@eq-agepde4].
 
 The offspring production of each species in the metacommunity is given by the rate at which seeds are produced across all patches,
 $$
@@ -193,7 +220,7 @@ Y_x  = \int_0^{\infty} \int_0^{\infty} P(a) \, S_{\rm D} \, f(x, H, E_a) \, N(H 
 $$ {#eq-seed-rain}
 where $S_{\rm D}$ is the survival probability of seeds during dispersal.
 
-A convenient feature of @eq-pde - @eq-agepde4 is that
+A convenient feature of Eqs. [-@eq-pde]--[-@eq-agepde4] is that
 the dynamics of a single patch scale up to give the dynamics of the
 entire metacommunity. Note that the rate $Y_x$ at which offspring of individuals with traits $x$ arrive from the
 disperser pool is constant when the metacommunity is at
@@ -204,7 +231,7 @@ difference between them being their ages.
 
 To model the temporal dynamics of an archetypal patch, we need only a
 value for $Y_x$. The numerical challenge is therefore to find the
-right value for $Y_x$, by solving @eq-bc1-@eq-seed-rain simultaneously, for all species with traits $x$ in the metacommunity.
+right value for $Y_x$, by solving Eqs. [-@eq-bc1]--[-@eq-seed-rain] simultaneously, for all species with traits $x$ in the metacommunity.
 
 ## Emergent properties of metacommunities {#sec-emergent-properties}
 
@@ -349,7 +376,7 @@ $$ {#eq-flux-1}
 The first two terms describe the flux in and out of the considered size interval
 through growth, while the last term describes losses through mortality.
 The change in the density of individuals within this size interval during a time
-step $\Delta $a is thus
+step $\Delta a$ is thus
 $$
 \begin{array}{ll} N(H, a + \Delta a)\Delta H - N(H, a)\Delta H = &g(H - 0.5 \Delta H, a) \, N(H - 0.5 \Delta H, a)\Delta a \\ & - g(H + 0.5 \Delta H, a) \, N(H + 0.5 \Delta H, a)\Delta a\\& - d (H, a) \, N(H, a)\Delta H\Delta a.
 \end{array}

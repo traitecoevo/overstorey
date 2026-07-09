@@ -1,0 +1,240 @@
+---
+title: "Soil water & root uptake"
+execute:
+  eval: false
+---
+::: {.eyebrow}
+theory
+:::
+
+::: {.callout-note}
+## Prerequisites
+This page builds on [Assimilation & hydraulics](assimilation-hydraulics.qmd)
+and [the TF24 model](models/tf24.qmd). Read those first for the leaf-level
+profit-maximisation model that this page supplies with soil water.
+:::
+
+::: {.callout-warning}
+## Scope: TF24 and TF24f only
+Only the hydraulically-explicit strategies — `TF24` and `TF24f` — carry a soil
+water balance. `FF16` and `K93` are light-only: their `Environment` tracks
+canopy openness and nothing below ground. Everywhere this page says "the
+environment", it means the `TF24_Environment`, not the shared base class.
+:::
+
+## The idea first
+
+A plant's leaves are only half the story. We also need to model the dynamics of water transport in the soil. 
+The [assimilation & hydraulics page](assimilation-hydraulics.qmd) starts the story partway through: it hands
+you a soil water potential $\psi_s$ and shows how that translates into a rate of carbon gain and a rate
+of water loss. This page fills in where that number comes from.
+
+Picture the soil beneath a patch as a stack of buckets, one on top of the
+other. Rain fills the top bucket; once it is approaching saturation, it drains more rapidly to the layer below. This continues sequentially for each layer, before draining into deep drainage from the bottom layer. 
+Meanwhile every plant rooted in the patch is drawing water out of whichever buckets its roots reach,
+in proportion to how wet those buckets are and how far the roots have to pull
+against gravity to reach the root collar. The wetter a bucket, the less
+suction it takes to pull water out of it. Both the buckets' fullness and the resistance of the roots in that layer change the
+water potential the plant actually experiences at its root collar — and *that*
+combined number, not a flat single-layer average, is what feeds into the leaf
+model described elsewhere.
+
+The rest of this page makes this precise.
+
+## The soil column: N layers, one bucket each {#sec-layers}
+
+The soil beneath a patch is discretised into $N$ layers (`soil_number_of_depths`,
+default $N = 5$), stacked from the surface to a total depth of `depth`
+(default 1.5 m). Layer $i$ has thickness $\Delta z_i$ (`dz`, all equal by
+default: `depth` $/ N$), a lower boundary depth $z_i$, and a midpoint depth
+$\bar z_i$ (`z_mid`) that the root-uptake model in
+@sec-plant-coupling treats as the depth from which that layer's water is
+actually drawn.
+
+Each layer carries one state variable, its volumetric soil moisture
+$\theta_i$ (m$^3$ water m$^{-3}$ soil), bounded above by the saturated
+moisture content $\theta_{\rm sat}$ (`soil_moist_sat`, default 0.428). The
+mass balance for layer $i$ is
+
+$$
+\frac{{\rm d}\theta_i}{{\rm d}t} = \frac{q_{{\rm in},i} - q_{{\rm out},i} - u_i}{\Delta z_i},
+$$ {#eq-layer-balance}
+
+where $q_{{\rm in},i}$ is the water flowing into the layer from above,
+$q_{{\rm out},i}$ is gravitational drainage out of the layer's base, and $u_i$
+is the sum of root water uptake by every plant rooted in layer $i$ (the
+`resource_depletion` vector passed in from the patch). @sec-infiltration and
+@sec-drainage give $q_{{\rm in}}$ and $q_{{\rm out}}$; @sec-plant-coupling
+gives $u$.
+
+## Infiltration and runoff {#sec-infiltration}
+
+Water enters the top layer ($i = 0$) as rainfall, but not all of it: as the
+top layer approaches saturation, an increasing share runs off rather than
+infiltrating. Infiltration follows a saturation-excess form,
+
+$$
+q_{{\rm in},0} = P\left[1 - a_{\rm infil}\left(\frac{\theta_0}{\theta_{\rm sat}}\right)^{b_{\rm infil}}\right]^{+},
+$$ {#eq-infiltration}
+
+where $P$ is the rainfall rate (an extrinsic driver, `rainfall`, evaluated at
+the current time), $[\,\cdot\,]^+$ denotes the term is floored at zero (no
+negative infiltration), $a_{\rm infil}$ is a switch (0 = no runoff ever, 1 =
+runoff scales fully with the saturation-excess term) and $b_{\rm infil}$
+controls how sharply runoff increases as the layer approaches saturation. For
+every layer below the surface, $q_{{\rm in},i}$ is simply the drainage flux
+leaving the layer above, $q_{{\rm out},i-1}$ — water passed straight down the
+column, layer to layer.
+
+## Gravitational drainage {#sec-drainage}
+
+Water leaves the base of each layer at a rate set by the layer's unsaturated
+hydraulic conductivity, which rises steeply with moisture content following
+the Clapp & Hornberger (1978) form, as parameterised by Zeng & Decker (2009,
+their Eq. 5):
+
+$$
+q_{{\rm out},i} = K(\theta_i) = K_{\rm sat}\left(\frac{\theta_i}{\theta_{\rm sat}}\right)^{2n_\psi + 3},
+$$ {#eq-drainage}
+
+where $K_{\rm sat}$ (`K_sat`) is the saturated hydraulic conductivity and
+$n_\psi$ (`n_psi`) is the same retention-curve shape parameter used in
+@eq-retention below. This is the same function used for every layer,
+`soil_K_from_soil_theta`; a layer's own outflow becomes the next layer's
+inflow, and the outflow of the deepest layer is lost from the column
+entirely as deep drainage.
+
+This is a first-order, single-direction bucket scheme: drainage only ever
+moves down the column, never up. There is no capillary rise or lateral flow
+between layers in the soil water balance itself — the only place water moves
+"against gravity" is inside the plant, in the root-to-collar hydraulic path
+of @sec-plant-coupling.
+
+## From moisture to potential: the retention curve {#sec-retention}
+
+Plants do not respond to volumetric moisture directly; they respond to the
+water potential $\psi$ it corresponds to. The soil water retention curve
+converts between the two,
+
+$$
+\psi_{\rm soil}(\theta) = \frac{a_\psi}{10^6}\left(\frac{\theta}{\theta_{\rm sat}}\right)^{-n_\psi},
+$$ {#eq-retention}
+
+(`psi_from_soil_moist`; the $10^6$ converts the coefficient $a_\psi$ from Pa
+to MPa, the unit used throughout the leaf model), with $a_\psi$ (`a_psi`) and
+$n_\psi$ (`n_psi`) shape parameters of the same retention curve family as
+@eq-drainage. As a layer dries ($\theta \to 0$), $\psi_{\rm soil} \to \infty$:
+the drier the soil, the harder a root has to pull to extract any more water.
+The inverse, `soil_moist_from_psi`, is the same relationship solved for
+$\theta$ given $\psi$.
+
+::: {.callout-note}
+## Residual-moisture floor
+$\psi_{\rm soil}(\theta)$ diverges as $\theta \to 0$, and the drainage rate
+@eq-drainage is undefined for $\theta < 0$ — both of which an explicit,
+fixed-step solver can produce transiently at the edges of a drought. `plant`
+guards against this with a residual moisture floor, `soil_moist_residual`
+(default $10^{-2}$ m$^3$ m$^{-3}$): a layer at or below this floor is not
+dried any further by @eq-layer-balance (only rewetting is allowed), and
+$\psi_{\rm soil}$ is evaluated at $\max(\theta, \theta_r)$ rather than at
+$\theta$ itself, so the retention curve stays finite even for an
+already-depleted layer. This floor sits well below any realistic operating
+moisture, so it leaves non-drought runs unaffected; see issue #485 for the
+numerical failure mode this closes off.
+:::
+
+## Coupling to the plant: root-collar water potential {#sec-plant-coupling}
+
+Every layer's moisture state feeds the leaf model as a potential
+$\psi_{{\rm soil},i} = \psi_{\rm soil}(\theta_i)$ via @eq-retention. But a
+plant with roots spread across several layers does not experience $N$
+separate potentials — it experiences one, at its root collar.
+
+Picture each layer connected to the root collar by its own pipe. Layer $i$'s
+pipe has a horizontal segment, resisting the movement of water from the soil
+into the root ($r_{{\rm R},H,i}$), and a vertical segment, resisting the
+movement of water up through the root axis to the collar ($r_{{\rm R},V,i}$,
+which accumulates with depth, since water drawn from a deep layer must pass
+through the resistance of every shallower layer's root segment on its way
+up). Both resistances scale with how much root carbon the plant has invested
+horizontally and vertically in that layer. The horizontal resistance is
+further inflated by a root vulnerability curve — structurally the same
+exponential form as the stem vulnerability curve on the [assimilation &
+hydraulics page](assimilation-hydraulics.qmd), but
+parameterised separately for roots (`root_c`, `root_b`, `root_psi_crit`) — so
+a root losing conductance under water stress becomes proportionately harder
+for water to pass through.
+
+For a candidate root-collar potential $P_{x,r}$ and layer potential
+$\psi_{{\rm soil},i}$, the water drawn from layer $i$ (per unit plant leaf
+area) is
+
+$$
+E_i = \frac{\left(\psi_{{\rm soil},i} - P_{x,r} - g\,\bar z_i\right)}{r_{{\rm R},i}},
+$$ {#eq-layer-uptake}
+
+where $r_{{\rm R},i} = r_{{\rm R},H,i} + r_{{\rm R},V,i}$ is the layer's total
+resistance and $g\,\bar z_i$ is the gravitational head that must be overcome
+to lift water from the layer's midpoint depth $\bar z_i$ up to the collar,
+with $g$ = `gravity_head` = $9.8\times10^{-3}$ MPa m$^{-1}$. (Two special
+cases are handled exactly rather than through this general form: if
+$P_{x,r} = \psi_{{\rm soil},i}$ the layer is driven purely by gravity, and if
+the potential gradient exactly balances the gravitational head, $E_i = 0$.)
+Because the root vulnerability curve is non-linear in $\psi$, the horizontal
+resistance in @eq-layer-uptake is not evaluated at a single point but as the
+*mean* fractional conductivity over the potential interval spanned between
+the soil and the collar — i.e. $r_{{\rm R},H,i}$ scales with the span of that
+interval divided by the integral of the vulnerability curve across it, rather
+than the vulnerability curve evaluated once.
+
+Summing $E_i$ over layers gives the total water the root system can supply at
+a given $P_{x,r}$. The root-collar potential is then found — alongside the
+leaf xylem potential $\psi_l$, by the same profit-maximising solve described
+in [assimilation & hydraulics](assimilation-hydraulics.qmd) — as the value
+that reconciles this soil-side supply with the demand implied by the
+optimal stomatal conductance: the water reaching the collar from the soil
+must equal the water the root-to-leaf hydraulic path is carrying onward. In
+other words, $\psi_{{\rm soil},i}$ (one per layer, from this page) plus the
+gravity head and root vulnerability curves above are exactly the "downstream
+water potential" the leaf model's cost function needs; solving for $P_{x,r}$
+is the missing link between the soil water balance and the leaf-level
+profit-maximisation.
+
+## Diagnostics: cumulative fluxes {#sec-diagnostics}
+
+Alongside the $N$ moisture states, the environment tracks four cumulative
+auxiliary states (`aux_num` = 4) that integrate, rather than instantaneously
+report, the water balance:
+
+- cumulative rainfall $\int P\,{\rm d}t$;
+- cumulative infiltration $\int q_{{\rm in},0}\,{\rm d}t$;
+- cumulative deep drainage, the outflow lost from the bottom of the column,
+  $\int q_{{\rm out},N-1}\,{\rm d}t$;
+- cumulative total root uptake, $\int \sum_i u_i\,{\rm d}t$.
+
+These are running totals in the same spirit as the cumulative growth and seed
+output tracked for individual plants on the [size-structured PDE
+page](size-structured-pde.qmd) — a convenient way to audit the water budget of
+a run (rain in, runoff and drainage out, uptake removed) without re-deriving
+it from the instantaneous rates.
+
+## Current limitation: only light can be pinned {#sec-limitation}
+
+`set_fixed_environment()` lets a user pin the light environment to a fixed
+value, useful for isolating a plant's response to light alone. There is no
+equivalent for soil water: the water balance of @eq-layer-balance always runs
+dynamically, driven by rainfall and uptake, with no way to hold
+$\psi_{\rm soil}$ constant at a chosen value. This is a known gap
+(`TODO(#476)`, tracked against the shared `Environment` machinery) rather than
+a deliberate modelling choice — see `ff16_environment.h` for where the same
+TODO is recorded.
+
+## Where this leads
+
+The per-layer potentials, root-collar solve, and cumulative fluxes on this
+page are the supply side of the water economy; [assimilation &
+hydraulics](assimilation-hydraulics.qmd) is the demand side, where the plant
+decides how much of that supply to draw on by optimising leaf xylem potential
+against the profit it buys in carbon. Together the two pages are the whole of
+TF24's water story; see [the TF24 model page](models/tf24.qmd) for how that
+story fits into the rest of the strategy.

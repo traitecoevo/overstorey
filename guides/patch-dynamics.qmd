@@ -19,16 +19,17 @@ used to solve it.
 
 ## Background
 
-First we instantiate the basic parameters of the `FF16` strategy, particularly
-the probability that a patch is disturbed (via `disturbance_mean_interval`):
+First we instantiate the basic parameters of the `FF16` strategy. The length of
+a patch's development — and hence its disturbance regime — is governed by
+`max_patch_lifetime` (in years). The mean disturbance interval is a derived,
+read-only property of the disturbance regime rather than a field you set
+directly; here we simply keep the default (~105 years):
 
 ```{r}
 #| label: setup-params
 library(plant)
 
 params <- scm_base_parameters("FF16")
-
-params$disturbance_mean_interval <- 30.0
 ```
 
 ```{r}
@@ -68,7 +69,7 @@ Next, we configure a patch containing a single species:
 
 ```{r}
 #| label: single-species-patch
-patch <- expand_parameters(trait_matrix(0.0825, "lma"), params)
+patch <- add_strategies(params, trait_matrix(0.0825, "lma"))
 ```
 
 <!-- TODO: rename SCM to solve_characteristic_method (issue: #206) -->
@@ -125,8 +126,8 @@ signif(t[c(1, 10, 50, 100, 142)], 1)
 higher temporal resolution is needed to resolve early patch development, where
 small differences are magnified through competitive feedbacks. Our patch ran
 for 105 yrs, but the solver spent half the recorded steps exploring the first
-year alone. More on timing can be found in the
-[node scheduling algorithm](https://traitecoevo.github.io/plant/articles/node_spacing.html).
+year alone. More on timing can be found in
+[The node-spacing algorithm](../theory/implementation/node-spacing.qmd).
 
 Nodes are introduced at each time-step, except the last. At time step $i$, the
 rows of `h` record the height of all previously introduced nodes in the patch:
@@ -178,8 +179,10 @@ matplot(t, h, lty=1, col=util_colour_set_opacity("black", 0.25), type="l",
         las=1, xlab="Time (years)", ylab="Height (m)")
 ```
 
-The light environment is stored over each time step, meaning that we can also
-plot how it changes during patch development:
+The light environment — canopy openness as a function of height — is stored over
+each time step; see [Canopy & light-environment models](../theory/implementation/canopy-models.qmd)
+for how it is computed from the leaf area above. This means we can also plot how
+it changes during patch development:
 
 ```{r}
 #| label: plot-light-environment
@@ -240,7 +243,8 @@ to a density that generates a canopy that they cannot survive under.
 ## Multiple patches
 
 In the `FF16` strategy, leaf area index (LAI) is the driver that controls the
-canopy openness (via the light extinction coefficient `params$k_I`, following
+canopy openness (via the light extinction coefficient `k_I`, a strategy
+parameter at `params$strategy_default$pars$k_I`, following
 exponential extinction). The collected output records the leaf area
 (`competition_effect`) of an individual in each node, so we can integrate across
 the size distribution to recover the patch-level competition experienced at
@@ -249,7 +253,7 @@ ground level (height = 0) in terms of LAI:
 ```{r}
 #| label: plot-lai
 # Light extinction coefficient, used to weight leaf area into competition.
-k_I <- result$p$strategies[[1]]$k_I
+k_I <- result$p$strategies[[1]]$pars$k_I
 
 lai <- result$species |>
   dplyr::filter(species == "1") |>
@@ -269,7 +273,7 @@ to the population:
 
 ```{r}
 #| label: two-species-patch
-patch_2sp <- expand_parameters(trait_matrix(0.2625, "lma"), patch)
+patch_2sp <- add_strategies(patch, trait_matrix(0.2625, "lma"))
 ```
 
 Then collect the patch-level dynamics:

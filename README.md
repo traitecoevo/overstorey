@@ -56,6 +56,49 @@ quarto preview          # live reload
 quarto render           # full build to _site/
 ```
 
+## Previewing a branch that isn't merged/published
+
+CI publishes from `master` using the committed `_freeze/`, so it never needs a
+`plant` build. On a feature branch the same holds for any page you *haven't*
+touched — `freeze: auto` re-executes a page only when its own source changes.
+So the situation splits:
+
+- **Pages you didn't edit** — `quarto preview` / `quarto render` renders them
+  straight from the committed freeze; no `plant` required.
+- **Pages you edited that run R** (a `library(plant)` setup chunk, inline
+  helpers like `plant_version_badge()`, …) — their freeze is now stale, so
+  Quarto tries to re-execute them and fails if `plant` isn't installed.
+
+**Just want to eyeball prose/layout, no `plant` build?** Temporarily force
+Quarto to use the committed freeze for *every* page:
+
+```bash
+sed -i '' 's/  freeze: auto/  freeze: true/' _quarto.yml   # macOS; drop the '' on Linux
+quarto render          # or: quarto preview — no plant needed
+git checkout _quarto.yml                                    # revert; never commit this flip
+```
+
+This renders your **new prose** against the **last-frozen computed output** —
+accurate for markdown-only edits, but for edited *code* chunks you'll see new
+code with stale output (fine for a visual check, not a validation).
+
+> Don't reach for `quarto render --no-execute`: it disables the engine but still
+> evaluates inline `` `r …` `` expressions and errors on them instead of
+> falling back to the freeze.
+
+**Before the branch can merge/publish**, the changed R pages must be
+re-executed for real and their freeze committed:
+
+```r
+renv::restore()        # install plant at the pinned commit (compiles C++)
+```
+```bash
+quarto render theory/<edited-page>.qmd   # regenerates that page's _freeze/
+git add _freeze/ && git commit
+```
+The `pr-checks` freeze-consistency check gates the PR until the committed
+`_freeze/` matches source.
+
 ## First-time setup
 ```r
 install.packages("renv")
