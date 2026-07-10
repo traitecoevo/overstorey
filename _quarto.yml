@@ -95,7 +95,15 @@ website:
             - theory/size-structured-pde.qmd
             - theory/assimilation-hydraulics.qmd
             - theory/soil-water.qmd
+        - section: "Adaptive dynamics"
+          contents:
             - theory/adaptive-dynamics.qmd
+            - theory/adaptive-dynamics/index.qmd
+            - theory/adaptive-dynamics/DD99.qmd
+            - theory/adaptive-dynamics/GK98.qmd
+            - theory/adaptive-dynamics/GM99.qmd
+            - theory/adaptive-dynamics/JJ12.qmd
+            - theory/adaptive-dynamics/assembly.qmd
         - section: "Models"
           contents:
             - theory/models/index.qmd

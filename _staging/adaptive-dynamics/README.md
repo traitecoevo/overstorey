@@ -1,31 +1,28 @@
-# Staged: adaptive-dynamics section (regnans toy models)
+# Staged: computational assembly vignettes
 
-These pages document the fast toy adaptive-dynamics models in
-[`regnans`](https://github.com/traitecoevo/regnans) — per-model write-ups
-(DD99/GK98/GM99/JJ12), the community-assembly examples, and the attractor solver.
+These three worked-example vignettes are held back from the live site (this
+`_staging/` directory is a leading-underscore path Quarto does not render). The
+rest of the adaptive-dynamics section — the model write-ups (DD99/GK98/GM99/JJ12),
+the section index, and the main `assembly.qmd` — is live under
+`theory/adaptive-dynamics/`.
 
-They live under `_staging/` (a leading-underscore directory Quarto does not
-render) because they are **not yet publishable on the site**. Two things are
-needed first:
+- `assembly_fitmax.qmd` — max-fitness assembly (1- and 2-trait)
+- `assembly_stochastic.qmd` — stochastic assembly
+- `solving_attractors.qmd` — solving for attractors
 
-1. **regnans must export the workflow verbs these pages use.** The pages call
-   `community_add()`, `assembler_set_traits()`, and
-   `plant_default_assembly_pars()`, which are currently internal to regnans
-   (defined but not in its `NAMESPACE`). They were written to run under
-   `devtools::load_all()`, which exposes every internal function. Once regnans
-   exports them (or provides public equivalents), the pages render against the
-   installed package.
+They are not yet render-ready for the site (in addition to the now-fixed
+`devtools::load_all()` calls):
 
-2. **regnans must be added to the site's `renv.lock`.** It is not currently a
-   recorded dependency of the overstorey site.
+- **Dev-machine caching.** They `saveRDS()`/`readRDS()` to a local `output/`
+  directory — including reading files that do not exist in the repo (e.g.
+  `output/fitmax-lma-old1.rds`, a comparison against a previous run). On a clean
+  checkout these error. The caching needs to be removed or made
+  self-contained before the pages can freeze.
+- **A code bug** in `assembly_stochastic.qmd` (a glue/parse error around the
+  filename handling) still needs fixing.
+- **Cost.** The stochastic-assembly and attractor runs are heavy (parallel);
+  decide how they should be frozen for the site.
 
-To take them live once both are done:
-
-- `git mv _staging/adaptive-dynamics theory/adaptive-dynamics`
-- add an "Adaptive dynamics" section to the Theory sidebar in `_quarto.yml`
-  (lead with `theory/adaptive-dynamics.qmd`, then `index.qmd`, the four model
-  pages, the three `assembly*` pages, and `solving_attractors.qmd`)
-- `quarto render` and commit the generated `_freeze/` entries
-
-The dev-environment `devtools::load_all()` calls have already been removed from
-these files; they otherwise render once the regnans API above is in place.
+Once cleaned up: `git mv` each back to `theory/adaptive-dynamics/`, add it to the
+"Adaptive dynamics" section in `_quarto.yml`, `quarto render`, and commit the
+`_freeze/`.
