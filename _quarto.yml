@@ -70,6 +70,7 @@ website:
         - section: "Running the model"
           contents:
             - guides/patch-dynamics.qmd
+            - guides/initialising-a-patch.qmd
             - guides/strategies.qmd
             - guides/extrinsic-drivers.qmd
             - guides/calibration.qmd
@@ -78,6 +79,10 @@ website:
             - guides/example-analysis.qmd
             - guides/self-thinning.qmd
             - guides/emergent-properties.qmd
+        - section: "TF24 in depth"
+          contents:
+            - guides/tf24-hydraulics-and-acclimation.qmd
+            - guides/tf24-nsc-storage.qmd
     - title: "Theory"
       style: floating
       contents:
@@ -97,6 +102,7 @@ website:
             - theory/models/ff16.qmd
             - theory/models/k93.qmd
             - theory/models/tf24.qmd
+            - theory/models/scientific-versioning.qmd
         - section: "Implementation"
           contents:
             - theory/implementation/index.qmd

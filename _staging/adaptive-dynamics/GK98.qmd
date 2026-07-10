@@ -1,0 +1,103 @@
+---
+title: "GK98 — Geritz, Kisdi, Meszéna & Metz 1998"
+subtitle: "Soft selection across patches, and the adaptive branching of the evolutionary tree"
+format: html
+---
+
+## The original paper
+
+Geritz, S.A.H., Kisdi, É., Meszéna, G. & Metz, J.A.J. (1998). *Evolutionarily
+singular strategies and the adaptive growth and branching of the evolutionary
+tree.* **Evolutionary Ecology** 12, 35–57.
+
+This is the foundational adaptive-dynamics paper — it defines invasion fitness,
+the selection gradient, pairwise invasibility plots, and the classification of
+**evolutionarily singular strategies** (ESS, convergence stability, branching
+points). Its worked example is a haploid **Levene soft-selection** model: a single
+trait under stabilising selection in each of several patches with different
+optima, and *soft* density regulation (each patch contributes a fixed share to the
+next generation). It is not a seed-size model — that is the separate
+[GM99](GM99.qmd) paper.
+
+## Fitness equations
+
+Three patches ($m=3$) with optima $\mu = (-d, 0, d)$, equal capacities $K_j$
+(weights $c_j = K_j/\sum_h K_h$), and Gaussian within-patch survival of width
+$\sigma$:
+
+$$
+f_j(x) = \exp\!\left(-\frac{(x-\mu_j)^2}{2\sigma^2}\right).
+$$
+
+For a single resident `x`, the invasion fitness of a mutant `y` (a log per-capita
+growth, zero at the resident) is
+
+$$
+s_x(y) = \log \sum_{j} c_j \, \frac{f_j(y)}{f_j(x)}.
+$$
+
+The singular strategy is the capacity-weighted mean optimum,
+$x^\* = \sum_j c_j \mu_j$ (= 0 for the symmetric default). It is **always
+convergence stable**, and is an evolutionary **branching point iff
+$d/\sigma > \sqrt{3/2} \approx 1.2247$** (a continuously stable strategy below
+that threshold).
+
+## Example analysis with `regnans`
+
+```{r setup}
+#| message: false
+library(regnans)
+```
+
+```{r singular}
+h <- harness_gk98(d = 1.5, sigma = 1)   # d/sigma = 1.5 > sqrt(1.5) → branching
+
+out <- community_start(bounds(x = c(-4, 4)), harness = h) |>
+  community_solve_singularity_1D()
+
+as.numeric(out$traits)   # x* — expected 0 (symmetric three-patch)
+```
+
+The branching threshold $d/\sigma = \sqrt{3/2}$ is recovered numerically by
+finding where the invasion-fitness curvature at `x* = 0` changes sign:
+
+```{r threshold}
+curv0 <- function(d, sigma = 1, h = 1e-4) {
+  comm <- community_start(bounds(x = c(-4, 4)),
+                          harness = harness_gk98(d = d, sigma = sigma)) |>
+    community_add(trait_matrix(0, "x")) |>
+    community_demography()
+  f <- comm$fitness_function
+  (f(h) - 2 * f(0) + f(-h)) / h^2
+}
+
+uniroot(curv0, c(1.0, 1.5))$root   # ≈ sqrt(3/2)
+sqrt(3 / 2)
+```
+
+### Pairwise invasibility plots either side of the threshold
+
+```{r pip}
+#| fig-width: 8
+#| fig-height: 4.2
+pip <- function(h, xs) {
+  sapply(xs, function(res) {
+    community_start(bounds(x = range(xs)), harness = h) |>
+      community_add(trait_matrix(res, "x")) |>
+      community_demography() |>
+      (\(comm) comm$fitness_function(xs))()
+  })
+}
+xs <- seq(-4, 4, length.out = 81)
+
+op <- par(mfrow = c(1, 2))
+for (d in c(1.0, 1.5)) {
+  S <- pip(harness_gk98(d = d, sigma = 1), xs)
+  image(xs, xs, t(sign(S)), col = c("white", "grey85", "forestgreen"),
+        xlab = "resident x", ylab = "mutant y",
+        main = sprintf("d/sigma = %.1f (%s)", d,
+                       if (d > sqrt(1.5)) "branching" else "CSS"))
+  abline(0, 1, lty = 2)
+}
+par(op)
+```

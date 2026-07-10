@@ -1,0 +1,106 @@
+---
+title: "JJ12 — Johansson & Jonzén 2012"
+subtitle: "Evolution of migratory arrival time, and a tragedy of the commons"
+format: html
+---
+
+## The original paper
+
+Johansson, J. & Jonzén, N. (2012). *Game theory sheds new light on ecological
+responses to current climate change when phenology is historically mismatched.*
+**Ecology Letters** 15, 881–888.
+
+Migratory birds compete for a fixed number of breeding territories. Arriving early
+is costly (harsh conditions) but improves the chance of securing a territory;
+arriving at the seasonal optimum maximises reproduction. Because securing a
+territory is a *competitive* advantage, individuals are selected to arrive
+**earlier than the date that would maximise population output** — an evolutionary
+tragedy of the commons, and a baseline mismatch that matters when climate change
+shifts the optimal date. This write-up uses the simplified, fully analytic form of
+the model from Brännström, Johansson & von Festenberg (2013, *Games* 4:304–328,
+§4), which makes it an exact benchmark for numerical solvers.
+
+## Fitness equations
+
+Competitive ability (declines with arrival time `x`) and reproduction (Gaussian
+about the seasonal optimum `x_opt`):
+
+$$
+C(x) = e^{-a x},
+\qquad
+R(x) = R_0\,\exp\!\left(-\frac{(x-x_{\mathrm{opt}})^2}{2\sigma^2}\right).
+$$
+
+With year-to-year survival `p`, a single resident reaches
+$n^\* = K R(x)/(1-p)$. The invasion fitness of a mutant `x'` (a discrete-time
+geometric growth rate; $w = 1$, i.e. log = 0, at the resident) is
+
+$$
+w(x') = (1-p)\,\frac{C(x')\,R(x')}{C(x)\,R(x)} + p .
+$$
+
+The selection gradient is linear and decreasing, so there is a single
+**continuously stable strategy** (no branching) with the closed form
+
+$$
+x^\* = x_{\mathrm{opt}} - a\,\sigma^2 ,
+$$
+
+which lies *before* the population optimum `x_opt` whenever `a > 0`.
+
+## Example analysis with `regnans`
+
+```{r setup}
+#| message: false
+library(regnans)
+```
+
+```{r singular}
+a <- 0.125; x_opt <- 0; sigma <- 10
+h <- harness_jj12(a = a, x_opt = x_opt, sigma = sigma, R0 = 1, K = 5, p = 0.5)
+
+out <- community_start(bounds(x = c(-40, 40)), harness = h) |>
+  community_solve_singularity_1D()
+
+c(numeric = as.numeric(out$traits),
+  analytic = x_opt - a * sigma^2)     # should match: -12.5
+```
+
+The numerically-solved singular strategy matches the closed form exactly — this
+is the model's value as a test oracle. It arrives `a*sigma^2` = `r 0.125*100`
+units *before* the seasonal optimum (the tragedy of the commons).
+
+### Selection gradient and convergence
+
+The gradient is positive below `x*` and negative above it, so evolution converges
+to `x*` from either side:
+
+```{r gradient}
+#| fig-width: 5.5
+#| fig-height: 4
+xs <- seq(-30, 10, length.out = 60)
+grad <- sapply(xs, function(x) {
+  community_start(bounds(x = c(-40, 40)), harness = h) |>
+    community_add(trait_matrix(x, "x")) |>
+    community_demography() |>
+    community_selection_gradient() |>
+    (\(comm) comm$selection_gradient)()
+})
+
+plot(xs, grad, type = "l", lwd = 2,
+     xlab = "resident arrival time x", ylab = "selection gradient")
+abline(h = 0, lty = 3); abline(v = x_opt - a * sigma^2, col = "forestgreen", lty = 2)
+legend("topright", legend = "x* = x_opt - a sigma^2", col = "forestgreen",
+       lty = 2, bty = "n")
+```
+
+### Mismatch grows with the competitive advantage `a`
+
+```{r mismatch}
+sapply(c(0, 0.04, 0.125), function(a) {
+  h <- harness_jj12(a = a, x_opt = 0, sigma = 10)
+  as.numeric(community_start(bounds(x = c(-40, 40)), harness = h) |>
+               community_solve_singularity_1D() |>
+               (\(comm) comm$traits)())
+})   # 0, -4, -12.5  — earlier arrival as competition for territories intensifies
+```

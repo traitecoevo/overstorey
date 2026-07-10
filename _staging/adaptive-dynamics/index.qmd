@@ -1,0 +1,41 @@
+---
+title: "Toy adaptive-dynamics models in regnans"
+---
+::: {.eyebrow}
+theory
+:::
+
+Per-model write-ups of the fast toy adaptive-dynamics models shipped with
+[`regnans`](https://github.com/traitecoevo/regnans). Each model has an
+explicitly-coded invasion fitness and equilibrium (backed by C++), so it runs in
+milliseconds and has known answers to validate the assembly / attractor
+algorithms against — a complement to the full `plant` SCM. They pair with the
+[adaptive dynamics](../adaptive-dynamics.qmd) theory page, which develops
+invasion fitness for the full size-structured model.
+
+Each page gives a brief description of the original paper, the fitness equations,
+and a worked example using the `regnans` harness API.
+
+| Model | Paper | Behaviour |
+|---|---|---|
+| [DD99](DD99.qmd) | Dieckmann & Doebeli 1999 | competition kernel; branching iff $\sigma_C<\sigma_K$ |
+| [GK98](GK98.qmd) | Geritz, Kisdi, Meszéna & Metz 1998 | soft selection; branching iff $d/\sigma>\sqrt{3/2}$ |
+| [GM99](GM99.qmd) | Geritz, van der Meijden & Metz 1999 | seed size in safe sites; branching at high asymmetry |
+| [JJ12](JJ12.qmd) | Johansson & Jonzén 2012 | bird arrival time; a single CSS, $x^\*=x_{opt}-a\sigma^2$ |
+
+All single-model pages use the same pipeline:
+
+```r
+library(regnans)
+h <- harness_dd99()                                   # or _gk98 / _gm99 / _jj12
+community_start(bounds(x = c(-2, 2)), harness = h) |>
+  community_solve_singularity_1D()                    # -> evolutionary attractor
+```
+
+The DD99, GK98 and GM99 models also handle **mixtures**, so beyond pairwise
+invasibility plots you can run the full community-assembly algorithm and watch a
+multi-species community build up by branching and limiting similarity — including
+**DD99 in two trait dimensions**. See [Community assembly](assembly.qmd).
+
+> Rendering these pages requires `regnans` (and its dependency `plant`) to be
+> installed, not just loaded from source.

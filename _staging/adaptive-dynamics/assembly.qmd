@@ -1,0 +1,109 @@
+---
+title: "Community assembly with the toy models"
+subtitle: "Beyond pairwise invasibility: running the assembly algorithm"
+format: html
+---
+
+A pairwise invasibility plot (PIP) shows whether a *single* mutant can invade a
+*single* resident. The toy models in `regnans` also support **mixtures**, so we
+can run the full community-assembly algorithm — repeatedly introduce the
+best-invading mutant, re-solve the community to demographic equilibrium, and drop
+any residents driven extinct — and watch a multi-species community build up by
+evolutionary branching and limiting similarity.
+
+```{r setup}
+#| message: false
+library(regnans)
+```
+
+## A note on trait scale
+
+The assembly machinery spaces and searches trait space on a configurable scale.
+Strictly positive biological traits (plant's `lma`, or GM99 seed size) suit a
+**log** scale; traits whose optimum sits at 0 (DD99, GK98) need a **linear**
+scale. Set it with `community_start(trait_scale = ...)` — `"log"` is the default.
+
+## DD99 — limiting similarity in one dimension
+
+With competition narrower than the resource (`sigma_C < sigma_K`) the resource
+optimum is a branching point, and assembly packs trait space with coexisting
+species roughly one competition-width apart.
+
+```{r dd99-1d}
+#| fig-width: 6
+#| fig-height: 3.4
+h <- harness_dd99(x0 = 0, sigma_K = 1, sigma_C = 0.4)
+comm <- community_start(bounds(x = c(-3, 3)), harness = h, trait_scale = "linear",
+                        fitness_control = list(method = "grid", n_evals = 150))
+a <- assembler_start(comm, assembler_control(list(birth_type = "maximum")))
+a <- assembler_run(a, 14)
+
+cat(length(a$community), "coexisting species\n")
+xs <- sort(as.numeric(a$community$traits))
+plot(xs, rep(1, length(xs)), pch = 19, col = "forestgreen", yaxt = "n",
+     ylab = "", xlab = "trait x", xlim = c(-3, 3),
+     main = sprintf("DD99 assembly: %d species (limiting similarity)", length(xs)))
+```
+
+## GK98 — branching to a protected dimorphism
+
+The soft-selection model conserves total population, so there is no "empty
+habitat" to colonise — we **seed** the first type, then let it evolve. At
+`d/sigma = 1.5` (above the branching threshold √(3/2)) the single type splits
+into a stable dimorphism.
+
+```{r gk98}
+comm <- community_start(bounds(x = c(-4, 4)), harness = harness_gk98(d = 1.5, sigma = 1),
+                        trait_scale = "linear",
+                        fitness_control = list(method = "grid", n_evals = 150))
+a <- assembler_start(comm, assembler_control(list(birth_type = "maximum")))
+a <- assembler_set_traits(a, trait_matrix(0, "x"))   # seed the first type
+a <- assembler_run(a, 10)
+
+sort(round(as.numeric(a$community$traits), 3))        # a symmetric dimorphism
+```
+
+## GM99 — a seed-size polymorphism
+
+Strong size-asymmetric competition (`alpha*R = 7`) drives branching in seed size.
+Assembly from empty produces a polymorphism of small and large seeds. (GM99's
+multi-resident fitness is a multi-dimensional Poisson sum, so it is the slowest
+of the toy models — a few species takes seconds, not milliseconds.)
+
+```{r gm99}
+#| eval: false
+comm <- community_start(bounds(x = c(0.06, 0.95)), harness = harness_gm99(alpha = 7, beta = 15),
+                        fitness_control = list(method = "grid", n_evals = 80))
+a <- assembler_start(comm, assembler_control(list(birth_type = "maximum")))
+a <- assembler_run(a, 4)
+sort(round(as.numeric(a$community$traits), 3))   # e.g. 0.11, 0.45, 0.69 — small, medium, large seeds
+```
+
+## DD99 in two trait dimensions
+
+`harness_dd99_nd()` is the multi-trait extension (cf. Ito & Dieckmann 2007): the
+resource and competition kernels are products of per-dimension Gaussians, so each
+trait has its own optimum and widths. The singular point is `x* = x0` and a
+dimension branches iff its `sigma_C < sigma_K`.
+
+The same `assembler_run()` drives 2D assembly — the only change from 1D is a
+two-trait `bounds()` and the multi-trait harness:
+
+```{r dd99-2d}
+#| fig-width: 5
+#| fig-height: 5
+h2 <- harness_dd99_nd(x0 = c(0, 0), sigma_K = c(1, 1), sigma_C = c(0.5, 0.5))
+comm <- community_start(bounds(x1 = c(-3, 3), x2 = c(-3, 3)), harness = h2,
+                        trait_scale = "linear",
+                        fitness_control = list(method = "grid", n_evals = 40))
+a <- assembler_start(comm, assembler_control(list(birth_type = "maximum")))
+a <- assembler_run(a, 40)
+
+cat(length(a$community), "coexisting species in 2D\n")
+plot(a$community$traits[, 1], a$community$traits[, 2], pch = 19, col = "forestgreen",
+     xlab = "trait x1", ylab = "trait x2", xlim = c(-3, 3), ylim = c(-3, 3),
+     main = sprintf("DD99 2D assembly: %d species", length(a$community)))
+```
+
+The species pack the trait plane at a characteristic spacing set by the
+competition widths — limiting similarity in two dimensions.

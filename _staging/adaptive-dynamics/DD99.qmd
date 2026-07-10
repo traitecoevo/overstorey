@@ -1,0 +1,97 @@
+---
+title: "DD99 — Dieckmann & Doebeli 1999"
+subtitle: "Competition for a Gaussian resource, and the origin of evolutionary branching"
+format: html
+---
+
+## The original paper
+
+Dieckmann, U. & Doebeli, M. (1999). *On the origin of species by sympatric
+speciation.* **Nature** 400, 354–357.
+
+A single quantitative trait `x` (e.g. beak size) sets how an individual uses a
+resource. Carrying capacity is highest at an intermediate phenotype `x0` and
+competition is strongest between similar phenotypes. The paper's central result is
+that this simple ingredient — competition that weakens with phenotypic distance —
+makes the resource optimum `x0` a **fitness minimum** once the population sits
+there, so the population splits into two diverging branches. It is the canonical
+demonstration of **evolutionary branching**, and (with sexual reproduction added)
+of sympatric speciation.
+
+## Fitness equations
+
+Carrying capacity and competition kernel:
+
+$$
+K(x) = K_0 \exp\!\left(-\frac{(x-x_0)^2}{2\sigma_K^2}\right),
+\qquad
+C(d) = \exp\!\left(-\frac{d^2}{2\sigma_C^2}\right).
+$$
+
+For a rare mutant `y` in a resident community $\{x_i, N_i\}$ at demographic
+equilibrium, the invasion fitness (a per-capita growth **rate**, zero at the
+resident) is
+
+$$
+s(y) = r\left(1 - \frac{\sum_i N_i\, C(y - x_i)}{K(y)}\right).
+$$
+
+A single resident sits at $N^\* = K(x)$. The singular strategy is $x^\* = x_0$, and
+it is an **evolutionary branching point iff $\sigma_C < \sigma_K$** (competition
+narrower than the resource), otherwise an ESS.
+
+## Example analysis with `regnans`
+
+```{r setup}
+#| message: false
+library(regnans)
+```
+
+Build the harness with the paper's branching parameters ($\sigma_C = 0.4 <
+\sigma_K = 1$) and solve for the singular strategy:
+
+```{r singular}
+h <- harness_dd99(r = 1, K0 = 500, x0 = 0, sigma_K = 1, sigma_C = 0.4)
+
+out <- community_start(bounds(x = c(-2, 2)), harness = h) |>
+  community_solve_singularity_1D()
+
+as.numeric(out$traits)        # x* — expected 0 (= x0)
+```
+
+Is it a branching point? Check the curvature of invasion fitness at the resident
+(positive = fitness minimum = disruptive selection):
+
+```{r curvature}
+resident_at <- function(h, x) {
+  community_start(bounds(x = c(-2, 2)), harness = h) |>
+    community_add(trait_matrix(x, "x")) |>
+    community_demography()
+}
+curv <- function(comm, at, d = 1e-4) {
+  f <- comm$fitness_function
+  (f(at + d) - 2 * f(at) + f(at - d)) / d^2
+}
+
+curv(resident_at(h, 0), 0)                                   # > 0  → branching
+curv(resident_at(harness_dd99(sigma_C = 1.5), 0), 0)        # < 0  → ESS
+```
+
+### Pairwise invasibility plot
+
+Sign of $s(y)$ over (resident `x`, mutant `y`) — green where a mutant can invade.
+The two off-diagonal invasion wedges around `x0 = 0` are the branching signature.
+
+```{r pip}
+#| fig-width: 5
+#| fig-height: 5
+xs <- seq(-2, 2, length.out = 81)
+S <- sapply(xs, function(res) {
+  resident_at(h, res)$fitness_function(xs)   # vector over all mutants
+})                                            # S[mutant, resident]
+
+image(xs, xs, t(sign(S)), col = c("white", "grey85", "forestgreen"),
+      xlab = "resident trait x", ylab = "mutant trait y",
+      main = "DD99 PIP (sigma_C = 0.4 < sigma_K = 1)")
+abline(0, 1, lty = 2)
+```
