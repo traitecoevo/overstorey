@@ -1,0 +1,102 @@
+---
+title: "max_fitness assembly"
+---
+::: {.eyebrow}
+theory
+:::
+
+This vignette runs community assembly with the **max-fitness** method in
+`regnans`: at each step the single best-invading mutant (the trait that maximises
+invasion fitness in the current community's light environment) is introduced, the
+community is re-solved to demographic equilibrium, and any residents driven
+extinct are dropped. We show a one-trait (`lma`) and a one-trait (`hmat`) example
+on the full `plant` FF16 model.
+
+```{r setup}
+#| message: false
+library(plant)
+library(regnans)
+library(dplyr)
+library(ggplot2)
+```
+
+# One trait: lma
+
+## Assembly
+
+```{r lma-assembly}
+# controls on the assembler: keep introducing the max-fitness mutant and
+# re-solving to equilibrium
+control <- assembler_control(
+  list(
+    run_type = "to_equilibrium",
+    birth_type = "maximum",
+    birth_move_tol = 1,
+    compute_viable_fitness = FALSE
+  )
+)
+
+# start from an empty community on the full plant FF16 model
+community0 <-
+  community_start(
+    bounds = bounds(lma = c(0.01, 2)),
+    fitness_control = list(method = "bayesopt", n_evals = 10, n_init = 5),
+    demography_control = demographic_step_control(
+      list(equilibrium_solver_name = "equilibrium_iteration", equilibrium_nsteps = 10)),
+    model_support = list(
+      p = plant_default_assembly_pars(max_patch_lifetime = 30),
+      plant_control = plant::control())
+  )
+
+obj <- assembler_run(assembler_start(community0, control = control), nsteps = 10)
+```
+
+## Analysis
+
+The resident traits and birth rates of the assembled community:
+
+```{r lma-result}
+obj$community$traits
+obj$community$birth_rate
+```
+
+The fitness landscape of the assembled community — residents (points) sit at the
+peaks/zeros, and no mutant can invade (fitness ≤ 0 everywhere):
+
+```{r lma-landscape}
+community_plot_fitness_landscape(obj$community)
+```
+
+`tidy_assembly()` returns a tidy record of the run — one row per strategy per
+step, carrying each step's traits, births, and fitness landscape in list columns
+for custom plotting:
+
+```{r lma-history}
+tidy_assembly(obj)
+```
+
+# One trait: height (`hmat`)
+
+The same method on a different trait — height at maturation.
+
+```{r hmat-assembly}
+community0 <-
+  community_start(
+    bounds = bounds(hmat = c(0.5, 30)),
+    fitness_control = list(method = "bayesopt", n_evals = 10, n_init = 5),
+    demography_control = demographic_step_control(
+      list(equilibrium_solver_name = "equilibrium_iteration", equilibrium_nsteps = 10)),
+    model_support = list(
+      p = plant_default_assembly_pars(max_patch_lifetime = 30),
+      plant_control = plant::control())
+  )
+
+obj_h <- assembler_run(assembler_start(community0, control = control), nsteps = 10)
+
+obj_h$community$traits
+obj_h$community$birth_rate
+```
+
+```{r hmat-landscape}
+community_plot_fitness_landscape(obj_h$community)
+```

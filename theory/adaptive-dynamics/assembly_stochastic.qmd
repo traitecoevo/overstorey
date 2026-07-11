@@ -1,0 +1,121 @@
+---
+title: "Stochastic assembly"
+---
+::: {.eyebrow}
+theory
+:::
+
+This vignette runs **stochastic** community assembly with `regnans` on the full
+`plant` FF16 model. Where the [max-fitness](assembly_fitmax.qmd) method always
+introduces the single best mutant, stochastic assembly draws each invader at
+random (here from a Gaussian mutation kernel `vcv`), so the community builds up as
+a noisy evolutionary walk rather than a deterministic climb. We show a one-trait
+(`lma`) and a two-trait (`lma` + `hmat`) example.
+
+```{r setup}
+#| message: false
+library(plant)
+library(regnans)
+library(tidyverse)
+
+model_support <- list(
+  p = plant_default_assembly_pars(),
+  plant_control = plant_default_assembly_control()
+)
+```
+
+# One trait: lma
+
+## Assembly
+
+```{r lma-assembly}
+control <- assembler_control(
+  list(
+    run_type = "single_step",
+    birth_type = "stochastic",
+    vcv = diag(1)
+  )
+)
+
+community0 <- community_start(bounds(lma = c(0.01, 1)), model_support = model_support)
+obj <- assembler_run(assembler_start(community0, control = control), nsteps = 60)
+
+obj$community$traits
+obj$community$birth_rate
+```
+
+## The assembly walk
+
+`tidy_assembly()` gives one row per resident per step; unnesting the traits shows
+the stochastic build-up of the community over assembly steps (point size ∝ birth
+rate):
+
+```{r lma-walk}
+#| fig-width: 7
+#| fig-height: 4
+tidy_assembly(obj) |>
+  filter(resident) |>
+  unnest(traits) |>
+  mutate(step = as.integer(step)) |>
+  ggplot(aes(step, lma, size = births)) +
+  geom_point(alpha = 0.4, colour = "forestgreen") +
+  scale_y_log10() +
+  labs(x = "assembly step", y = "lma", size = "birth rate") +
+  theme_classic()
+```
+
+## Fitness landscape
+
+Stochastic runs don't compute a fitness landscape by default, but we can evaluate
+it for the endpoint community (on a grid) and confirm the residents (red) sit at
+or near fitness zero with no strong invasion peaks left:
+
+```{r lma-landscape}
+#| fig-width: 7
+#| fig-height: 4
+obj$community <- community_fitness_landscape(obj$community, method = "grid", n_evals = 100)
+fp <- obj$community$fitness_points
+ggplot(fp, aes(lma, fitness)) +
+  geom_line() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_point(data = filter(fp, resident), colour = "red", size = 2) +
+  scale_x_log10() +
+  theme_classic()
+```
+
+# Two traits: lma + hmat
+
+The same method with a two-dimensional mutation kernel assembles a community in
+the `lma`–`hmat` plane.
+
+```{r hmat-assembly}
+control2 <- assembler_control(
+  list(
+    run_type = "single_step",
+    birth_type = "stochastic",
+    compute_viable_fitness = FALSE,
+    vcv = diag(2)
+  )
+)
+
+community0 <- community_start(bounds(lma = c(0.01, 1), hmat = c(0.5, 30)),
+                             model_support = model_support)
+obj2 <- assembler_run(assembler_start(community0, control = control2), nsteps = 10)
+
+obj2$community$traits
+obj2$community$birth_rate
+```
+
+The assembled two-trait community (point size ∝ birth rate):
+
+```{r hmat-plot}
+#| fig-width: 5.5
+#| fig-height: 4.5
+as_tibble(obj2$community$traits) |>
+  mutate(birth_rate = obj2$community$birth_rate) |>
+  ggplot(aes(lma, hmat, size = birth_rate)) +
+  geom_point(colour = "forestgreen", alpha = 0.6) +
+  scale_x_log10() +
+  labs(size = "birth rate") +
+  theme_classic()
+```

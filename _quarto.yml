@@ -104,6 +104,9 @@ website:
             - theory/adaptive-dynamics/GM99.qmd
             - theory/adaptive-dynamics/JJ12.qmd
             - theory/adaptive-dynamics/assembly.qmd
+            - theory/adaptive-dynamics/assembly_fitmax.qmd
+            - theory/adaptive-dynamics/assembly_stochastic.qmd
+            - theory/adaptive-dynamics/solving_attractors.qmd
         - section: "Models"
           contents:
             - theory/models/index.qmd
