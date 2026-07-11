@@ -10,38 +10,33 @@ under `theory/adaptive-dynamics/`.
 - `assembly_stochastic.qmd` — stochastic assembly
 - `solving_attractors.qmd` — selection gradients and solving for attractors
 
-## Primary blocker: the full-plant assembly path errors
+## Primary blocker: a plant regression breaks mutant fitness (plant#564)
 
 Unlike `assembly.qmd` (which uses the fast **toy models** — `harness_dd99` etc.),
 these three drive the **full `plant` SCM** assembly via
-`plant_default_assembly_pars()`. Against current plant `develop`, even the basic
-workflow
-
-```r
-community_start(..., model_support = list(p = plant_default_assembly_pars(), ...)) |>
-  community_add(trait_matrix(x, "lma"), birth_rate = 200) |>
-  community_demography() |>
-  community_selection_gradient()
-```
-
-fails with:
+`plant_default_assembly_pars()`. Against current plant `develop`, computing a
+mutant's fitness / selection gradient fails with:
 
 ```
 Error: Run a resident first to generate a competitve landscape
 ```
 
-thrown in plant C++ (`inst/include/plant/patch.h:244`). plant requires a
-resident's SCM to be run before a mutant's competitive fitness can be evaluated,
-and regnans's full-plant community path calls the fitness/selection-gradient
-machinery in an order plant now rejects. This is a **regnans↔plant integration
-bug in the full-plant assembly path** (regnans's full-plant integration predates
-this plant contract), not a documentation issue — and fixing it touches the SCM
-assembly algorithm, so it needs the maintainers, not a docs pass.
+thrown in plant C++ (`inst/include/plant/patch.h`, `Patch::set_mutant()`).
 
-Once that path works against installed plant, these pages can be finished. A
-related crash on the same path — `regr.km` not registered for the bayesopt
-fitness method — has already been fixed in regnans
-(traitecoevo/regnans#44).
+This is **not** a regnans or docs bug — it is a plant regression, filed as
+**traitecoevo/plant#564**. plant's mutant-fitness replay (#362) relies on caching
+the resident's per-RK-step environments during the resident run, via three
+`Patch` hooks (`cache_RK45_step`, `cache_ode_step`, `load_ode_step`). The odelia
+migration (#456) deleted plant's own ODE solver — which called those hooks — and
+swapped in odelia, which never calls them, so they are now dead code and
+`environment_history` is always empty. plant's own `tests/testthat/test-mutant.R`
+fails as a result. regnans (via `plant_community_update_fitness_function`)
+correctly sets `save_RK45_cache = TRUE` and runs the resident first; the cache
+just never gets populated underneath it.
+
+Once plant#564 is fixed, these pages should render. A related crash on the same
+path — `regr.km` not registered for the bayesopt fitness method — has already
+been fixed in regnans (traitecoevo/regnans#44).
 
 ## Secondary cleanups still needed (once the path works)
 
