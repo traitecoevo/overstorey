@@ -6,26 +6,33 @@ subtitle: "Telling a scientific change apart from a software change"
 theory
 :::
 
-`plant` has a single software version — its package `Version` — but the
-*scientific* models it ships evolve on a different clock than the code. `FF16`
-and `K93` encode published theory [@Falster-2015; @Kohyama-1993] and rarely
-change, while `TF24` and its fast variant `TF24f` are under active development. A
-new `plant` release might be a pure refactor, a performance tweak, or a genuine
-change to the equations — the package version moves in all three cases, so on its
-own it cannot tell you whether a simulation's *results* would change.
+There are two different kinds of change to keep track of when you use `plant`.
 
-That distinction matters most when you archive a run. What you are really
-archiving is a *result of the science*, and the question that matters months
-later is not "which release of the package produced this?" but "**is the science
-still the same, so this archived run is still valid?**" Re-running every archived
-simulation on every release would be wasteful; never re-running them would be
-wrong.
+The first is a change to the **software**. The package has a `Version`, just like
+any other R package. That version may move because an argument was renamed, some
+code was made faster, a bug was fixed, or the model itself changed.
 
-The **scientific version** exists to answer exactly that question. It is a small
-integer, carried per model, independent of the package `Version`, that changes
-*only* when a model's equations or default parameters change the simulation
-output for identical inputs — never for refactors, performance work, or interface
-changes.
+The second is a change to the **scientific model**. This happens when an equation
+or a default parameter changes in a way that changes the simulation result for
+the same inputs. `FF16` and `K93` encode established published models
+[@Falster-2015; @Kohyama-1993] and therefore change rarely. `TF24` and its fast
+variant, `TF24f`, are still being developed more actively.
+
+The package version alone cannot distinguish these cases. A performance
+improvement and a new growth equation may both produce a new release, even
+though only the second change should alter the scientific result.
+
+This matters when simulations are expensive and their outputs are archived. If
+only the software implementation changes, an existing result can usually be
+reused. If the model's science changes, that result may need to be recomputed.
+Re-running everything after every software release would waste time, but never
+re-running anything could leave you using results from an older model.
+
+To make that decision explicit, each model has its own **scientific version**.
+This version is independent of the package `Version`. It advances only when a
+change to the model's equations or default parameters changes its output for
+identical inputs. Refactors, performance work, and interface changes do not
+advance it.
 
 ## Reading a model's version
 
@@ -34,126 +41,146 @@ changes.
 library(plant)
 ```
 
-`model_version()` returns the scientific version as a string, and `model_id()`
-pairs it with the model name — the identifier used to label archived runs:
+Use `model_version()` when you need only the scientific version. It returns a
+string because some models have compound versions. Use `model_id()` when you
+want the model name and version together in an identifier suitable for labelling
+an archived run:
 
 ```{r read-version}
 model_version("FF16")   # scientific version
 model_id("FF16")        # name-and-version identifier
 ```
 
-The versions the installed `plant` currently ships are:
+To inspect all four models in the installed copy of `plant`:
 
 ```{r all-ids}
 sapply(c("FF16", "K93", "TF24", "TF24f"), model_id)
 ```
 
-`FF16` and `K93` are scientifically frozen at `v1`. `TF24` began at `v2` rather
-than `v1` because a published result used the pre-versioning "v1" science; the
-integer has advanced since as its defaults have been recalibrated. `TF24f`
-carries a compound version (see below).
+`FF16` and `K93` are scientifically frozen at `v1`, meaning that scientific
+changes to them should be exceptional. `TF24` began at `v2` rather than `v1`
+because a published result used the pre-versioning “v1” science. Its version has
+advanced as the model has developed. `TF24f` uses a compound version, explained
+below.
 
 ## The two versions, and why they are separate
 
-|  | changes when… | example |
+| Version | Changes when… | Example |
 |---|---|---|
 | Package `Version` | *anything* ships — bug fixes, refactors, performance, interface changes | renaming an argument |
 | Scientific version | the simulation output changes for identical inputs — an equation or a default parameter moves | recalibrating a default trait value |
 
-A refactor that leaves every number identical bumps the package `Version` but
-**not** the scientific version. That is the whole point: an archived run stays
-valid across such releases, and downstream tools can tell.
+For example, suppose a refactor makes a simulation run faster but leaves every
+number unchanged. The package `Version` advances because new software was
+released. The model's scientific version does not advance because its scientific
+meaning and output have not changed.
+
+Now suppose a default mortality parameter is recalibrated. The package version
+advances, and so does the scientific version of the affected model. An archived
+run made with the old default can then be recognised as belonging to the earlier
+science.
 
 ## Compound versions: `TF24f`
 
-Most models carry a single integer. The exception is a model defined *relative to
-another*. `TF24f` ("f" for fast) is a fast approximation of `TF24` — same
-biology, cheaper evaluation — so its version has two components,
-`"<TF24 version>.<approximation revision>"`:
+Most models need only one number. `TF24f` is different because it is defined
+relative to another model. It is a fast approximation of `TF24`: it shares the
+underlying biology but uses a cheaper way to track the leaf's operating point.
+
+Its version therefore has two components:
+
+`"<TF24 version>.<approximation revision>"`
 
 ```{r tf24f}
 model_id("TF24f")
 ```
 
-- The **major** component auto-tracks `TF24`'s scientific version. This is the
-  safe direction: any scientific change to `TF24` also invalidates `TF24f`,
-  automatically, with no second edit. Because `TF24f` is built on `TF24`, a
-  `TF24` change usually shifts `TF24f`'s output too, and an unnecessary rerun is
-  always safe whereas a missed one silently serves stale results.
+- The **major** component automatically follows the scientific version of
+  `TF24`. Because `TF24f` is built on `TF24`, a scientific change to `TF24` may
+  also change `TF24f`'s output. Following the parent version ensures that
+  archived `TF24f` results are reconsidered after such a change.
 - The **minor** component (`approximation_revision`) tracks changes to the
-  approximation itself — a change that affects `TF24f` but not `TF24`.
+  approximation itself. These changes affect `TF24f` but not `TF24`.
 
-So a `TF24` science bump advances the major component while leaving the minor
-component in place, and tightening the approximation advances the minor
-component alone.
+For example, a scientific change to `TF24` advances the first component while
+leaving the second in place. A change only to the fast approximation advances
+the second component.
 
 ## Where the number lives, and the bump rule
 
-There is a single source of truth, and it is in C++, sitting next to the
-equations it versions — the `scientific_version` constant on each strategy class:
+The scientific version has one source of truth. It is declared in C++, beside
+the strategy implementation that it describes, as the `scientific_version`
+constant on each strategy class:
 
 ```cpp
 // inst/include/plant/models/ff16_strategy.h
 static constexpr int scientific_version = 1;
 ```
 
-`TF24f` instead declares `approximation_revision`; the compound string is
-assembled in `src/strategy_version.cpp`, which the R accessors call through. R
-holds no duplicated copy of the number.
+`TF24f` instead declares `approximation_revision`. The code in
+`src/strategy_version.cpp` combines this revision with the current `TF24`
+version. The R functions read the result from the compiled code, so there is no
+second copy of the version number to keep in sync.
 
-**The rule for bumping it:** increment the constant when, and only when, a change
-moves simulation output for identical inputs — a changed equation or a changed
-default parameter. Do *not* bump it for refactors, performance work, or interface
-changes. When you add a new strategy, add its `scientific_version` constant to the
-model header and a dispatch arm in `src/strategy_version.cpp`.
+The rule is deliberately narrow: increment the scientific version when, and
+only when, a changed equation or default parameter changes simulation output
+for identical inputs. Do not increment it for refactors, performance work, or
+interface changes.
+
+When adding a new strategy, developers must add a `scientific_version` constant
+to its model header and a matching dispatch arm in
+`src/strategy_version.cpp`.
 
 ## The drift guard
 
-Reviewer discipline is fallible, so a test backs the rule for the common,
-mechanical case — a default parameter that quietly changes without a version
-bump. `tests/testthat/test-model-version.R` snapshots each model's *scientific
-surface*: its `model_id` together with the default strategy (biological `pars`,
-numerical `control`, and birth-rate defaults), each value formatted to full
+The version still has to be changed by a person, so `plant` includes a test to
+catch one common mistake: changing a default without changing the scientific
+version. `tests/testthat/test-model-version.R` records a snapshot of each
+model's *scientific surface*. The snapshot contains the `model_id` and the
+default strategy, including biological parameters (`pars`), numerical settings
+(`control`), and birth-rate defaults. Numeric values are stored at full
 precision.
 
-If a default changes but the version constant does **not**, the `model_id` in the
-snapshot stays the same while the surrounding values differ — so the snapshot
-test fails. The developer is then forced to choose: bump the version (if the
-change is scientific) or accept the new snapshot with
-`testthat::snapshot_accept()` (if it is not). The guard does not catch *pure
-equation* changes that leave every default untouched — those still rely on
-reviewer discipline and the bump convention in the header comments.
+If a default changes while the version stays fixed, the snapshot changes but
+the `model_id` does not, and the test fails. The developer must then decide
+whether to bump the scientific version or, if the change is genuinely
+non-scientific, deliberately accept the new snapshot.
+
+This guard has a limit: it cannot detect a change to an equation when all
+defaults remain unchanged. Those changes still depend on code review and the
+versioning rule documented beside the strategy.
 
 ## How downstream tools use it
 
-The reason the version is a stable, machine-readable string is so that tools
-built on top of `plant` can key their caches on it.
-[`logpile`](https://github.com/traitecoevo/logpile) archives `plant` simulations
-in a content-addressed cache: a run is identified by a hash of its resolved
-inputs, and the model's scientific version is one of those inputs. So:
+The version is machine-readable so downstream tools can treat it as part of a
+simulation's identity. [`logpile`](https://github.com/traitecoevo/logpile), for
+example, archives `plant` simulations in a content-addressed cache. It hashes a
+resolved set of inputs, including the versioned model identifier.
 
-- **Reuse.** A software-only `plant` release leaves the scientific version
-  untouched, the hash is unchanged, and archived results are reused — you don't
-  pay to recompute simulations whose science hasn't moved.
-- **Rerun.** When a model's scientific version is bumped, the hash changes and
-  the affected simulations are recomputed. `FF16`/`K93` runs stay put; `TF24`
-  runs re-run when `TF24`'s science advances.
+- **After a software-only change**, the scientific version is unchanged. With
+  the same inputs, the request identity is unchanged and the archived result
+  can be reused.
+- **After a scientific change**, the model identifier changes. The request is
+  therefore different, so a result from the earlier scientific version is not
+  mistaken for the new one.
 
-You never type the version yourself. `logpile` reads it from the installed
-`plant`, so you can name a model bare and let `plant` supply the version:
+At present, `logpile` expects an explicit versioned model identifier rather than
+a bare name such as `"TF24"`. Generate that identifier from the installed copy
+of `plant`, then include it in the request:
 
 ```r
-logpile::resolve_request(list(model_id = "TF24"))$model_id
+tf24_id <- plant::model_id("TF24")
+logpile::resolve_request(list(model_id = tf24_id))$model_id
 #> "TF24@v3"
 ```
 
-Pinning a version that disagrees with the installed `plant` is a hard error
-rather than a silent stale-cache hit — a safeguard against accidentally reading
-results from a different scientific version than you think you're running.
+This makes the link between the request and the installed scientific model
+explicit. If you are reproducing an older archived run, keep its older
+identifier with the archive rather than silently relabelling it as current.
 
 ## For developers
 
-See `plant`'s `agents.md` (§7) for the bump rules; family-wide conventions live
-in [`plant-meta`](https://github.com/traitecoevo/plant-meta).
+See `plant`'s `agents.md` (§7) for the maintenance rules. Family-wide
+conventions live in
+[`plant-meta`](https://github.com/traitecoevo/plant-meta).
 
 # References

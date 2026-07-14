@@ -5,113 +5,317 @@ title: "TF24"
 model
 :::
 
-TF24 is the hydraulically-explicit strategy. It keeps the trait-based
-functional-balance growth and allocation machinery of [FF16](ff16.qmd) but
-replaces FF16's fixed light-use efficiency with a mechanistic leaf model: at
-each instant the plant chooses stomatal conductance to **maximise carbon
-profit net of the hydraulic cost** of transpiration.
+TF24 adds explicit plant hydraulics to the trait-based growth framework used by
+[FF16](ff16.qmd). It was developed to ask how plant water use, tissue costs,
+and growth interact as water availability and atmospheric conditions change
+[@Towers-2024].
 
-That leaf-level optimisation — photosynthetic revenue from the Farquhar model,
-hydraulic cost from a xylem vulnerability curve, and the golden-section search
-that balances them — is the heart of TF24 and is documented in full on the
-core theory page:
+The central idea is simple. Opening stomata allows carbon dioxide to enter a
+leaf, supporting photosynthesis, but it also allows water to escape through
+transpiration. Replacing that water puts the xylem under tension and increases
+the risk of losing hydraulic conductivity. TF24 therefore chooses an operating
+point that **maximises photosynthetic carbon gain after accounting for a
+carbon-equivalent hydraulic cost**.
 
-- **[Assimilation & hydraulics](../assimilation-hydraulics.qmd)** — the
-  profit-maximisation leaf model, equation by equation, with worked examples.
+The cost is expressed in carbon units so it can be subtracted from
+photosynthetic gain. In the original formulation, it represents the carbon
+needed to restore xylem conductivity lost through cavitation.
+
+This operating point is not prescribed by an empirical stomatal-response
+curve. It emerges from the interaction among leaf biochemistry, atmospheric
+demand, soil water, plant size, and hydraulic traits. The calculation combines:
+
+- the Farquhar model of C3 photosynthesis;
+- a vulnerability curve describing how xylem conductivity declines as water
+  potential becomes more negative;
+- a water-supply calculation linking soil, xylem, and transpiration; and
+- a numerical search for the point where photosynthetic benefit minus
+  hydraulic cost is greatest.
+
+The [Assimilation & hydraulics](../assimilation-hydraulics.qmd) page develops
+this leaf-level calculation equation by equation. The sections below explain
+why it was added to the model and how it connects to whole-plant growth.
 
 ## How TF24 relates to FF16
 
 | | FF16 | TF24 |
 |---|---|---|
-| Carbon income | fixed leaf-level light-use efficiency | Farquhar photosynthesis coupled to stomatal conductance |
+| Carbon income | prescribed saturating light-response curve | Farquhar photosynthesis coupled to stomatal conductance |
 | Water | implicit | explicit supply–demand hydraulics with a vulnerability curve |
 | Stomata | — | conductance set by profit maximisation |
 | Allocation / growth | functional balance (shared) | functional balance (shared) |
 
-Everything below the leaf model — how assimilate is turned into height,
-diameter, and tissue pools, and how those feed the
-[size-structured PDE](../size-structured-pde.qmd) — is inherited from FF16.
+TF24 changes how the plant calculates carbon income at the leaf. The
+subsequent steps are inherited from FF16: assimilated carbon is allocated to
+height, diameter, and tissue pools, and these individual-level rates feed into
+the [size-structured PDE](../size-structured-pde.qmd).
+
+## The paper behind TF24
+
+Earlier versions of the `plant` framework could explain how traits affect
+growth through tissue construction, allocation, respiration, and turnover, but
+water availability entered that framework only indirectly. Towers et al.
+connected those whole-plant growth rules to an explicit stomatal and hydraulic
+model. This made it possible to follow a continuous chain from the environment
+to plant performance:
+
+1. soil water and atmospheric conditions constrain water supply and demand;
+2. the leaf chooses a stomatal and hydraulic operating point;
+3. that operating point determines net carbon assimilation;
+4. respiration, tissue turnover, and hydraulic costs reduce the carbon
+   available for growth; and
+5. the plant's allocation and allometry determine how that growth changes its
+   height and tissue pools [@Towers-2024].
+
+The supporting information adds detail to the carbon calculation. Biochemical
+carbon demand is the smoothly co-limited outcome of Rubisco activity and
+electron transport, while diffusive carbon supply depends on stomatal
+conductance. The model solves for an intercellular carbon dioxide concentration
+at which supply and demand agree. Leaf respiration is also linked to structural
+and photosynthetic nitrogen, so maintaining photosynthetic machinery carries a
+carbon cost as well as providing a benefit [@Towers-2024].
+
+### Two different optimisations
+
+The article uses the word *optimisation* at two different levels. Keeping them
+separate prevents a common misunderstanding.
+
+- **The leaf operating-point optimisation is part of TF24.** The model varies
+  water potential and the associated stomatal conductance to maximise
+  instantaneous photosynthetic gain minus hydraulic cost. TF24 repeats this
+  calculation as the plant and environment change.
+- **The trait-strategy optimisation was part of the paper's analysis.** The
+  researchers varied leaf mass per area, Huber value, wood density, and
+  sapwood conductivity to find the strategy with the fastest height growth in
+  each environment. This outer search is not part of an ordinary TF24 run.
+
+In other words, an individual in a standard TF24 run does not continually
+evolve or re-optimise its leaf mass per area, wood density, or other strategy
+traits. Those values define the strategy being simulated. The paper compared
+many possible strategies to ask which one would grow in height fastest under
+each set of conditions [@Towers-2024].
+
+## From carbon gain to height growth
+
+Why did the paper optimise height growth rather than photosynthesis alone?
+Because carbon income is only the start of the growth calculation. A trait can
+increase photosynthesis while also making leaves, sapwood, bark, or roots more
+expensive to build and maintain.
+
+The paper expressed height growth as a chain of four relationships:
+
+$$
+\frac{dH}{dt}
+=
+\frac{dH}{dA_l}
+\frac{dA_l}{dM_a}
+\frac{dM_a}{dB}
+\frac{dB}{dt}.
+$$ {#eq-tf24-height-growth}
+
+Read from right to left, new biomass production ($dB/dt$) is allocated to
+living tissue ($dM_a/dB$); that investment supports additional leaf area
+($dA_l/dM_a$); and the plant's allometry translates added leaf area into
+height growth ($dH/dA_l$). This is the same kind of functional-balance logic
+used by FF16. The hydraulic leaf model changes the carbon income entering the
+right-hand side, while traits can also change the construction and maintenance
+terms further along the chain [@Towers-2024].
+
+This distinction matters. In the paper, the leaf mass per area that maximised
+biomass production did not respond to the environment, whereas the value that
+maximised height growth did. The response appeared only after the cost of
+turning biomass into leaf area was included. A model that stopped at carbon
+gain or biomass production would therefore miss part of the trait trade-off
+[@Towers-2024].
+
+## Four focal traits and their trade-offs
+
+The study used TF24 to examine four measurable traits. Each trait can help in
+one part of the carbon-water economy while imposing a cost elsewhere.
+
+- **Leaf mass per area**, $\phi$, is the dry leaf mass needed to deploy a unit
+  of leaf area. Higher values make each unit of leaf area more expensive to
+  build, but the leaves turn over more slowly. Leaf respiration also changes
+  with the nitrogen investment associated with this trait.
+- **Huber value**, $\theta$, is the cross-sectional sapwood area supplying a
+  unit of leaf area. More sapwood improves water supply, but the extra sapwood
+  and bark must be built and maintained. A larger sapwood volume can also
+  incur a larger absolute hydraulic repair cost.
+- **Wood density**, $\rho$, is sapwood mass per unit volume. The paper
+  represents denser wood as more resistant to cavitation-related damage, but
+  also more expensive to construct.
+- **Maximum sapwood-specific conductivity**, $K_{s,\max}$, describes how
+  quickly a unit of sapwood can transport water at maximum conductivity. High
+  conductivity improves water transport, but the model links it to less
+  embolism-resistant xylem through a hydraulic safety-efficiency trade-off.
+
+These are not four independent "good" or "bad" settings. For example,
+increasing Huber value improves water supply per unit leaf area but also diverts
+more biomass into supporting tissue. Whether that change improves height
+growth depends on plant size and on the current soil, light, carbon dioxide,
+and atmospheric conditions [@Towers-2024].
+
+## What the study found
+
+The first result was that familiar stomatal responses emerged from the
+optimisation rather than being imposed as response curves. Under the paper's
+parameterisation, stomatal conductance declined as soils dried, vapour pressure
+deficit increased, or atmospheric carbon dioxide increased. It rose as light
+availability increased. Plants with a greater Huber value or greater maximum
+sapwood conductivity could support higher conductance under the same
+conditions [@Towers-2024].
+
+For plants of a fixed size and strategy, height growth was faster with wetter
+soil, lower vapour pressure deficit, more carbon dioxide, and more light. The
+authors then asked which traits maximised height growth along each
+environmental gradient. When all four traits were optimised together, drying
+soil favoured a coordinated shift towards:
+
+- higher leaf mass per area;
+- higher wood density;
+- higher Huber value; and
+- lower maximum sapwood-specific conductivity.
+
+In the model, the wet-adapted strategies achieved faster maximum growth but
+lost that advantage quickly as soil dried. More conservative strategies grew
+more slowly under wet conditions but maintained positive growth across a wider
+range of dry conditions. This produces a growth-versus-drought-tolerance
+trade-off that can help explain why species with different trait combinations
+replace one another along rainfall or soil-moisture gradients [@Towers-2024].
+
+::: {.callout-note}
+## A result, not a universal rule
+The joint drought pattern above is a result of the paper's parameterisation and
+trait assumptions. Some single-trait responses were more complicated. In
+particular, the height-growth-optimal Huber value changed non-monotonically as
+soil dried before increasing again under the driest conditions. Treat these
+results as mechanistic hypotheses produced by TF24, not as fixed responses that
+every parameterisation must show [@Towers-2024].
+:::
+
+The paper also examined plant height. Taller plants support more
+non-photosynthetic tissue and move water through a longer pathway, so their
+costs per unit leaf area rise. The predicted height-growth optima generally
+shifted towards higher leaf mass per area, wood density, and Huber value as
+plants became taller. Maximum sapwood conductivity increased only slightly
+[@Towers-2024].
+
+## How to interpret the paper's results
+
+The published experiments deliberately simplified the setting so the trait
+trade-offs could be understood. They modelled isolated individuals in fixed
+environments, without competition, reproduction, mortality, or a dynamic soil
+water balance. Most environmental-gradient results used a one-metre-tall plant
+and changed one driver at a time. Height growth was used as a tractable proxy
+for fitness, not as a complete measure of lifetime reproductive success
+[@Towers-2024].
+
+The study also held photosynthetic temperature-response parameters at their
+25 °C values rather than testing temperature as an environmental driver.
+Its conclusions concern soil water potential, vapour pressure deficit,
+atmospheric carbon dioxide, light, and plant height. They should not be read as
+predictions of thermal acclimation [@Towers-2024].
+
+Several biological relationships were simplified or uncertain. The hydraulic
+safety-efficiency trade-off was assumed, some hydraulic-cost parameters were
+poorly constrained, and the xylem representation omitted processes such as
+conduit widening, hydraulic segmentation, and gravitational water potential.
+The aim was to explain qualitative response directions, not to predict exact
+trait values for a particular species or site [@Towers-2024].
+
+::: {.callout-important}
+## The paper is the scientific origin, not a complete description of current TF24
+The 2024 analysis used the TF24 physiological module with a fixed soil water
+potential. The current strategy has since been connected to a dynamic,
+multi-layer soil-water and root-uptake model. The paper is therefore the best
+source for TF24's motivation, focal trait trade-offs, and original tests, while
+the pages linked below describe the current implementation.
+:::
 
 ## Soil water and root uptake
 
-TF24's hydraulics terminate at the root collar. The supply side — the soil
-water balance and multi-layer root water uptake that feed water to it — is
-documented on its own core theory page:
+The leaf model needs to know how much water the roots can supply. In TF24, the
+plant's hydraulic calculation extends down to the root collar. A separate soil
+water model tracks the water balance and calculates uptake from multiple soil
+layers, providing the water supply at that boundary. These calculations are
+described on their own core theory page:
 
 - **[Soil water & root uptake](../soil-water.qmd)** — the multi-layer bucket
   model, infiltration and drainage, the retention curve, and the root-collar
   solve that couples soil moisture into the leaf model.
 
-The original prototyping and benchmarking of this machinery lives in the
-notebook:
+The notebooks below record the original prototyping and benchmarking work:
 
 - [The AWRA soil-water bucket model](../../posts/index.qmd) <!-- TODO: point at the migrated awra-soil-water post slug once created -->
 - [Multi-layer root water uptake](../../posts/index.qmd) <!-- TODO: point at the migrated root-water-uptake post slug -->
 - [Root water-uptake performance work](../../posts/index.qmd) <!-- TODO: point at the test-root summary post slug -->
 
 ::: {.callout-note}
-## Strategy-level documentation is partial
-The original `strategy_TF24` vignette was an empty stub. This page assembles
-TF24 from its documented parts (the leaf model and the inherited FF16
-machinery). A full strategy-level write-up — the exact coupling of the leaf
-model into whole-plant growth, and the complete TF24 parameter set — is still
-**TODO** and should be supplied by the model authors rather than guessed.
+## Scope of this page
+This page explains the scientific logic of TF24 and how the published model
+connects leaf hydraulics to the FF16 growth framework. It is not a parameter
+reference. The exact current parameter set and its links to the whole-plant
+implementation still need a separate, version-specific account.
 :::
 
 ## TF24f: acclimation lag instead of instantaneous re-optimisation
 
-TF24f is a variant of TF24, not a different physiology. It subclasses
-`TF24_Strategy` and reuses TF24's leaf model, its xylem vulnerability curve,
-and its soil-water coupling untouched — every carbon-income and
-water-transport calculation is exactly the one described on
-[Assimilation & hydraulics](../assimilation-hydraulics.qmd). The one thing
-TF24f changes is *how the plant finds its operating point on the profit
-curve*.
+TF24 assumes that stomata and hydraulics adjust immediately when conditions
+change. At every ODE step, the model solves the profit-maximisation problem
+again and places the plant directly at the new optimum. This quasi-steady-state
+assumption is useful, but it cannot represent a plant that is still adjusting
+to a change in its environment.
 
-TF24 treats stomatal/hydraulic behaviour as quasi-steady-state: at every ODE
-step it re-solves the profit-maximisation problem from scratch, using a
-golden-section search over root-collar water potential to find the $\psi$
-that maximises the profit $P(\psi_l)$ defined on the
-[assimilation & hydraulics](../assimilation-hydraulics.qmd#eq-profit) page. This assumes the plant's
-hydraulic operating point adjusts instantaneously to its physical and
-environmental optimum at every instant — a reasonable simplification, but one
-that leaves no room for a plant that is still adjusting.
+TF24f introduces that adjustment time. It uses the same physiology as TF24:
+the same leaf model, xylem vulnerability curve, and soil-water coupling. The
+implementation subclasses `TF24_Strategy`, so the carbon-income and
+water-transport calculations described on
+[Assimilation & hydraulics](../assimilation-hydraulics.qmd) are inherited
+unchanged. The only difference is *how the plant moves towards the most
+profitable hydraulic operating point*.
 
-TF24f relaxes that assumption. It adds a sixth ODE state,
-`opt_root_psi_state`, that tracks the plant's *current* root-collar water
-potential and lets it climb toward the profit-maximising optimum by gradient
-ascent, rather than jumping straight to it:
+In TF24, a golden-section search over root-collar water potential is used at
+every step to find the $\psi$ that maximises the profit $P(\psi_l)$ defined on
+the [assimilation & hydraulics](../assimilation-hydraulics.qmd#eq-profit) page.
+TF24f instead adds a sixth ODE state, `opt_root_psi_state`, which records the
+plant's current root-collar water potential. Gradient ascent then moves this
+state towards the profit-maximising value rather than allowing it to jump
+there immediately:
 
 $$
 \frac{d\psi}{dt} = k_{\text{acclim}} \cdot \frac{dP}{d\psi}
 $$
 
-Instead of a golden-section search, TF24f's leaf-solve step evaluates profit
-at the *tracked* $\psi$ and hands the local profit gradient
-$dP/d\psi$ back to the ODE system, which integrates the state forward. The
-tracked state is seeded at the true optimum at establishment, so there is no
-birth transient — the lag only shows up once the environment moves the
-optimum away from where the plant is sitting.
+Here, $k_{\text{acclim}}$ controls how quickly the operating point changes, and
+$dP/d\psi$ indicates which direction increases profit. At each leaf-solve
+step, TF24f evaluates profit at the *current tracked* value of $\psi$. It then
+passes the local gradient $dP/d\psi$ to the ODE system, which advances the
+state through time.
 
-The gradient itself can be computed two ways, controlled by
-`use_ad_gradient`:
+At establishment, the tracked state begins at the true optimum. There is
+therefore no artificial adjustment period at birth. A lag appears only after
+the environment changes and shifts the optimum away from the plant's current
+operating point.
 
-- **`use_ad_gradient = true`** (the default) — an exact gradient,
-  `Leaf::dprofit_droot_collar_psi`, built from forward-mode automatic
-  differentiation of the photosynthesis/cost algebra, the implicit-function
-  theorem applied at the $\psi_l \to C_i$ root-find, and analytic spline
-  derivatives for the transport terms.
-- **`use_ad_gradient = false`** — a finite-difference approximation, stepping
-  $\psi$ by `psi_fd_step` (MPa) and differencing profit either side.
+The `use_ad_gradient` setting selects one of two ways to calculate the
+gradient:
 
-`k_acclim` is the acclimation-rate knob, and it is what makes TF24f a family
-of behaviours rather than a single alternative to TF24:
+- **`use_ad_gradient = true`** (the default) uses the exact gradient
+  `Leaf::dprofit_droot_collar_psi`. It combines forward-mode automatic
+  differentiation of the photosynthesis and cost calculations, the
+  implicit-function theorem at the $\psi_l \to C_i$ root-find, and analytic
+  spline derivatives for the transport terms.
+- **`use_ad_gradient = false`** uses a finite-difference approximation. It
+  steps $\psi$ by `psi_fd_step` (MPa) and compares the profit on either side.
+
+The parameter `k_acclim` controls the acclimation rate. Changing it produces a
+range of behaviours rather than one fixed alternative to TF24:
 
 | | Small `k_acclim` | Large `k_acclim` |
 |---|---|---|
 | Behaviour | slow, lagged tracking of the optimum | tight tracking — approaches TF24's instantaneous optimum |
 | Interpretation | a real acclimation delay in stomatal/hydraulic adjustment | quasi-steady-state recovered as a limiting case |
-| Cost | — | cheaper: no per-step search, just one gradient evaluation |
+| Calculation at each evaluation | one gradient evaluation | one gradient evaluation; a stiff state may require more ODE steps |
 | Risk | plant can be caught away from the optimum by fast environmental change | stiff ODE state; may demand a smaller integration step |
 
 ### TF24 vs TF24f
@@ -125,12 +329,14 @@ of behaviours rather than a single alternative to TF24:
 | Physiology, hydraulics, soil coupling | shared | shared (inherited unchanged from TF24) |
 | Bit-for-bit match to TF24 | — | no — by design, it tracks rather than reproduces the optimum |
 
-Reach for TF24f when the question is about *dynamics of acclimation* — how
-quickly a plant's stomatal/hydraulic behaviour can respond to a shifting
-environment — rather than assuming it is always instantaneously optimal, or
-when running many individuals/steps makes TF24's per-step search the
-bottleneck and a large `k_acclim` is an acceptable stand-in for the
-instantaneous optimum. Stick with TF24 when the quasi-steady-state assumption
-is the thing you want (no extra state, no acclimation-rate parameter to
-choose), or when you need results that match TF24 exactly rather than
-approach it as $k_{\text{acclim}} \to \infty$.
+Use TF24f when the timing of acclimation matters—for example, when asking how
+quickly stomatal or hydraulic behaviour can respond to a changing environment.
+It can also be useful when TF24's repeated optimisation becomes a computational
+bottleneck across many individuals or time steps, provided that a large
+`k_acclim` is an acceptable approximation to instantaneous adjustment.
+
+Use TF24 when the quasi-steady-state assumption is appropriate and you do not
+want to introduce an extra state or choose an acclimation-rate parameter. TF24
+is also the right choice when results must match TF24 exactly: TF24f approaches
+its behaviour as $k_{\text{acclim}} \to \infty$, but does not reproduce it
+bit for bit.

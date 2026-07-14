@@ -194,227 +194,245 @@ $$
 \frac{{\rm d}D}{{\rm d}t} = \left(\pi \, A_{\rm st}\right)^{-0.5} \, \frac{{\rm d}A_{\rm st}}{{\rm d}t}.
 $$ {#eq-dDdt}
 
-# Functional-balance model for allocation {#a-functional-balance-model-for-allocation}
+## Functional-balance model for allocation {#a-functional-balance-model-for-allocation}
 
-Here we describe an allometric model linking to a plant's height its various other size dimensions
-required by most ecologically realistic vegetation models
-(i.e., the masses of leaves, sapwood, bark, and fine
-roots). This approach allows us to track only the
-plant's height, while still accounting for the mass needs to build
-leaves, roots, and stems. The growth rates of various tissues can then
-also be derived (@tbl-allometry).
+The previous section used tissue masses and areas even though the population
+model tracks only plant height. FF16 connects these quantities through an
+allometric **functional-balance model**. Given a plant's height, the model
+infers how much leaf, sapwood, bark, and fine-root tissue it needs to maintain
+a workable plant architecture.
 
-## Leaf area {#leaf-area}
+This approach keeps the population model one-dimensional while still charging
+the plant for all the tissue needed to support new leaves. It also allows the
+growth rates of individual tissues to be derived from height growth
+(@tbl-allometry).
 
-Based on empirically observed allometry [@Falster-2011], we assume an allometric power-law
-scaling relationship between the accumulated leaf area of a plant and
-its height,
+### Leaf area {#leaf-area}
+
+The first relationship links total leaf area to height. Following empirical
+allometry [@Falster-2011], FF16 uses a power law:
 $$
 H = \alpha_{{\rm l1}} \, \left(A_{\rm l} \, {\rm m^{-2}}\right)^{\alpha_{{\rm l2}}}.
 $$ {#eq-ha}
-This relationship is normalised around a leaf area of 1m${^2}$.
+The factor ${\rm m^{-2}}$ makes the quantity inside the power dimensionless, so
+the relationship is normalised at a leaf area of 1 m${^2}$.
 
-## Vertical distribution of leaf area {#vertical-distribution-of-leaf-area}
+### Vertical distribution of leaf area {#vertical-distribution-of-leaf-area}
 
-We follow the model of @Yokozawa-1995 describing the vertical
-distribution of leaf area within the crowns of individual plants. This
-model can account for a variety of canopy profiles through a single
-parameter $\eta$. Setting $\eta = 1$ results in a conical canopy, as
-seen in many conifers, while higher values, e.g., $\eta = 12$ , give a
-top-heavy canopy profile similar to those seen among angiosperms. We denote
-by $A_{{\rm s},z}$ the sapwood area at height $z$ within the plant, by $q(z, H)$ the vertical distribution of leaf area of
-leaf area with respect to height $z$, and by $Q(z, H)$ the cumulative fraction of a
-plant's leaves above height $z$. As defined previously, $A_{\rm s}$ is the sapwood
-area at the base of the plant. Following @Yokozawa-1995, we
-assume a relationship between $A_{{\rm s},z}$ and height such that
+Total leaf area is not enough to calculate photosynthesis: the model also needs
+to know where those leaves sit within the crown. FF16 follows
+@Yokozawa-1995 and describes crown shape with a single parameter, $\eta$.
+Setting $\eta=1$ gives a conical canopy, as seen in many conifers. A larger
+value, such as $\eta=12$, produces a more top-heavy crown like those of many
+angiosperms.
+
+Let $A_{{\rm s},z}$ be sapwood area at height $z$, and let $A_{\rm s}$ be
+sapwood area at the base of the plant. Following @Yokozawa-1995, their
+relationship is
 $$
 \frac{A_{{\rm s},z}}{A_{\rm s}} = \left(1 - \left(\frac{z}{H}\right)^\eta\right)^2.
 $$ {#eq-crown1}
 
-We also assume that each unit of leaf area is supported by a fixed area $\theta$ of
-sapwood [in agreement with the pipe model; @Shinozaki-1964], so that the total canopy
-area of a plant relates to its basal sapwood area $A_{\rm s}$,
+The **pipe model** assumes that each unit of leaf area is supported by a fixed
+area, $\theta$, of sapwood [@Shinozaki-1964]. Basal sapwood area is therefore
+proportional to total leaf area:
 $$
 A_{\rm s} = \theta \, A_{\rm l}.
 $$ {#eq-crown2}
-The pipe model is assumed to hold within individual plants, as well as
-across plants of different size. It follows that,
+FF16 applies this relationship both within an individual and across plants of
+different sizes. As a result, the fraction of a plant's leaves above height
+$z$, denoted $Q(z,H)$, is
 
 $$
 Q(z, H) = \left(1-\left(\frac{z}{H}\right)^\eta\right)^2.
 $$ {#eq-crown1b}
 
-Differentiating with respect to $z$ then yields a solution for the
-probability density of leaf area as a function of height,
+Differentiating this cumulative relationship gives $q(z,H)$, the density that
+describes how leaf area is distributed with height:
 $$
 q(z, H) = 2\frac{\eta}{H}\left(1-\left(\frac{z}{H}\right)^{\eta}\right) \left(\frac{z}{H}\right)^{\eta-1}.
 $$ {#eq-crown3}
 
-## Sapwood mass {#mass-of-sapwood}
+### Sapwood mass {#mass-of-sapwood}
 
-Integrating $A_{{\rm s},z}$ yields the total mass of
-sapwood in a plant,
+Sapwood mass depends on its cross-sectional area throughout the full height of
+the stem. Integrating $A_{{\rm s},z}$ over height and multiplying by wood
+density, $\rho$, gives
 $$
 M_{\rm s}  = \rho \int_0^H A_{{\rm s},z} \, {\rm d}z = \rho A_{\rm s} H \eta_{\rm c} ,
 $$ {#eq-ms1}
-where $\eta_{\rm c} = 1 - \frac{2}{1 + \eta} + \frac{1}{1 + 2\eta}$
-[@Yokozawa-1995]. Substituting from @eq-crown2 into @eq-ms1 then gives an expression for sapwood mass as a function of
-leaf area and height,
+where $\eta_{\rm c} = 1 - \frac{2}{1 + \eta} + \frac{1}{1 + 2\eta}$ is a
+factor determined by crown shape [@Yokozawa-1995]. Substituting the pipe-model
+relationship from @eq-crown2 expresses sapwood mass directly in terms of leaf
+area and plant height:
 $$
 M_{\rm s} = \rho \, \eta_{\rm c} \, \theta \, A_{\rm l}  \, H.
 $$ {#eq-ms2}
 
-## Bark mass {#bark-mass}
+### Bark mass {#bark-mass}
 
-Bark and phloem tissue are modelled using an analogue of the pipe model,
-leading to a similar equation as that for sapwood mass (@eq-ms2). The cross-section area of bark per unit leaf area is
-assumed to be a constant fraction $\alpha_{{\rm b1}}$ of sapwood area per unit leaf
-area such that
+FF16 treats bark and phloem with a relationship analogous to the pipe model.
+Their mass is a fixed fraction, $\alpha_{{\rm b1}}$, of sapwood mass:
 $$
 M_{\rm b} = \alpha_{{\rm b1}} M_{\rm s}.
 $$ {#eq-mb}
 
-## Root mass {#root-mass}
+### Root mass {#root-mass}
 
-Also consistent with the pipe model, we assume a fixed ratio of
-root mass per unit leaf area,
+Root mass is also proportional to leaf area:
 $$
 M_{\rm r} = \alpha_{{\rm r1}} \, A_{\rm l}.
 $$ {#eq-mr}
-Even though nitrogen and water uptake are not modelled explicitly,
-imposing a fixed ratio of root mass to leaf area ensures that
-approximate costs of root production are included in calculations of
-carbon budget.
+FF16 does not explicitly model nitrogen or water uptake. This relationship
+nevertheless ensures that building and maintaining roots contributes to the
+plant's carbon budget.
 
-# Seed production {#seed-production}
+## Seed production {#seed-production}
 
-The rate of seed production, $f(x, H, E_{a})$, is a direct
-function of the mass allocated to reproduction,
+Once the plant begins reproducing, the fraction of production not allocated to
+growth is available for seeds. Dividing that reproductive production by the
+total cost per seed gives the seed-production rate, $f(x,H,E_a)$:
 $$
 f(x, H, E_{a}) = \frac{(1 - \frac{{\rm d}M_{\rm a}}{{\rm d}B}) \times \frac{{\rm d}B}{{\rm d}t}}{
 \omega + \alpha_{{\rm f3}}},
 $$ {#eq-fecundity}
-where $\omega$ is the mass of the seed and $\alpha_{{\rm f3}}$ is the cost
-per seed of accessories, such as fruits, flowers, and dispersal
-structures. The function $\frac{{\rm d}M_{\rm a}}{{\rm d}B}$ is the fraction
-of $\frac{{\rm d}B}{{\rm d}t}$ that is allocated to growth (from @eq-allocation, while
-$1-\frac{{\rm d}M_{\rm a}}{{\rm d}B}$ gives the fraction allocated
-to reproduction).
+Here, $\omega$ is seed mass and $\alpha_{{\rm f3}}$ is the additional cost of
+flowers, fruits, and dispersal structures associated with each seed. From
+@eq-allocation, ${\rm d}M_{\rm a}/{\rm d}B$ is the fraction allocated to growth,
+so $1-{\rm d}M_{\rm a}/{\rm d}B$ is the fraction allocated to reproduction.
 
-# Mortality {#mortality}
+## Mortality {#mortality}
 
-Instantaneous rates of plant mortality are given by the sum of a growth-independent and a growth-dependent rate
-[@Falster-2011; @Moorcroft-2001],
+FF16 represents mortality as a continuous hazard: the instantaneous risk of
+death at a particular size and in a particular environment. The total hazard
+has two parts [@Falster-2011; @Moorcroft-2001]:
 $$
 d(x, H, E_{a}) = d_{{\rm I}}(x, H) + d_{{\rm G}}(x, H, E_{a}).
 $$ {#eq-mortality}
-The growth-independent rate is taken to be constant, independent of
-plant performance, but potentially varying with species traits. The
-growth-dependent rate is assumed to decline exponentially with the rate
-of mass production per unit leaf area,
+The growth-independent component, $d_{\rm I}$, is constant with respect to
+current plant performance, although it may vary among trait combinations. The
+growth-dependent component, $d_{\rm G}$, falls exponentially as net biomass
+production per unit leaf area increases:
 $$
 d_{{\rm G}}(x, H, E_{a}) = \alpha_{{\rm dG1}} \exp(-\alpha_{{\rm dG2}} X),
 $$ {#eq-mortality-gd}
-where $X = {\rm d}B/{\rm d}t / A_{\rm l}$. This
-relationship allows for plants to increase in mortality as their growth rate
-approaches zero, while allowing for species to differ in
-the parameters $\alpha_{{\rm dG1}}$ and $\alpha_{{\rm dG2}}$.
+where $X=({\rm d}B/{\rm d}t)/A_{\rm l}$. Plants with little production relative
+to their leaf area therefore face a higher mortality hazard. The parameters
+$\alpha_{{\rm dG1}}$ and $\alpha_{{\rm dG2}}$ allow the level and sensitivity of
+this response to differ among species.
 
-We also require a function $S_{\rm G}  (x^\prime, H_0, E_{{\rm a}0})$ for plant survival
-through germination. For the demographic model to behave smoothly,
-$S_{\rm G}  (x^\prime, H_0, E_{{\rm a}0}) / g(x, H_0, E_{{\rm a}0})$ should approach zero as
-$g(x, H_0, E_{{\rm a}0})$ approaches zero. Following @Falster-2011,
-we use the function
+Germination and establishment require a separate survival function,
+$S_{\rm G}(x^\prime,H_0,E_{{\rm a}0})$, evaluated for a new plant of initial
+height $H_0$ in its initial environment $E_{{\rm a}0}$. For the demographic
+model to remain well behaved, the ratio
+$S_{\rm G}(x^\prime,H_0,E_{{\rm a}0})/g(x,H_0,E_{{\rm a}0})$ must approach zero
+as initial growth approaches zero. Following @Falster-2011, FF16 uses
 $$
 S_{\rm G} (x^\prime, H_0, E_{{\rm a}0}) = \frac1{1 + X^2},
 $$ {#eq-pi1}
-where $X = \alpha_{{\rm d0}} \frac{A_{\rm l}}{{\rm d}B / {\rm d}t}$ and $\alpha_{{\rm d0}}$ is a
-constant. @eq-pi1 is consistent with @eq-mortality-gd, as both cause survival to decline with mass production.
+where $X = \alpha_{{\rm d0}} \frac{A_{\rm l}}{{\rm d}B / {\rm d}t}$ and
+$\alpha_{{\rm d0}}$ is a constant. Because $X$ is large when production per
+unit leaf area is small, establishment survival falls towards zero for plants
+with very poor initial production. This is consistent with the
+growth-dependent mortality rule in @eq-mortality-gd: both penalise poor carbon
+balance.
 
-# Hyper-parameterisation of physiological model via traits {#traits}
+## Hyper-parameterisation of physiological model via traits {#traits}
 
-The `FF16` physiological model includes default values for all needed parameters
-(@tbl-params-core). Species are known to vary considerably
-in many of these parameters, such as $\phi$, $\rho$, $\nu$, and $\omega$; so by varying parameters
-one can account for species differences. When altering a parameter in the model, however,
-one must also consider whether there are trade-offs linking parameters.
+FF16 has default values for every physiological parameter
+(@tbl-params-core), but species can differ substantially in quantities such as
+leaf mass per area ($\phi$), wood density ($\rho$), leaf nitrogen per area
+($\nu$), and seed mass ($\omega$). These measurable quantities can therefore be
+used as functional traits that distinguish strategies.
 
-`plant` allows for the
-hyper-parameterisation of the `FF16` physiological model via plant functional traits: this enables
-simultaneous variation in multiple parameters in accordance with an assumed trade-off. In the
-`FF16` physiological model, we implement the relationships described below. For more
-details, see `make_FF16_hyperpar.R`.
+A trait often affects more than one model parameter. For example, changing
+leaf mass per area alters both the cost of constructing leaf area and the rate
+at which leaves turn over. Treating those effects independently could create a
+plant strategy that violates an assumed biological trade-off.
 
-## Leaf mass per unit area
+To keep linked parameters consistent, `plant` **hyper-parameterises** FF16:
+trait values are passed through a set of relationships that update several
+physiological parameters together. Those relationships are described below.
+Their implementation is in the `make_FF16_hyperpar()` function.
 
-The trait leaf mass per unit area, denoted by $\phi$, directly influences growth by changing
-${\rm d}A_{\rm l} / {\rm d}M_{\rm a}$. In addition, we
-link $\phi$ to the rate of leaf turnover,
-based on a widely observed scaling relationship from @Wright-2004,
+### Leaf mass per unit area
+
+Leaf mass per unit area, $\phi$, measures how much dry mass is needed to build
+a unit of leaf area. A larger $\phi$ therefore increases the construction cost
+captured by ${\rm d}A_{\rm l}/{\rm d}M_{\rm a}$. It is also linked to leaf
+turnover through the widely observed relationship reported by @Wright-2004:
 $$
 k_{\rm l} = \beta_{{\rm kl1}} \, \left(\frac{\phi}{\phi_0}\right)^{-\beta_{{\rm kl2}}}.
 $$ {#eq-k-l}
 
-This relationship is normalised around $\phi_0$, the global mean of $\phi$. This
-allows us to vary $\beta_{{\rm kl1}}$ and $\beta_{{\rm kl2}}$ without displacing the relationship from the
-observed mean.
+Here, $\phi_0$ is the global mean of $\phi$. Normalising the relationship at
+$\phi_0$ allows $\beta_{{\rm kl1}}$ and $\beta_{{\rm kl2}}$ to change its level
+and slope without shifting it away from the observed mean.
 
-We also vary the mass-based leaf respiration rate so that it stays constant per unit leaf area and
-varies with $\phi$ and nitrogen per unit leaf area $\nu$, as empirically observed by @Wright-2004,
+Leaf respiration is specified per unit leaf mass, but is constrained to remain
+constant per unit leaf area for a given leaf nitrogen content. It therefore
+varies with both $\phi$ and nitrogen per unit leaf area, $\nu$, following
+@Wright-2004:
 $$
 r_{\rm l} = \frac{\beta_{{\rm lf4}}\, \nu}{\phi}.
 $$ {#eq-rl}
 
 
-## Wood density
+### Wood density
 
-The trait wood density, denoted by $\rho$, directly influences growth by changing
-${\rm d}A_{\rm l} / {\rm d}M_{\rm a}$. In addition, we allow for
-$\rho$ to influence the rate of growth-independent mortality,
+Wood density, $\rho$, affects how much biomass is needed to build a given
+volume of stem. It therefore changes the construction-cost term
+${\rm d}A_{\rm l}/{\rm d}M_{\rm a}$. FF16 can also link wood density to the
+growth-independent mortality rate,
 $$
 d_{\rm I} = \beta_{{\rm dI1}} \, \left(\frac{\rho}{\rho_0}\right) ^ {-\beta_{{\rm dI2}}},
 $$ {#eq-di}
 
-and also the rate of sapwood turnover,
+and to the sapwood turnover rate,
 $$
 k_{\rm s} = \beta_{{\rm ks1}} \, \left(\frac{\rho}{\rho_0}\right)^ {-\beta_{{\rm ks2}}},
 $$ {#eq-ks}
 
-As for $\phi$, these relationships are normalized around $\rho_0$, the global mean of $\rho$.
-By default, $\beta_{{\rm kI2}}$ and $\beta_{{\rm ks2}}$ are set to zero, so these linkages
-only become present when these parameters are set to something other than their default values.
+where $\rho_0$ is the global mean wood density. As with $\phi$, normalising at
+this mean keeps the relationships anchored while their other parameters vary.
+By default, $\beta_{{\rm dI2}}$ and $\beta_{{\rm ks2}}$ are zero, so wood density
+does not affect these two rates unless the corresponding exponents are changed.
 
-The rate of sapwood respiration per unit volume is assumed to be constant, so
-sapwood respiration per unit mass varies as
+FF16 assumes that sapwood respiration is constant per unit volume. A unit of
+mass occupies less volume when wood is denser, so respiration per unit mass is
 $$
 r_{\rm s}  = \frac{\beta_{{\rm rs1}}}{\rho},
 $$ {#eq-rs}
 
-where $\beta_{{\rm rs1}}$ is a default rate per volume of sapwood.
-Similarly, the rate of bark respiration per unit mass varies as
+where $\beta_{{\rm rs1}}$ is the default respiration rate per unit sapwood
+volume. Bark respiration per unit mass follows the same logic:
 $$
 r_{\rm b} = \frac{\beta_{{\rm rb1}}}{\rho},
 $$ {#eq-rb}
 
 with $\beta_{{\rm rb1}} = 2 \beta_{{\rm rs1}}$.
 
-## Seed mass
+### Seed mass
 
-Effects of the trait seed mass, denoted by $\omega$, are naturally embedded in the equation determining
-fecundity (@eq-fecundity) and the initial height of seedlings. In addition,
-we let the accessory cost per seed be a multiple of seed size,
+Seed mass, $\omega$, directly affects fecundity through @eq-fecundity and also
+determines a seedling's initial height. FF16 assumes that the accessory cost of
+producing flowers, fruits, and dispersal structures scales with seed mass:
 $$
 \alpha_{{\rm f3}} = \beta_{{\rm f1}} \omega,
 $$ {#eq-a-f3}
-as empirically observed [@Henery-2001].
+as observed empirically by @Henery-2001.
 
-## Nitrogen per unit leaf area
+### Nitrogen per unit leaf area
 
-Photosynthesis per unit leaf area and respiration rates per unit leaf mass (or area) are assumed to vary with leaf nitrogen per unit area, $\nu$. The calculation of respiration rates is already described above. To calculate the average annual photosynthesis for a leaf, we integrate the instantaneous rate per unit leaf area over the annual solar trajectory, using a rectangular-hyperbolic photosynthesis light response curve,
+Leaf nitrogen per unit area, $\nu$, affects both photosynthesis and respiration.
+The respiration relationship was introduced above. For photosynthesis, FF16
+first calculates the instantaneous response of a leaf to light and then
+averages that response over an annual solar trajectory. The light-response
+curve is
 $$
 p(\nu, E) = \frac1{365 \textrm{d}}\int_0^{365 \textrm{d}}\frac{Y(t) + A_{\rm max} - \sqrt{(Y(t) + A_{\rm max})^2 - 4 \beta_{{\rm lf2}} Y(t) A_{\rm max} }}{2 \beta_{{\rm lf2}}} {\rm d}t,
 $$ {#eq-ptss}
-where
+The terms in this expression are:
 
 - $A_{\rm max}$ is the maximum photosynthetic capacity of the leaf,
 - $\beta_{{\rm lf2}}$ is the curvature of the light response curve,
@@ -422,18 +440,28 @@ where
 - $I(t) = k_{\rm I} \, I_0(t)\, E$ is the intensity of light on the leaf surface, and
 - $I_0(t)$ is light incident on a surface perpendicular to the sun's rays directly above the canopy at time $t$.
 
-The profile of $I_0(t)$ is given by a solar model adapted from @TerSteege-1997.
+The time-varying profile $I_0(t)$ comes from a solar model adapted from
+@TerSteege-1997.
 
-We allow for the maximum photosynthetic capacity of the leaf to vary with leaf nitrogen per unit area, as
+Maximum photosynthetic capacity increases with leaf nitrogen per unit area
+according to
 $$
 A_{\rm max} = \beta_{{\rm lf1}} \, \left(\frac{\nu}{\nu_0}\right)^{\beta_{{\rm lf5}}},
 $$ {#eq-amax}
-where $\beta_{{\rm lf1}}$ and $\beta_{{\rm lf5}}$ are constants. The relationships is normalized around $\nu_0$, the global mean of leaf nitrogen per unit area.
+where $\beta_{{\rm lf1}}$ and $\beta_{{\rm lf5}}$ are constants, and $\nu_0$ is
+the global mean leaf nitrogen per unit area used to normalise the relationship.
 
-Values of $p(\nu, E)$ are calculated across a range of values of $E$, and then an expression of the form in @eq-photosynthesis is fitted to extract the parameters
-$\alpha_{{\rm p1}}$ and $\alpha_{{\rm p2}}$, such that these become functions of $\nu$.
+Finally, the model evaluates $p(\nu,E)$ across a range of light levels and fits
+the simpler curve in @eq-photosynthesis. This fitting step turns
+$\alpha_{{\rm p1}}$ and $\alpha_{{\rm p2}}$ into functions of leaf nitrogen.
+The rest of FF16 can then use the compact photosynthesis equation while
+retaining the effect of $\nu$ derived from the detailed annual calculation.
 
-# Tables {#tables}
+## Tables {#tables}
+
+The following tables collect the notation, allometric relationships, and
+parameter values used above. They are generated directly from the installed
+`plant` package so that the displayed defaults match the implementation.
 
 ```{r}
 #| label: functions
@@ -506,4 +534,4 @@ x$Value <- extract_strategy_parameter_values(x$Code)
 knitr::kable(x,  align = "l")
 ```
 
-# References
+## References
