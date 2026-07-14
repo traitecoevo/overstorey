@@ -8,51 +8,56 @@ model
 
 ::: {.callout-note}
 ## Prerequisites
-This page builds on [The big picture](../overview.qmd) and [The maths, gently](../maths-primer.qmd). Read those first if the notation here is unfamiliar.
+This page builds on [The big picture](../overview.qmd) and [The maths,
+gently](../maths-primer.qmd). If the notation below is unfamiliar, those pages
+provide a gentler introduction to the model and its equations.
 :::
 
 ## The idea first
 
-Every plant carries a set of traits -- things like how it builds leaves, how
-dense its wood is, how it allocates mass to different tissues -- and a
-current size. FF16 takes those two ingredients, together with the light
-available to the plant, and turns them into rates: how fast it grows taller,
-how fast it produces seeds, and how likely it is to die. The engine
-underneath all three rates is the same: the plant captures carbon through
-photosynthesis, spends some of that income on maintaining and replacing its
-existing tissues, and what's left over is net production it can invest in
-new growth. A larger plant with more leaf area can capture more light, but
-it also carries more tissue to maintain, so the model tracks how that
-balance shifts as the plant gets bigger. Traits shape the balance too: a
-plant built for fast height growth channels production differently than one
-built to survive shade or drought. Once you know how much a plant produces
-and how it chooses to allocate that production, growth, reproduction, and
-mortality all follow as natural consequences of the same underlying
-physiology, rather than as separate, disconnected assumptions.
-The rest of this page makes this precise.
+FF16 turns three kinds of information into demographic rates:
 
-This document outlines the core physiological model used in the `plant`
-package. This model has primarily been developed elsewhere, in particular in
-@Falster-2011. The model's equations are presented here not as original findings,
-but rather so that users can understand the full system of equations being
-solved within `plant`.
+- the plant's traits, such as leaf mass per area and wood density;
+- its current size; and
+- the light available at each height in its crown.
+
+From these inputs, the model calculates how quickly the plant grows, how many
+seeds it produces, and how likely it is to die. All three rates share the same
+starting point: a carbon budget. Leaves capture carbon through photosynthesis,
+while respiration and tissue turnover use some of that income. The carbon that
+remains is **net biomass production**. FF16 then divides this production
+between growth and reproduction, and uses poor production as a signal of
+increased mortality risk.
+
+This shared carbon budget is important. Growth, reproduction, and mortality
+are not three unrelated assumptions; they are different consequences of the
+same plant physiology. Size and traits affect both sides of the budget. For
+example, a larger plant can carry more leaves and capture more light, but it
+also has more living tissue to maintain.
+
+The rest of this page develops that idea mathematically. The model was
+developed elsewhere, particularly in @Falster-2011. The equations are collected
+here so that users can see the complete FF16 system implemented in `plant`, not
+as a claim that the model originated in this documentation.
 
 ```{r}
 #| echo: false
 library(plant)
 ```
 
-# Introduction
+## Introduction
 
-The purpose of a physiological model in `plant` is to take a plant's
-current size, light environment, and physiological parameters as inputs,
-and return its growth, mortality, and fecundity rates. In the `FF16`
-physiological model, these vital rates are all
-derived from the rate at which living biomass is produced by the plant,
-which in turn is calculated based on well-understood physiology (see @fig-phys). Various physiological parameters
-influence demographic outcomes. Varying these parameters allows accounting for
-species differences, potentially via traits. Tables summarize the units and definitions of all variables, parameters, and hyper-parameters used in
-the material below.
+A physiological model in `plant` connects an individual plant to the wider
+population model. It takes the individual's size, light environment, and
+physiological parameters as inputs, and returns three **vital rates**: growth,
+mortality, and fecundity.
+
+In FF16, net biomass production links these inputs to all three outputs
+(@fig-phys). Physiological parameters determine how the plant earns carbon,
+what it costs to maintain its tissues, and how it divides the remaining
+production. Changing those parameters can therefore represent differences
+among species. The [Tables](#tables) section defines the variables and lists
+the default parameter values used by the implementation.
 
 ```{r}
 #| label: fig-phys
@@ -64,32 +69,38 @@ the material below.
 knitr::include_graphics()
 ```
 
-# Growth {#growth}
+## Growth {#growth}
 
-## Leaf photosynthesis {#leaf-photosynthesis}
+### Leaf photosynthesis {#leaf-photosynthesis}
 
-We denote by $p(x, E)$ the gross rate of leaf photosynthesis per unit
-leaf area within the canopy of a plant with traits $x$ at light
-level $E(z)$, where $z$ is height within the canopy.
-We assume a relationship of the form
+We begin with photosynthesis by a small patch of leaf. Let $x$ denote the
+plant's traits, $z$ a height within its crown, and $E(z)$ the light available at
+that height. The gross photosynthetic rate per unit leaf area is $p(x,E)$,
+which FF16 represents with a saturating light-response curve:
 $$
 p(x, E(z)) = \alpha_{{\rm p1}} \frac{ E(z)}{E(z) + \alpha_{{\rm p2}}},
 $$ {#eq-photosynthesis}
-for the average of $p$ across the year. The parameters
-$\alpha_{{\rm p1}}$ and $\alpha_{{\rm p2}}$ are derived from a detailed leaf-level
-model and measure, respectively, maximum annual photosynthesis and the light levels at 50\% of this maximum. The average rate of
-leaf photosynthesis across the plant is then
+Here, $\alpha_{{\rm p1}}$ is the maximum annual photosynthetic rate, and
+$\alpha_{{\rm p2}}$ is the light level at which the leaf reaches half that
+maximum. Both parameters are derived from a more detailed leaf-level model.
+
+Leaves at different heights receive different amounts of light. To obtain a
+whole-plant average, the model weights the photosynthetic rate at each height
+by the fraction of the plant's leaf area found there:
 $$
 \bar{p}(x, H, E_{a}) = \int_0^H p(x, E_a(z)) \, q(z, H) \, {\rm d}z,
 $$ {#eq-photosynthesis-av}
-where $q(z, H)$ is the vertical distribution of leaf area with respect to height $z$ (@eq-crown3).
+where $H$ is plant height and $q(z,H)$ describes the vertical distribution of
+leaf area (@eq-crown3). The result, $\bar p$, is the mean photosynthetic rate
+per unit leaf area across the whole crown.
 
-## Mass production {#standard-model-for-mass-production}
+### Mass production {#standard-model-for-mass-production}
 
-The amount of biomass available for growth,
-${\rm d}B  / {\rm d}t$, is given by the difference between income
-(total photosynthetic rate) and losses (respiration and turnover) within the
-plant [@Makela-1997; @Thornley-2000; @Falster-2011],
+The next step is to turn photosynthesis into net biomass production. The
+accounting is much like a budget: total photosynthesis is the income, while
+maintenance respiration and tissue turnover are expenses
+[@Makela-1997; @Thornley-2000; @Falster-2011]. Their balance gives
+${\rm d}B/{\rm d}t$:
 $$
 \underbrace{\strut \frac{{\rm d}B}{{\rm d}t}}_\textrm{net biomass production}
 = \underbrace{\strut \alpha_{\rm bio} }_\textrm{mass per C} \,
@@ -98,27 +109,28 @@ $$
 \underbrace{\strut \, \sum_{i = {\rm l}, {\rm b}, {\rm s}, {\rm r}}{M_i \, r_i}}_\textrm{respiration}\big)
 - \underbrace{\strut \sum_{i = {\rm l}, {\rm b}, {\rm s},  {\rm r}}{M_i \, k_i}}_\textrm{turnover}.
 $$ {#eq-dbdt}
-Here, $M, r$, and $k$ refer to the mass, maintenance respiration rate, and
-turnover rate of different tissues, denoted by subscripts $l$ = leaves,
-$b$ = bark, $s$ = sapwood, and $r$ = roots. $\bar{p}$ is the assimilation
-rate of CO$_2$ per unit leaf area, $\alpha_{\rm y}$ is yield (i.e., the fraction of
-assimilated carbon fixed in biomass, with the remaining fraction being lost
-as growth respiration; this comes in addition
-to the costs of maintenance respiration), and $\alpha_{\rm bio}$ is the amount of biomass per unit carbon fixed. Gross photosynthetic production is proportional to leaf area,
-$A_{\rm l} = M_{\rm l} / \phi$, where $\phi$ is leaf mass per
-area. The total mass of living tissues is
-$M_{\rm a} = M_{\rm l} + M_{\rm b} + M_{\rm s} + M_{\rm r}.$
+The tissue subscripts are $l$ for leaves, $b$ for bark, $s$ for sapwood, and
+$r$ for roots. For each tissue, $M_i$ is its mass, $r_i$ its maintenance
+respiration rate, and $k_i$ its turnover rate. The other terms make two
+conversions:
 
-## Height growth {#height-growth-rate}
+- $\alpha_{\rm y}$ is the fraction of assimilated carbon retained after growth
+  respiration; and
+- $\alpha_{\rm bio}$ converts retained carbon into biomass.
 
-The key measure of growth required by the demographic model is the
-rate of height growth, denoted $g(x, H, E_{a})$. To model height growth
-requires that we translate mass
-production into height increment, accounting for the costs of
-building new tissues, allocation
-to reproduction, and architectural layout. Using the chain rule, height growth
-can be decomposed into a product of physiologically relevant terms
-[@Falster-2011],
+Total photosynthesis equals the mean rate per unit leaf area, $\bar p$, times
+total leaf area, $A_{\rm l}$. Leaf area is related to leaf mass by
+$A_{\rm l}=M_{\rm l}/\phi$, where $\phi$ is leaf mass per area. The total living
+mass that the plant must support is
+$M_{\rm a}=M_{\rm l}+M_{\rm b}+M_{\rm s}+M_{\rm r}$.
+
+### Height growth {#height-growth-rate}
+
+The demographic model tracks individuals by height, so it needs to translate
+net biomass production into height growth. FF16 makes this conversion in three
+conceptual steps: production builds living tissue, living tissue supports leaf
+area, and leaf area is related to height. The chain rule combines these steps
+[@Falster-2011]:
 $$
 g(x, H, E_{a}) = \frac{{\rm d}H}{{\rm d}t} = \frac{{\rm d}H}{{\rm d}A_{\rm l}}
 \times \frac{{\rm d}A_{\rm l} }{{\rm d}M_{\rm a}}
@@ -126,52 +138,58 @@ g(x, H, E_{a}) = \frac{{\rm d}H}{{\rm d}t} = \frac{{\rm d}H}{{\rm d}A_{\rm l}}
 \times \frac{{\rm d}B}{{\rm d}t}.
 $$ {#eq-dhdt}
 
-The first factor,
-${\rm d}H / {\rm d}A_{\rm l}$, is the growth in plant height
-per unit growth in total leaf area -- accounting for the architectural
-strategy of the plant. Some species tend to leaf out more than grow
-tall, while other species emphasise vertical extension.
+Read from right to left, the four factors ask:
 
-The second factor,
-${\rm d}A_{\rm l} / {\rm d}M_{\rm a}$, accounts for the
-marginal cost of deploying an additional unit of leaf area, including
-construction of the leaf itself and various support structures. As such,
-${\rm d}A_{\rm l} / {\rm d}M_{\rm a}$ can itself be
-expressed as a sum of construction costs per unit leaf area,
+1. How much net biomass does the plant produce?
+2. What fraction of that production becomes new living tissue rather than
+   reproductive tissue?
+3. How much additional leaf area can that living tissue support?
+4. How much taller does the plant become for that increase in leaf area?
+
+The final factor, ${\rm d}H/{\rm d}A_{\rm l}$, captures plant architecture.
+Some species deploy relatively more leaf area, whereas others gain relatively
+more height from the same increase in leaf area.
+
+The term ${\rm d}A_{\rm l}/{\rm d}M_{\rm a}$ represents the marginal cost of
+deploying more leaf area. A plant must build not only the new leaves, but also
+the sapwood, bark, and roots needed to support them. The inverse of those
+combined construction costs is
 $$
 \frac{{\rm d}A_{\rm l}}{{\rm d}M_{\rm a}}
 = \bigg( \frac{{\rm d}M_{\rm l}}{{\rm d}A_{\rm l}} + \frac{{\rm d}M_{\rm s}}{{\rm d}A_{\rm l}} + \frac{{\rm d}M_{\rm b}}{{\rm d}A_{\rm l}} + \frac{{\rm d}M_{\rm r}}{{\rm d}A_{\rm l}}\bigg)^{-1}.
 $$ {#eq-daldmt}
 
-The third factor,
-${\rm d}M_{\rm a} / {\rm d}B$, is the fraction
-of net biomass production (@eq-dbdt) that is allocated to
-growth rather than reproduction or storage. In the `FF16` physiological model,
-we let this growth fraction decrease with height according to the function
+The remaining conversion, ${\rm d}M_{\rm a}/{\rm d}B$, is the fraction of net
+biomass production allocated to growth rather than reproduction. FF16 assumes
+that young plants allocate nearly all production to growth, then shift more
+production towards reproduction as they approach their maturation height:
 $$
 \frac{{\rm d}M_{\rm a}}{{\rm d}B}(H) = 1 -
 \frac{\alpha_{{\rm f1}}} {1 + \exp\left(\alpha_{{\rm f2}} \left(1 - H / H_{\rm mat}\right)\right)},
 $$ {#eq-allocation}
-where $\alpha_{{\rm f1}}$ is the maximum possible allocation ($0-1$) and $\alpha_{{\rm f2}}$
-determines the sharpness of the transition [@Falster-2011].
+Here, $\alpha_{{\rm f1}}$ is the maximum fraction allocated to reproduction
+(between 0 and 1), $\alpha_{{\rm f2}}$ controls how abruptly allocation changes,
+and $H_{\rm mat}$ sets the height around which the transition occurs
+[@Falster-2011].
 
-## Diameter growth
+### Diameter growth
 
-Analogously, the growth in basal area $A_{\rm st}$ can be
-expressed as the sum of growth in sapwood, bark, and heartwood areas
-($A_{\rm s}, A_{\rm b}$, and $A_{\rm h}$, respectively),
+Although height is the size variable used in the population model, FF16 can
+also calculate stem diameter. Total stem basal area, $A_{\rm st}$, is the sum
+of sapwood, bark, and heartwood cross-sectional areas ($A_{\rm s}$,
+$A_{\rm b}$, and $A_{\rm h}$). Its rate of change is therefore
 $$
 \frac{{\rm d}A_{\rm st}}{{\rm d}t} = \frac{{\rm d}A_{\rm b}}{{\rm d}t} + \frac{{\rm d}A_{\rm s}}{{\rm d}t} + \frac{{\rm d}A_{\rm h}}{{\rm d}t}.
 $$ {#eq-dA-dst}
 
-Applying the chain rule, we derive an equation for basal area growth that contains many of the same
-elements as @eq-dhdt,
+Basal-area growth uses the same production, allocation, and construction terms
+as height growth. It also includes the conversion of sapwood to heartwood:
 $$
 \frac{{\rm d}A_{\rm st}}{{\rm d}t} = \left(\frac{{\rm d}A_{\rm s}}{{\rm d}A_{\rm l}} + \frac{{\rm d}A_{\rm b}}{{\rm d}A_{\rm l}}\right) \times
 \frac{{\rm d}A_{\rm l}}{{\rm d}M_{\rm a}} \times \frac{{\rm d}M_{\rm a}}{{\rm d}B} \times \frac{{\rm d}B}{{\rm d}t} + \frac{{\rm d}A_{\rm h}}{{\rm d}t} .
 $$ {#eq-dast}
-Diameter growth is then given by the geometric relationship between stem
-diameter $D$ and $A_{\rm st}$,
+Finally, the geometric relationship between stem area and diameter converts
+basal-area growth into diameter growth:
 $$
 \frac{{\rm d}D}{{\rm d}t} = \left(\pi \, A_{\rm st}\right)^{-0.5} \, \frac{{\rm d}A_{\rm st}}{{\rm d}t}.
 $$ {#eq-dDdt}

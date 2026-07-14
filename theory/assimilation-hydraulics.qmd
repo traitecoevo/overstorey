@@ -9,47 +9,50 @@ theory
 
 ::: {.callout-note}
 ## Prerequisites
-This page builds on [the FF16 model](models/ff16.qmd) and [The maths, gently](maths-primer.qmd). Read those first if the notation here is unfamiliar.
+This page builds on [the FF16 model](models/ff16.qmd) and
+[The maths, gently](maths-primer.qmd). Read those first if the notation here is
+unfamiliar.
 :::
 
 ## The idea first
 
-A leaf makes its living by opening tiny pores, called stomata, to let carbon
-dioxide in from the air. Every time it does this, water vapour escapes the
-same way. That escaping water has to be replaced, and pulling replacement
-water up from the soil through the plant's internal plumbing has a cost: it
-draws the water column in the stem tighter, and if pulled too hard, that
-plumbing can fail. So a leaf faces a trade-off. Opening the pores wider lets
-in more carbon dioxide, which means more sugar produced through
-photosynthesis, but it also draws more water, straining the plumbing and
-raising the risk of damage further. Opening them less protects the plumbing
-but starves the leaf of carbon dioxide, so it makes less sugar. Somewhere
-between "shut" and "wide open" sits a setting that gets the most net benefit:
-the sugar gained minus the cost of running and protecting the water supply.
-This page treats the leaf as if it always finds that best setting, a
-convenient shorthand for describing how carbon gain responds to sun, air
-dryness, and water availability. The rest of this page makes this precise.
+A leaf takes in carbon dioxide through tiny pores called stomata. When the
+stomata open, carbon dioxide enters and water vapour escapes. The lost water
+must be replaced by water drawn from the soil through the plant's hydraulic
+system.
+
+This creates a trade-off. Opening the stomata further can increase
+photosynthesis, but it also increases transpiration and places more strain on
+the water-transport pathway. Closing them protects that pathway, but restricts
+carbon dioxide and therefore limits photosynthesis.
+
+TF24 represents this trade-off as an optimisation problem. For each possible
+leaf xylem water potential, the model calculates a photosynthetic benefit and a
+hydraulic cost. It then chooses the water potential at which their difference,
+called *profit*, is greatest. This page develops those three pieces in order:
+photosynthetic revenue, hydraulic cost, and the numerical search for maximum
+profit.
 
 ::: {.callout-warning}
 ## Code not executed — needs updating to the current `Leaf()` API
-The worked examples on this page were written against an earlier `Leaf()`
-constructor. In the installed `plant` (2.0.0.9001) the leaf model gained an
-explicit root-hydraulics parameter set, so the seed call
-`Leaf(vcmax = ..., ...)` now fails: `vcmax` is renamed `vcmax_25`, and
-`root_c`, `root_b`, `root_psi_crit` (plus `beta2`, `jmax_25`, `hk_s`, …) are
-required with no defaults. Because every figure below derives from that one
-`leaf` object, execution is disabled page-wide (`eval: false`) until the call
-is updated with the correct current parameter values — these are model values
-and should be supplied by the model authors, not guessed. The maths and the
-code listing remain accurate as documentation.
+The worked examples below use an earlier `Leaf()` constructor. In the installed
+`plant` (2.0.0.9001), the leaf model has an explicit set of root-hydraulics
+parameters. The initial call `Leaf(vcmax = ..., ...)` therefore no longer runs:
+`vcmax` has become `vcmax_25`, and `root_c`, `root_b`, `root_psi_crit`,
+`beta2`, `jmax_25`, `hk_s`, and other arguments are now required.
+
+Every figure on this page depends on that first `leaf` object, so execution is
+disabled for the whole page (`eval: false`). Updating the example requires
+model parameter values that should come from the model authors rather than be
+guessed. Until then, the code is retained to show the sequence of calculations,
+but it should not be copied as a current, executable `Leaf()` example.
 :::
 
-This leaf-level carbon/water economy is the heart of the
-[TF24 strategy](models/tf24.qmd): it determines how a unit of leaf area
-assimilates carbon and transpires water in response to the surrounding
-environment. The model maximises *profit* — photosynthetic revenue minus the
-hydraulic cost of supplying transpired water — by optimising the leaf xylem
-water potential.
+This leaf-level carbon and water balance is central to the
+[TF24 strategy](models/tf24.qmd). It determines the carbon assimilation and
+transpiration of a unit of leaf area under the current light, atmospheric, and
+soil-water conditions. The whole-plant strategy then uses those leaf-level
+rates in its growth and water-use calculations.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -61,29 +64,42 @@ library(tidyr)
 library(purrr)
 ```
 
-This is the documentation for the Leaf model within the `TF24` strategy.
+## Introduction
 
-# Introduction
+TF24 extends the plant model with processes that link rainfall, soil water,
+plant hydraulics, transpiration, and carbon assimilation. This page focuses on
+one part of that system: the `Leaf` submodel that chooses a stomatal and
+hydraulic operating point. Its answer depends on plant traits and on the
+current water availability, vapour pressure deficit, and other environmental
+conditions. A response to leaf temperature is still to be implemented.
 
-At a broad level, the TF24 strategy module includes additional processes which capture plant-soil water feedbacks driven by precipitation. A critical subcompontent of this module is a physiological stomatal optimisation sub-model which determines how plants assimilate carbon and transpire water dynamically in response to water availability, vapour pressure deficit, leaf temperature (still to be implemented), in a trait-dependent manner. This stomatal optimisation model is described below. The other components of the TF24 strategy, such as the soil water submodule, are discussed on the [Soil water & root uptake](soil-water.qmd) page.
+The accompanying [Soil water & root uptake](soil-water.qmd) page describes the
+other side of the coupling: how rainfall, drainage, and root uptake determine
+the soil-water conditions supplied to this leaf calculation.
 
-The strategy will enable several new parameters to be considered:
+Several parameters are especially important for the leaf calculation:
 
 - `vcmax_25`: the maximum rate of carboxylation at 25 °C ($\mu mol~m^{-2}~s^{-1}$)
-- `p_50`: The leaf water potential ($\psi_l$) at which 50% of conductivity is lost
-- `K_s`: The maximum hydraulic conductivity ($kg~m^{-2}~s^{-1}~MPa^{-1})$
-- `c`: Shape parameter for the hydraulic vulnerability curve (unitless)
-- `b`: Sensitivity parameter for the hydraulic vulnerability curve (-MPa)
-- `psi_crit`: $\psi_l$ at which 95% of conductivity is lost. Maximum water potential. (-MPa)
+- `p_50`: the leaf water potential ($\psi_l$) at which 50% of conductivity is lost
+- `K_s`: the maximum hydraulic conductivity ($kg~m^{-2}~s^{-1}~MPa^{-1})$
+- `c`: the shape parameter for the hydraulic vulnerability curve (unitless)
+- `b`: the sensitivity parameter for the hydraulic vulnerability curve (-MPa)
+- `psi_crit`: the critical $\psi_l$ at which 95% of conductivity is lost (-MPa)
 
-For the most part, these traits, in combination with traits from `TF24`, determine how plant assimilate carbon and transpire water via the physiological `Leaf` submodel. We can start by exploring the theory behind how the `Leaf` submodel works, found in `leaf_model.cpp`.
+Together with the other TF24 traits and parameters, these values determine how
+the `Leaf` submodel responds to its environment. The implementation lives in
+`leaf_model.cpp`; the sections below explain the calculation conceptually.
 
-# Profitmax
+## Profitmax
 
-Plants are known to vary the aperture of their stomata, which control the rate of conductance of $H_2O$ for $CO_2$, in response to environmental stimuli including the amount of available soil moisture. But how do plants determine the optimum rate of exchange? Multiple theoretical frameworks exist to address this question, but currently `TF24` employs the `profitmax` model. The profitmax models states that the optimum stomatal conductance is the point at which profits, $P~(\mu mol~m^{-2}~s^{-1})$, is maximised.
+Plants vary the aperture of their stomata in response to conditions such as
+soil moisture and atmospheric dryness. Several theoretical frameworks can be
+used to represent that response. TF24 uses the `profitmax` model, which assumes
+that the chosen operating point is the one that maximises profit,
+$P~(\mu mol~m^{-2}~s^{-1})$.
 
 ::: {.callout-note}
-## A second stomatal model lives in the code, but is dormant
+### A second stomatal model lives in the code, but is dormant
 
 The `Leaf` submodel also carries an implementation of the Medlyn *et al.* (2011)
 stomatal-conductance model — an empirical $g_1$ formulation (`medlyn_model_gs`,
@@ -94,63 +110,116 @@ comparison/exploration tool, so treat any Medlyn-style $g_1$ behaviour as
 opt-in, not the model's default stomatal response.
 :::
 
-$P (\mu mol~m^{-2}~s^{-1})$ is the difference between photosynthetic revenue, $A~(\mu mol~m^{-2}~s^{-1})$ and the costs,$C~(\mu mol~m^{-2}~s^{-1})$ required to maintain the transpirational pathway which supplies water for transpiration through the stomates:
+Profit is the difference between photosynthetic revenue,
+$A~(\mu mol~m^{-2}~s^{-1})$, and hydraulic cost,
+$C~(\mu mol~m^{-2}~s^{-1})$:
 
 $$
 P~(\psi_l) = A~(\psi_l) - C~(\psi_l).
 $$ {#eq-profit}
 
-$\psi_l~(-MPa)$ is the water potential of the canopy xylem. This can considered equivalent to the rate of stomatal conductance, because the larger that the leaf water potential gets, the greater the stomatal conductance, all else being equal, which we return to later. What is clear from the equation is that, because both $R$ and $C$ are functions of $\psi_l$, there is a value of $\psi_l$ which can be found which results in $max(P)$. In other words, the maximum profit. We will return to how we numerically solve this function later.
+Later code and figures label photosynthetic revenue as $R$ and hydraulic cost as
+$H$. These are the same two quantities denoted by $A$ and $C$ in @eq-profit;
+only the labels change.
 
-For now, lets go through how the cost and revenue are calculated as a function of $\psi_l$.
+$\psi_l~(-MPa)$ is the water potential of the canopy xylem. In this page's
+notation, water stress is expressed as the magnitude of a negative potential:
+a larger value means a more negative physical water potential. Changing
+$\psi_l$ changes how much water the hydraulic pathway can supply and therefore
+the stomatal conductance that can be supported.
 
-# Revenue
+Both $A$ and $C$ are therefore functions of $\psi_l$. The model evaluates their
+difference over the feasible range of $\psi_l$ and finds the value that gives
+the largest $P$.
 
-Revenue in `profitmax` is the photosynthetic assimilate $A~(\mu mol~m^{-2}~s^{-1})$ that can produced at a given level of stomatal conductance before taking away costs associated with transpiration.
+We begin with the revenue side of the calculation.
 
-$A~(\mu mol~m^{-2}~s^{-1})$ is related to stomatal behaviour via a coupled-stomatal conductance model, which employs Fick's first law to describe the flux of $CO_2$ across a concentration gradients from the atmosphere $C_a~(Pa)$ to the inter-cellular spaces in the leaf $C_i~(Pa)$:
+## Revenue
+
+Revenue in `profitmax` is the photosynthetic carbon assimilation rate
+$A~(\mu mol~m^{-2}~s^{-1})$ supported at a given stomatal conductance. At this
+stage, it is the carbon gain before the hydraulic cost is subtracted.
+
+Stomata connect the carbon and water calculations. Fick's first law describes
+the flux of $CO_2$ down the concentration gradient from the atmosphere,
+$C_a~(Pa)$, to the intercellular spaces in the leaf, $C_i~(Pa)$:
 
 $$
 A~(C_i) = \frac{g_c(\psi_{l})(C_a - C_i)}{P_{atm}}.
 $$ {#eq-assim-ci}
 
-In the above equation, $P_{atm}~(kPa)$ is the atmospheric pressure and $g_c$ is the stomatal conducatance to $CO_2$, which is calculated as
+Here, $P_{atm}~(kPa)$ is atmospheric pressure and $g_c$ is stomatal
+conductance to $CO_2$. Water vapour and carbon dioxide diffuse at different
+rates, so conductance to $CO_2$ is calculated from conductance to water,
+$g_w$, as
 
 $$
 g_c(\psi_{l}) = \frac{g_w(\psi_{l})}{1.6},
 $$ {#eq-gc}
 
-where $g_w$ is the stomatal conducatance to $H_2O$ and 1.6 is ratio of exchange of $CO_2$ and $H_2O$ at the stomatal boundary. For now, we will treat $g_c$ as a constant, because $\psi_l$ varies when maximising the profit function. As can be seen in the coupled stomatal model, $C_i$ is present on both sides of the equation, meaning that we must solve for the value of $C_i$. To better understand this, we first need to understand how $A$ relates to $C_i$
+where the factor 1.6 accounts for the difference in diffusivity between $H_2O$
+and $CO_2$ at the stomatal boundary.
 
-$A$ is itself a function of $C_i$ and is calculated using a biochemical photosynthetic model (Farquhar et al. 1980) which incorporates both the rubisco-limited, $A_c~(umol~m^{-2}~s^{-1})$ and electron-transport limited photosythnetic rate $A_j~(umol~m^{-2}~s^{-1})$. Net $A$ occurs at the most limiting of these two rate using a smoothing transitiion function.
+For any candidate $\psi_l$, the hydraulic calculation supplies a value of
+$g_w$, and therefore of $g_c$. The remaining unknown is $C_i$. This cannot be
+read directly from @eq-assim-ci because assimilation also depends on $C_i$
+through leaf biochemistry. The model must find a value of $C_i$ at which the
+diffusive supply of carbon dioxide and its biochemical use agree.
 
-The standard electron-transport limited photosynthetic rate equation describes how photosynthesis varies with light availability and $C_i$:
+The biochemical side uses the photosynthesis model of Farquhar et al. (1980).
+It calculates a Rubisco-limited rate,
+$A_c~(umol~m^{-2}~s^{-1})$, and an electron-transport-limited rate,
+$A_j~(umol~m^{-2}~s^{-1})$. Net assimilation follows the more limiting process,
+with a smooth transition between them.
+
+The electron-transport-limited rate depends on both light availability and
+$C_i$:
 
 $$
 A_j=\frac{J(C_i-\Gamma^*)}{4(C_i+2\Gamma^*)},
 $$ {#eq-aj}
 
-where $\Gamma^*~(Pa)$ is the CO2 compensation point of photosynthesis. $J~(umol~m^{-2}~s^{-1})$ describes the effect of light availability on photosythnesis, being the irradiance dependence of electron transport:
+where $\Gamma^*~(Pa)$ is the $CO_2$ compensation point. The electron transport
+rate $J~(umol~m^{-2}~s^{-1})$ carries the effect of irradiance into the
+calculation:
 
 $$
 J=\frac{aQ+J_{max}-\sqrt{(aQ+J_{max})^2-4caQJ_{max}}}{2c},
 $$ {#eq-j}
 
-where $a~(mol~photon~mol^{-1}~electron)$ is the effective quantum yield of electron transport, $Q~(umol~m^{-2}~s^{-1})$ is the PPFD (i.e. the light), $c (unitless)$ is the curvature of the the response of the electron transport rate to light and $J_{max}~(umol~m^{-2}~s^{-1})$ is the maximum electron transport rate.
+where $a~(mol~photon~mol^{-1}~electron)$ is the effective quantum yield of
+electron transport, $Q~(umol~m^{-2}~s^{-1})$ is photosynthetic photon flux
+density (PPFD), $c$ is the unitless curvature of the light-response curve, and
+$J_{max}~(umol~m^{-2}~s^{-1})$ is the maximum electron transport rate.
 
-$A_c$ is calculated as:
+::: {.callout-note}
+### Two different curvature parameters use the symbol $c$
+
+The light-response equation above and the hydraulic vulnerability equation
+below both use $c$, but they refer to different parameters. In the code, the
+light-response curvature is `curv_fact_elec_trans`, while the vulnerability
+curve uses `c`.
+:::
+
+The Rubisco-limited rate is
 
 $$
 A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
 $$ {#eq-ac}
 
-where $K_m~(Pa)$ is the effective Michaelis-Menten constant. $V_{c,max}$, $\Gamma*$ and $K_m$ are all temperature dependent variables.
+where $K_m~(Pa)$ is the effective Michaelis--Menten constant. $V_{c,max}$,
+$\Gamma^*$, and $K_m$ are all temperature-dependent variables.
 
-We can view the functional form of $A_c$ and $A_j$ a function of $C_i$ below.
+The next example compares $A_c$ and $A_j$ across a range of $C_i$ values.
 
-First, we need to initialise a leaf with some traits and some environmental information. We can extract them from the strategy object. Remember, we only need to initialise the leaf object with traits which are related to leaf physiological sub-model, rather than the whole plant as would be required for growing an `Individual` or a `patch`.
+The calculation needs both fixed strategy parameters and environmental or
+plant-state values that can change through time. We first create a `Leaf` object
+to hold the fixed parameters. Unlike an `Individual` or a patch, this object
+represents the physiology of a unit of leaf area rather than a whole plant or
+population.
 
-The `Leaf` function creates a `Leaf` object, which contains most of the internal functions which are used when calculating the photosynthetic assimilation and water use of a unit of leaf area when using `TF24`. We initialise the `Leaf` object with a set of traits.
+The following historical example shows the intended setup sequence. As noted
+above, its constructor arguments have not yet been updated to the current API.
 
 ```{r}
 sw <- list(
@@ -183,7 +252,12 @@ leaf <- Leaf(vcmax = sw$vcmax_25, b = sw$b, c = sw$c, psi_crit = sw$psi_crit,
                g1_TF24 = sw$g1_TF24, beta_R_H = sw$beta_R_H, beta_R_V = sw$beta_R_V)
 ```
 
-We also need to set a series of variables which describe the environmment and physiology of the plant at a given time using the `set_physiology` function. Whereas the traits set using the `Leaf` function describe a species' strategy and do not vary over time, the variables set in `set_physiology` do vary. This becomes more relevant for when we dynamically running an individual plant or forest. For now, we will set some constants, based on plant height.
+Next, `set_physiology` supplies the conditions at one point in time. These
+include the light and atmospheric environment, soil water, and size-dependent
+properties of the plant. Unlike the fixed parameters passed to `Leaf()`, these
+values can change as an individual grows and its environment changes. Here they
+are held constant so that the leaf-level relationships can be viewed in
+isolation.
 
 ```{r}
   psi_soil = c(1)
@@ -205,15 +279,16 @@ leaf$set_physiology(area_leaf = area_leaf_, mass_root_prop = mass_root_prop_, rh
 
 ```
 
-Set some $C_i$ values.
+We now evaluate the biochemical rates over a sequence of $C_i$ values.
 
 ```{r}
 C_i = seq(0,40,1)
 ```
 
-Plot $A_j$ and $A_c$ against $C_i$
-
-Note that the leaf object has functions and objects with similar names. For example, `leaf$assim_electron_limited` is a function which takes C_i as an input, and `leaf$assim_electron_limited_` is the output object.
+The `Leaf` object uses similar names for calculation methods and stored results.
+For example, `leaf$assim_electron_limited` is a function that takes $C_i$ as an
+input, whereas `leaf$assim_electron_limited_` stores a calculated result. The
+first plot calls the functions directly.
 
 ```{r}
 tibble(C_i = C_i) %>%
@@ -225,7 +300,10 @@ tibble(C_i = C_i) %>%
   theme_classic()
 ```
 
-As can be seen in the plot, $A$ increases with $C_i$ regardless of whether it is rubisco or light-limited. However, the most-limiting rate changes as $C_i$ increases, which can be captured using a smoothing function (see paper for details.)
+Both potential rates increase with $C_i$, but they do not increase at the same
+rate. Which process is most limiting can therefore change across the range of
+$C_i$. The model combines them with a smooth co-limitation function (see the
+paper for details).
 
 ```{r}
 tibble(C_i = C_i) %>%
@@ -239,17 +317,28 @@ tibble(C_i = C_i) %>%
   theme_classic()
 ```
 
-The A_net function also includes a carbon deduction associated with dark respiration, so we can add this back on to show correspondence between the A_net curve and A_c/Aj.
+The `A_net` calculation also subtracts dark respiration. Adding that respiration
+term back helps show how the co-limited curve relates to $A_c$ and $A_j$ before
+the respiratory deduction.
 
-# Cost
+## Cost
 
-In order for plants to photosynthesise, plants must move from water from the soil to the canopy via the xylem. To do this, the downstream water potential must be lower (i.e. more negative) than the soil. In `profitmax`, the hydraulic cost incurred by plants is associated with the fact that as the xylem water potential increases, the hydraulic conductance $k_{l,max}~(\mu mol~m^{-2}~s^{-1}~MPa^{-1})$ of the xylem pathway declines, which is assumed to be caused by an increased risk of embolism in the xylem. For simplicity, in `TF24`, we currently represent the xylem pathway as a single element representing the roots, stem and leaves. We acknowledge that in reality these elements would each have separate hydraulic conductance. The decline in hydraulic conductance with increasing $\psi_l$ follows the hydraulic vulnerability curve:
+Photosynthesis requires a continuous supply of water from the soil to the
+canopy. Water moves along a potential gradient, so the leaf xylem must be at a
+more negative physical water potential than the soil. In the positive-magnitude
+notation used here, this means that $\psi_l$ must be larger than $\psi_s$.
+
+Making that gradient steeper can supply more water, but it also reduces the
+conductance of the xylem pathway as embolism risk increases. The formulation
+developed on this page represents the hydraulic pathway with the following
+vulnerability curve:
 
 $$
 k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
 $$ {#eq-vuln-curve}
 
-We can this demonstrated graphically using the traits from above.
+The historical example below plots this decline using the parameter values
+defined above.
 
 ```{r}
 data <-
@@ -266,29 +355,45 @@ data %>%
 ```
 
 
-$b~(MPa)$ and $c~(unitless)$ are the sensitivity and shape parameters of the hydraulic vulnerability curve. $b$ is calculated as:
+$b~(MPa)$ controls the sensitivity of the curve and $c$ controls its shape. The
+value of $b$ is calculated as
 
 $$b = \frac{p_{50}}{-log(1-\frac{50}{100}^{\frac{1}{c}})},$$
 
-where $p_{50}$ is the $\psi_l$ at which 50% of hydraulic conductance is lost. $c$ can be calculated if two hydraulic vulnerability (i.e. $p_{x}$) values are known. Instead, we use an empirical value for $c$ obtained from Austraits.
+where $p_{50}$ is the $\psi_l$ at which 50% of hydraulic conductance is lost.
+If two points on a hydraulic vulnerability curve are known, they can be used to
+calculate $c$. Here, an empirical value for $c$ is obtained from AusTraits.
 
-$p_{50}$, in turn, is calculated from an empirical relaitonship between $p_50$ and the hydraulic conductivity of the xylem pathway, where more conductive stems lose conductivity at a less negative water potential (Liu et al. 2019):
+$p_{50}$ is in turn calculated from an empirical relationship with the
+hydraulic conductivity of the xylem pathway. In this relationship, more
+conductive stems lose conductivity at a less negative water potential (Liu et
+al. 2019):
 
 $$p_{50} = 1.73\frac{K_s}{2}^{-0.72}$$
 
-$k_{l,max}$ is the maximum hydraulic conductance achievable by the plant at $\psi_l = 0$ and is calculated as:
+$k_{l,max}$ is the maximum hydraulic conductance at $\psi_l = 0$:
 
 $$k_{l,max} = \frac{K_s\theta}{h\eta_c},$$
 
-where $\theta~(m^2~sapwood~m^{-2}~leaf~area)$ is the huber value (described in `TF24`), $h$ is the height of the plant and $eta_c~(unitless)[0,1]$ (described in `TF24`) is the average relative position of leaves in the canopy. Input traits required to parameterise these equations beyond those required in `TF24` are therefore: $K_s$, $\theta$ and $c$, with the remaining traits being handled by the `TF24` hyperparameterisation function. $h$ is the height of the plant, and is therefore resolved dynamically when running `plant`
+Here, $\theta~(m^2~sapwood~m^{-2}~leaf~area)$ is the Huber value, $h$ is plant
+height, and $\eta_c~(unitless)[0,1]$ describes the average relative position of
+leaves within the canopy. The [TF24 strategy](models/tf24.qmd) provides more
+context for these quantities. $K_s$, $\theta$, and $c$ parameterise the
+hydraulic relationships, while the TF24 hyper-parameterisation handles the
+remaining parameter links. Plant height is a dynamic state, so $k_{l,max}$ can
+change as the plant grows.
 
-The total volume of water transpiring through a given unit area of leaf is given by the following equation:
+For a given soil water potential and candidate leaf water potential, the water
+that the pathway can supply per unit leaf area is the integral of conductance
+across that potential interval:
 
 $$
 E_{supply} = \int^{\psi_l}_{\psi_s}k_l(\psi)\delta\psi 
 $$ {#eq-e-supply}
 
-Again, visualising this below, the water supplied for transpiration is equivalent to the area under the curve between  the soil water potential ($\psi_s~(-MPa)$) and the xylem water potential ($\psi_l~(-MPa)$).
+Graphically, $E_{supply}$ is the area under the conductance curve between the
+soil water potential, $\psi_s~(-MPa)$, and the leaf xylem water potential,
+$\psi_l~(-MPa)$.
 
 ```{r}
 data %>%
@@ -302,7 +407,11 @@ data %>%
   annotate("text", x = 2.2, y = 4.8e-05, label = expression(psi[l]), col = "red")
 ```
 
-Or, put another way, for a given $\psi_s$, this is the $E_{supply}$ that could be achieved as $psi_l$ becomes more negative. It can be seen that $E_{supply}$ slowly tapers off as $psi_s$ increases, owing to the shape of the hydraulic vulnerability curve. This is important as it implies declining marginal returns to transpired water as $psi_stem$ becomes increasingly negative.
+Holding $\psi_s$ fixed, the next plot shows how $E_{supply}$ changes as
+$\psi_l$ becomes more negative. Supply initially rises as the potential
+gradient increases, but the rise tapers because conductance is simultaneously
+being lost along the vulnerability curve. Increasing hydraulic strain therefore
+produces progressively smaller gains in water supply.
 
 ```{r}
 data %>%
@@ -313,35 +422,59 @@ data %>%
   theme_classic()
 ```
 
-We assume an upper critical limit to $\psi_l$ beyond which catastrophic xylem failure would occur, $\psi_{crit}$. Here, $psi_{crit}$ is assumed to the $\psi_l$ at which 95% of conductance is lost.
+The feasible range ends at a critical value, $\psi_{crit}$, beyond which the
+xylem is assumed to fail catastrophically. Here, $\psi_{crit}$ is the
+$\psi_l$ at which 95% of conductance has been lost.
 
-Recall from the `Revenue` section that $g_c$ is required in order to determine the $A$. We can take advantage of the robust assumption that plants optimally allocate water transport resources to ensure that $E_{supply}$, that is, the water transpired from the soil to the canopy, is equivalent to $E_{demand}$, which is the atmospheric demand for water. In other words, we assume:
+The revenue calculation requires stomatal conductance, while the hydraulic
+calculation gives water supply. The two are joined by requiring water supplied
+through the plant to equal water lost from the leaf:
 
 $$E_{supply} = E_{demand}$$
 
-$E_{demand}$ is calculated according to the following equation:
+Atmospheric demand is
 
 $$
 E_{demand} = \frac{g_sD}{P_{atm}},
 $$ 
 {#eq-e-demand}
 
-where $D~(kPa)$ is the atmospheric vapour pressure deficit. For simplicity, we assume that it is the atmospheric VPD, not the leaf-to-atmoshpere VPD, which emerges from variation in leaf temperature relative to air temperature, that drives $E_demand$, although we acknolwedge that this could have important consequences for stomatal behaviour. From the equation above, it is clear to see that all else being held equal, $E_{demand}$ increases when either the $g_s$ or $D$ increases. The key point here is that, all else being equal, in order for the assimilation of carbon into the leaf to increase via an increase in $g_s$, there must be an increase in $E_{demand}$, which in turns requires an increasingly negative $\psi_l$, which, in turn, means that there is further drop in hydraulic conductance. This captures the inherent trade-off of stomatal conductance between greater assimilation and a higher risk of xylem damage.
+where $D~(kPa)$ is atmospheric vapour pressure deficit and $g_s$ is stomatal
+conductance. The model uses atmospheric VPD rather than leaf-to-atmosphere VPD;
+the latter would also depend on differences between leaf and air temperature.
 
-To represent the risk of xylem damage as a cost in units of carbon, we calculate $H~(\psi_l)$ (from the profit equation) as:
+For a fixed $D$, increasing $g_s$ increases $E_{demand}$. Meeting that demand
+requires a more negative leaf water potential, which causes further loss of
+hydraulic conductance. This closes the central loop: opening stomata can raise
+carbon assimilation, but doing so also raises water demand and hydraulic risk.
+
+To compare that risk directly with carbon revenue, the model expresses
+hydraulic cost, $H~(\psi_l)$, in the same units as assimilation:
 $$
 H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
 $$ {#eq-hydraulic-cost}
 
-Here, $z~(m^3~sapwood~m^{-2}~leaf~area)$ is the sapwood volume per leaf area, $b_1(\mu mol~m^{-2}~s^{-1})$ is the carbon cost per unit of conductivity lost and $b^2~(unitless)$ is a shape parameter. The second term in the brackets is the proportion of conductivity remaining at a $\psi_l$, such that $H=0$ when $\psi_l = 0$.
+Here, $z~(m^3~sapwood~m^{-2}~leaf~area)$ is sapwood volume per leaf area,
+$b_1(\mu mol~m^{-2}~s^{-1})$ converts conductivity loss to a carbon cost, and
+$b_2~(unitless)$ controls the shape of the cost curve. The term in parentheses
+is the proportion of conductivity lost at $\psi_l$, so $H=0$ when
+$\psi_l = 0$ and increases as conductivity is lost.
 
-$z$ is calculated based on the size of the tree and $theta$, representing the total amount of sapwood supplying transpiration:
+$z$ depends on plant size and the Huber value, and represents the volume of
+sapwood supplying each unit of leaf area:
 
 $$z = \frac{\theta*h}{\eta_c}$$
 
-# Profit
+## Profit
 
-The relative forms of the $R$ and $H$ curves in relation to $\psi_l$ means that a single $psi_l$ which maximises profit emerges. Let's demonstrate this below, graphically.
+We can now put the two sides together. For each candidate $\psi_l$, the model
+calculates photosynthetic revenue and hydraulic cost, then subtracts the second
+from the first. Revenue tends to benefit from the additional stomatal opening
+supported by a steeper water-potential gradient, while hydraulic cost rises as
+conductivity is lost. Their difference therefore has a maximum within the
+feasible range.
+
+The first example calculates the revenue, cost, and profit curves step by step.
 
 
 ```{r}
@@ -367,7 +500,9 @@ data %>%
   geom_vline(xintercept = 2.05, linetype = "dashed")
 ```
 
-That's a pretty complicated way to do it though. We can just automatically calculated these values using a given profit funciton. For example, the in-built profit funciton in `TF24` is the `profit_psi_stem_TF`.
+The explicit calculation is useful for seeing where the three curves come from.
+In normal use, TF24 performs the same sequence through its built-in
+`profit_psi_stem_TF` function.
 
 ```{r}
 f <- function(psi_stem){
@@ -387,13 +522,24 @@ data  %>%
   theme_classic()
 ```
 
-# Optimising profit
+## Optimising profit
 
-Recall that the goal of the leaf physiology sub-model is to calculate the $CO_2$ assimilation and water use of a given unit of leaf area given the presiding environmental conditions and plant state. In order to do this, then, a numerical method is required to find the $\psi_l$ which maximises $P$ (@eq-profit). This also allows $E$ to be calculated, which is used in the soil hydrology sub-model (discussed elsewhere).
+The leaf submodel ultimately needs two outputs under the current environmental
+conditions and plant state: carbon assimilation and water use per unit leaf
+area. Obtaining them requires finding the $\psi_l$ that maximises $P$ in
+@eq-profit. Once that operating point is known, the corresponding transpiration
+$E$ can also be passed to the soil-water calculation.
 
-The preferred method for numerical optimisation at the time of writing for `TF24` is the Golden Section Search algorthim. This algorithm finds local maxima or minima by successively narrowing the position of two initial boundary values until the distance of movement is below a defined tolerance values. As above, the x-values of the method is $\psi_l$, and the two initial boundary values in this case are $\psi_s$ and $psi_{crit}$; $psi_l$ cannot be less negative than $psi_s$ and is assumed to not surpass $psi_crit$.
+TF24 uses a golden-section search. The search starts with a lower and upper
+bound and repeatedly narrows the interval containing the maximum until that
+interval is smaller than a chosen tolerance. Here, the quantity being varied is
+$\psi_l$. Its bounds are $\psi_s$ and $\psi_{crit}$: the leaf cannot be less
+negative than the soil that supplies it, and it is not allowed to pass the
+critical loss-of-conductivity threshold.
 
-A manual demonstration is shown below, and then the method implemented in `TF24`
+The following code first demonstrates the search manually. It evaluates profit
+at two interior points, discards the part of the interval that cannot contain
+the maximum, and repeats.
 
 ```{r}
 #golden ratio
@@ -437,13 +583,12 @@ while (abs(bound_b - bound_a) > delta_crit) {
 (transpiration = leaf$transpiration_)
 ```
 
-## Validation against the compiled implementation
+### Validation against the compiled implementation
 
-The chunk below is an internal validation step: it re-runs the optimisation
-through the compiled `TF24` C++ `Leaf` object and checks the result matches the
-manual golden-section search above. It is disabled here (`eval: false`) because
-it is a self-consistency check on the implementation rather than an illustration
-of the theory.
+The final chunk shows the corresponding call to the compiled TF24 `Leaf`
+implementation. Its purpose is to check that the built-in optimisation returns
+the same optimum, profit, and transpiration as the manual search. It remains
+disabled with the rest of the historical example.
 
 ```{r}
 #| eval: false
@@ -451,3 +596,17 @@ leaf$optimise_psi_stem_TF()
 leaf$profit_
 leaf$transpiration_
 ```
+
+The complete calculation can therefore be read as a short sequence:
+
+1. choose a candidate leaf xylem water potential $\psi_l$;
+2. calculate the water supply and the stomatal conductance it can support;
+3. solve for $C_i$ and calculate photosynthetic assimilation;
+4. calculate the hydraulic cost associated with lost conductivity;
+5. subtract cost from assimilation and search for the $\psi_l$ with the highest
+   profit.
+
+TF24 repeats this calculation as plant size and environmental conditions change.
+The resulting assimilation contributes to the whole-plant carbon balance, while
+transpiration feeds back on the soil-water state described in
+[Soil water & root uptake](soil-water.qmd).

@@ -95,6 +95,7 @@ website:
             - theory/size-structured-pde.qmd
             - theory/assimilation-hydraulics.qmd
             - theory/soil-water.qmd
+            - theory/uncertainty-partitioning.qmd
         - section: "Adaptive dynamics"
           contents:
             - theory/adaptive-dynamics.qmd

@@ -6,14 +6,16 @@ toc: false
 the model, from the ground up
 :::
 
-What `plant` actually solves, and why. Consolidates material currently
-scattered across papers and vignettes.
+These pages explain what `plant` solves, why the model is built that way, and
+how the pieces fit together. They bring material from papers and vignettes
+into one route through the theory.
 
 ## Core
 
-The demographic and physiological machinery shared by every strategy.
+Start here for the demographic and physiological ideas behind the model.
 
-New here? Start with the two orientation pages, then dive into the details.
+If you are new to `plant`, begin with the big picture. The next two pages then
+introduce the mathematics in stages before the more detailed chapters.
 
 - [The big picture](overview.qmd) — the mental model in plain language, no
   equations. **Start here.**
@@ -30,12 +32,14 @@ New here? Start with the two orientation pages, then dive into the details.
   to the leaf model.
 - [Adaptive dynamics](adaptive-dynamics.qmd) — invasion fitness and
   evolutionary endpoints.
+- [Uncertainty & prediction](uncertainty-partitioning.qmd) — where uncertainty
+  enters a `plant` prediction, and how ensembles could be used to measure it.
 
 ## Models {#models}
 
-The physiological strategies that plug into that machinery — each a concrete
-set of growth, fecundity, and mortality functions. See the
-[models overview](models/index.qmd).
+These pages describe the biological strategies that plug into the demographic
+machinery. Each strategy supplies its own growth, fecundity, and mortality
+functions. See the [models overview](models/index.qmd) for an introduction.
 
 - [FF16](models/ff16.qmd) — the trait-based functional-balance model.
 - [K93](models/k93.qmd) — Kohyama's basal-area competition model.
@@ -44,8 +48,8 @@ set of growth, fecundity, and mortality functions. See the
 
 ## Implementation {#implementation}
 
-How the equations are solved numerically. See the
-[implementation overview](implementation/index.qmd).
+These pages explain how the equations are solved on a computer. See the
+[implementation overview](implementation/index.qmd) for an introduction.
 
 - [The characteristic method](implementation/characteristic-method.qmd)
 - [ODE stepping & control](implementation/ode-stepping.qmd)
