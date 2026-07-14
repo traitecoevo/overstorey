@@ -5,6 +5,16 @@ title: "TF24"
 model
 :::
 
+::: {.callout-note}
+## Prerequisites
+This page builds on [The big picture](../overview.qmd) and the
+[FF16 model](ff16.qmd). The [Assimilation &
+hydraulics](../assimilation-hydraulics.qmd) page gives the leaf-level equations
+in more detail.
+:::
+
+## The idea first
+
 TF24 adds explicit plant hydraulics to the trait-based growth framework used by
 [FF16](ff16.qmd). It was developed to ask how plant water use, tissue costs,
 and growth interact as water availability and atmospheric conditions change
@@ -50,7 +60,7 @@ subsequent steps are inherited from FF16: assimilated carbon is allocated to
 height, diameter, and tissue pools, and these individual-level rates feed into
 the [size-structured PDE](../size-structured-pde.qmd).
 
-## The paper behind TF24
+## Model origin and scope
 
 Earlier versions of the `plant` framework could explain how traits affect
 growth through tissue construction, allocation, respiration, and turnover, but
@@ -67,13 +77,13 @@ to plant performance:
 5. the plant's allocation and allometry determine how that growth changes its
    height and tissue pools [@Towers-2024].
 
-The supporting information adds detail to the carbon calculation. Biochemical
-carbon demand is the smoothly co-limited outcome of Rubisco activity and
-electron transport, while diffusive carbon supply depends on stomatal
-conductance. The model solves for an intercellular carbon dioxide concentration
-at which supply and demand agree. Leaf respiration is also linked to structural
-and photosynthetic nitrogen, so maintaining photosynthetic machinery carries a
-carbon cost as well as providing a benefit [@Towers-2024].
+The paper and its supporting information provide the scientific basis for this
+new carbon-income calculation. Biochemical demand for carbon dioxide is set by
+Rubisco activity and electron transport, while diffusive supply depends on
+stomatal conductance. TF24 solves for the intercellular carbon dioxide
+concentration at which supply and demand agree. Leaf respiration is also linked
+to structural and photosynthetic nitrogen, so photosynthetic machinery provides
+a benefit but also carries a maintenance cost [@Towers-2024].
 
 ### Two different optimisations
 
@@ -97,12 +107,12 @@ each set of conditions [@Towers-2024].
 
 ## From carbon gain to height growth
 
-Why did the paper optimise height growth rather than photosynthesis alone?
-Because carbon income is only the start of the growth calculation. A trait can
-increase photosynthesis while also making leaves, sapwood, bark, or roots more
-expensive to build and maintain.
+TF24 does not treat photosynthesis as the final measure of plant performance.
+Carbon income is only the start of the growth calculation. A trait can increase
+photosynthesis while also making leaves, sapwood, bark, or roots more expensive
+to build and maintain.
 
-The paper expressed height growth as a chain of four relationships:
+As in FF16, TF24 expresses height growth as a chain of four relationships:
 
 $$
 \frac{dH}{dt}
@@ -121,17 +131,17 @@ used by FF16. The hydraulic leaf model changes the carbon income entering the
 right-hand side, while traits can also change the construction and maintenance
 terms further along the chain [@Towers-2024].
 
-This distinction matters. In the paper, the leaf mass per area that maximised
-biomass production did not respond to the environment, whereas the value that
-maximised height growth did. The response appeared only after the cost of
-turning biomass into leaf area was included. A model that stopped at carbon
-gain or biomass production would therefore miss part of the trait trade-off
-[@Towers-2024].
+This complete chain matters because traits can affect more than carbon income.
+They can also change tissue construction, maintenance, turnover, and allometry.
+TF24 therefore evaluates their combined consequences for whole-plant growth;
+their effects cannot be inferred from photosynthesis or biomass production
+alone [@Towers-2024].
 
-## Four focal traits and their trade-offs
+## Traits that connect hydraulics to growth
 
-The study used TF24 to examine four measurable traits. Each trait can help in
-one part of the carbon-water economy while imposing a cost elsewhere.
+Towers et al. focused on four measurable traits that connect water transport to
+the wider carbon budget. In TF24, each trait can help one part of the plant's
+carbon-water economy while imposing a cost elsewhere.
 
 - **Leaf mass per area**, $\phi$, is the dry leaf mass needed to deploy a unit
   of leaf area. Higher values make each unit of leaf area more expensive to
@@ -141,9 +151,9 @@ one part of the carbon-water economy while imposing a cost elsewhere.
   unit of leaf area. More sapwood improves water supply, but the extra sapwood
   and bark must be built and maintained. A larger sapwood volume can also
   incur a larger absolute hydraulic repair cost.
-- **Wood density**, $\rho$, is sapwood mass per unit volume. The paper
-  represents denser wood as more resistant to cavitation-related damage, but
-  also more expensive to construct.
+- **Wood density**, $\rho$, is sapwood mass per unit volume. TF24 represents
+  denser wood as more resistant to cavitation-related damage, but also more
+  expensive to construct.
 - **Maximum sapwood-specific conductivity**, $K_{s,\max}$, describes how
   quickly a unit of sapwood can transport water at maximum conductivity. High
   conductivity improves water transport, but the model links it to less
@@ -155,82 +165,24 @@ more biomass into supporting tissue. Whether that change improves height
 growth depends on plant size and on the current soil, light, carbon dioxide,
 and atmospheric conditions [@Towers-2024].
 
-## What the study found
+## How the paper relates to current TF24
 
-The first result was that familiar stomatal responses emerged from the
-optimisation rather than being imposed as response curves. Under the paper's
-parameterisation, stomatal conductance declined as soils dried, vapour pressure
-deficit increased, or atmospheric carbon dioxide increased. It rose as light
-availability increased. Plants with a greater Huber value or greater maximum
-sapwood conductivity could support higher conductance under the same
-conditions [@Towers-2024].
-
-For plants of a fixed size and strategy, height growth was faster with wetter
-soil, lower vapour pressure deficit, more carbon dioxide, and more light. The
-authors then asked which traits maximised height growth along each
-environmental gradient. When all four traits were optimised together, drying
-soil favoured a coordinated shift towards:
-
-- higher leaf mass per area;
-- higher wood density;
-- higher Huber value; and
-- lower maximum sapwood-specific conductivity.
-
-In the model, the wet-adapted strategies achieved faster maximum growth but
-lost that advantage quickly as soil dried. More conservative strategies grew
-more slowly under wet conditions but maintained positive growth across a wider
-range of dry conditions. This produces a growth-versus-drought-tolerance
-trade-off that can help explain why species with different trait combinations
-replace one another along rainfall or soil-moisture gradients [@Towers-2024].
-
-::: {.callout-note}
-## A result, not a universal rule
-The joint drought pattern above is a result of the paper's parameterisation and
-trait assumptions. Some single-trait responses were more complicated. In
-particular, the height-growth-optimal Huber value changed non-monotonically as
-soil dried before increasing again under the driest conditions. Treat these
-results as mechanistic hypotheses produced by TF24, not as fixed responses that
-every parameterisation must show [@Towers-2024].
-:::
-
-The paper also examined plant height. Taller plants support more
-non-photosynthetic tissue and move water through a longer pathway, so their
-costs per unit leaf area rise. The predicted height-growth optima generally
-shifted towards higher leaf mass per area, wood density, and Huber value as
-plants became taller. Maximum sapwood conductivity increased only slightly
+Towers et al. introduced the physiological module and used it in an outer
+trait-optimisation analysis. That analysis is best read as a worked application
+of TF24: it shows how the model can be used to investigate trait-environment
+trade-offs, but its predicted trait responses are not rules built into the
+strategy. A normal TF24 simulation uses fixed strategy traits unless the user
+places it inside a separate evolutionary or optimisation analysis
 [@Towers-2024].
 
-## How to interpret the paper's results
-
-The published experiments deliberately simplified the setting so the trait
-trade-offs could be understood. They modelled isolated individuals in fixed
-environments, without competition, reproduction, mortality, or a dynamic soil
-water balance. Most environmental-gradient results used a one-metre-tall plant
-and changed one driver at a time. Height growth was used as a tractable proxy
-for fitness, not as a complete measure of lifetime reproductive success
-[@Towers-2024].
-
-The study also held photosynthetic temperature-response parameters at their
-25 °C values rather than testing temperature as an environmental driver.
-Its conclusions concern soil water potential, vapour pressure deficit,
-atmospheric carbon dioxide, light, and plant height. They should not be read as
-predictions of thermal acclimation [@Towers-2024].
-
-Several biological relationships were simplified or uncertain. The hydraulic
-safety-efficiency trade-off was assumed, some hydraulic-cost parameters were
-poorly constrained, and the xylem representation omitted processes such as
-conduit widening, hydraulic segmentation, and gravitational water potential.
-The aim was to explain qualitative response directions, not to predict exact
-trait values for a particular species or site [@Towers-2024].
-
-::: {.callout-important}
-## The paper is the scientific origin, not a complete description of current TF24
-The 2024 analysis used the TF24 physiological module with a fixed soil water
-potential. The current strategy has since been connected to a dynamic,
-multi-layer soil-water and root-uptake model. The paper is therefore the best
-source for TF24's motivation, focal trait trade-offs, and original tests, while
-the pages linked below describe the current implementation.
-:::
+The distinction between the published experiment and the current `plant`
+implementation is also important. Towers et al. supplied a fixed soil water
+potential and did not simulate competition, reproduction, mortality, or a
+changing soil water balance. The current TF24 strategy can instead receive
+water from the dynamic, multi-layer soil-water and root-uptake model described
+below. The paper is therefore the source for TF24's physiological logic and
+original tests, while the linked theory pages describe the broader model in
+which that physiology now operates.
 
 ## Soil water and root uptake
 
