@@ -7,33 +7,34 @@ implementation
 
 ::: {.callout-note}
 ## Prerequisites
-This page builds on [The big picture](../overview.qmd) and [the FF16 model](../models/ff16.qmd). Read those first if the notation here is unfamiliar.
+This page builds on [The big picture](../overview.qmd) and
+[the FF16 model](../models/ff16.qmd). Read those first if the notation here is
+unfamiliar.
 :::
 
 ## The idea first
 
-Picture a forest from above: tall trees catch the sun first, and everything
-shorter sits in their shade. The lower a leaf sits, the more leaf area there
-is above it blocking the light, so less and less sunlight reaches it. That
-simple fact -- shade builds up with height -- is the whole idea behind a
-canopy or light-environment model. Rather than tracking every leaf
-individually, the model builds a profile: at each height in the forest, how
-much of the open-sky light actually gets through. Near the top, almost all of
-it does. Lower down, less does, because it has been filtered by the crowns
-above. This profile is shared by every plant in the patch: each one reads
-from it to work out how much light its own leaves receive, and each one also
-adds to it, since its own leaves cast shade on whatever grows beneath them.
-So a plant's growth is never just about its own size or strategy -- it also
-depends on the light environment its neighbours create by growing above or
-beside it. Some versions of the model track this shading in fine detail
-through each individual crown; others simplify it to make the calculation
-faster, at some cost in accuracy. The rest of this page makes this precise.
+Imagine looking down on a forest. Tall trees intercept light first, leaving
+shorter trees in their shade. A leaf lower in the canopy has more leaf area
+above it, so less open-sky light reaches it. This accumulation of shade with
+depth is the central idea behind a canopy, or light-environment, model.
 
-This page documents the canopy / shading models that `plant` implements: what
-the six models are, how each computes the light environment a plant experiences,
-the realism-versus-speed tradeoff between them, and why the perfect-plasticity
-approximation (PPA) requires smoothing to run in `plant`'s adaptive solver. It
-is an implementation reference for the current code.
+Rather than following every leaf, the model constructs a vertical light profile:
+at every height, it records the fraction of open-sky light that remains. Near
+the canopy top, that fraction is close to one; lower down, crowns above have
+filtered more of the light. All plants in a patch use the same profile. Each
+plant reads it to determine the light reaching its leaves, while also changing
+it by shading the plants below. Growth therefore depends not only on a plant's
+own size and strategy, but also on the light environment created by its
+neighbours.
+
+`plant` provides several ways to represent this process. Some resolve shading
+throughout each crown; others use faster approximations that sacrifice some
+detail. This page explains the six implemented canopy and shading models, how
+each calculates the light environment and assimilation, the trade-off between
+realism and speed, and why the perfect-plasticity approximation (PPA) must be
+smoothed for `plant`'s adaptive solver. It is an implementation reference for
+the current code.
 
 <!-- out-of-scope: the full model comparison — demographic equilibrium, invasion
      (mutant) fitness, the box-competition fitness comparison, the evolutionary
@@ -41,103 +42,102 @@ is an implementation reference for the current code.
      DunFalster 2026 — belongs in the paper reproduction, not this reference
      page. See the pointer at the foot of this page. -->
 
-# Background
+## How canopy shading affects the model
 
-## Light interception, and why it matters
+### Light interception, and why it matters
 
-Light is the currency of competition in a forest. A plant's carbon gain depends
-on the light its leaves intercept, and that light has been filtered twice: by
-the crowns of taller neighbours above it, and by the plant's own leaves higher
-in its crown (self-shading). `plant` captures this through a single shared
-object -- the patch **light profile** $E(z)$, the fraction of open-sky light
-reaching height $z$. Every plant both *reads* this profile (to photosynthesise)
-and *contributes* to it (the shade its leaves cast lowers $E$ below them).
+Light is the currency of forest competition. A plant's carbon gain depends on
+the light intercepted by its leaves. That light has already been filtered by
+taller neighbours' crowns and by leaves higher in the plant's own crown
+(self-shading). `plant` represents this with one shared patch **light profile**,
+$E(z)$: the fraction of open-sky light reaching height $z$. Every plant both
+*reads* this profile to photosynthesise and *contributes* to it, because its
+leaves lower $E$ for plants beneath them.
 
-Getting the light profile right is not a detail. It sets each plant's growth
-rate, which sets the size structure of the stand, which sets the competitive
-hierarchy, which ultimately decides which strategies persist and which traits
-selection favours. Errors here propagate all the way up to the ecological and
-evolutionary predictions the model exists to make.
+This profile is consequential, not a minor implementation detail. It determines
+plant growth, which determines stand size structure and competitive hierarchy,
+and ultimately affects which strategies persist and which traits selection
+favours. Errors in shading can therefore propagate to the ecological and
+evolutionary predictions that the model is designed to make.
 
-## Realism versus speed
+### Realism versus speed
 
-A fully realistic treatment would resolve the light field through each crown and
-integrate photosynthesis over it. That is expensive -- especially when the
-leaf-level photosynthesis model is itself costly (as in `TF24`, whose coupled
-stomatal/hydraulic optimisation is far heavier than a simple light-response
-curve). The classic response is to *simplify*: treat the crown as a single
-point, or the canopy as a few discrete layers -- trading fidelity for speed.
-`plant` lets you choose where to sit on that spectrum. The job of this page is
-to describe **what each simplification does**, because, as the model comparison
-shows, a model can be perfectly adequate for one question and badly wrong for
-another.
+A fully detailed model would resolve the light field throughout every crown and
+integrate photosynthesis across it. This is costly, particularly when leaf-level
+photosynthesis is itself expensive: `TF24` uses coupled stomatal/hydraulic
+optimisation rather than a simple light-response curve. A common alternative is
+to simplify the crown to a point, or the canopy to a small number of layers.
+That saves computation but reduces fidelity.
 
-## The models
+`plant` lets you choose a point on this spectrum. The important question is not
+which simplification is universally best, but **what each one changes**. As the
+model comparison shows, an approximation can be suitable for one purpose and
+seriously misleading for another.
+
+### The models
 
 The `FF16` strategy offers six shading models, selected with
-`control$shading_model`. Four of them share the *same* per-plant competition --
-the smooth Yokozawa leaf-area profile -- and differ only in how a plant's own
-assimilation is computed (and, for PPA, how the light profile is assembled):
+`control$shading_model`. Start by separating two ideas: the shade a plant
+*casts* (competition) and how it turns the light it *receives* into assimilation.
+Four models use the same smooth Yokozawa leaf-area profile for competition.
+They differ only in how they calculate a plant's own assimilation, except that
+PPA also changes how the light profile is assembled:
 
 * **`"deep-crown"`** (the default) -- the original `plant` behaviour. Leaf area
-  is distributed continuously through the crown following the Yokozawa (1995)
-  foliage profile, and a plant's gross assimilation is computed by *integrating*
-  photosynthesis over crown depth against the light profile. The patch light
-  profile is a smooth function of height.
+  is distributed continuously through the crown according to the Yokozawa (1995)
+  foliage profile. Gross assimilation is calculated by *integrating*
+  photosynthesis over crown depth against the light profile. The resulting patch
+  light profile is smooth with height.
 
-* **`"crown-centre"`** -- the light profile is built exactly as for `"deep-crown"`,
-  but a plant's assimilation is approximated by a *single evaluation* of the
-  light at its crown centre rather than an integral over depth. This skips the
-  per-plant quadrature, so it is faster, and removes within-crown self-shading.
+* **`"crown-centre"`** -- builds the light profile exactly as `"deep-crown"` does,
+  but approximates assimilation with a *single evaluation* at the crown centre
+  rather than an integral over crown depth. Skipping the per-plant quadrature
+  makes it faster, but removes within-crown self-shading.
 
-* **`"mean-light"`** -- partway between deep-crown and crown-centre. Rather than
-  integrating the *photosynthetic rate* over depth, it integrates the *light*
-  over depth (weighted by leaf-area density) to a single leaf-area-weighted mean
-  light, then takes one photosynthesis evaluation of that mean. It therefore
-  still feels the within-crown change in light environment -- and how that environment
-  shifts as the canopy develops -- but collapses the expensive photosynthesis
-  calculation to a *single* call per plant rather than one per crown depth. For
-  FF16 that saving is modest (its leaf photosynthesis is a cheap saturating
-  function), but it becomes important for models with an expensive leaf
-  submodel: the `TF24` strategy's coupled stomatal/hydraulic optimisation is far
-  more costly to evaluate, so integrating the light and optimising once is the
-  natural choice there. The cost is bias: because photosynthesis saturates with
-  light, evaluating the rate at the mean light overestimates the depth-averaged
-  rate (Jensen's inequality). So `"mean-light"` always gives at least as much
-  assimilation as `"deep-crown"`, the two agreeing only when the within-crown
-  light is uniform.
+* **`"mean-light"`** -- sits between deep-crown and crown-centre. It integrates
+  the *light* over crown depth, weighted by leaf-area density, to obtain one
+  leaf-area-weighted mean light level, then evaluates photosynthesis once at
+  that mean. It therefore retains the changing within-crown light environment
+  as the canopy develops, while replacing many photosynthesis calculations with
+  *one* per plant. The saving is modest for FF16, whose leaf photosynthesis is a
+  cheap saturating function. It matters more for models with expensive leaf
+  submodels: `TF24`'s coupled stomatal/hydraulic optimisation makes integrating
+  light and optimising once the natural choice. The trade-off is bias. Because
+  photosynthesis saturates with light, the rate evaluated at mean light exceeds
+  the depth-averaged rate (Jensen's inequality). `"mean-light"` therefore always
+  gives at least as much assimilation as `"deep-crown"`; they agree only when
+  light is uniform within the crown.
 
-* **`"ppa"`** -- the perfect-plasticity approximation, the scheme that underlies
-  large models such as FATES. The patch light profile is discretised into
-  discrete canopy *layers*: light steps down by a fixed amount of optical depth
-  (`control$ppa_layer_optical_depth`) per layer.
-  Assimilation is evaluated at the crown centre as in `"crown-centre"`, but now
-  reads this stepped profile. Because a hard step is not differentiable (and
-  makes the ODE solver fail), the layer boundaries are smoothed with a
-  C^1^-continuous ramp whose width is set by `control$ppa_layer_smoothing`.
-  This gives two variants of the *one* `"ppa"` model, exactly paralleling the
-  Flat Top pair below: **PPA (hard step)** (`ppa_layer_smoothing = 0`) is the
-  literal field discretisation (e.g. Strigul 2008, FATES) -- discontinuous, and
-  it does not run in `plant`'s adaptive solver -- while **PPA (smoothed)**
-  (`ppa_layer_smoothing > 0`, default `0.3`) is the runnable version.
+* **`"ppa"`** -- the perfect-plasticity approximation used by large models such
+  as FATES. It divides the patch light profile into discrete canopy *layers*:
+  light decreases by a fixed optical depth
+  (`control$ppa_layer_optical_depth`) in each layer. Assimilation is evaluated
+  at the crown centre, as in `"crown-centre"`, but reads this stepped profile.
+  A hard step is not differentiable and causes the ODE solver to fail, so layer
+  boundaries are smoothed with a $C^1$-continuous ramp whose width is set by
+  `control$ppa_layer_smoothing`. This creates two versions of the single
+  `"ppa"` model, paralleling the Flat Top pair below: **PPA (hard step)**
+  (`ppa_layer_smoothing = 0`) is the literal field discretisation (e.g. Strigul
+  2008, FATES). It is discontinuous and does not run in `plant`'s adaptive
+  solver. **PPA (smoothed)** (`ppa_layer_smoothing > 0`, default `0.3`) is the
+  runnable version.
 
-Two further models instead change the *competition* itself -- the shade a plant
-casts -- collapsing its leaf area towards a thin crown-centre layer rather than
-spreading it through the crown. This discrete-layer view is close to how many
-large vegetation models (e.g. LPJ-GUESS) represent canopy competition, so it is
-worth taking seriously rather than dismissing:
+The remaining two models change *competition* itself: the shade a plant casts.
+Instead of spreading leaf area through the crown, they collapse it towards a
+thin layer at the crown centre. Many large vegetation models, including
+LPJ-GUESS, use a similar discrete-layer view of canopy competition, so these
+are useful approximations to examine rather than dismiss:
 
-* **`"flat-top-box"`** -- the shade cast is a hard *step*: full below the crown
-  centre, none above. Summed over cohorts this makes the patch light profile
-  discontinuous, and in `plant` the stand then cannot be solved at all.
-* **`"flat-top-soft-box"`** -- the same box competition with the step smoothed to
-  a continuous drop, so the light environment can be built. It runs, but the
-  mis-shaped shade biases its predictions.
+* **`"flat-top-box"`** -- casts a hard *step* of shade: full below the crown
+  centre and none above. Across cohorts this makes the patch light profile
+  discontinuous, so `plant` cannot solve the stand at all.
+* **`"flat-top-soft-box"`** -- uses the same box competition but smooths the step
+  into a continuous drop, allowing the light environment to be built. It runs,
+  but its incorrectly shaped shade biases predictions.
 
-The model is resolved once when a strategy is prepared, so there is no per-call
-cost to having the choice available. The `TF24` strategy supports `"deep-crown"`,
-`"mean-light"` (its default) and `"crown-centre"`, but not the PPA or box
-variants.
+The selected model is resolved once when a strategy is prepared, so offering the
+choice has no per-call cost. `TF24` supports `"deep-crown"`, `"mean-light"`
+(its default), and `"crown-centre"`, but not the PPA or box variants.
 
 ```{r}
 #| label: libraries
@@ -148,11 +148,12 @@ library(ggplot2)
 library(patchwork)
 ```
 
-# Simulating a patch under each model
+## A patch simulated under each model
 
-We grow a single `FF16` species in a patch, and run the same patch under each of
-the four smooth-competition models. Everything except `control$shading_model`
-is held fixed, so any differences are due to the shading model alone.
+We grow one `FF16` species in a patch and run the identical patch under each of
+the four smooth-competition models. Because everything except
+`control$shading_model` is fixed, differences among runs can be attributed to
+the shading model alone.
 
 ```{r}
 #| label: run-models
@@ -171,11 +172,11 @@ results <- lapply(models, run_model)
 names(results) <- models
 ```
 
-Each run returns the full collected state (`run_scm(collect = TRUE)`): a tidy
-`species` table (one row per node per step) and the light environment
-(`env$light_availability`). We tag each run's `species` table with its shading
-model and bind them together so we can use `plant`'s tidy helpers across all
-four.
+Each run returns its full collected state (`run_scm(collect = TRUE)`): a tidy
+`species` table, with one row for every node at every step, and the light
+environment (`env$light_availability`). We label each `species` table with its
+shading model, then combine the tables so that `plant`'s tidy helpers can work
+across all four runs.
 
 ```{r}
 #| label: bind-species
@@ -186,22 +187,22 @@ species_all$method <- factor(species_all$method, levels = models)
 
 # Light-extinction coefficient, used throughout to convert canopy openness to
 # cumulative leaf area: E = exp(-k_I * LAI), so LAI_above = -log(E) / k_I.
-k_I <- results[[1]]$p$strategies[[1]]$k_I
+k_I <- results[[1]]$p$strategies[[1]]$pars$k_I
 ```
 
-# Stand dynamics
+## What happens to the stand
 
-The least demanding test of a shading model is whether a stand develops
-sensibly. We look at three views of the same patch as it grows and self-thins:
-the size distribution, the leaf area index, and the vertical light profile.
+The first and least demanding test is whether a stand develops sensibly. We
+inspect the same patch in three complementary ways as it grows and self-thins:
+its size distribution, leaf area index, and vertical light profile.
 
-## Size distribution
+### Size distribution
 
-The size distribution is the set of node height trajectories: each line is a
-cohort introduced at a given patch age and followed as it grows, with line
-opacity scaled by the cohort's density (faint lines are sparse cohorts).
-`plant`'s `plot_size_distribution()` builds this directly from the tidy
-`species` table; faceting by `method` compares the shading models.
+The size distribution consists of node height trajectories. Each line follows a
+cohort introduced at a particular patch age; line opacity is scaled by cohort
+density, so sparse cohorts appear faint. `plant`'s `plot_size_distribution()`
+builds this view directly from the tidy `species` table, and facets by `method`
+make the shading models easy to compare.
 
 ```{r}
 #| label: fig-sizedist
@@ -214,20 +215,20 @@ p_size <- plot_size_distribution(species_all) +
 p_size
 ```
 
-The discrete layering in `"ppa"` produces visibly different growth trajectories:
-cohorts grow at near-constant light within a layer, then accelerate as they
-emerge into a brighter layer.
+The discrete layers in `"ppa"` create visibly different trajectories. Cohorts
+grow under nearly constant light within a layer, then accelerate as they emerge
+into a brighter one.
 
-## Leaf area index
+### Leaf area index
 
-Leaf area index (LAI) -- the total one-sided leaf area per unit ground -- is the
-cumulative leaf area above the ground, which is already encoded in the recorded
-light profile: with Beer's law $E = \exp(-k_I\,\mathrm{LAI})$, the patch LAI is
-just $-\log E(0) / k_I$, where $E(0)$ is canopy openness at ground level. This
-reads straight off `env$light_availability` and needs no integration over the
-size distribution. (LAI is real leaf area, so the smooth recorded profile gives
-the true value for all four models -- the PPA layering only affects the light
-plants *experience*, not the leaf area present.)
+Leaf area index (LAI) is total one-sided leaf area per unit ground area. It is
+the cumulative leaf area above the ground, and the recorded light profile
+already contains it. By Beer's law, $E = \exp(-k_I\,\mathrm{LAI})$, so patch LAI
+is $-\log E(0) / k_I$, where $E(0)$ is canopy openness at ground level. We can
+therefore read it directly from `env$light_availability`, without integrating
+over the size distribution. LAI is real leaf area, so the smooth recorded
+profile gives its true value for all four models: PPA layering changes the light
+plants *experience*, not the leaf area that is present.
 
 ```{r}
 #| label: lai-table
@@ -255,26 +256,26 @@ p_lai <- ggplot(lai_all, aes(time, lai, colour = method)) +
 p_lai
 ```
 
-`"deep-crown"`, `"mean-light"` and `"crown-centre"` track each other closely and
-settle to a steady LAI: under a near-uniform light profile, all three ways of
-summarising within-crown light give similar carbon gain (with
-`"mean-light"` and `"crown-centre"` running slightly richer, since they do not
-fully resolve self-shading). The `"ppa"` model instead shows large, sustained
-oscillations -- successive waves of recruitment and self-thinning -- because the
-discrete light layers create sharp thresholds for cohort success (visible as the
-pulses of emerging cohorts in the size-distribution panel above).
+`"deep-crown"`, `"mean-light"`, and `"crown-centre"` closely track one another
+and settle to a steady LAI. Under a nearly uniform light profile, their three
+ways of summarising within-crown light produce similar carbon gain.
+`"mean-light"` and `"crown-centre"` are slightly richer because they do not
+fully resolve self-shading. In contrast, `"ppa"` has large, persistent
+oscillations: discrete light layers create sharp thresholds for cohort success,
+leading to successive waves of recruitment and self-thinning. The pulses of
+emerging cohorts are also visible in the size-distribution panel above.
 
-## Vertical light profile
+### Vertical light profile
 
-We can also look *within* the canopy at a few patch ages, at the vertical
-profile of cumulative leaf area above each height -- $\mathrm{LAI}_{above}(z) =
--\log E(z) / k_I$, where $E$ is canopy openness. This is the quantity that sets
-how much each individual is shaded.
+Next, we look *within* the canopy at selected patch ages. The vertical profile
+of cumulative leaf area above each height is $\mathrm{LAI}_{above}(z) =
+-\log E(z) / k_I$, where $E$ is canopy openness. This is the quantity that
+determines how strongly each individual is shaded.
 
-The recorded `env$light_availability` is the smooth underlying profile shared by
-all models. The light that plants actually *experience* under PPA is the stepped
-version, so for the `"ppa"` panel we apply the same layering transform used
-internally (see `FF16_Environment::step_light`).
+`env$light_availability` records the smooth underlying profile shared by all
+models. PPA plants actually *experience* a stepped version of that profile, so
+the `"ppa"` panel applies the same internal layering transform (see
+`FF16_Environment::step_light`).
 
 ```{r}
 #| label: profile-data
@@ -330,36 +331,32 @@ p_profile <- ggplot(profile_all,
 p_profile
 ```
 
-`"deep-crown"`, `"mean-light"` and `"crown-centre"` share an identical smooth
-profile (they build the light environment the same way and differ only in how
-assimilation is evaluated); `"ppa"` shows the characteristic staircase, with
-cumulative leaf area held constant within a layer and jumping at each layer
-boundary.
+`"deep-crown"`, `"mean-light"`, and `"crown-centre"` have the same smooth
+profile because they construct the light environment identically and differ only
+in their assimilation calculation. `"ppa"` has its characteristic staircase:
+cumulative leaf area is constant within a layer and jumps at layer boundaries.
 
-# Computational cost
+## Computational cost: work per step and solver steps
 
-Speed is the whole reason the simpler models exist. A single patch is cheap, but
-`plant` is usually run thousands of times over -- sweeping traits, fitting to
-data, or computing fitness landscapes -- so the per-run cost compounds, and
-shaving the most expensive inner calculation is worthwhile. This is the payoff
-side of the realism-versus-speed trade.
+Speed is why the simpler models exist. One patch is inexpensive, but `plant` is
+often run thousands of times for trait sweeps, model fitting, or fitness
+landscapes. At that scale, reducing the cost of an inner calculation matters.
 
-How much you save depends on two competing effects, and on a feature that is
-relatively unusual in vegetation models: `plant` integrates the patch with an
-**adaptive** ODE solver, which chooses its own step sizes (large where the
-dynamics are smooth, small only where they are not) to hit a requested accuracy
-cheaply. So the cost of a model is set both by the work *per step* and by the
-*number of steps* the solver decides to take:
+The saving depends on two competing effects. Unlike many vegetation models,
+`plant` integrates a patch with an **adaptive** ODE solver. The solver chooses
+large steps where dynamics are smooth and small steps where they are not, aiming
+to achieve the requested accuracy efficiently. A model's total cost therefore
+depends both on the work *per step* and on the *number of steps* the solver
+chooses:
 
-* **Per step**, `"deep-crown"` is the most expensive -- it performs a
-  Gauss-Kronrod quadrature over crown depth for every individual -- while
-  `"crown-centre"` and `"ppa"` replace that with a single light evaluation.
-* **Number of steps**: a model whose light profile is smooth lets the solver
-  stride; PPA's near-stepped profile is much stiffer, forcing many more, smaller
-  steps.
+* **Work per step:** `"deep-crown"` is most expensive because it performs a
+  Gauss-Kronrod quadrature over crown depth for every individual. `"crown-centre"`
+  and `"ppa"` replace this with one light evaluation.
+* **Number of steps:** a smooth light profile lets the solver stride. PPA's
+  near-stepped profile is much stiffer, forcing many more and smaller steps.
 
-Which effect dominates depends on how the system is stepped, so we report both
-the adaptive cost (what you actually pay) and the per-step cost on a fixed
+Which effect dominates depends on how the system is stepped. We therefore report
+both adaptive cost (the cost normally paid) and per-step cost on a fixed
 schedule.
 
 ```{r}
@@ -388,14 +385,14 @@ speed_table <- function(timings) {
 }
 ```
 
-## Adaptive solver (real-world cost)
+### Adaptive solver: real-world cost
 
-This is how `plant` runs by default, and the cost you actually pay. The adaptive
-solver is part of what makes `plant` efficient: it spends steps only where the
-dynamics demand them. But it also means a model's cost is not just its per-step
-work -- a model that makes the dynamics harder to integrate pays for it in extra
-steps. (Most large vegetation models instead march on a *fixed* timestep, where
-this consideration simply does not arise; we return to that below.)
+This is `plant`'s default mode and the cost normally paid. Adaptive stepping is
+part of what makes `plant` efficient: the solver spends steps only where the
+dynamics need them. It also means that cost is not determined solely by work per
+step. A model that is harder to integrate pays an additional cost through extra
+steps. Most large vegetation models instead use a *fixed* timestep, where this
+second consideration does not arise; we return to that case below.
 
 ```{r}
 #| label: speed-adaptive
@@ -403,22 +400,22 @@ timings_adaptive <- vapply(models, time_model, numeric(1))
 knitr::kable(speed_table(timings_adaptive))
 ```
 
-`"crown-centre"` is fastest -- it shares deep-crown's smooth light profile (so the
-same number of solver steps) but skips the per-plant crown-depth integral.
-`"mean-light"` costs about the same as `"deep-crown"`: it also integrates over
-crown depth (just the light rather than the rate), so the per-step work and the
-step count are both similar. `"ppa"` is *slower* overall despite the cheaper
-per-plant assimilation, because its near-stepped profile forces the adaptive
-solver to take many more steps; finer layers (smaller `ppa_layer_optical_depth`)
-or sharper boundaries (smaller `ppa_layer_smoothing`) make this worse.
+`"crown-centre"` is fastest. It shares deep-crown's smooth light profile, and
+therefore its solver-step count, but skips the per-plant crown-depth integral.
+`"mean-light"` costs about as much as `"deep-crown"`: it still integrates over
+crown depth, although it integrates light rather than rate, so both per-step
+work and step count are similar. Despite cheaper per-plant assimilation,
+`"ppa"` is *slower* overall because its near-stepped profile makes the adaptive
+solver take many more steps. Finer layers (smaller `ppa_layer_optical_depth`) or
+sharper boundaries (smaller `ppa_layer_smoothing`) make this effect stronger.
 
-## Fixed ODE schedule (per-step cost)
+### Fixed ODE schedule: per-step cost
 
-If instead every model is pinned to the *same* fixed schedule
-(`run_scm(..., use_ode_times = TRUE)`), the step-count effect is removed and only
-the per-step cost remains. Now PPA's advantage shows: like `"crown-centre"`, it
-skips the crown-depth quadrature, so both are markedly faster than
-`"deep-crown"`.
+When all models are pinned to the *same* fixed schedule
+(`run_scm(..., use_ode_times = TRUE)`), the step-count effect disappears and
+only per-step cost remains. PPA's advantage is then clear: like
+`"crown-centre"`, it skips crown-depth quadrature, so both are markedly faster
+than `"deep-crown"`.
 
 ```{r}
 #| label: speed-fixed
@@ -427,40 +424,37 @@ timings_fixed <- vapply(models, time_model, numeric(1), times = times)
 knitr::kable(speed_table(timings_fixed))
 ```
 
-So PPA is not inherently slow -- on a fixed schedule it is *faster* than
-`"deep-crown"`. Its apparent cost under the adaptive solver comes entirely from
-the extra steps the stiff profile demands. This is also why discrete-layer
-schemes are unproblematic in the large models that use them: those models march
-on a fixed timestep, so a stepped, stiff light profile costs nothing extra and
-the difficulty never surfaces. It is `plant`'s adaptive solver that makes the
-stiffness visible -- and, as the next section shows, a *hard* step visible as
-outright failure. `"deep-crown"` nonetheless remains the default here: it is the
-most faithful representation of within-crown light capture and carries no speed
-penalty relative to earlier versions of `plant`.
+PPA is therefore not inherently slow: on a fixed schedule it is *faster* than
+`"deep-crown"`. Its apparent adaptive-solver cost comes entirely from the extra
+steps required by its stiff profile. This also explains why discrete-layer
+schemes are unproblematic in large models that use fixed timesteps. There, a
+stepped, stiff profile costs no additional steps, so the difficulty does not
+appear. `plant`'s adaptive solver makes stiffness visible and, as the next
+section shows, makes a *hard* step fail outright. `"deep-crown"` remains the
+default because it is the most faithful representation of within-crown light
+capture and has no speed penalty relative to earlier versions of `plant`.
 
-# Why PPA needs smoothing
+## Why PPA must be smoothed
 
-A literal PPA discretisation is a *hard* step function: as a plant grows and its
-crown centre crosses a layer boundary, the light it experiences jumps
-discontinuously, and so does its growth rate. This is what `ppa_layer_smoothing`
-exists to tame, and it is worth being explicit about *why* -- because the
-problem is specifically one of **adaptive ODE stepping**, not of the model
-itself.
+A literal PPA discretisation is a *hard* step function. When a growing plant's
+crown centre crosses a layer boundary, the light it receives jumps
+discontinuously, and so does its growth rate. `ppa_layer_smoothing` exists to
+remove this problem. The issue is specifically **adaptive ODE stepping**, not
+PPA itself.
 
-## Adaptive stepping cannot integrate a discontinuity
+### Why adaptive stepping fails at a discontinuity
 
-`plant` solves the patch dynamics with an adaptive, error-controlled solver
-(an embedded Runge-Kutta scheme). At each step it forms two estimates of the
-state at different orders, and uses their difference as an estimate of the local
-truncation error. If that error exceeds the requested tolerance, the step is
-*rejected* and retried with a smaller size; the method assumes the solution is
-smooth, so halving the step should roughly quarter the error.
+`plant` solves patch dynamics with an adaptive, error-controlled embedded
+Runge-Kutta scheme. At each step, it makes two state estimates of different
+orders. Their difference estimates local truncation error. If that error is
+larger than the requested tolerance, the solver *rejects* the step and retries
+with a smaller one. This relies on a smooth solution: halving the step should
+roughly quarter the error.
 
-Across a discontinuity that assumption breaks. No matter how small the step, a
-step that straddles the jump carries an O(jump) error that never falls below
-tolerance, so the solver rejects and shrinks the step indefinitely until it
-gives up. With a hard step (`ppa_layer_smoothing = 0`) this is exactly what
-happens:
+That assumption fails at a discontinuity. However small the step becomes, a
+step that straddles the jump has an O(jump) error that never falls below the
+tolerance. The solver keeps rejecting and shrinking the step until it gives up.
+This is exactly what happens with a hard step (`ppa_layer_smoothing = 0`):
 
 ```{r}
 #| label: ppa-hard
@@ -474,45 +468,46 @@ tryCatch(
 )
 ```
 
-A *fixed* schedule (`run_scm(..., use_ode_times = TRUE)`) sidesteps the
-error-control loop -- it simply takes the prescribed steps without rejecting any
--- but then nothing protects against a large explicit step overshooting the jump,
-which sends growth to non-finite values unless the schedule is very fine. Either
-way, a hard step is not something the solver can handle robustly.
+A *fixed* schedule (`run_scm(..., use_ode_times = TRUE)`) avoids the
+error-control loop because it simply takes its prescribed steps. However, it
+then has no protection against a large explicit step overshooting the jump,
+which sends growth to non-finite values unless the schedule is very fine. A hard
+step is therefore not robustly handled by either approach.
 
-Switching the rounding direction (light at the top vs the bottom of a layer)
-does not help: the difficulty is the discontinuity itself, not where the step
-sits.
+Changing the rounding direction (using light at the top rather than the bottom
+of a layer) does not solve this. The problem is the discontinuity, not its
+location.
 
-## The smoothed profile
+### The smoothed profile
 
-`ppa_layer_smoothing` replaces each hard boundary with a C^1^-continuous cubic
-ramp over the top fraction of the layer (see `FF16_Environment::smooth_floor`).
-The light profile -- and hence each plant's growth rate -- is now continuous with
-a continuous first derivative, so the adaptive error estimate behaves as the
-solver assumes and steps are accepted normally. Even a small amount of smoothing
-is enough to recover a well-behaved integration, and with the default the
-adaptive and fixed-step solutions agree.
+`ppa_layer_smoothing` replaces each hard boundary with a $C^1$-continuous cubic
+ramp over the upper fraction of the layer (see `FF16_Environment::smooth_floor`).
+The light profile, and therefore each plant's growth rate, now has a continuous
+first derivative. The adaptive error estimate behaves as the solver expects, so
+steps are accepted normally. Even a small amount of smoothing restores a
+well-behaved integration; with the default, adaptive and fixed-step solutions
+agree.
 
 Two parameters control the discretisation:
 
-* `ppa_layer_optical_depth` -- the optical-depth thickness of one layer
-  (default `0.5`, i.e. one unit of leaf area index per layer at the default
-  extinction coefficient `k_I = 0.5`). Smaller values give finer layering.
-* `ppa_layer_smoothing` -- the fraction of each layer over which the boundary is
-  smoothed (default `0.3`). Values approaching `0` recover a hard step (and the
-  instability above); `1` removes the flat region and approaches the smooth
-  `"deep-crown"`-style profile. There is a tension here: smaller values are
-  closer to a true PPA step but stiffer (slower, per the speed table above),
-  while larger values integrate faster but blur the layer structure.
+* `ppa_layer_optical_depth` -- the optical-depth thickness of a layer (default
+  `0.5`, meaning one unit of leaf area index per layer at the default extinction
+  coefficient `k_I = 0.5`). Smaller values produce finer layers.
+* `ppa_layer_smoothing` -- the fraction of each layer over which its boundary is
+  smoothed (default `0.3`). Values approaching `0` recover a hard step and its
+  instability; `1` removes the flat region and approaches a smooth
+  `"deep-crown"`-style profile. This creates a trade-off: smaller values more
+  closely represent a true PPA step but are stiffer and slower, as the speed
+  table shows; larger values integrate faster but blur the layers.
 
-# The competition profile
+## How the models represent competition
 
-The four smooth-competition models above all build the *same* light environment
--- they differ only in how a plant summarises its own assimilation. The two box
-models instead change the shade a plant *casts*, collapsing its leaf area towards
-a thin crown-centre layer. This mirrors the discrete-layer competition of large
-vegetation models (e.g. LPJ-GUESS), so it is worth inspecting directly.
+The four smooth-competition models above construct the *same* light environment.
+They differ only in how a plant summarises its own assimilation. The two box
+models instead alter the shade a plant *casts*, concentrating leaf area near a
+thin layer at the crown centre. Because this mirrors the discrete-layer
+competition used by large vegetation models such as LPJ-GUESS, it is useful to
+inspect the difference directly.
 
 ```{r}
 #| label: fig-compbox
@@ -541,14 +536,14 @@ ggplot(comp, aes(competition, z, colour = model)) +
   theme_classic()
 ```
 
-The correct profile (crown-centre) tapers continuously to zero through the crown;
-the box profile is a step, and the soft box a continuous-but-wrong drop
-concentrated near the crown centre.
+The correct crown-centre profile tapers continuously to zero through the crown.
+The box profile is a step; the soft box replaces that step with a
+continuous-but-incorrect drop concentrated near the crown centre.
 
-**The hard step does not even run.** Summed over a population of discrete
-cohorts, a step competition makes the patch light profile a discontinuous,
-piecewise-constant function of height, which the adaptive light-environment
-spline cannot represent -- the model fails before a stand can develop:
+**The hard step does not even run.** When summed across a population of discrete
+cohorts, step competition produces a discontinuous, piecewise-constant patch
+light profile. The adaptive light-environment spline cannot represent it, so the
+model fails before a stand develops:
 
 ```{r}
 #| label: box-fail
@@ -560,9 +555,9 @@ tryCatch(
 )
 ```
 
-The soft box runs (its continuous profile lets the light environment build), but
-the shade is mis-distributed through the canopy, which biases its predictions
-relative to the deep-crown reference.
+The soft box runs because its continuous profile allows the light environment to
+be built. However, it distributes shade incorrectly through the canopy and so
+biases predictions relative to the deep-crown reference.
 
 <!-- out-of-scope: the demographic-equilibrium iteration, the invasion (mutant)
      fitness landscapes, the box-vs-correct fitness comparison, and the
@@ -572,24 +567,26 @@ relative to the deep-crown reference.
      they establish is summarised below; the full analysis is reproduced in the
      reproduction post linked at the foot of this page. -->
 
-# What the comparison establishes
+## What this comparison shows
 
-The full model comparison (see the reproduction below) puts these models through
-a ladder of increasingly demanding tests -- stand dynamics, demographic
-equilibrium, invasion fitness, and the evolutionary endpoint. The recurring
-finding is that the cheap models are often fine for stand dynamics and
-acceptable for equilibrium, but invasion fitness is unforgiving. The key
-requirement it exposes is **continuity of the shade each plant casts as a
-function of height**: `"deep-crown"`, `"mean-light"` and `"crown-centre"` all
-build a continuous light profile and behave well; PPA's stepped profile and the
-box models' mis-shaped competition do not. None of this means the large models
-are wrong to use discrete layers -- for stand-level simulation on a fixed
-timestep the representation is fast, robust, and adequate. The caution is
-specific to the eco-evolutionary questions `plant` is built for.
+The full model comparison (see the reproduction below) tests these models in
+increasingly demanding settings: stand dynamics, demographic equilibrium,
+invasion fitness, and the evolutionary endpoint. Its recurring result is that
+cheap models are often adequate for stand dynamics and acceptable for
+equilibrium, whereas invasion fitness is much less forgiving. The key
+requirement is **continuity of the shade each plant casts as a function of
+height**. `"deep-crown"`, `"mean-light"`, and `"crown-centre"` all construct a
+continuous light profile and behave well; PPA's stepped profile and the box
+models' incorrectly shaped competition do not.
+
+This does not mean that large models are wrong to use discrete layers. For
+stand-level simulation on a fixed timestep, that representation is fast,
+robust, and adequate. The caution applies specifically to the eco-evolutionary
+questions that `plant` is built to answer.
 
 The full model comparison and evolutionary analysis -- demographic equilibrium,
-invasion-fitness landscapes, and the singular-strategy / work-precision results
--- is reproduced in the DunFalster 2026 canopy reproduction post.
+invasion-fitness landscapes, and singular-strategy / work-precision results --
+is reproduced in the DunFalster 2026 canopy reproduction post.
 <!-- TODO: link this once the DunFalster 2026 reproduction is published. The
      draft lives in posts/_drafts/2026-06-20-dunfalster2026-canopy/ and is not
      rendered, so no link target exists yet. Restore as

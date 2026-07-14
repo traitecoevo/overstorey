@@ -7,29 +7,29 @@ implementation
 
 ::: {.callout-note}
 ## Prerequisites
-This page builds on [The size-structured PDE](../size-structured-pde.qmd) and [the method of characteristics](characteristic-method.qmd). Read those first if the notation here is unfamiliar.
+This page builds on [The size-structured PDE](../size-structured-pde.qmd) and
+[the method of characteristics](characteristic-method.qmd). Read those first if
+the notation here is unfamiliar.
 :::
 
 ## The idea first
 
-Once you've written the model down as a set of ordinary differential
-equations, the job of the solver is simple to describe even if the mechanics
-are intricate: start from the current state and march forward in time, one
-small step at a time, building up the future from the present. The question
-that makes this hard is how big each step should be. Take steps that are too
-large and the solution drifts away from the truth, accumulating error you
-can't see until it's too late. Take steps that are too small and you waste
-enormous amounts of computation grinding through periods where nothing much
-is changing. The solver used here resolves this by adapting as it goes. At
-every step it takes a trial step forward, then checks how much that step
-disagrees with a slightly more careful version of the same step. That
-disagreement is a proxy for the error being made. When the disagreement is
-small, the solver grows more confident and takes a longer stride next time.
-When it's large, the solver backs off and takes a shorter, more cautious
-step. The result is a trajectory through time that spends its effort where
-growth and mortality are changing quickly, and coasts through the quiet
-periods, all while keeping the error in each step below a chosen tolerance.
-The rest of this page makes this precise.
+Once the model has been expressed as ordinary differential equations (ODEs),
+the solver's task is straightforward in principle: begin with the current
+state and move it forward through time in a sequence of small steps. The
+important practical question is how large those steps should be. Large steps
+can let unobserved numerical error accumulate; very small steps spend a great
+deal of computation on periods when little is changing.
+
+The solver balances these two risks by adapting as it goes. For each proposed
+step, it also constructs a more careful estimate of that same step. The
+difference between the estimates is used as an error estimate. A small
+difference permits a longer next step, while a large difference triggers a
+shorter, more cautious one. In this way, the calculation concentrates effort
+where growth and mortality change quickly and takes larger strides through
+quieter periods, while keeping the estimated error per step below a chosen
+tolerance. The sections below explain how `plant` does this and how to control
+it.
 
 `plant` casts the entire patch as a system of ordinary differential equations
 (ODEs) and steps it through time with classic ODE methods. (For details on the
@@ -39,42 +39,33 @@ parameters that govern it, then works through the trade-off between the default
 **adaptive** stepper and a **fixed-step** forward-Euler mode using a
 work–precision diagram.
 
-# The Runge–Kutta 45 ODE stepper
+## The adaptive Runge–Kutta 45 stepper
 
-The `plant` model uses an explicit Runge-Kutta ODE stepper to integrate the
-ordinary differential equations that describe the system. Specifically, we use
-the Runge-Kutta Cash-Karp 4-5 (RK45) algorithm, with adaptive time step.
+`plant` integrates its system of ODEs with an explicit Runge-Kutta solver: the
+adaptive Runge-Kutta Cash-Karp 4-5 (RK45) algorithm.
 
-In brief, this means that the solver takes a step through time, and then
-evaluates the error in the step. Error is estimated by comparing two possible
-steps: one using 4 sub-intervals, and one using 5 sub-intervals. By comparing
-the step made with more sub-intervals, the algorithm can estimate the
-non-linearity in the system and error in the step. If the error is too high, the
-solver will attempt to take a smaller step. If the error is well below a target
-value, the solver will attempt to take a larger step. Importantly, the 5 step
-reuses information from the 4 step and thereby only requires a single extra call
-on rates of change, so the RK45 algorithm is much more efficient than
-alternatives like the RK48. The math of RK45 stepping has long been established,
-and the method is available in most solvers for ODE systems. You can read more
-about Runge-Kutta methods and adaptive time steps on
-[Wikipedia](https://en.wikipedia.org/wiki/Runge-Kutta_methods).
+Cash-Karp RK45 is an *embedded* method: the same six evaluations of the rates of
+change produce both a fourth-order and a fifth-order estimate of the next state.
+Their disagreement estimates the local numerical error. If that estimate is too
+large, the solver rejects the proposed step and retries with a smaller one. If
+it is comfortably below the target, the solver attempts a larger step next
+time. Because both estimates share the same rate evaluations, error control is
+much cheaper than solving the step twice with separate methods. For general
+background, see [Runge-Kutta methods](https://en.wikipedia.org/wiki/Runge-Kutta_methods).
 
-The RK45 is an explicit method, as opposed to an implicit method. As
-[wikipedia explains](https://en.wikipedia.org/wiki/Explicit_and_implicit_methods)
-_"Explicit methods calculate the state of a system at a later time from the state
-of the system at the current time, while implicit methods find a solution by
-solving an equation involving both the current state of the system and the later
-one"_. The advantage of explicit methods are that they are simple to implement
-and fast, particularly when allowing adaptive time steps. The disadvantage is
-that they are less stable than implicit methods when they encounter stiff
-systems. As described in wikipedia
+RK45 is an *explicit* method: it calculates the next state directly from the
+current state and its rates of change. An implicit method instead solves an
+equation involving both the current and future states. Explicit methods are
+usually simpler and cheaper per step, but can require impractically small steps
+for a *stiff* system, in which important processes operate on very different
+time scales. Implicit methods cost more per step but are often more stable for
+such problems. See [explicit and implicit
+methods](https://en.wikipedia.org/wiki/Explicit_and_implicit_methods) for more
+background.
 
-* _"[Implicit methods](https://en.wikipedia.org/wiki/Explicit_and_implicit_methods) require an extra computation, and they can be much harder to implement. Implicit methods are used because many problems arising in practice are stiff, for which the use of an explicit method requires impractically small time steps $\Delta t$ to keep the error in the result bounded"_.
-* _"[Explicit Runge Kutta methods](https://en.wikipedia.org/wiki/Runge–Kutta_methods) are generally unsuitable for the solution of stiff equations because their region of absolute stability is small; in particular, it is bounded. This issue is especially important in the solution of partial differential equations..... The advantage of implicit Runge–Kutta methods over explicit ones is their greater stability, especially when applied to stiff equations."_
-
-In practice, we've found the RK45 to be extremely stable and fast for solving the
-size-density distribution. However, there are circumstances where the system
-becomes stiff and the solver struggles. E.g.
+In practice, RK45 has been extremely stable and fast for the size-density
+distribution. It can nevertheless struggle when an extension makes the system
+stiff. For example:
 
 - When implementing soil water into plant via the Richards Equation, Isaac
   Towers found the system became stiff.
@@ -82,24 +73,23 @@ becomes stiff and the solver struggles. E.g.
   <https://doi.org/10.1101/2023.08.04.551683> reported that the system became
   stiff when enabling a continuous feedback of seeds into germination.
 
-Any extensions should therefore be wary of stiff behaviours.
+When extending the model, therefore, check carefully for stiff behaviour.
 
-# Setup of templated ODE solver in C++
+## How the templated C++ solver is set up
 
-The characteristic method used to solve density requires regular introduction of
-new nodes, which entails a resizing of the ODE system as the system progresses.
-To make this play nicely with the ODE stepping, Rich FitzJohn designed a custom
-ODE solver class based on the RK45 method. The code is built into the model, with
-some details ported from the
+The characteristic method that solves density regularly introduces new nodes.
+That means the ODE system must be resized as a simulation progresses. To support
+this, Rich FitzJohn designed a custom RK45-based ODE solver class. The code is
+built into the model, with some details ported from the
 [GNU Scientific Library](http://www.gnu.org/software/gsl/) [@Galassi-2009].
 
-The main interface is the class `odelia::ode::Solver`. The solver has been
-extracted from `plant` into a standalone `odelia` library, so it no longer lives
-under `inst/include/plant/`; `plant` pulls it in via
-`#include <odelia/ode_solver.hpp>` (see `scm.h`). The class is established using a
-template `System` class, meaning you can effectively cast any variety of classes
-as an ODE Solver. (In a similar way, you can create a vector of any variety of
-data types.)
+The main interface is `odelia::ode::Solver`. It was extracted from `plant` into
+the standalone `odelia` library, so it no longer lives under
+`inst/include/plant/`; `plant` includes it with
+`#include <odelia/ode_solver.hpp>` (see `scm.h`). The class is parameterised by
+a template `System`, allowing any class that provides the required interface to
+be treated as an ODE system. This is the same broad C++ idea that allows a
+vector to hold a chosen data type.
 
 From odelia's `ode_solver.hpp`:
 
@@ -112,23 +102,20 @@ public:
 };
 ```
 
-## Solving an entire patch
+### Stepping an entire patch
 
-The main solver for our system is the class `SCM`, (in the file `scm.h`). This
-creates an ode solver based on patch type. Simultaneously, the class `SCM` owns
-an actual instance of the patch, which contains species and environment.
+The model's main solver is `SCM` (in `scm.h`). It creates an ODE solver for the
+patch type and owns the patch instance containing the species and environment.
 
 ```cpp
 patch_type patch;                        # Instance of patch
 odelia::ode::Solver<patch_type> solver;  # ODE solver (owns the system)
 ```
 
-All we need to do to advance the system is make calls like the following. These
-advance the system, using the patch to estimate rates of change. Moreover, we can
-take steps of a specified fixed size, or an adaptive step where the solver
-determines the spacing. Note that the solver now *owns* the system, so these
-calls no longer take the patch as an argument — they operate on the system the
-solver already holds:
+To advance the system, call one of the following methods. They use the patch to
+evaluate rates of change. One accepts specified fixed times; the other lets the
+solver select an adaptive spacing. Because the solver now *owns* the system,
+neither call receives the patch as an argument:
 
 ```cpp
 solver.advance_fixed(e.times);
@@ -138,20 +125,18 @@ solver.advance_adaptive({solver.time(), e.time_end()});
 A third method, `solver.advance_euler(...)`, backs the fixed-step forward-Euler
 mode (`fixed_time_step`, discussed below).
 
-In the background, the solver then passes information (rates of change, states)
-between the actual patch (which contains all the biological information informing
-rates of change) and ode solver (which uses the RK45 math to calculate future
-states from rates of change).
+Behind these calls, the solver exchanges states and rates of change with the
+patch. The patch supplies the biological information that determines the rates;
+the ODE solver applies RK45 to those rates to calculate future states.
 
-Additionally, we have the following function, which resizes the ODE system after
-a node has been introduced.
+The following function resizes the ODE system after a node is introduced.
 
 ```cpp
 solver.set_state_from_system()
 ```
 
-For the above to work, the patch class (see `patch.h`) must have some essential
-functions used by the ODE system.
+For this arrangement to work, the patch class (see `patch.h`) supplies the
+essential functions required by the ODE system.
 
 ```cpp
 // * ODE interface
@@ -173,21 +158,20 @@ ode::iterator ode_aux(ode::iterator it) const;
 ode::const_iterator set_ode_state(ode::const_iterator it, double time);
 ```
 
-Note the use of iterators. These enable state from a complicated data structure
-like a patch, to be converted into a vector, as needed by ode solver. And vice
-versa.
+The iterators are important here: they translate the state held in a complicated
+structure such as a patch into the vector required by the ODE solver, and then
+translate it back again.
 
-## Solving individuals and other systems
+### Stepping individuals and other systems
 
-As templated C++, we can use the `odelia::ode::Solver` class to step any "system"
-that has the requisite functions. In addition to patches, we also use the ode
-solver to run individual plants, given an environment. This is achieved by
-introducing a wrapper class `plant::tools::IndividualRunner` (in
-`individual_runner.h`), which handles the ownership semantics around the solver
-and the object it steps.
+Because this is templated C++, `odelia::ode::Solver` can step any "system" that
+provides the required functions. As well as patches, it is used to run an
+individual plant in a given environment. The wrapper class
+`plant::tools::IndividualRunner` (in `individual_runner.h`) manages the
+ownership relationship between the solver and the object it steps.
 
-Like the patch system, `IndividualRunner` is templated — on a strategy `T` and an
-environment `E` — so we can set up a variety of systems.
+Like the patch system, `IndividualRunner` is templated on a strategy `T` and an
+environment `E`, so it can represent a variety of systems.
 
 ```cpp
 template <typename T, typename E>
@@ -202,21 +186,20 @@ public:
 ```
 
 `IndividualRunner` provides exactly the `ode_size()`/`ode_state()`/`ode_rates()`/
-`set_ode_state()` interface the solver expects, so it can be handed to an
-`odelia::ode::Solver` to step an individual plant to a given size. This is
-available via the R functions `grow_individual_...`, which in turn use
-`IndividualRunner`.
+`set_ode_state()` interface expected by the solver. It can therefore be passed
+to `odelia::ode::Solver` to step an individual plant to a given size. The R
+functions `grow_individual_...` expose this capability and use
+`IndividualRunner` internally.
 
 The test suite also shows how to drive the solver directly on the classic Lorenz
 system (see `tests/testthat/test-ode-euler.R`).
 
-# Controls on ODE stepping
+## Controlling ODE stepping
 
-The RK45 ode solver is controlled by a set of parameters that determine how the
-solver steps through time.
+The RK45 solver is controlled by parameters that determine how it advances
+through time.
 
-As a simple example, we can step a system using the default values for ODE
-stepping:
+For a first example, run a system with the default ODE controls:
 
 ```{r}
 library(plant)
@@ -237,42 +220,40 @@ out <- run_scm(p, ctrl = ctrl)
 length(out$ode_times)
 ```
 
-The precise times used by the solver are stored in `out$ode_times`, so the length
-of this object indicates the number of times used.
+The exact times used by the solver are stored in `out$ode_times`; its length is
+therefore the number of recorded solver times.
 
-The number and timing of steps taken by the solver will vary with the controls on
-the ode solver. Looking at the ctrl object, we can extract the items beginning
-with `ode_`, which control the ODE solver:
+The controls change both the number and timing of steps. The following extracts
+the fields of `ctrl` beginning with `ode_`:
 
 ```{r}
 ctrl %>% subset(grepl("(?<!n)ode_", names(.), perl = TRUE))
 ```
 
-These have the following effect
+These fields have the following effects:
 
 - `ode_step_size_initial`: The initial step size used by the solver in the first
   step.
-- `ode_step_size_min`, `ode_step_size_max`: The minimum step size permitted. Any
-  attempt by the solver to use a smaller value will be curtailed at this value.
-- `ode_tol_abs`, `ode_tol_rel`: When taking a step, the absolute and relative
-  error for any single equation that is allowed. If the error is too high, the
-  solver will attempt to take a smaller step. If the error is well below this
-  value, the solver attempts to expand the step size in the next step.
-- `ode_a_y`, `ode_a_dydt`: Weightings on y and dy/dt, in calculation of allowable
+- `ode_step_size_min`, `ode_step_size_max`: The permitted minimum and maximum
+  step sizes. An attempted step outside these bounds is limited to the relevant
+  bound.
+- `ode_tol_abs`, `ode_tol_rel`: The allowed absolute and relative error for an
+  individual equation in a step. Excess error causes a smaller attempted step;
+  error well below the target permits expansion at the next step.
+- `ode_a_y`, `ode_a_dydt`: Weights on y and dy/dt when calculating allowable
   relative error (see `OdeControl::errlevel`).
 
-Varying these will potentially change the number of steps taken by the solver.
+Changing these values can change the number of steps taken.
 
-However, note that unlike a regular ode solver, the number of steps taken is also
-influenced by the timing of node introduction. The ode stepper will only expand
-the time step up until the next node introduction event, for any species. So the
-node scheduling sets an upper limit on the size of time steps. In the default
-setup, the node schedule primarily determines the timesteps in the first months
-of the simulation. After that, the ode stepper takes a bigger control.
+Unlike a conventional ODE solver, however, node introduction also affects the
+step count. The stepper cannot extend a step beyond the next node-introduction
+event for any species. Node scheduling therefore sets an additional upper bound
+on step size. In the default setup it mainly determines time steps during the
+first months of a simulation; later, the ODE stepper has more control.
 
-## Limiting the Minimum and Maximum step size
+### Limiting the minimum and maximum step size
 
-Let's alter the maximum step size and compare to what we had above.
+First, change the maximum step size and compare the result with the default.
 
 ```{r}
 #| eval: false
@@ -295,7 +276,7 @@ f(out$ode_times, "original")
 f(out2$ode_times, "max 0.1")
 ```
 
-Now let's alter the minimum step size and compare to what we had above.
+Next, change the minimum step size and make the same comparison.
 
 ```{r}
 #| eval: false
@@ -314,10 +295,10 @@ f(out$ode_times, "original")
 f(out3$ode_times, "min 0.01")
 ```
 
-## Fixing the step sizes (option 1)
+### Fixing step sizes: bounds (option 1)
 
-We set exact step sizes by specifying max and min step sizes. But this could
-result in other times, depending on the cohort schedule.
+Setting identical minimum and maximum sizes requests an exact step size. Other
+times can still occur because of the cohort schedule.
 
 ```{r}
 #| eval: false
@@ -327,9 +308,9 @@ ctrl$ode_step_size_max <- 0.1
 ctrl$ode_step_size_initial <- 0.1
 ```
 
-## Fixing the step sizes (option 2)
+### Fixing step sizes: supplied times (option 2)
 
-We can also specify some exact steps, by passing in a vector of ode_times.
+Alternatively, supply selected exact steps in a vector of `ode_times`.
 
 ```{r}
 pc <- p
@@ -341,13 +322,13 @@ result2 <- run_scm(pc, ctrl = ctrl, use_ode_times = TRUE)
 result2$ode_times
 ```
 
-## Fixing the step sizes (option 3): forward Euler
+### Fixing step sizes: forward Euler (option 3)
 
-The options above still drive the full adaptive RK45 machinery at each step. For
-operational-realism comparisons with daily-step DGVMs, `plant` can instead use
-plain **forward (explicit) Euler** on a uniform grid — one derivative evaluation
-per step, no error estimate — by setting `fixed_time_step` (units: years) on the
-`Control`:
+The two options above still invoke the full adaptive RK45 machinery at each
+step. For operational-realism comparisons with daily-step DGVMs, `plant` can
+instead use plain **forward (explicit) Euler** on a uniform grid. Euler uses one
+derivative evaluation per step and makes no error estimate. Enable it by setting
+`fixed_time_step` (in years) in `Control`:
 
 ```{r}
 #| eval: false
@@ -355,40 +336,39 @@ ctrl <- Control(fixed_time_step = 1 / 365)  # daily step; 0 = adaptive (default)
 run_scm(p, ctrl = ctrl)
 ```
 
-This is not the way to get an accurate or cheap solution: forward Euler is
-first-order, and matching the adaptive solver's accuracy needs far more
-evaluations. The [next part](#sec-adaptive-vs-fixed-step) works this trade-off
-through with a work–precision diagram. Note that `fixed_time_step` is
+This mode is not a route to either an accurate or an inexpensive solution:
+forward Euler is first-order, so matching the adaptive solver's accuracy needs
+many more evaluations. The [next section](#sec-adaptive-vs-fixed-step) shows
+this trade-off with a work–precision diagram. `fixed_time_step` is also
 incompatible with the mutant-fitness replay path
 (`save_RK45_cache` / `use_ode_times`) and errors clearly if combined.
 
-## Future changes
+### Possible future changes
 
-Would it help to have option to pass in ode_times, use if supplied?
+The current interface still leaves several implementation questions open:
 
-- But, current system in NodeSchedule interweaves ode_times and
-  node_schedule_times. It's complex code, poorly documented, low value to mess
-  with. Suggests leaving as is
-- could have option to pass in ode_times, add to pars inside function, use if
-  supplied?
-- if supplied, do we always want to use ode_times?
-- what's the advantage of using previous ode_times?
-  - suggest always using them if present?
+- `NodeSchedule` interleaves `ode_times` with `node_schedule_times`. Simplifying
+  that code may not justify the regression risk without a clear use case.
+- Should supplied `ode_times` be stored in the parameters and used
+  automatically?
+- If they are present, should they always take precedence over adaptive times?
+- When is reusing the times from an earlier run scientifically or
+  computationally useful?
 
-# Adaptive vs fixed-step {#sec-adaptive-vs-fixed-step}
+## Adaptive versus fixed-step integration {#sec-adaptive-vs-fixed-step}
 
-By default, `plant` integrates the patch with the **adaptive, error-controlled
-Cash–Karp Runge–Kutta (RK45)** stepper described above. The solver chooses each
-step size to keep the local error within a tolerance: tiny steps early on, when
-newly introduced cohorts are diverging rapidly, and much coarser steps later,
-once the stand settles.
+By default, `plant` integrates a patch with the **adaptive, error-controlled
+Cash–Karp Runge–Kutta (RK45)** stepper described above. It chooses each step
+size to keep the local error within a tolerance: very small steps early in a
+run, when newly introduced cohorts diverge rapidly, and much coarser steps
+later, once the stand has settled.
 
-Many widely used **dynamic global vegetation models (DGVMs)** instead march the
-state forward on a *fixed* grid — most commonly a **daily** time step — using
-plain forward (explicit) Euler. `plant` can be run this way too, via the
-`fixed_time_step` control (option 3 above). This part shows how to enable it and
-uses a **work–precision diagram** to make the central trade-off concrete: at
-*matched accuracy*, adaptive stepping does far less work.
+Many widely used **dynamic global vegetation models (DGVMs)** instead move the
+state forward on a *fixed* grid, most often with a **daily** time step, using
+plain forward (explicit) Euler. `plant` can do this too through
+`fixed_time_step` (option 3 above). This section shows how to enable it, then
+uses a **work–precision diagram** to make the key comparison concrete: at
+*matched accuracy*, adaptive stepping performs far less work.
 
 ```{r}
 #| label: load-libraries
@@ -397,10 +377,10 @@ library(dplyr)
 library(ggplot2)
 ```
 
-## Enabling fixed-step forward Euler
+### Enabling fixed-step forward Euler
 
-The integration mode is selected by a single control field, `fixed_time_step`
-(units: **years**):
+One control field selects the integration mode: `fixed_time_step`, measured in
+**years**:
 
 - `fixed_time_step = 0` (the default) → adaptive RK45.
 - `fixed_time_step > 0` → forward Euler on a uniform grid of that spacing.
@@ -421,9 +401,10 @@ out_adaptive <- run_scm(p, env, ctrl_adaptive)
 out_daily    <- run_scm(p, env, ctrl_daily)
 ```
 
-Forward Euler does **one** derivative evaluation per step (`y <- y + h * dy/dt`),
-whereas each RK45 step evaluates the derivatives six times. The two runs report
-slightly different fitness, and use a very different number of steps:
+Forward Euler performs **one** derivative evaluation per step
+(`y <- y + h * dy/dt`); each RK45 step evaluates derivatives six times. The two
+runs therefore use very different numbers of steps and report slightly
+different fitness:
 
 ```{r}
 tibble::tibble(
@@ -443,10 +424,10 @@ tibble::tibble(
 > need to reach the same accuracy?* That is what the work–precision diagram
 > below answers — and there adaptive wins comfortably.
 
-## A work–precision diagram
+### A work–precision diagram
 
-We sweep the adaptive solver over a range of error tolerances, and forward Euler
-over a range of step sizes, and for each run record:
+To compare methods fairly, sweep the adaptive solver across error tolerances and
+forward Euler across step sizes. For every run, record:
 
 - **work**: total derivative evaluations — `6 × n_steps` for RK45, `1 × n_steps`
   for Euler (this is the dominant cost of the inner loop);
@@ -500,9 +481,9 @@ ggplot(work_precision, aes(work, error, colour = mode)) +
   theme(legend.position = "top")
 ```
 
-## Why adaptive stepping dominates
+### Why adaptive stepping dominates
 
-The two curves tell a consistent story:
+The curves show the same underlying pattern:
 
 - **Forward Euler is first-order.** Halving the step size roughly halves the
   error, so the Euler curve descends slowly — buying an extra digit of accuracy
@@ -513,23 +494,23 @@ The two curves tell a consistent story:
   set by the node-introduction schedule rather than the ODE tolerance — at a
   fraction of the evaluations Euler would need to match it.
 
-To get daily-Euler accuracy *down to* the adaptive frontier you would need a
-sub-daily step everywhere, including the long, smooth tail of the simulation
-where the adaptive solver is happily taking steps of years. That is wasted work,
-and it is exactly the inefficiency adaptive stepping removes.
+To bring daily Euler's accuracy *down to* the adaptive frontier, it would need a
+sub-daily step everywhere. That includes the long, smooth tail of the simulation,
+where the adaptive solver can take steps of years. This is wasted work, and it
+is exactly the inefficiency adaptive stepping avoids.
 
-The practical conclusion: fixed-step Euler is valuable for **operational-realism
-comparisons** — running `plant` on the same footing as a daily-step DGVM — but it
-is not the way to get an accurate or cheap solution. For that, keep the default
+In practice, fixed-step Euler is useful for **operational-realism comparisons**:
+it runs `plant` on the same footing as a daily-step DGVM. It is not the best way
+to obtain an accurate or inexpensive solution. For that, retain the default
 adaptive solver.
 
-## A run that completes is not a run that converged
+### A run that completes has not necessarily converged
 
-Fixed-step integration removes the solver's safety net: forward Euler will march
-across *anything*, including a discontinuous right-hand side that the adaptive
-solver rightly refuses. When that happens the integrator still returns numbers —
-but they are an artefact of where the step grid happens to fall, not an
-approximation to a solution that gets better as you refine.
+Fixed-step integration removes one of the solver's safeguards. Forward Euler
+will march across *anything*, including a discontinuous right-hand side that the
+adaptive solver correctly refuses. It may still return numbers, but those
+numbers can be artefacts of where the step grid falls rather than an
+approximation that improves as the grid is refined.
 
 `plant`'s experimental **PPA hard-step** shading variant
 (`ppa_layer_smoothing = 0`, the literal field discretisation) is exactly such a
@@ -570,13 +551,13 @@ ggplot(convergence, aes(steps_per_year, seed, colour = variant)) +
   theme_bw() + theme(legend.position = "none")
 ```
 
-The smoothed variant marches monotonically toward a limit — refining the step
-buys accuracy, as it should. The hard step does not converge to anything: each
-step size gives a different answer, so no step size gives *the* answer. This is
-why such variants must not be read as fitness or as a solution — the fixed-step
-solver makes them *executable*, not *correct*.
+The smoothed variant moves monotonically toward a limit: refining the step buys
+accuracy, as it should. The hard step does not converge: every step size gives a
+different answer, so no step size gives *the* answer. Such variants must not be
+interpreted as fitness or as a solution. The fixed-step solver makes them
+*executable*, not *correct*.
 
-## Caveats and scope
+### Caveats and scope
 
 - **Mutant fitness / resident replay is not supported under `fixed_time_step`.**
   The mutant pathway replays a resident run by reusing the six cached RK
