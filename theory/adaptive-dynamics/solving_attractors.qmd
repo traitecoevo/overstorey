@@ -1,5 +1,5 @@
 ---
-title: "Solving for attractors"
+title: "Finding evolutionary attractors"
 format: html
 ---
 
@@ -10,10 +10,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette provides an example of calculating attractors for 1 spp communities, using 1,2 or more traits. 
+An evolutionary attractor is a set of trait values towards which small
+evolutionary steps move a resident population. At the attractor, the selection
+gradient is zero: a small increase or decrease in the trait does not have an
+immediate fitness advantage.
 
+This page shows how to calculate selection gradients for a one-species `plant`
+community. We first vary leaf mass per area (`lma`) alone, then vary `lma` and
+height at maturation (`hmat`) together.
 
-First, some basic setup
+## Set up the model
+
+Load the required packages and use the default parameters for community
+assembly:
 
 ```{r, setup}
 #| message: false
@@ -22,9 +31,6 @@ library(regnans)
 library(parallel)
 library(tidyverse)
 
-# set baseline parameters
-p <- plant_default_assembly_pars()
-
 model_support <- list(
   p = plant_default_assembly_pars(),
   plant_control = plant_default_assembly_control()
@@ -32,18 +38,18 @@ model_support <- list(
 
 ```
 
-# Example for 1 trait (lma)
+# One trait: leaf mass per area (`lma`)
 
 ## Selection gradients
 
-Solving for the 1D attractor is possible with the community objects. 
-
-Let's say you want to calculate the selection gradient at the following trait value. 
+We begin by calculating the selection gradient at one value of `lma`. A positive
+gradient favours mutants with slightly larger `lma`; a negative gradient favours
+slightly smaller values.
 
 ```{r}
 trait <- 0.04045
 
-# setup the assembler to start with empty community
+# Start with an empty community.
 community0 <-
   community_start(
     bounds(lma = c(0.01, 2)),
@@ -52,22 +58,24 @@ community0 <-
   )
 
 community_eq <-
-  # Empty community
   community0 %>%
-  # Add a strategy specified by it's trait value
+  # Add one resident strategy with the chosen trait value.
   community_add(trait_matrix(trait, "lma"), birth_rate = 200) %>%
-  # solve equilibrium density
+  # Solve for its demographic equilibrium.
   community_demography() %>%
-  # calculate fitness gradient
+  # Calculate the local slope of invasion fitness.
   community_selection_gradient()
 
 community_eq$resident_fitness
 community_eq$selection_gradient
 ```
 
-In this example fitness is near zero (as it should be), because the community is at equilibrium. The selection gradient is positive meaning, selection is to increase trait value. 
+The resident fitness is close to zero because its population has been brought to
+demographic equilibrium. The positive selection gradient means that a mutant
+with slightly larger `lma` would have an advantage.
 
-Let's visualise this by calculating a fitness landscape:
+We can see the same result in the local fitness landscape. The resident is shown
+in red, and the slope at that point is positive:
 
 ```{r}
 community_eq <- community_eq %>%
@@ -82,9 +90,12 @@ ggplot(data, aes(lma, fitness)) +
   scale_x_log10()
 ```
 
-So let's plot the selection gradient across a range of trait values. The attractor is where the gradient crosses zero.
+One gradient describes only one resident trait value. To locate the attractor,
+we repeat the calculation across a range of `lma` values. The attractor is where
+the gradient crosses zero.
 
-I'll make a worker function that runs the above routines.
+The helper function below adds a resident, solves its demography, and calculates
+its selection gradient:
 
 ```{r}
 f <- function(x, community) {
@@ -94,22 +105,21 @@ f <- function(x, community) {
     community_selection_gradient() 
 }
 
-# Create a data frame with range of trait values and solve
+# Create a sequence of trait values and solve each resident community.
 
 data_communities <- 
-  # trait matrix
   tibble(traits = seq_log_range(c(0.03, 0.15), length.out = 9)) %>%
   mutate(
-    # solve communities
+    # Solve one equilibrium community for each trait value.
     communities = parallel::mclapply(
       traits, function(x) f(x, community0),
-      mc.cores = parallel::detectCores() - 2
+      mc.cores = base::max(1L, parallel::detectCores() - 2L, na.rm = TRUE)
     ),
-    # extract gradient
+    # Extract the selection gradient from each solution.
     selection_gradient = map_dbl(communities, ~ .x$selection_gradient)
   )
 
-# plot
+# Plot the gradient against the resident trait value.
 plot_sg <- 
   ggplot(data_communities, aes(traits, selection_gradient)) +
   geom_line(col="red") +
@@ -123,7 +133,10 @@ plot_sg
 
 ## Using a root solver to find the 1D attractor
 
-We've wrapped up the above routines to enable solving of the 1D attractor
+The sign-change plot helps us see the attractor, but a root finder gives a more
+precise estimate. `community_solve_singularity_1D()` wraps the demographic and
+selection-gradient calculations and searches for the trait value where the
+gradient equals zero:
 
 ```{r}
 community_attractor <- community0 %>%
@@ -132,7 +145,8 @@ community_attractor <- community0 %>%
 community_attractor$traits
 ```
 
-Let's add this to our previous plot
+Add the root finder's solution to the selection-gradient plot:
+
 ```{r}
 plot_sg +
   geom_point(col="red",
@@ -143,18 +157,18 @@ plot_sg +
 ```
 
 
-# 2D Example: Attractor for lma and hmat
+# Two traits: `lma` and `hmat`
 
 ## Selection gradients
 
-Solving for the 2D attractor is possible with the community objects. 
-
-Let's say you want to calculate the selection gradient at the following trait values. 
+With two evolving traits, the selection gradient is a vector with one component
+for each trait. The following example calculates that vector for a resident with
+`lma = 0.04045` and `hmat = 10`:
 
 ```{r}
 traits <- c(0.04045, 10)
 
-# setup the assembler to start with empty community
+# Start with an empty two-trait community.
 community0 <-
   community_start(
     bounds(lma = c(0.01, 2), hmat = c(0.01, 100)),
@@ -163,24 +177,25 @@ community0 <-
   )
 
 community_eq <-
-  # Empty community
   community0 %>%
-  # Add a strategy specified by it's trait value
+  # Add one resident with the chosen lma and hmat values.
   community_add(trait_matrix(traits, c("lma", "hmat")), birth_rate = 200) %>%
-  # solve equilibrium density
+  # Solve for its demographic equilibrium.
   community_demography() %>%
-  # calculate fitness gradient
+  # Calculate one selection-gradient component for each trait.
   community_selection_gradient()
 
 community_eq$resident_fitness
 community_eq$selection_gradient
 ```
 
-In this example fitness is near zero (as it should be), because the community is at equilibrium. The selection gradient is positive meaning, selection is to increase trait value. 
+Resident fitness is again close to zero at demographic equilibrium. The two
+selection-gradient values describe the locally favoured direction of change in
+`lma` and `hmat`.
 
-So let's plot the selection gradient across a range of trait values. The attractor is where the gradient crosses zero.
-
-I'll make a worker function that runs the above routines.
+To see how that direction changes across trait space, we calculate the gradient
+on a grid. The two-dimensional attractor lies where both gradient components are
+zero. We can reuse a helper function similar to the one-trait version:
 
 ```{r}
 f <- function(x, community) {
@@ -190,9 +205,8 @@ f <- function(x, community) {
     community_selection_gradient() 
 }
 
-# Create a data frame with range of trait values and solve
+# Create a grid of trait combinations and solve each resident community.
 data_communities <- 
-  # trait matrix
   expand_grid(
     lma = seq_log_range(c(0.03, 0.05), length.out = 5),
     hmat = seq_log_range(c(5, 15), length.out = 5)
@@ -200,10 +214,10 @@ data_communities <-
   mutate(i = seq_len(n())) %>%
   nest(.by = i, .key = "traits") %>%
   mutate(
-    # solve communities
+    # Solve one equilibrium community for each trait combination.
     communities = parallel::mclapply(
       traits, function(x) f(as.matrix(x), community0),
-      mc.cores = parallel::detectCores() - 2
+      mc.cores = base::max(1L, parallel::detectCores() - 2L, na.rm = TRUE)
     ))
 
 data_communities2 <-
@@ -214,8 +228,8 @@ data_communities2 <-
     ) %>% 
     unnest(traits)
 
-# Plot the selection-gradient vector field. ggquiver draws the (u, v) gradient
-# arrows at each grid point; the trait axes are shown on the log scale.
+# Plot the selection-gradient vector field. ggquiver draws the two gradient
+# components as an arrow at each grid point. Both trait axes use log coordinates.
 library(ggquiver)
 
 plot_sg <-
@@ -227,6 +241,8 @@ plot_sg <-
 plot_sg
 ```
 
-The arrows point toward the joint attractor — where both trait gradients vanish.
-A wrapped 2D root solver (the analogue of `community_solve_singularity_1D`) is not
-yet available in `regnans`; for now the 2D attractor is read off the vector field.
+Each arrow shows the locally favoured direction of evolutionary change. The
+arrows converge near the joint attractor, where both components approach zero.
+`regnans` does not yet provide a two-dimensional equivalent of
+`community_solve_singularity_1D()`, so this example locates the attractor
+approximately from the vector field.

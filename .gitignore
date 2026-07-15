@@ -39,3 +39,6 @@ targets.txt
 drift-report.md
 
 **/*.quarto_ipynb
+
+# Local reference papers used while editing the adaptive-dynamics documentation.
+/theory/adaptive-dynamics/papers/

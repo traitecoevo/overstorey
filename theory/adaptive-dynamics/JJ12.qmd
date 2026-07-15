@@ -1,29 +1,31 @@
 ---
-title: "JJ12 — Johansson & Jonzén 2012"
-subtitle: "Evolution of migratory arrival time, and a tragedy of the commons"
+title: "JJ12: the evolution of migratory arrival time"
+subtitle: "How competition can favour arrival before the seasonal optimum"
 format: html
 ---
 
-## The original paper
+## What the model represents
 
-Johansson, J. & Jonzén, N. (2012). *Game theory sheds new light on ecological
-responses to current climate change when phenology is historically mismatched.*
-**Ecology Letters** 15, 881–888.
+Migratory birds compete for a fixed number of breeding territories. Arriving
+early can be costly because conditions are poor, but it also improves an
+individual's chance of securing a territory. Arriving at the seasonal optimum
+would maximise reproduction if there were no competition.
 
-Migratory birds compete for a fixed number of breeding territories. Arriving early
-is costly (harsh conditions) but improves the chance of securing a territory;
-arriving at the seasonal optimum maximises reproduction. Because securing a
-territory is a *competitive* advantage, individuals are selected to arrive
-**earlier than the date that would maximise population output** — an evolutionary
-tragedy of the commons, and a baseline mismatch that matters when climate change
-shifts the optimal date. This write-up uses the simplified, fully analytic form of
-the model from Brännström, Johansson & von Festenberg (2013, *Games* 4:304–328,
-§4), which makes it an exact benchmark for numerical solvers.
+Competition changes that result. Each individual gains by arriving slightly
+earlier than its competitors, so evolution favours an arrival date before the
+date that would maximise total population output. This difference between the
+individual and population optima is an evolutionary **tragedy of the commons**.
+
+The ecological setting follows Johansson and Jonzén (2012), *Game theory sheds
+new light on ecological responses to current climate change when phenology is
+historically mismatched*. The equations below use the simplified analytic form
+described by @Brannstrom-2013b, which gives us an exact answer against which to
+check the numerical solver.
 
 ## Fitness equations
 
-Competitive ability (declines with arrival time `x`) and reproduction (Gaussian
-about the seasonal optimum `x_opt`):
+Competitive ability declines with arrival time `x`, while reproduction follows
+a Gaussian curve centred on the seasonal optimum `x_opt`:
 
 $$
 C(x) = e^{-a x},
@@ -39,8 +41,9 @@ $$
 w(x') = (1-p)\,\frac{C(x')\,R(x')}{C(x)\,R(x)} + p .
 $$
 
-The selection gradient is linear and decreasing, so there is a single
-**continuously stable strategy** (no branching) with the closed form
+The selection gradient is a decreasing straight line, so the model has one
+**continuously stable strategy** and no evolutionary branching. Its exact value
+is
 
 $$
 x^\* = x_{\mathrm{opt}} - a\,\sigma^2 ,
@@ -66,14 +69,16 @@ c(numeric = as.numeric(out$traits),
   analytic = x_opt - a * sigma^2)     # should match: -12.5
 ```
 
-The numerically-solved singular strategy matches the closed form exactly — this
-is the model's value as a test oracle. It arrives `a*sigma^2` = `r 0.125*100`
-units *before* the seasonal optimum (the tragedy of the commons).
+The numerical solution should match the exact result. That known answer makes
+this model a useful check on the solver. With these parameters, the evolved
+strategy arrives `a*sigma^2` = `r 0.125*100` time units before the seasonal
+optimum.
 
 ### Selection gradient and convergence
 
-The gradient is positive below `x*` and negative above it, so evolution converges
-to `x*` from either side:
+The gradient is positive for arrival times below `x*` and negative for arrival
+times above it. Small evolutionary steps therefore move the population towards
+`x*` from either side:
 
 ```{r gradient}
 #| fig-width: 5.5
@@ -95,6 +100,9 @@ legend("topright", legend = "x* = x_opt - a sigma^2", col = "forestgreen",
 ```
 
 ### Mismatch grows with the competitive advantage `a`
+
+Increasing `a` strengthens the benefit of arriving before competitors. The
+evolved arrival date therefore moves farther ahead of the seasonal optimum:
 
 ```{r mismatch}
 sapply(c(0, 0.04, 0.125), function(a) {

@@ -1,26 +1,29 @@
 ---
-title: "DD99 — Dieckmann & Doebeli 1999"
-subtitle: "Competition for a Gaussian resource, and the origin of evolutionary branching"
+title: "DD99: competition and evolutionary branching"
+subtitle: "How local competition can split one strategy into two"
 format: html
 ---
 
-## The original paper
+## What the model represents
 
-Dieckmann, U. & Doebeli, M. (1999). *On the origin of species by sympatric
-speciation.* **Nature** 400, 354–357.
+A single quantitative trait `x`, such as beak size, determines which part of a
+continuous resource an individual uses. The environment supports the largest
+population at an intermediate trait value `x0`, while individuals with similar
+trait values compete most strongly with one another.
 
-A single quantitative trait `x` (e.g. beak size) sets how an individual uses a
-resource. Carrying capacity is highest at an intermediate phenotype `x0` and
-competition is strongest between similar phenotypes. The paper's central result is
-that this simple ingredient — competition that weakens with phenotypic distance —
-makes the resource optimum `x0` a **fitness minimum** once the population sits
-there, so the population splits into two diverging branches. It is the canonical
-demonstration of **evolutionary branching**, and (with sexual reproduction added)
-of sympatric speciation.
+These two effects can pull evolution in different directions. The resource
+distribution first draws the population towards `x0`. Once the population is
+there, however, strong competition among similar individuals can favour mutants
+on either side. The central strategy then becomes a fitness minimum and one
+lineage can split into two diverging strategies. This is **evolutionary
+branching**.
+
+The model is based on Dieckmann and Doebeli (1999), *On the origin of species by
+sympatric speciation*.
 
 ## Fitness equations
 
-Carrying capacity and competition kernel:
+The model uses two Gaussian curves:
 
 $$
 K(x) = K_0 \exp\!\left(-\frac{(x-x_0)^2}{2\sigma_K^2}\right),
@@ -36,9 +39,13 @@ $$
 s(y) = r\left(1 - \frac{\sum_i N_i\, C(y - x_i)}{K(y)}\right).
 $$
 
-A single resident sits at $N^\* = K(x)$. The singular strategy is $x^\* = x_0$, and
-it is an **evolutionary branching point iff $\sigma_C < \sigma_K$** (competition
-narrower than the resource), otherwise an ESS.
+A single resident reaches the equilibrium population size $N^\* = K(x)$. The
+singular strategy is $x^\* = x_0$. Its outcome depends on the widths of the two
+curves:
+
+- if $\sigma_C < \sigma_K$, competition acts over a narrower trait range than
+  the resource distribution, and $x_0$ is an evolutionary branching point;
+- otherwise, $x_0$ is an evolutionarily stable strategy (ESS).
 
 ## Example analysis with `regnans`
 
@@ -47,8 +54,8 @@ narrower than the resource), otherwise an ESS.
 library(regnans)
 ```
 
-Build the harness with the paper's branching parameters ($\sigma_C = 0.4 <
-\sigma_K = 1$) and solve for the singular strategy:
+Choose parameters that produce branching ($\sigma_C = 0.4 < \sigma_K = 1$),
+then solve for the singular strategy:
 
 ```{r singular}
 h <- harness_dd99(r = 1, K0 = 500, x0 = 0, sigma_K = 1, sigma_C = 0.4)
@@ -59,8 +66,10 @@ out <- community_start(bounds(x = c(-2, 2)), harness = h) |>
 as.numeric(out$traits)        # x* — expected 0 (= x0)
 ```
 
-Is it a branching point? Check the curvature of invasion fitness at the resident
-(positive = fitness minimum = disruptive selection):
+Finding the singular strategy does not tell us whether it is stable. We also
+check the curvature of invasion fitness at the resident. Positive curvature
+means the resident lies at a fitness minimum, so selection is disruptive and
+branching can occur:
 
 ```{r curvature}
 resident_at <- function(h, x) {
@@ -79,8 +88,10 @@ curv(resident_at(harness_dd99(sigma_C = 1.5), 0), 0)        # < 0  → ESS
 
 ### Pairwise invasibility plot
 
-Sign of $s(y)$ over (resident `x`, mutant `y`) — green where a mutant can invade.
-The two off-diagonal invasion wedges around `x0 = 0` are the branching signature.
+A pairwise invasibility plot shows the sign of $s(y)$ for each resident `x` and
+mutant `y`. Green marks combinations for which the mutant can invade. The two
+green wedges on either side of `x0 = 0` show that nearby mutants can invade the
+singular resident, which is the signature of branching.
 
 ```{r pip}
 #| fig-width: 5

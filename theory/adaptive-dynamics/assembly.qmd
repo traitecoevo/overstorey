@@ -1,15 +1,23 @@
 ---
-title: "Community assembly with the toy models"
-subtitle: "Beyond pairwise invasibility: running the assembly algorithm"
+title: "Community assembly with simple models"
+subtitle: "From one successful mutant to a community of coexisting strategies"
 format: html
 ---
 
-A pairwise invasibility plot (PIP) shows whether a *single* mutant can invade a
-*single* resident. The toy models in `regnans` also support **mixtures**, so we
-can run the full community-assembly algorithm — repeatedly introduce the
-best-invading mutant, re-solve the community to demographic equilibrium, and drop
-any residents driven extinct — and watch a multi-species community build up by
-evolutionary branching and limiting similarity.
+A pairwise invasibility plot (PIP) asks whether one mutant can invade a community
+containing one resident strategy. Community assembly goes further by allowing
+several resident strategies to coexist.
+
+At each assembly step, the algorithm:
+
+1. finds the mutant with the highest invasion fitness;
+2. adds that mutant to the resident community;
+3. returns the community to demographic equilibrium; and
+4. removes any resident strategies whose populations fall to zero.
+
+Repeating these steps shows how evolutionary branching and competition can
+build a multi-strategy community. The small models in `regnans` make this process
+quick enough to explore interactively.
 
 ```{r setup}
 #| message: false
@@ -18,16 +26,23 @@ library(regnans)
 
 ## A note on trait scale
 
-The assembly machinery spaces and searches trait space on a configurable scale.
-Strictly positive biological traits (plant's `lma`, or GM99 seed size) suit a
-**log** scale; traits whose optimum sits at 0 (DD99, GK98) need a **linear**
-scale. Set it with `community_start(trait_scale = ...)` — `"log"` is the default.
+The assembly algorithm must search across possible trait values. The scale used
+for that search matters:
+
+- use a **log scale** for strictly positive traits, such as `plant`'s leaf mass
+  per area (`lma`) or seed size in GM99;
+- use a **linear scale** for traits that can be zero or negative, as in DD99 and
+  GK98.
+
+Set the scale with `community_start(trait_scale = ...)`. The default is `"log"`.
 
 ## DD99 — limiting similarity in one dimension
 
-With competition narrower than the resource (`sigma_C < sigma_K`) the resource
-optimum is a branching point, and assembly packs trait space with coexisting
-species roughly one competition-width apart.
+When competition covers a narrower trait range than the resource distribution
+(`sigma_C < sigma_K`), the resource optimum is a branching point. Repeated
+branching fills trait space with coexisting strategies. Strategies that are too
+similar compete too strongly to coexist, so the survivors are spaced apart.
+This spacing is called **limiting similarity**.
 
 ```{r dd99-1d}
 #| fig-width: 6
@@ -47,10 +62,11 @@ plot(xs, rep(1, length(xs)), pch = 19, col = "forestgreen", yaxt = "n",
 
 ## GK98 — branching to a protected dimorphism
 
-The soft-selection model conserves total population, so there is no "empty
-habitat" to colonise — we **seed** the first type, then let it evolve. At
-`d/sigma = 1.5` (above the branching threshold √(3/2)) the single type splits
-into a stable dimorphism.
+Soft selection keeps the model's total population fixed, so an empty community
+cannot be colonised in the usual way. We instead **seed** the community with one
+strategy and allow it to evolve. At `d/sigma = 1.5`, which is above the branching
+threshold $\sqrt{3/2}$, the original strategy splits into two coexisting
+strategies. This stable pair is called a **protected dimorphism**.
 
 ```{r gk98}
 comm <- community_start(bounds(x = c(-4, 4)), harness = harness_gk98(d = 1.5, sigma = 1),
@@ -65,10 +81,11 @@ sort(round(as.numeric(a$community$traits), 3))        # a symmetric dimorphism
 
 ## GM99 — a seed-size polymorphism
 
-Strong size-asymmetric competition (`alpha*R = 7`) drives branching in seed size.
-Assembly from empty produces a polymorphism of small and large seeds. (GM99's
-multi-resident fitness is a multi-dimensional Poisson sum, so it is the slowest
-of the toy models — a few species takes seconds, not milliseconds.)
+Strong size-asymmetric competition (`alpha*R = 7`) drives branching in seed
+size. Starting from an empty community produces a mixture of small- and
+large-seeded strategies. GM99 evaluates a multidimensional Poisson sum when
+several residents are present, so this example is slower than the other simple
+models. Assembling even a few strategies can take several seconds.
 
 ```{r gm99}
 #| eval: false
@@ -81,13 +98,13 @@ sort(round(as.numeric(a$community$traits), 3))   # e.g. 0.11, 0.45, 0.69 — sma
 
 ## DD99 in two trait dimensions
 
-`harness_dd99_nd()` is the multi-trait extension (cf. Ito & Dieckmann 2007): the
-resource and competition kernels are products of per-dimension Gaussians, so each
-trait has its own optimum and widths. The singular point is `x* = x0` and a
-dimension branches iff its `sigma_C < sigma_K`.
+`harness_dd99_nd()` extends DD99 to more than one trait. The resource and
+competition curves are products of separate Gaussian curves for each trait, so
+every trait has its own optimum and curve widths. The joint singular strategy is
+`x* = x0`. Evolution branches along any trait for which `sigma_C < sigma_K`.
 
-The same `assembler_run()` drives 2D assembly — the only change from 1D is a
-two-trait `bounds()` and the multi-trait harness:
+The same `assembler_run()` function handles two-dimensional assembly. We only
+need to provide bounds for two traits and use the multi-trait harness:
 
 ```{r dd99-2d}
 #| fig-width: 5
@@ -105,5 +122,6 @@ plot(a$community$traits[, 1], a$community$traits[, 2], pch = 19, col = "forestgr
      main = sprintf("DD99 2D assembly: %d species", length(a$community)))
 ```
 
-The species pack the trait plane at a characteristic spacing set by the
-competition widths — limiting similarity in two dimensions.
+The resulting strategies are separated across the trait plane. The competition
+widths determine their characteristic spacing, extending limiting similarity to
+two dimensions.

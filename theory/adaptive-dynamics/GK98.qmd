@@ -1,29 +1,32 @@
 ---
-title: "GK98 — Geritz, Kisdi, Meszéna & Metz 1998"
-subtitle: "Soft selection across patches, and the adaptive branching of the evolutionary tree"
+title: "GK98: adaptation across different habitats"
+subtitle: "How soft selection can maintain two strategies"
 format: html
 ---
 
-## The original paper
+## What the model represents
 
-Geritz, S.A.H., Kisdi, É., Meszéna, G. & Metz, J.A.J. (1998). *Evolutionarily
-singular strategies and the adaptive growth and branching of the evolutionary
-tree.* **Evolutionary Ecology** 12, 35–57.
+This model follows one trait across several habitats, each with a different
+optimal trait value. Selection within each habitat favours individuals close to
+its local optimum. Density regulation is **soft**: every habitat contributes a
+fixed share of the next generation, regardless of how many individuals survive
+there. This prevents the most productive habitat from dominating the whole
+population.
 
-This is the foundational adaptive-dynamics paper — it defines invasion fitness,
-the selection gradient, pairwise invasibility plots, and the classification of
-**evolutionarily singular strategies** (ESS, convergence stability, branching
-points). Its worked example is a haploid **Levene soft-selection** model: a single
-trait under stabilising selection in each of several patches with different
-optima, and *soft* density regulation (each patch contributes a fixed share to the
-next generation). It is not a seed-size model — that is the separate
-[GM99](GM99.qmd) paper.
+When habitat optima are close together, evolution settles on one compromise
+strategy. When they are far enough apart, the same compromise attracts gradual
+evolution but can be invaded after it is reached. The population then branches
+into two strategies adapted to different parts of the habitat distribution.
+
+The model comes from Geritz et al. (1998), *Evolutionarily singular strategies
+and the adaptive growth and branching of the evolutionary tree* [@Geritz-1998].
 
 ## Fitness equations
 
-Three patches ($m=3$) with optima $\mu = (-d, 0, d)$, equal capacities $K_j$
-(weights $c_j = K_j/\sum_h K_h$), and Gaussian within-patch survival of width
-$\sigma$:
+There are three habitats ($m=3$), with optima $\mu = (-d, 0, d)$. Habitat $j$
+has capacity $K_j$ and therefore contributes the fraction
+$c_j = K_j/\sum_h K_h$ of the next generation. Survival within each habitat is
+a Gaussian curve with width $\sigma$:
 
 $$
 f_j(x) = \exp\!\left(-\frac{(x-\mu_j)^2}{2\sigma^2}\right).
@@ -37,10 +40,13 @@ s_x(y) = \log \sum_{j} c_j \, \frac{f_j(y)}{f_j(x)}.
 $$
 
 The singular strategy is the capacity-weighted mean optimum,
-$x^\* = \sum_j c_j \mu_j$ (= 0 for the symmetric default). It is **always
-convergence stable**, and is an evolutionary **branching point iff
-$d/\sigma > \sqrt{3/2} \approx 1.2247$** (a continuously stable strategy below
-that threshold).
+$x^\* = \sum_j c_j \mu_j$. It equals zero when the three habitats have equal
+capacities. Evolution always moves towards this strategy, but what happens on
+arrival depends on the separation of habitat optima:
+
+- if $d/\sigma > \sqrt{3/2} \approx 1.2247$, it is a branching point;
+- below that threshold, it is a continuously stable strategy (CSS): evolution
+  approaches it and nearby mutants cannot invade it.
 
 ## Example analysis with `regnans`
 
@@ -58,8 +64,8 @@ out <- community_start(bounds(x = c(-4, 4)), harness = h) |>
 as.numeric(out$traits)   # x* — expected 0 (symmetric three-patch)
 ```
 
-The branching threshold $d/\sigma = \sqrt{3/2}$ is recovered numerically by
-finding where the invasion-fitness curvature at `x* = 0` changes sign:
+We can recover the branching threshold numerically. The following code finds
+where the curvature of invasion fitness at `x* = 0` changes sign:
 
 ```{r threshold}
 curv0 <- function(d, sigma = 1, h = 1e-4) {
@@ -76,6 +82,10 @@ sqrt(3 / 2)
 ```
 
 ### Pairwise invasibility plots either side of the threshold
+
+The left plot uses closely spaced habitat optima and has one stable strategy.
+The right plot uses more widely spaced optima and shows the invasion pattern
+around a branching point.
 
 ```{r pip}
 #| fig-width: 8
