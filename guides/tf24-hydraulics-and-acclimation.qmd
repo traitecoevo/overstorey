@@ -6,23 +6,19 @@ title: "TF24: hydraulics, and a fast acclimating variant"
 guide
 :::
 
-`TF24` is `plant`'s hydraulically-explicit strategy. Where the simpler `FF16`
-strategy reads a single light value and applies a fixed light–response curve,
-`TF24` resolves, for every plant at every step, the **leaf water potential** the
-plant should operate at — trading carbon gain (open stomata, more
-photosynthesis) against hydraulic risk (more negative water potential, closer to
-loss of conductivity). Concretely it maximises a carbon *profit* over the
-root-collar water potential, which itself requires solving the soil → root →
-stem water-transport problem.
+TF24 represents the movement of water from soil, through roots and stems, to
+leaves. At each rate calculation it finds the root-collar water potential that
+best balances two outcomes: opening stomata increases photosynthesis, but more
+negative water potential increases hydraulic risk.
 
-That optimisation is the model's accuracy *and* its cost: each rate evaluation
-runs a golden-section search over collar potential, and inside every step of that
-search a root-find for the water-transport continuity. Under the adaptive ODE
-solver this happens many times per plant per patch step.
+The standard TF24 model solves this optimisation from scratch each time. TF24f
+("f" for fast or forecasting) instead carries the operating point forward and
+allows it to adjust as conditions change. In practical terms, **TF24 repeatedly
+finds the optimum, whereas TF24f tracks it**.
 
-This guide explains the idea behind **TF24f** ("f" for fast / forecasting), a
-variant that keeps the same biology but stops re-solving the optimisation from
-scratch every step.
+Tracking can reduce repeated calculations and also introduces a finite
+acclimation time. This guide explains that approximation, compares the two
+models, and shows the parameter that controls tracking speed.
 
 ```{r}
 #| label: setup
@@ -39,27 +35,31 @@ base <- function(type) {
 
 ## The idea: let the optimum chase a moving target
 
-The optimal operating point changes only slowly as a plant grows, its light
-environment shifts and the water environment changes. So instead of re-optimising it from scratch, `TF24f` carries
-the optimal root-collar potential as an **extra ODE state** that *relaxes toward*
-its optimum — gradient ascent on the carbon profit:
+As a plant grows and its environment changes, the preferred operating point
+moves. TF24f stores its current estimate as an extra state variable and adjusts
+that state in the direction that increases carbon profit:
 
 $$\frac{\mathrm{d}\psi}{\mathrm{d}t} = k \,\frac{\partial\,\text{profit}}{\partial\psi}.$$
 
-The fixed point of this ODE is exactly the optimum (where the profit gradient is
-zero), so $\psi$ tracks the moving optimum *without ever solving for it*. Each
-step then needs only a pair of perturbed evaluations either side of the current
-$\psi$ for a centred finite-difference gradient — no golden-section search. The gain $k$ sets how
-tightly the state tracks: this is both a performance lever and, at finite $k$, a
-genuine model of **acclimation** with a finite adjustment lag (issues #405/#406).
+At the optimum, the profit gradient is zero and the state stops moving. When the
+optimum shifts, the gradient moves the state towards its new value. The gain
+$k$ controls how quickly that adjustment occurs and therefore how much
+acclimation lag remains.
 
-`TF24f` is implemented as a thin C++ subclass of `TF24` (it inherits all of
-TF24's biology and reuses its environment and parameters), adding just the
-tracked state and the gradient-ascent rate. From R it behaves like any other
-strategy, with two extra knobs: `k_acclim` (the gain $k$) and `psi_fd_step` (the
-finite-difference step for the gradient).
+::: {.callout-note}
+## How the gradient is calculated
 
-## Running TF24 and TF24f side by side
+By default, `plant` calculates the gradient exactly with automatic
+differentiation and the implicit-function theorem (`use_ad_gradient = TRUE`). A
+centred finite-difference calculation is available as a fallback. In R,
+`k_acclim` controls the gain, `use_ad_gradient` selects the method, and
+`psi_fd_step` matters only on the finite-difference path.
+:::
+
+## Run TF24 and TF24f side by side
+
+The following example gives both models the same trait and recruitment inputs.
+For TF24f we use an illustrative gain of 2; the package default is 1.
 
 ```{r}
 #| label: run-both
@@ -67,14 +67,13 @@ tf24  <- run_scm(base("TF24"),  collect = TRUE, refine_schedule = FALSE)
 
 p_f <- base("TF24f")
 s <- p_f$strategies[[1]]
-s$k_acclim   <- 2     # gain; low values track best (see below)
-s$psi_fd_step <- 0.05
+s$k_acclim <- 2
+s$use_ad_gradient <- TRUE
 p_f$strategies[[1]] <- s
 tf24f <- run_scm(p_f, collect = TRUE, refine_schedule = FALSE)
 ```
 
-The two patches develop near-identically — the size-structure trajectories track
-each other closely:
+In this example, the two size structures remain very similar:
 
 ```{r}
 #| label: size-distributions
@@ -89,12 +88,11 @@ bind_rows(
   labs(title = "Same biology, two ways of resolving the leaf optimum")
 ```
 
-`TF24f` adds one diagnostic column, `opt_root_psi_state` — the tracked collar
-potential — which we can compare against TF24's per-step optimum (`opt_root_psi`,
-reported as a signed potential). They sit close throughout. The visible gap is
-the **acclimation lag** early in life, when the optimum drops quickly as the
-seedling grows and the finite-$k$ state cannot descend quite as fast; once growth
-slows the two converge to within a fraction of a millivolt:
+TF24f records the tracked potential in `opt_root_psi_state`. TF24 reports its
+newly optimised value as `opt_root_psi`, with the opposite sign convention in
+this output. Plotting them together reveals the acclimation lag: early in life,
+the optimum moves faster than the finite-gain state can follow. The gap then
+narrows as growth slows.
 
 ```{r}
 #| label: tracking
@@ -113,42 +111,27 @@ bind_rows(
 
 ## Choosing the gain `k`
 
-It is tempting to think a very large `k` (track the optimum instantly) should
-recover `TF24` exactly. It does **not**. Two things get worse as `k` grows:
+A larger `k` makes the tracked state respond more quickly, but it also makes the
+extra ODE state **stiffer**, which can force the adaptive solver to take many
+smaller steps.
+A smaller `k` is easier to integrate but produces a longer acclimation lag.
+There is therefore no universal best value: compare TF24f against TF24 over the
+environmental range and time scale relevant to the analysis.
 
-- **Stiffness.** A fast-relaxing extra state forces the adaptive solver into ever
-  smaller steps; beyond a moderate `k` the run becomes effectively unintegrable.
-- **Gradient noise.** The profit gradient here is a finite difference, and the
-  underlying leaf solve has its own internal tolerances, so a large `k` amplifies
-  that numerical noise into the dynamics.
-
-The result is a *low* optimal gain. On the standard single-species patch above,
-`k ≈ 2` gives the best agreement with `TF24` — median height difference a few
-millimetres, ~93% of the population within 1% — while running `run_scm` in
-roughly **half the time** of `TF24`. Larger `k` is both slower and less accurate.
-
-The gradient is a *centred* finite difference, so its fixed point sits at the
-true optimum to $O(h^2)$ rather than the $O(h)$ of a one-sided difference — at
-`psi_fd_step = 0.05` the steady-state offset from `TF24` is well under a
-millivolt. (An earlier one-sided difference left a constant `psi_fd_step`/2 ≈
-0.025 MPa offset that did not shrink as the patch aged.) The remaining mismatch
-is a floor set by the finite-difference gradient, not by the tracking idea
-itself; a smooth/analytic gradient (automatic differentiation) is the route to
-tightening it further.
+The default automatic-differentiation path avoids a finite-difference step and
+its truncation error. If `use_ad_gradient = FALSE`, TF24f instead uses a centred
+finite difference controlled by `psi_fd_step`; that fallback should be treated
+as a numerical sensitivity setting and checked explicitly.
 
 ## A note on initialisation
 
-A subtlety worth flagging: a newly recruited seedling must *start* at its optimal
-operating point. If the tracked state instead starts at zero, shaded understory
-recruits spend their first steps at a non-physical operating point and can
-**escape light suppression** — growing into the canopy where `TF24` would keep
-them suppressed. `TF24f` avoids this by seeding the tracked potential at its true
-optimum (one full solve) when each plant is born, so gradient ascent starts at
-the optimum rather than racing toward it.
+Each new seedling starts with its tracked state at the current optimum. Without
+this initial full solve, a seedling would begin at a non-physical value and
+could temporarily escape the light limitation that should suppress it. After
+initialisation, TF24f resumes tracking rather than re-optimising at every step.
 
 ## Status
 
-`TF24f` currently tracks the root-collar potential only, under the mean-light
-canopy model, and matches `TF24` well (not exactly) at roughly twice the speed.
-Tightening the match with a smooth gradient, and extending to the deep-crown
-canopy model, are the next steps.
+TF24f currently tracks root-collar potential and inherits TF24's selectable
+canopy models. It is an approximation with an explicit acclimation lag, not an
+exact replacement for TF24.

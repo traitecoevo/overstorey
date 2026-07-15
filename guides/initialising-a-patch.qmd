@@ -13,9 +13,10 @@ want a patch to *start* with plants already in it — either to **resume** a run
 you stopped earlier, or to **seed** a patch with an arbitrary initial size
 distribution and watch it evolve.
 
-This guide covers both. The mechanism is the same in each case: an initial state
-is attached to the `Parameters` object and applied when the patch is reset, so an
-ordinary `run_scm(p)` picks it up with no special arguments.
+This guide covers both. In each case, the starting state is attached to a
+`Parameters` object—the object that holds the strategies and settings for a
+run. When the patch is reset, an ordinary `run_scm(p)` reads that state without
+needing a special run argument.
 
 ```{r}
 #| label: setup
@@ -25,7 +26,7 @@ library(tidyr)
 library(ggplot2)
 
 p0 <- scm_base_parameters("FF16")
-p  <- expand_parameters(trait_matrix(0.0825, "lma"), p0, birth_rate_list = 20)
+p  <- add_strategies(p0, trait_matrix(0.0825, "lma"), birth_rate = 20)
 ```
 
 ## Exporting and resuming a run
@@ -44,12 +45,11 @@ k <- floor(length(scm$history) / 2)
 state <- export_patch_state(scm, step = k)
 ```
 
-`export_patch_state()` captures everything needed to continue the run: every
-node's ODE state, the per-node *birth bookkeeping* (introduction time, patch-age
-density and survival probability at birth — quantities that are not part of the
-ODE state but feed the growth/mortality rates and the lifetime-fitness
-integrals), the patch age, and the portion of the introduction schedule that has
-not happened yet.
+`export_patch_state()` saves both the plants and the information the solver
+needs to continue them. This includes every node's ODE state, the current patch
+age, the unused part of the node-introduction schedule, and per-node birth
+bookkeeping such as introduction time, initial patch density, and survival at
+birth.
 
 `set_initial_state()` writes that onto a `Parameters` object, and `run_scm()`
 resumes from it:
@@ -60,10 +60,10 @@ p_resumed <- set_initial_state(p, state)
 resumed   <- run_scm(p_resumed, collect = TRUE)
 ```
 
-The resumed run reproduces the original. The seed is loaded bit-for-bit; only the
-adaptive ODE stepper, whose internal step size is not part of the checkpoint,
-diverges slightly going forward — so the recovered fitness matches to a few parts
-in $10^5$ rather than exactly:
+The resumed run closely reproduces the original. The checkpointed state is
+loaded exactly, but the adaptive ODE solver's internal step size is not part of
+the checkpoint. Its later steps can therefore differ slightly, so the recovered
+fitness agrees to a few parts in $10^5$ rather than bit-for-bit:
 
 ```{r}
 #| label: compare-fitness
@@ -77,11 +77,11 @@ a fresh session.
 
 ## Seeding an arbitrary size distribution
 
-To start a patch from scratch with a chosen distribution of plants, build an
-initial state from node heights and densities with `make_initial_state()`. The
-remaining state (mortality, fecundity, accumulated reproduction, heartwood) starts
-at zero, every node is introduced at patch age 0, and recruitment continues
-normally for $t > 0$ (the seeded distribution stands in for the $t = 0$ recruit).
+Seeding a size distribution supplies the plants present at patch age zero; it
+does not replace recruitment later in the run. Build the initial state from node
+heights and densities with `make_initial_state()`. Mortality, fecundity,
+accumulated reproduction, and heartwood start at zero. Recruitment then
+continues normally for $t > 0$.
 
 As an example, take a log-normal distribution of heights, normalised to a target
 total density — the same shape PR #304 used to motivate this feature:
@@ -175,10 +175,10 @@ plot_size_distribution(panel) +
 
 ## Plausible initial conditions
 
-Very large plants at very high density are not a state the model can integrate:
-they self-shade so heavily that net production goes negative, mortality blows up,
-and node densities race to non-finite values within a few steps. `plant` checks
-for this when the patch is seeded and refuses rather than producing garbage:
+Not every combination of starting sizes and densities is biologically or
+numerically plausible. Very large plants at very high density can self-shade so
+strongly that production becomes negative and node densities become non-finite.
+`plant` checks for this and stops with an error:
 
 ```{r}
 #| label: guard
@@ -188,6 +188,7 @@ bad <- make_initial_state(p, heights = seq(8, 12, length.out = 20),
 run_scm(set_initial_state(p, bad))
 ```
 
-If you hit this, reduce the sizes and/or densities of the initial plants — a
-distribution the solver itself could have produced (for example, one obtained via
-`export_patch_state()`) is always safe to re-import.
+If this happens, begin with a compatible state from `export_patch_state()`, or
+reduce the sizes and densities of the seeded plants. An exported state is the
+safest choice for resuming a run because it preserves the full node
+bookkeeping.

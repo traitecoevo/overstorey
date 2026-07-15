@@ -6,21 +6,18 @@ title: "TF24: carbohydrate storage, buffered growth and mortality"
 guide
 :::
 
-By default `TF24` maps carbon supply to demography *instantaneously*: the height
-growth rate and the growth-dependent mortality rate both read the current net
-mass production. That coupling is brittle. Under a deep productivity trough net
-production goes sharply negative, and the growth-dependent mortality term
-`a_dG1 · exp(-a_dG2 · productivity)` runs away to enormous values — in the SCM it
-reached ~10³² and overflowed the coupled size-density equations (issue #550).
-Biologically it is also wrong: real trees do not die the instant a bad season
-starts. They draw down stored **non-structural carbohydrate (NSC)** and die
-gradually only once reserves are exhausted (Fiona Robinson's thesis; Stefaniak et
-al. 2026).
+Trees can use stored non-structural carbohydrates (NSC) to buffer periods when
+photosynthesis does not meet demand. Growth can slow while reserves decline,
+and mortality risk can rise gradually rather than responding immediately to
+one poor day or season.
 
-This guide describes the NSC **storage pool** added to `TF24` (issue #517). A new
-state variable stores carbon; growth and mortality read that *buffered* reserve
-rather than instantaneous production. The governing principle, following the
-biology, is simple:
+TF24 now represents this buffer with an explicit carbon-storage state. Earlier
+versions linked growth and mortality directly to instantaneous net production.
+During a severe productivity trough, that formulation could produce mortality
+rates near $10^{32}$ and overflow the size-density equations (issue #550).
+
+This guide follows carbon into and out of the storage pool, then uses a simple
+drought experiment to show its effects. The governing idea is:
 
 > a plant should not grow unless it has ample carbon in storage.
 
@@ -36,9 +33,10 @@ library(ggplot2)
 ## The carbon flow
 
 Each plant carries a storage pool $S$ (kg of NSC) as an extra ODE state. Net mass
-production $P$ (the usual TF24 quantity: assimilation, less respiration and
-turnover) charges the pool; growth and reproduction are funded from it, gated on
-how full it is; the balance stays in reserve. In symbols:
+production $P$ is assimilation after respiration and turnover costs. Current
+positive production supplies growth and reproduction, but the fraction used is
+controlled by how full the reserve pool is. Production not used for growth
+refills storage:
 
 $$
 \frac{\mathrm{d}S}{\mathrm{d}t} = P - U,
@@ -79,9 +77,8 @@ $$
 
 $a_{\mathrm{st2}}$ is the reserve fraction at which growth is half-on (default
 `0.10`), $w$ a fixed width, and $P^{+}$ a differentiable stand-in for
-$\max(P, 0)$ that removes the old hard `net > 0` growth cutoff. Carbon not spent
-on growth (because the gate is partly closed, or because $P > U$) stays in $S$ and
-refills the pool.
+$\max(P, 0)$ that removes the old hard `net > 0` growth cutoff. Carbon not
+committed to growth and reproduction stays in $S$ and refills the pool.
 
 A deliberate modelling choice sits here. Growth is gated *at the production rate*,
 not metered out of the pool as a discharge $a_{\mathrm{st2}}\,S$ (the literal
@@ -101,12 +98,12 @@ $$
 d(r) = d_I + a_{\mathrm{dG1}}\,\exp(-a_{\mathrm{dG2}}\, r).
 $$
 
-Because $r \in [0,1]$, this is **bounded** in
-$[\,a_{\mathrm{dG1}} e^{-a_{\mathrm{dG2}}},\; a_{\mathrm{dG1}}\,]$: near-zero
-excess mortality at full reserves, rising smoothly to a finite maximum
-$a_{\mathrm{dG1}}$ as the pool empties. This is the structural fix for the #550
-blow-up — the runaway is impossible by construction — and it makes death
-*gradual* as reserves deplete rather than instantaneous when a season turns bad.
+Because $r \in [0,1]$, total mortality is bounded between
+$d_I + a_{\mathrm{dG1}} e^{-a_{\mathrm{dG2}}}$ and
+$d_I + a_{\mathrm{dG1}}$. Excess mortality is lowest at full reserves and rises
+smoothly to the finite maximum $a_{\mathrm{dG1}}$ as the pool empties. The old
+runaway is therefore impossible by construction, and mortality changes
+gradually as reserves decline.
 
 A newborn seedling is seeded with reserves at a fraction $a_{\mathrm{st3}}$ of its
 capacity (default `0.8`), so it can establish rather than dying immediately with
@@ -132,8 +129,8 @@ tibble(r = seq(0, 1, length.out = 200)) |>
 
 ## Behaviour: growth pauses in drought and resumes on recovery
 
-The clearest way to see the buffer at work is to drive a single plant through a
-drought and back. The helper below reproduces the C++ storage capacity
+The clearest way to see the buffer is to drive one plant through a deliberately
+simple drought and recovery. The helper below reproduces the C++ storage capacity
 ($S_{\max} = a_{\mathrm{st1}}\, m_s$) so we can report the relative reserve $r$
 alongside height and mortality.
 
@@ -156,9 +153,10 @@ fixed_env <- function(theta) {
 }
 ```
 
-We integrate one plant with a simple fixed step: three years in a well-watered
-soil, then a sharp drought (soil moisture dropped to near the residual floor) from
-year 3 to 4.5, then recovery.
+For transparency, this diagnostic uses a small manual Euler step rather than
+the production ODE solver. It follows three years in well-watered soil, a sharp
+drought from year 3 to 4.5, and then recovery. Use `run_scm()` for model runs;
+this loop is only a teaching probe.
 
 ```{r}
 #| label: drought-probe
@@ -210,29 +208,26 @@ traj |>
   theme_classic()
 ```
 
-Three things happen when the drought hits (shaded band) and none of them are the
-old failure mode:
+The storage model produces three linked responses during the shaded drought:
 
-- **Growth pauses.** As reserves fall below the gate threshold, the growth rate
-  drops smoothly to ~0 — the plant stops building tissue rather than growing down
-  its stores.
+- **Height growth and reproduction pause.** As reserves fall below the gate
+  threshold, their shared growth flux drops smoothly towards zero. The
+  turnover-driven conversion of sapwood to heartwood continues independently.
 - **Reserves deplete, mortality rises — but stays bounded.** The mortality rate
   climbs toward its finite maximum ($d_I + a_{\mathrm{dG1}} \approx 5.5$/yr), so
   death is gradual over the drought rather than an instantaneous overflow.
-- **Recovery is buffered, not instantaneous.** When water returns, carbon first
-  *refills* the pool; growth resumes only once reserves have recovered, a short
-  lag after the environment improves.
+- **Recovery is buffered, not instantaneous.** When water returns, the reserve
+  gate directs much of the carbon towards refilling the pool. Height growth
+  strengthens as reserves recover rather than switching on all at once.
 
 ## The growth threshold `a_st2`
 
-`a_st2` is the reserve fraction below which growth throttles — the knob that sets
-how strictly "you need carbon to grow". Because a healthy plant self-regulates to
-reserves around $r \approx 0.45$, thresholds up to ~0.2 leave healthy growth
-essentially untouched and bite only as reserves draw down in drought; the default
-is `0.10`. Lower values behave more like the original instantaneous model (faster
-maturation, higher lifetime reproduction); higher values enforce a stronger
-storage-first strategy at the cost of slower growth. It is exposed as an ordinary
-strategy parameter:
+`a_st2` is the reserve fraction at which the growth gate is half open. Raising it
+requires fuller reserves before growth proceeds strongly; lowering it allows
+growth at lower reserve levels. In this particular setup, a well-watered plant
+settles near $r \approx 0.45$, so thresholds up to roughly 0.2 mainly affect the
+drought response. These values are model outcomes, not universal biological
+thresholds. The default is `0.10`.
 
 ```{r}
 #| label: params
@@ -246,22 +241,12 @@ s$pars[c("a_st1", "a_st2", "a_st3")]
 | `a_st2` | reserve fraction at which growth is half-on | 0.10 |
 | `a_st3` | initial storage at birth, as a fraction of capacity | 0.80 |
 
-## Status
-
-The storage pool makes the #550 drought regime complete robustly (across patch
-lifetimes 20–70 yr and drought amplitudes 0.30–0.40) with bounded, finite
-densities, and reproduces the qualitative growth-and-mortality buffering above.
-The parameters are **defensible prototype defaults, not calibrated**; fitting
-$a_{\mathrm{st1}}$, $a_{\mathrm{st2}}$, $a_{\mathrm{st3}}$ and the
-reserve→mortality shape to Fiona Robinson's thesis and Stefaniak et al. (2026) is
-the next step. `TF24f` (the fast acclimating variant) inherits the storage pool
-automatically.
-
-Reaching this regime also required fixing an independent soil-water singularity
-(issue #549), where a layer at the residual moisture floor produced a non-finite
-soil water potential; that is documented in PR #554.
-
 ## Smoother soil moisture variation
+
+The sharp drought makes the sequence easy to see but is not intended as a
+realistic forcing trajectory. The next diagnostic changes soil moisture
+smoothly through the same interval. It uses the same manual integration solely
+to illustrate how reserve buffering responds to a gradual environmental change.
 
 ```{r}
 #| label: drought-probe-smooth
@@ -312,3 +297,15 @@ traj |>
        subtitle = "Growth pauses and reserves draw down; mortality rises to a bounded rate; growth resumes once reserves refill") +
   theme_classic()
 ```
+
+## Status
+
+The storage formulation keeps mortality bounded and produces the qualitative
+growth-and-mortality buffering shown above. Its parameter values are
+**prototype defaults, not calibrated estimates**. In particular,
+$a_{\mathrm{st1}}$, $a_{\mathrm{st2}}$, $a_{\mathrm{st3}}$, and the
+reserve-to-mortality relationship still need to be evaluated against suitable
+observations. TF24f inherits the same storage pool.
+
+An independent soil-water singularity at the residual moisture floor was also
+fixed while testing this regime (issue #549; PR #554).
