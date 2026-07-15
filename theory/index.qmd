@@ -8,14 +8,14 @@ the model, from the ground up
 
 These pages explain what `plant` solves, why the model is built that way, and
 how the pieces fit together. They bring material from papers and vignettes
-into one route through the theory.
+into one route through the theory. The sections below, and the contents pane on
+the left, follow the recommended reading order.
 
-## Core
+## 1. Foundations
 
-Start here for the demographic and physiological ideas behind the model.
-
-If you are new to `plant`, begin with the big picture. The next two pages then
-introduce the mathematics in stages before the more detailed chapters.
+Start here for the demographic framework shared by the biological models. If
+you are new to `plant`, begin with the big picture. The next two pages introduce
+the mathematics in stages before the full population equation.
 
 - [The big picture](overview.qmd) — the mental model in plain language, no
   equations. **Start here.**
@@ -25,28 +25,48 @@ introduce the mathematics in stages before the more detailed chapters.
   through one small numerical example, bridging the primer and the full PDE.
 - [The size-structured PDE](size-structured-pde.qmd) — demography of
   individuals, patches, and metacommunities.
+
+## 2. Models and physiology {#models}
+
+Next, see how different biological strategies supply growth, fecundity, and
+mortality rates to the shared demographic framework. Begin with the
+[models overview](models/index.qmd), then follow the models and physiological
+processes in dependency order.
+
+- [FF16](models/ff16.qmd) — the trait-based functional-balance model and the
+  starting point for the more detailed physiology.
 - [Assimilation & hydraulics](assimilation-hydraulics.qmd) — the leaf-level
   carbon and water economy.
+- [TF24](models/tf24.qmd) — the hydraulically coupled leaf model, plus its TF24f
+  acclimation-lag variant.
 - [Soil water & root uptake](soil-water.qmd) — where transpired water comes
   from: the multi-layer soil balance and the root-collar solve that feeds it
   to the leaf model.
-- [Adaptive dynamics](adaptive-dynamics.qmd) — invasion fitness and
-  evolutionary endpoints.
-- [Uncertainty & prediction](uncertainty-partitioning.qmd) — where uncertainty
-  enters a `plant` prediction, and how ensembles could be used to measure it.
-
-## Models {#models}
-
-These pages describe the biological strategies that plug into the demographic
-machinery. Each strategy supplies its own growth, fecundity, and mortality
-functions. See the [models overview](models/index.qmd) for an introduction.
-
-- [FF16](models/ff16.qmd) — the trait-based functional-balance model.
 - [K93](models/k93.qmd) — Kohyama's basal-area competition model.
-- [TF24](models/tf24.qmd) — the hydraulically-coupled leaf model, plus its
-  TF24f acclimation-lag variant.
 
-## Implementation {#implementation}
+## 3. Adaptive dynamics
+
+After learning how resident plants grow and compete, move on to invasion
+fitness and evolutionary change.
+
+- [Adaptive dynamics](adaptive-dynamics.qmd) — the main ideas and evolutionary
+  endpoints.
+- [Models in `regnans`](adaptive-dynamics/index.qmd) — four small models for
+  learning and checking the workflow.
+- [DD99](adaptive-dynamics/DD99.qmd) — competition and evolutionary branching.
+- [GK98](adaptive-dynamics/GK98.qmd) — adaptation across different habitats.
+- [GM99](adaptive-dynamics/GM99.qmd) — the evolution of seed size.
+- [JJ12](adaptive-dynamics/JJ12.qmd) — the evolution of migratory arrival time.
+- [Finding evolutionary attractors](adaptive-dynamics/solving_attractors.qmd) —
+  selection gradients in the full `plant` model.
+- [Community assembly with simple models](adaptive-dynamics/assembly.qmd) — how
+  repeated invasion builds a community.
+- [Maximum-fitness community assembly](adaptive-dynamics/assembly_fitmax.qmd) —
+  assembly in `plant` using the best available mutant.
+- [Stochastic assembly](adaptive-dynamics/assembly_stochastic.qmd) — assembly
+  using random mutational steps.
+
+## 4. Implementation {#implementation}
 
 These pages explain how the equations are solved on a computer. See the
 [implementation overview](implementation/index.qmd) for an introduction.
@@ -55,3 +75,13 @@ These pages explain how the equations are solved on a computer. See the
 - [ODE stepping & control](implementation/ode-stepping.qmd)
 - [The node-spacing algorithm](implementation/node-spacing.qmd)
 - [Canopy & light-environment models](implementation/canopy-models.qmd)
+
+## 5. Prediction and reproducibility
+
+Finish with two cross-cutting topics that matter when interpreting, comparing,
+or forecasting with model results.
+
+- [Uncertainty & prediction](uncertainty-partitioning.qmd) — where uncertainty
+  enters a `plant` prediction, and how ensembles could be used to measure it.
+- [Scientific versioning of models](models/scientific-versioning.qmd) — how to
+  distinguish changes in the scientific model from changes in the software.

@@ -85,18 +85,24 @@ website:
             - guides/tf24-nsc-storage.qmd
     - title: "Theory"
       style: floating
+      collapse-level: 1
       contents:
         - theory/index.qmd
-        - section: "Core"
+        - section: "1. Foundations"
           contents:
             - theory/overview.qmd
             - theory/maths-primer.qmd
             - theory/from-primer-to-pde.qmd
             - theory/size-structured-pde.qmd
+        - section: "2. Models and physiology"
+          contents:
+            - theory/models/index.qmd
+            - theory/models/ff16.qmd
             - theory/assimilation-hydraulics.qmd
+            - theory/models/tf24.qmd
             - theory/soil-water.qmd
-            - theory/uncertainty-partitioning.qmd
-        - section: "Adaptive dynamics"
+            - theory/models/k93.qmd
+        - section: "3. Adaptive dynamics"
           contents:
             - theory/adaptive-dynamics.qmd
             - theory/adaptive-dynamics/index.qmd
@@ -104,24 +110,21 @@ website:
             - theory/adaptive-dynamics/GK98.qmd
             - theory/adaptive-dynamics/GM99.qmd
             - theory/adaptive-dynamics/JJ12.qmd
+            - theory/adaptive-dynamics/solving_attractors.qmd
             - theory/adaptive-dynamics/assembly.qmd
             - theory/adaptive-dynamics/assembly_fitmax.qmd
             - theory/adaptive-dynamics/assembly_stochastic.qmd
-            - theory/adaptive-dynamics/solving_attractors.qmd
-        - section: "Models"
-          contents:
-            - theory/models/index.qmd
-            - theory/models/ff16.qmd
-            - theory/models/k93.qmd
-            - theory/models/tf24.qmd
-            - theory/models/scientific-versioning.qmd
-        - section: "Implementation"
+        - section: "4. Implementation"
           contents:
             - theory/implementation/index.qmd
             - theory/implementation/characteristic-method.qmd
             - theory/implementation/ode-stepping.qmd
             - theory/implementation/node-spacing.qmd
             - theory/implementation/canopy-models.qmd
+        - section: "5. Prediction and reproducibility"
+          contents:
+            - theory/uncertainty-partitioning.qmd
+            - theory/models/scientific-versioning.qmd
     - title: "Pipeline"
       style: floating
       contents:
