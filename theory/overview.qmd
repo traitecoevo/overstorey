@@ -81,18 +81,25 @@ several parts of the model at once.
 | Trait | Symbol | Contrast represented in FF16 |
 |---|---|---|
 | Leaf mass per area (LMA) | $\phi$ | Thin, inexpensive, short-lived leaves versus denser, longer-lived leaves |
-| Wood density | $\rho$ | Lower-cost wood versus denser, more durable wood |
+| Wood density | $\rho$ | Less construction-expensive wood versus denser, more construction-expensive wood |
 | Seed mass | $\omega$ | Many small seeds versus fewer, better-provisioned seeds |
 | Maximum height | $H_{\rm mat}$ | Shorter understorey plants versus taller canopy plants |
 
 : The four main traits used by the FF16 hyper-parameterisation.
 
-Changing one of these traits changes several physiological parameters. For
-example, LMA affects the construction cost, turnover, respiration, and
-photosynthetic properties of leaves. `plant` uses a mapping from the trait
+Changing one of these traits can change several physiological parameters. For
+example, LMA affects leaf construction cost, turnover, and respiration. Leaf
+nitrogen per area, which can also be supplied to the hyper-parameterisation,
+controls the photosynthetic response. `plant` uses a mapping from these input
 values to the lower-level physiological parameters needed by FF16. This mapping
 is called a **hyper-parameterisation** and is described in the
 [Strategies and traits](../guides/strategies.qmd) guide.
+
+Wood density also changes construction costs and respiration per unit mass.
+Although the hyper-parameterisation can link wood density to mortality and
+sapwood turnover, those two relationships are switched off in the current
+default settings. Denser wood should therefore not automatically be interpreted
+as more durable in a default FF16 run.
 
 This trait-based parameterisation is an important use of `plant`, but it is not
 the definition of a strategy. More generally, a strategy is the complete set of
@@ -131,15 +138,46 @@ leaf-level calculations used by the hydraulically explicit strategies.
 
 ## From an individual to a landscape
 
-The ecological model is organised at three scales.
+The ecological model is organised at three scales: individuals, patches, and
+the metacommunity. **Nodes are not a fourth ecological scale.** They are the
+numerical objects that the solver uses to represent groups of similar plants
+within a patch.
 
 ```{mermaid}
-flowchart TD
-accTitle: The three ecological scales in plant
-accDescr: Individual plant biology contributes to a population within a patch. Patches of different ages are combined to represent a landscape-scale metacommunity.
-  I["Individual<br/>state and demographic rates"] --> P["Patch<br/>a size-structured population"]
-  P --> M["Metacommunity<br/>patches of different ages"]
+flowchart LR
+accTitle: Ecological scales and their numerical representation in plant
+accDescr: Similar individuals are grouped into cohorts represented numerically by nodes. Nodes describe a size-structured population within one patch. Patch states at different ages are weighted together to represent the landscape-scale metacommunity.
+  I["Individuals<br/>biological plants"] --> C["Cohorts<br/>same strategy and recruitment time"]
+  C -. "represented by" .-> N["Nodes<br/>numerical objects"]
+  N --> P["Patch<br/>one local competing population"]
+  P --> M["Metacommunity<br/>implicit landscape representation"]
 ```
+
+The distinction can be summarised as follows:
+
+| Term | What it is | What makes another one different? |
+|---|---|---|
+| **Node** | One numerical representation of a cohort within a patch | A different strategy or recruitment time produces a different cohort and therefore a different node |
+| **Patch** | One local community followed through time after disturbance | A different time since disturbance gives a different patch age and community state |
+| **Metacommunity** | The landscape represented by patches of different ages, connected through a shared seed pool | It combines patch-level states rather than adding more nodes to a single patch |
+
+: The relationship between nodes, patches, and the metacommunity.
+
+Here is a concrete way to picture the nesting. Consider a patch that is 40
+years old. It contains plants that recruited at different times during those
+40 years. For each strategy, the solver uses nodes to represent these cohorts:
+an early node might represent a small number of large survivors, while a recent
+node might represent many small recruits. Together, all the nodes describe the
+current population in that one patch.
+
+Now zoom out to the landscape. Some patches were disturbed recently and are
+young; others have developed for decades. The metacommunity combines the
+modelled states of these different patch ages, weighting each age by how common
+it is. This is an **implicit** representation: the deterministic solver does not
+create a separate object for every physical patch or for the metacommunity.
+Instead, one patch trajectory supplies the community state at each possible
+patch age. Thus, **nodes are combined to describe a patch, while patch ages are
+combined to describe the metacommunity**.
 
 ### Individual
 
@@ -147,6 +185,11 @@ An individual is one biological plant governed by a strategy. Its state
 includes a size coordinate and, for some strategies, additional physiological
 variables. FF16, TF24, and TF24f use height as the main size coordinate. K93
 uses stem diameter.
+
+One implementation detail can otherwise be confusing when reading K93 output.
+The shared solver calls its first size state `height` for every strategy, so
+K93's stem diameter is stored in a column named `height`, even though its
+biological meaning and units are DBH in centimetres.
 
 The strategy uses that state and the plant's surroundings to calculate growth,
 mortality, fecundity, and its contribution to competition.
@@ -159,10 +202,11 @@ the population by a **size distribution**: the density of plants at each size,
 for each strategy, at a given patch age.
 
 The numerical method follows a finite set of **nodes** along this distribution.
-Each node represents plants that recruited at a particular patch age and
-therefore follow the same deterministic trajectory. As the patch develops, the
-node's position and density change as plants grow and die. New nodes are
-introduced to represent continuing recruitment.
+Each node belongs to one strategy and represents plants that recruited at a
+particular patch age, so those plants follow the same deterministic trajectory.
+As the patch develops, the node's position records the cohort's changing size,
+while its density records how many plants from that cohort remain per unit
+area. New nodes are introduced to represent continuing recruitment.
 
 The words *individual*, *cohort*, and *node* therefore refer to related but
 different things:
@@ -184,6 +228,13 @@ At the landscape scale, `plant` represents a forest as a collection of patches
 with different ages since their last disturbance. Seed dispersal connects these
 patches, producing a shared seed pool for each strategy.
 
+The prefix *meta-* signals that this is a community of communities: each patch
+contains its own local plant community, and the metacommunity connects those
+local communities at the landscape scale. In the standard model, this
+connection occurs through seeds rather than through nodes. A node never moves
+from one patch to another; it is only part of the numerical description of one
+patch trajectory.
+
 Under the standard metacommunity assumptions, patches begin from the same empty
 state after disturbance, receive the same constant seed rain, and differ only
 in age. In that setting, one simulated patch trajectory can represent all patch
@@ -191,6 +242,11 @@ ages. Patch-level results are averaged using the frequency of patches at each
 age to obtain landscape-level quantities. Demographic equilibrium adds a
 further condition: the seed rain must be consistent with the seeds produced
 across the metacommunity.
+
+Constant seed rain is the usual assumption for the demographic-equilibrium
+calculation, not a restriction of the solver. `plant` can also accept birth
+rates that vary with patch age when a different ecological scenario requires
+them.
 
 This reduction depends on those assumptions. It is not a general claim that one
 physical forest patch represents every heterogeneous landscape.
@@ -392,7 +448,7 @@ the standard deterministic `plant` workflow are:
 | **Cohort** | Plants with the same strategy and recruitment time following the same deterministic trajectory |
 | **Node** | A numerical point representing a cohort and sampling the continuous size distribution |
 | **Patch** | A local population of competing plants followed from disturbance onward |
-| **Size distribution** | Plant density across the model's size coordinate: height for FF16/TF24 or stem diameter for K93 |
+| **Size distribution** | Plant density across the model's size coordinate: height for FF16/TF24 or stem diameter for K93 (stored under the generic state name `height`) |
 | **Competitive environment** | The shared quantity through which plants interact, such as the canopy-light profile or basal area of larger neighbours |
 | **Metacommunity** | A landscape of patches of different ages connected by seed dispersal |
 | **Birth rate / seed rain** | The rate at which seeds of a strategy arrive in a patch |

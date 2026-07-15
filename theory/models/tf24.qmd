@@ -151,13 +151,18 @@ carbon-water economy while imposing a cost elsewhere.
   unit of leaf area. More sapwood improves water supply, but the extra sapwood
   and bark must be built and maintained. A larger sapwood volume can also
   incur a larger absolute hydraulic repair cost.
-- **Wood density**, $\rho$, is sapwood mass per unit volume. TF24 represents
-  denser wood as more resistant to cavitation-related damage, but also more
-  expensive to construct.
+- **Wood density**, $\rho$, is sapwood mass per unit volume. It makes a given
+  volume of sapwood more expensive to construct. In the current default
+  parameterisation, it does **not** change cavitation resistance: the
+  density-to-`d_I`, density-to-`g1_TF24`, and density-to-`k_s` exponents are all
+  zero. Those links can be enabled by changing their hyperparameters, but they
+  are inactive by default.
 - **Maximum sapwood-specific conductivity**, $K_{s,\max}$, describes how
   quickly a unit of sapwood can transport water at maximum conductivity. High
-  conductivity improves water transport, but the model links it to less
-  embolism-resistant xylem through a hydraulic safety-efficiency trade-off.
+  conductivity improves water transport. In the current parameterisation it
+  also determines $p_{50}$ and, through it, the vulnerability-curve parameters
+  $c$, $b$, and $\psi_{crit}$; this is the model's hydraulic
+  safety--efficiency trade-off.
 
 These are not four independent "good" or "bad" settings. For example,
 increasing Huber value improves water supply per unit leaf area but also diverts

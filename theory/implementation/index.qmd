@@ -53,9 +53,10 @@ its C++ interface, and the fixed-step alternative.
 
 Each node represents a cohort of plants born at roughly the same time. Too few
 nodes give a poor approximation to the population; too many make the simulation
-unnecessarily expensive. `plant` therefore refines the introduction schedule
-only where removing a node would make an important population integral too
-inaccurate.
+unnecessarily expensive. An ordinary run uses the supplied introduction
+schedule. When greater numerical accuracy is needed, users can opt in to a
+refinement step that adds nodes only where removing a node would make an
+important population integral too inaccurate.
 
 Read [The node-spacing algorithm](node-spacing.qmd) for the refinement test and
 worked diagnostics.
@@ -135,7 +136,7 @@ above height $z$ from an expression of the form
 across height and builds the light-availability spline.
 
 To **use the environment**, `compute_rates` passes it from patch to species to
-node to individual to strategy. In `FF16_strategy`, `net_mass_production_dt`
+node to individual to strategy. In `FF16_Strategy`, `net_mass_production_dt`
 calls `assimilation`. A `quadrature::QK` integrator then evaluates
 `assimilation_leaf(environment.get_environment_at_height(z)) * q(z, height)`
 over crown depth $z$. Earlier versions used the adaptive `QAG` layer here, but

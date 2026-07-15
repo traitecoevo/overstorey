@@ -158,7 +158,7 @@ the shading model alone.
 ```{r}
 #| label: run-models
 params <- scm_base_parameters("FF16")
-patch  <- expand_parameters(trait_matrix(0.0825, "lma"), params)
+patch  <- add_strategies(params, trait_matrix(0.0825, "lma"), birth_rate = 1)
 
 models <- c("deep-crown", "mean-light", "crown-centre", "ppa")
 

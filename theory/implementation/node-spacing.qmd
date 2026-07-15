@@ -35,8 +35,9 @@ The rest of this page makes this precise.
 As explained on [The size-structured PDE](../size-structured-pde.qmd), the SCM
 replaces a continuous size distribution with discrete nodes. Integrals over the
 size distribution are therefore approximations, and their accuracy depends on
-how closely those nodes are spaced. `plant` adapts the spacing to reach a chosen
-accuracy while avoiding nodes that contribute little useful information.
+how closely those nodes are spaced. An ordinary run uses its supplied schedule.
+You can opt in to adaptive refinement when you need a chosen accuracy without
+adding nodes that contribute little useful information.
 
 The algorithm begins with a schedule of node introduction times. For each node,
 it asks a practical question: if this node were removed, would either of two
@@ -52,8 +53,9 @@ nodes. The test is deliberately conservative: it measures the error caused by
 error in the final, refined schedule will therefore usually be below the stated
 tolerance.
 
-This refinement now lives entirely in C++, inside the `SCM` solver. You trigger
-it from R with:
+This optional refinement now lives entirely in C++, inside the `SCM` solver.
+`run_scm()` does not refine the schedule by default
+(`refine_schedule = FALSE`); request it from R with:
 
 ```r
 scm <- run_scm(p, refine_schedule = TRUE)
@@ -68,11 +70,11 @@ the final run are written back into the returned `parameters`, so the
 this work in R via the `build_schedule()` and `run_scm_error()` functions; both
 have been removed in favour of the in-solver implementation.)
 
-Most users can let this refinement happen automatically. The examples below are
-for readers who want to understand how the SCM chooses its nodes and how that
-choice affects numerical accuracy. Some examples inspect non-exported `plant`
-internals, which is why they use the `plant:::` prefix. Those interfaces are
-implementation details rather than part of the stable user API.
+Most users can use the supplied schedule. The examples below show readers who
+opt in to refinement how the SCM chooses its nodes and how that choice affects
+numerical accuracy. Some examples inspect non-exported `plant` internals, which
+is why they use the `plant:::` prefix. Those interfaces are implementation
+details rather than part of the stable user API.
 
 ## Node introduction times
 

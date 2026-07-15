@@ -71,9 +71,10 @@ in @sec-plant-coupling treats this midpoint as the depth from which the layer's
 water is drawn.
 
 Each layer carries one state variable, its volumetric soil moisture
-$\theta_i$ (m$^3$ water m$^{-3}$ soil), bounded above by the saturated
-moisture content $\theta_{\rm sat}$ (`soil_moist_sat`, default 0.428). The
-mass balance for layer $i$ is
+$\theta_i$ (m$^3$ water m$^{-3}$ soil). The saturated moisture content
+$\theta_{\rm sat}$ (`soil_moist_sat`, default 0.428) is a reference value in
+the retention and conductivity curves, not a hard upper bound on this stored
+state. The mass balance for layer $i$ is
 
 $$
 \frac{{\rm d}\theta_i}{{\rm d}t} = \frac{q_{{\rm in},i} - q_{{\rm out},i} - u_i}{\Delta z_i},
@@ -119,8 +120,11 @@ $$ {#eq-drainage}
 where $K_{\rm sat}$ (`K_sat`) is the saturated hydraulic conductivity and
 $n_\psi$ (`n_psi`) is the retention-curve shape parameter also used in
 @eq-retention. The same function, `soil_K_from_soil_theta`, is used for every
-layer. Each layer's outflow becomes the next layer's inflow, while the outflow
-from the deepest layer leaves the column as deep drainage.
+layer. For this conductivity calculation, the input moisture is clamped to
+$[0, \theta_{\rm sat}]$: a non-positive value gives zero conductivity, and a
+value above saturation gives $K_{\rm sat}$. Each layer's outflow becomes the
+next layer's inflow, while the outflow from the deepest layer leaves the column
+as deep drainage.
 
 This is a first-order, one-way bucket scheme: drainage moves down the column,
 never up. The soil water balance does not include capillary rise or lateral
@@ -145,6 +149,19 @@ a layer dries ($\theta \to 0$), $\psi^\ast_{\rm soil} \to \infty$: drier soil
 requires a root to pull harder to extract water. The inverse,
 `soil_moist_from_psi`, solves the same relationship for $\theta$ given $\psi$.
 
+::: {.callout-warning}
+## Current inverse-unit asymmetry
+`psi_from_soil_moist()` returns the potential magnitude in **MPa**, as in
+@eq-retention. Its apparent inverse, `soil_moist_from_psi()`, currently
+expects its potential argument in **Pa**, because it divides the input directly
+by `a_psi` before applying the inverse power. Thus, for a round trip, multiply
+the MPa result by $10^6$ before passing it to `soil_moist_from_psi()`.
+
+This is an API asymmetry, not a physical distinction. The theory and the leaf
+model use MPa, so a future `plant` change to make the inverse accept MPa would
+be easier to use; until then, callers need to make the conversion explicitly.
+:::
+
 ::: {.callout-note}
 ## Residual-moisture floor
 $\psi^\ast_{\rm soil}(\theta)$ diverges as $\theta \to 0$, and the drainage rate
@@ -156,7 +173,10 @@ further by @eq-layer-balance; only rewetting is allowed. The model also
 evaluates $\psi^\ast_{\rm soil}$ at $\max(\theta, \theta_r)$ rather than at
 $\theta$, keeping the retention curve finite for a depleted layer. The floor
 is well below realistic operating moisture, so it does not affect non-drought
-runs. See issue #485 for the numerical failure mode it prevents.
+runs. In addition, the resulting potential is capped at $10^3$ MPa: at the
+residual floor, root conductance is already effectively zero, while the cap
+keeps the coupled hydraulic calculation finite. See issue #485 for the
+numerical failure mode the floor prevents.
 :::
 
 ## Coupling to the plant: root-collar water potential {#sec-plant-coupling}

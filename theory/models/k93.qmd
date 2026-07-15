@@ -92,7 +92,7 @@ the same total reproductive output as Eq. 9 of @Kohyama-1993.
 Eq. 11 of @Kohyama-1993:
 
 $$
-\mu(t, a, x) = - c_0 + c_1 \cdot B(t, a, x_0)
+\mu(t, a, x) = - c_0 + c_1 \cdot B(t, a, x)
 $$ {#eq-k93-mortality}
 
 Competition-dependent mortality $\mu$ rises linearly with basal area above the
@@ -362,7 +362,7 @@ fast_par2 <- scm_base_parameters("K93")
 fast_par2$max_patch_lifetime <- 700
 fast_par2$strategy_default$pars$k_I <- 1e-6
 
-sp_par <- expand_parameters(sp, fast_par2, birth_rate_list = rep(1, 3))
+sp_par <- add_strategies(fast_par2, sp, birth_rate = rep(1, 3))
 
 sp_results <- run_scm(sp_par, collect = TRUE)
 
