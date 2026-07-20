@@ -123,7 +123,6 @@ website:
             - theory/implementation/canopy-models.qmd
         - section: "5. Prediction and reproducibility"
           contents:
-            - theory/uncertainty-partitioning.qmd
             - theory/models/scientific-versioning.qmd
     - title: "Pipeline"
       style: floating

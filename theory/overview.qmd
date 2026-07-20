@@ -435,8 +435,7 @@ the standard deterministic `plant` workflow are:
   structure emerges from those assumptions; it is not assumption-free.
 - A simulation produces conditional model output, not a calibrated forecast
   with uncertainty bounds. `plant` does not currently provide a complete
-  calibration, uncertainty-propagation, or forecasting workflow. See
-  [Uncertainty and prediction](uncertainty-partitioning.qmd) for the distinction.
+  calibration, uncertainty-propagation, or forecasting workflow.
 
 ## Glossary
 
@@ -474,5 +473,3 @@ Choose the path that matches your question:
   [TF24](models/tf24.qmd).
 - **I want to study evolution or community assembly.** Continue to
   [Adaptive dynamics](adaptive-dynamics.qmd).
-- **I want to understand prediction and uncertainty.** Read
-  [Uncertainty and prediction](uncertainty-partitioning.qmd).

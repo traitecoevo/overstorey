@@ -44,7 +44,5 @@ Keep the calibration data, units, model version, environmental drivers, and
 random seeds together. These details determine what the fitted values mean and
 whether the analysis can be repeated.
 
-For an introduction to the different sources of uncertainty in this workflow,
-see [Uncertainty partitioning](../theory/uncertainty-partitioning.qmd). The
-[Example analysis](example-analysis.qmd) shows how to turn patch output into
+The [Example analysis](example-analysis.qmd) shows how to turn patch output into
 quantities that could be compared with observations.

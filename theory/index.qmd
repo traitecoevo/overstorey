@@ -78,10 +78,8 @@ These pages explain how the equations are solved on a computer. See the
 
 ## 5. Prediction and reproducibility
 
-Finish with two cross-cutting topics that matter when interpreting, comparing,
+Finish with a cross-cutting topic that matters when interpreting, comparing,
 or forecasting with model results.
 
-- [Uncertainty & prediction](uncertainty-partitioning.qmd) — where uncertainty
-  enters a `plant` prediction, and how ensembles could be used to measure it.
 - [Scientific versioning of models](models/scientific-versioning.qmd) — how to
   distinguish changes in the scientific model from changes in the software.
