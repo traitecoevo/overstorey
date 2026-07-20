@@ -67,6 +67,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../guides/tf24-hydraulics-and-acclimation.html" rel="next">
 <link href="../guides/self-thinning.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -76,7 +77,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1461e13f5cda75d3dcfce56afc980b53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -238,6 +239,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../guides/initialising-a-patch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Initialising a patch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../guides/strategies.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Strategies &amp; traits</span></a>
   </div>
@@ -285,6 +292,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">TF24 in depth</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-hydraulics-and-acclimation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: hydraulics, and a fast acclimating variant</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-nsc-storage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: carbohydrate storage, buffered growth and mortality</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -295,10 +325,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#node-densities" id="toc-node-densities" class="nav-link active" data-scroll-target="#node-densities">Node densities</a></li>
-  <li><a href="#leaf-area" id="toc-leaf-area" class="nav-link" data-scroll-target="#leaf-area">Leaf area</a></li>
-  <li><a href="#growth-rate" id="toc-growth-rate" class="nav-link" data-scroll-target="#growth-rate">Growth rate</a></li>
-  <li><a href="#integrating-over-a-metapopulation" id="toc-integrating-over-a-metapopulation" class="nav-link" data-scroll-target="#integrating-over-a-metapopulation">Integrating over a metapopulation</a></li>
+  <li><a href="#node-density-profiles" id="toc-node-density-profiles" class="nav-link active" data-scroll-target="#node-density-profiles">Node-density profiles</a></li>
+  <li><a href="#leaf-area-profiles" id="toc-leaf-area-profiles" class="nav-link" data-scroll-target="#leaf-area-profiles">Leaf-area profiles</a></li>
+  <li><a href="#height-growth-profiles" id="toc-height-growth-profiles" class="nav-link" data-scroll-target="#height-growth-profiles">Height-growth profiles</a></li>
+  <li><a href="#average-across-a-metapopulation" id="toc-average-across-a-metapopulation" class="nav-link" data-scroll-target="#average-across-a-metapopulation">Average across a metapopulation</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/guides/emergent-properties.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -327,7 +357,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="eyebrow">
 <p>example</p>
 </div>
-<p>The aim here is to use the plant package to investigate dynamics within a patch of competing individuals, focusing on emergent patch-level properties, rather than properties of individuals within the patch.</p>
+<p>An <strong>emergent property</strong> belongs to the whole patch rather than to any one plant. It arises from many individuals growing, recruiting, dying, and changing one another’s light environment. This example moves from node-density profiles to leaf area and growth, then averages patch profiles across a metapopulation.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -341,7 +371,7 @@ Note
 <p>A few steps below reach into plant’s internal helpers (<code>plant:::trapezium</code>, <code>plant:::pad_list_to_array</code>). These are not part of the public API and may change or disappear between releases. They are kept here exactly as written because the example depends on them; treat them as implementation detail rather than something to build on.</p>
 </div>
 </div>
-<p>We’ll work with a single species at birth rate close to demographic equilibrium:</p>
+<p>We’ll work with a single species and an illustrative constant birth rate:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -350,9 +380,9 @@ Note
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>patch <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p, <span class="at">refine_schedule =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>parameters</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(patch, <span class="at">collect =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<section id="node-densities" class="level1">
-<h1>Node densities</h1>
-<p>There was a bit of hassle in the <a href="../guides/patch-dynamics.html">patch dynamics guide</a> in plotting all trajectories along with a couple of lines corresponding to focal years. We’re going to do the same thing here:</p>
+<section id="node-density-profiles" class="level2">
+<h2 class="anchored" data-anchor-id="node-density-profiles">Node-density profiles</h2>
+<p>Patch profiles change continuously, so plotting every recorded age at equal emphasis is difficult to read. We retain all trajectories in grey and highlight five representative ages:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>closest <span class="ot">&lt;-</span> <span class="cf">function</span>(t, time) {</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">which.min</span>(<span class="fu">abs</span>(time <span class="sc">-</span> t))</span>
@@ -371,7 +401,7 @@ Note
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>height      <span class="ot">&lt;-</span> <span class="fu">sdd_matrix</span>(species_1, <span class="st">"height"</span>)</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>log_density <span class="ot">&lt;-</span> <span class="fu">sdd_matrix</span>(species_1, <span class="st">"log_density"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>As with height in the <a href="../guides/patch-dynamics.html">patch dynamics guide</a>, node density is a matrix of time and node identity. However, to show the profiles for a given time slice using <code>matplot</code> it is convenient to have each column be the state of the system at a given time, so here each row is a node and each column is a time step:</p>
+<p>The helper arranges both height and density so rows are nodes and columns are recorded times. Each column can therefore be read as one patch-age profile:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>density <span class="ot">&lt;-</span> <span class="fu">exp</span>(log_density)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(height, density, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">lty=</span><span class="dv">1</span>,</span>
@@ -386,8 +416,7 @@ Note
 </div>
 </div>
 </div>
-<p>Note that the densities here can be <em>extremely</em> low, and yet individuals within the nodes continue to grow in size; this is the “<a href="http://en.wikipedia.org/wiki/Lotka-Volterra_equation">atto-fox problem</a>”, though here we drop down as low as 10 yocto individuals / m / metre squared (a yocto-x being 1 millionth of an atto-x). <em>Anyway</em>….</p>
-<p>The trajectories are easier to understand if a few are highlighted.</p>
+<p>Some nodes reach extremely small mathematical densities while their representative individuals continue to grow. This is a continuous-density model, so a value below one does not mean that a literal fraction of a plant is present in a particular physical patch. The highlighted ages make the consequences easier to see.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>xlim <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">max</span>(height, <span class="at">na.rm=</span><span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.05</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(height, density, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">lty=</span><span class="dv">1</span>,</span>
@@ -407,14 +436,15 @@ Note
 </div>
 </div>
 </div>
-<p>Early on there is a low density “dip” caused by self thinning (5 years). As the stand develops that dip broadens and deepens and moves forward in height (these very low density nodes are still traveling the <a href="../theory/implementation/characteristic-method.html">characteristic equations</a> of the SCM). Later on (20 years) additional an second wave of recruitment gives a second pulse of high density (around 4 m tall), which can be seen traveling along in the 40 year profile to about 13 m. When the patch is very old the stand approaches a stable age distribution, though a very narrow window of “missing” heights exists just below the top of the canopy.</p>
+<p>At five years, self-thinning creates a dip in density. As the stand develops, that dip becomes deeper, broader, and shifts towards taller plants because the low-density nodes still follow the model’s <a href="../theory/implementation/characteristic-method.html">characteristics</a>.</p>
+<p>A later wave of recruitment creates another density peak near 4 m at 20 years; by 40 years that cohort has reached roughly 13 m. In old patches, the overall size-density profile changes more slowly, although a narrow gap remains just below the canopy top.</p>
 </section>
-<section id="leaf-area" class="level1">
-<h1>Leaf area</h1>
-<p>It’s also possible see where the leaf area in the patch is coming from; a profile of leaf area with respect to height. The collected output records the leaf area (<code>competition_effect</code>) of an individual in each node, which we weight by node density and the light extinction coefficient <code>k_I</code> (see <a href="../theory/implementation/canopy-models.html">Canopy &amp; light-environment models</a>) to get each node’s contribution to patch competition:</p>
+<section id="leaf-area-profiles" class="level2">
+<h2 class="anchored" data-anchor-id="leaf-area-profiles">Leaf-area profiles</h2>
+<p>Which heights contribute most of the patch’s leaf area? The collected output records individual leaf area as <code>competition_effect</code>. Multiplying it by node density gives leaf area density. The canopy model later applies the light extinction coefficient <code>k_I</code> when computing competition; see <a href="../theory/implementation/canopy-models.html">Canopy and light environments</a>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>species_1 <span class="ot">&lt;-</span> species_1 <span class="sc">|&gt;</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">leaf_area =</span> k_I <span class="sc">*</span> density <span class="sc">*</span> competition_effect)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">leaf_area =</span> density <span class="sc">*</span> competition_effect)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>leaf_area <span class="ot">&lt;-</span> <span class="fu">sdd_matrix</span>(species_1, <span class="st">"leaf_area"</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(height, leaf_area, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">lty=</span><span class="dv">1</span>, <span class="at">col=</span><span class="st">"lightgrey"</span>,</span>
@@ -434,10 +464,10 @@ Note
 </div>
 </div>
 </section>
-<section id="growth-rate" class="level1">
-<h1>Growth rate</h1>
-<p>Finally, we can see where height growth rate is concentrated in the population. This differs from the profile in the <a href="../guides/first-individual.html">first individual guide</a> because it is reduced depending on the light environment, but that environment is the one constructed by the individual itself.</p>
-<p>The collected output records node state rather than instantaneous rates, so here we approximate each node’s height growth rate by finite differences along its trajectory (the change in height between successive time steps):</p>
+<section id="height-growth-profiles" class="level2">
+<h2 class="anchored" data-anchor-id="height-growth-profiles">Height-growth profiles</h2>
+<p>Where in the size distribution is height growth concentrated? Unlike the fixed environment in <a href="../guides/first-individual.html">Your first individual</a>, this patch has a shared light environment created by all its plants.</p>
+<p>The collected output records states rather than instantaneous rates. We therefore approximate height growth from the change in each node’s height between successive recorded times:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> result<span class="sc">$</span>steps<span class="sc">$</span>time</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>growth_rate <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">apply</span>(height, <span class="dv">1</span>, <span class="cf">function</span>(hh) <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(hh) <span class="sc">/</span> <span class="fu">diff</span>(time))))</span>
@@ -459,13 +489,13 @@ Note
 </div>
 </div>
 </section>
-<section id="integrating-over-a-metapopulation" class="level1">
-<h1>Integrating over a metapopulation</h1>
-<p>The above plots show relationships with patches of a given age What about the average relationship across the entire metapopulation? To get that, we average (integrate) over the distribution over patch (for formula see the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page). To achieve this we first need the patch-level relationships to a series of fixed heights</p>
+<section id="average-across-a-metapopulation" class="level2">
+<h2 class="anchored" data-anchor-id="average-across-a-metapopulation">Average across a metapopulation</h2>
+<p>The earlier curves each describe a patch of one age. A metapopulation contains patches of many ages, so its average profile weights every patch age by its abundance. Before averaging, we must interpolate each patch profile onto the same set of heights. See the <a href="../theory/size-structured-pde.html">size-structured PDE</a> for the corresponding integral.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>hh <span class="ot">&lt;-</span> <span class="fu">seq_log_range</span>(<span class="fu">range</span>(height, <span class="at">na.rm=</span><span class="cn">TRUE</span>), <span class="dv">500</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>We’ll use a spline interpolation, on log-log-scaled data, clamped so that for x values outside the observed range are set to zero.</p>
+<p>The next block is reusable numerical scaffolding; readers interested mainly in the ecological result can skip to the resulting average. It interpolates on a log-log scale and returns zero outside the observed height range.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">##' Spline interpolation in log-x space</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="do">##' @title Spline interpolation in log-x space</span></span>
@@ -482,58 +512,51 @@ Note
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        }</span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="do">##' Clamp a function to particular values when outside of a given domain (r)</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="do">##'</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="do">##' Things like names on input and return vectors are not dealt with</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="do">##' very well, and would differ if the function was better</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="do">##' constructed.  Values falling outwide the domain are not evaluated</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="do">##' (which is useful if these would cause crashes, warnings, etc).</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="do">##'</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="do">##' @title Clamp function to domain</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="do">##' @param f A function that takes \code{x} as a first argument.</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="do">##' @param r Range of values (vector of length 2)</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="do">##' @param value (Single) value to use when out of domain.</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="do">##' @return A new function</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="do">##' @export</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>clamp_domain <span class="ot">&lt;-</span> <span class="cf">function</span>(f, r, <span class="at">value =</span> <span class="cn">NA_real_</span>) {</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>        f <span class="ot">&lt;-</span> <span class="fu">match.fun</span>(f)</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">length</span>(r) <span class="sc">!=</span> <span class="dv">2</span>L) {</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>                <span class="fu">stop</span>(<span class="st">"Expected length two range"</span>)</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">any</span>(<span class="fu">is.na</span>(r)) <span class="sc">||</span> r[[<span class="dv">2</span>]] <span class="sc">&lt;</span> r[[<span class="dv">1</span>]]) {</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>                <span class="fu">stop</span>(<span class="st">"Values for range must be finite and not decreasing"</span>)</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">length</span>(value) <span class="sc">!=</span> <span class="dv">1</span>L) {</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>                <span class="fu">stop</span>(<span class="st">"value must be length 1"</span>)</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">function</span>(x, ...) {</span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>                ret <span class="ot">&lt;-</span> <span class="fu">rep_len</span>(value, <span class="fu">length</span>(x))</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>                i <span class="ot">&lt;-</span> x <span class="sc">&gt;=</span> r[[<span class="dv">1</span>]] <span class="sc">&amp;</span> x <span class="sc">&lt;=</span> r[[<span class="dv">2</span>]]</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> (<span class="fu">any</span>(i)) {</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>                        ret[i] <span class="ot">&lt;-</span> <span class="fu">f</span>(x[i])</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>                }</span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>                ret</span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(height, density, hout) {</span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>  r <span class="ot">&lt;-</span> <span class="fu">range</span>(height, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clamp_domain</span>(<span class="fu">splinefun_loglog</span>(height, density), r, <span class="dv">0</span>)(hout)</span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="do">##' Clamp a function to a fixed value outside a domain</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="do">##' @param f A function that takes \code{x} as a first argument.</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="do">##' @param r Range of values (vector of length 2)</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="do">##' @param value (Single) value to use when out of domain.</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="do">##' @return A new function</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="do">##' @export</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>clamp_domain <span class="ot">&lt;-</span> <span class="cf">function</span>(f, r, <span class="at">value =</span> <span class="cn">NA_real_</span>) {</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>        f <span class="ot">&lt;-</span> <span class="fu">match.fun</span>(f)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">length</span>(r) <span class="sc">!=</span> <span class="dv">2</span>L) {</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>                <span class="fu">stop</span>(<span class="st">"Expected length two range"</span>)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">any</span>(<span class="fu">is.na</span>(r)) <span class="sc">||</span> r[[<span class="dv">2</span>]] <span class="sc">&lt;</span> r[[<span class="dv">1</span>]]) {</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>                <span class="fu">stop</span>(<span class="st">"Values for range must be finite and not decreasing"</span>)</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">length</span>(value) <span class="sc">!=</span> <span class="dv">1</span>L) {</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>                <span class="fu">stop</span>(<span class="st">"value must be length 1"</span>)</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">function</span>(x, ...) {</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>                ret <span class="ot">&lt;-</span> <span class="fu">rep_len</span>(value, <span class="fu">length</span>(x))</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>                i <span class="ot">&lt;-</span> x <span class="sc">&gt;=</span> r[[<span class="dv">1</span>]] <span class="sc">&amp;</span> x <span class="sc">&lt;=</span> r[[<span class="dv">2</span>]]</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> (<span class="fu">any</span>(i)) {</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>                        ret[i] <span class="ot">&lt;-</span> <span class="fu">f</span>(x[i])</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>                }</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>                ret</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(height, density, hout) {</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  r <span class="ot">&lt;-</span> <span class="fu">range</span>(height, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clamp_domain</span>(<span class="fu">splinefun_loglog</span>(height, density), r, <span class="dv">0</span>)(hout)</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Now interpolate the height-density relationship in each patch to the series of specified heights</p>
+<p>Interpolate every patch-age profile onto the shared height grid:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>xx <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_along</span>(result<span class="sc">$</span>steps<span class="sc">$</span>time),</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>             <span class="cf">function</span>(i) <span class="fu">f</span>(height[, i], density[, i], hh))</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>n_hh <span class="ot">&lt;-</span> plant<span class="sc">:::</span><span class="fu">pad_list_to_array</span>(xx)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>For each of these heights, we can now integrate across patches (i.e.&nbsp;across rows), weighting by patch abundance</p>
+<p>At each height, integrate across patch ages while weighting by patch abundance:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>trapezium <span class="ot">&lt;-</span> plant<span class="sc">:::</span>trapezium</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>n_av <span class="ot">&lt;-</span> <span class="fu">apply</span>(n_hh, <span class="dv">1</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>              <span class="cf">function</span>(x) <span class="fu">trapezium</span>(result<span class="sc">$</span>steps<span class="sc">$</span>time, x <span class="sc">*</span> result<span class="sc">$</span>steps<span class="sc">$</span>patch_density))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Add this average to the plot (red line):</p>
+<p>The red line is the resulting metapopulation-average density profile:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>xlim <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">max</span>(height, <span class="at">na.rm=</span><span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.05</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(height, density, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">lty=</span><span class="dv">1</span>,</span>
@@ -966,6 +989,9 @@ Note
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../guides/tf24-hydraulics-and-acclimation.html" class="pagination-link" aria-label="TF24: hydraulics, and a fast acclimating variant">
+        <span class="nav-page-text">TF24: hydraulics, and a fast acclimating variant</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

@@ -52,8 +52,8 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../theory/models/index.html" rel="next">
-<link href="../theory/soil-water.html" rel="prev">
+<link href="../theory/adaptive-dynamics/index.html" rel="next">
+<link href="../theory/models/k93.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -62,7 +62,7 @@ div.csl-indent {
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1461e13f5cda75d3dcfce56afc980b53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -195,7 +195,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/adaptive-dynamics.html">Adaptive dynamics</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/adaptive-dynamics.html">3. Adaptive dynamics</a></li><li class="breadcrumb-item"><a href="../theory/adaptive-dynamics.html">Adaptive dynamics</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -215,13 +215,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Core</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">1. Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/overview.html" class="sidebar-item-text sidebar-link">
@@ -246,35 +246,17 @@ window.Quarto = {
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Assimilation &amp; hydraulics</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../theory/soil-water.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Soil water &amp; root uptake</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Adaptive dynamics</span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Models</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">2. Models and physiology</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/models/index.html" class="sidebar-item-text sidebar-link">
@@ -289,8 +271,8 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/models/k93.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">K93</span></a>
+  <a href="../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assimilation &amp; hydraulics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -299,17 +281,100 @@ window.Quarto = {
  <span class="menu-text">TF24</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/models/k93.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">K93</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Implementation</span></a>
+ <span class="menu-text">3. Adaptive dynamics</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Adaptive dynamics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive-dynamics models in regnans</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/DD99.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DD99: competition and evolutionary branching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/GK98.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GK98: adaptation across different habitats</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/GM99.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GM99: the evolution of seed size</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/JJ12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">JJ12: the evolution of migratory arrival time</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/solving_attractors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Finding evolutionary attractors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Community assembly with simple models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/assembly_fitmax.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Maximum-fitness community assembly</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/assembly_stochastic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stochastic assembly</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">4. Implementation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
@@ -342,6 +407,23 @@ window.Quarto = {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">5. Prediction and reproducibility</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/models/scientific-versioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scientific versioning of models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -352,7 +434,11 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#sec-invasion-fitness" id="toc-sec-invasion-fitness" class="nav-link active" data-scroll-target="#sec-invasion-fitness">Invasion fitness</a></li>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#sec-invasion-fitness" id="toc-sec-invasion-fitness" class="nav-link" data-scroll-target="#sec-invasion-fitness">Invasion fitness</a>
+  <ul class="collapse">
+  <li><a href="#reading-the-result" id="toc-reading-the-result" class="nav-link" data-scroll-target="#reading-the-result">Reading the result</a></li>
+  </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/adaptive-dynamics.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -360,7 +446,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/adaptive-dynamics.html">Adaptive dynamics</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/adaptive-dynamics.html">3. Adaptive dynamics</a></li><li class="breadcrumb-item"><a href="../theory/adaptive-dynamics.html">Adaptive dynamics</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Adaptive dynamics</h1>
 </div>
@@ -382,18 +468,57 @@ window.Quarto = {
 <div class="eyebrow">
 <p>theory</p>
 </div>
-<p>This page builds on the demographic machinery developed for the <a href="../theory/size-structured-pde.html">size-structured PDE</a> to estimate the fitness of rare mutant phenotypes and so reason about evolutionary endpoints in a trait-, size-, and patch-structured metacommunity. The approach for calculating fitness implemented here follows <span class="citation" data-cites="Falster-2015">Falster, Brännström, Westoby, &amp; Dieckmann (<a href="#ref-Falster-2015" role="doc-biblioref">2015</a>)</span>.</p>
-<section id="sec-invasion-fitness" class="level1">
-<h1>Invasion fitness</h1>
-<p>We now consider how to estimate the fitness of a rare mutant individual with traits <span class="math inline">\(x^\prime\)</span> growing in the light environment of a resident community with traits <span class="math inline">\(x\)</span>. We focus on phenotype-dependent components of fitness – describing the aggregate consequences of a given set of traits for growth, fecundity, and mortality – taking into account the non-linear effects of competition, but ignoring the underlying genetic basis for trait inheritance and expression. We also adhere to standard conventions in such analyses by assuming that the mutant phenotype is sufficiently rare to have a negligible effect on the light environment where it is growing <span class="citation" data-cites="Geritz-1998">(<a href="#ref-Geritz-1998" role="doc-biblioref">Geritz, Kisdi, Meszéna, &amp; Metz, 1998</a>)</span>. The approach for calculating fitness implemented here follows the approach described by <span class="citation" data-cites="Falster-2015">Falster et al. (<a href="#ref-Falster-2015" role="doc-biblioref">2015</a>)</span>.</p>
-<p>In general, invasion fitness is defined as the long-term per capita growth rate of a rare mutant phenotype in the environment determined by a resident phenotype <span class="citation" data-cites="Metz-1992">(<a href="#ref-Metz-1992" role="doc-biblioref">Metz, Nisbet, &amp; Geritz, 1992</a>)</span>. Calculating per capita growth rates, however, is particularly challenging in a structured metacommunity model <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>. As an alternative measure of invasion fitness in metacommunities, we can use the basic reproduction ratio measuring the expected number of new dispersers arising from a single dispersal event. For metacommunities at demographic equilibrium, evolutionary inferences made using basic reproduction ratios are equivalent to those made using per capita growth rates <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>.</p>
-<p>We denote by <span class="math inline">\(R\left(x^\prime, x\right)\)</span> the basic reproduction ratio of individuals with traits <span class="math inline">\(x^\prime\)</span> growing in the competitive light environment of the resident traits <span class="math inline">\(x\)</span>. Recalling that patches of age <span class="math inline">\(a\)</span> have frequency-density <span class="math inline">\(P(a)\)</span> in the landscape (the equilibrium patch-age distribution derived on the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page), it follows that any seed with traits <span class="math inline">\(x^\prime\)</span> has a probability of <span class="math inline">\(P(a)\)</span> of landing in a patch of age <span class="math inline">\(a\)</span>. The basic reproduction ratio for individuals with traits <span class="math inline">\(x^\prime\)</span> is then <span id="eq-invfit"><span class="math display">\[
-R\left(x^\prime,x\right) = \int _0^{\infty} P\left(a\right) \, \tilde{R}\left(x^\prime, a, \infty \right) \, {\rm d}a ,
-\tag{1}\]</span></span> where <span class="math inline">\(\tilde{R}\left(x^\prime, a_0, a \right)\)</span> is the expected number of dispersing offspring produced by a single dispersing seed with traits <span class="math inline">\(x^\prime\)</span> arriving in a patch of age <span class="math inline">\(a_0\)</span> up until age <span class="math inline">\(a\)</span> <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>. In turn, <span class="math inline">\(\tilde{R}\left(x^\prime, a,\infty\right)\)</span> is calculated by integrating an individual’s fecundity over the expected lifetime of a patch, taking into account competitive shading from residents with traits <span class="math inline">\(x\)</span>, the individual’s probability of surviving, and its traits, <span id="eq-tilder"><span class="math display">\[
-\tilde{R}(x^\prime, a_0, \infty) = \int_{a_0}^{\infty} S_{\rm D} \, f(x^\prime, H(x^\prime, a_0, a), E_{a}) \, S_{\rm I} (x^\prime, a_0, a) \, S_{\rm P} (a_0, a) \, {\rm d} a.
-\tag{2}\]</span></span> Here <span class="math inline">\(S_{\rm I}\)</span> is the individual survival probability and <span class="math inline">\(S_{\rm P}\)</span> the patch survival probability, both defined on the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../theory/overview.html">The big picture</a>, especially the birth-rate loop, and on the demographic quantities defined in <a href="../theory/size-structured-pde.html">The size-structured PDE</a>.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p>Adaptive dynamics asks a simple question: if a new strategy appears at very low frequency, can it increase in the environment created by the strategies already present? The established strategies are called <strong>residents</strong> and the new strategy is called a <strong>mutant</strong>. Because the mutant is rare, we assume it experiences the residents’ competitive environment without noticeably changing that environment itself.</p>
+<p>The calculation follows one mutant seed across all the patch ages at which it might arrive. In each possible patch, the seed may establish, grow, survive, and produce dispersing offspring. Averaging that lifetime return across the landscape gives a reproduction ratio: above one the mutant can invade, below one it cannot, and at one it exactly replaces itself. The equations below use the canopy-light environment developed on the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page. The fitness calculation follows <span class="citation" data-cites="Falster-2015">Falster, Brännström, Westoby, &amp; Dieckmann (<a href="#ref-Falster-2015" role="doc-biblioref">2015</a>)</span>.</p>
 </section>
-<section id="references" class="level1">
+<section id="sec-invasion-fitness" class="level2">
+<h2 class="anchored" data-anchor-id="sec-invasion-fitness">Invasion fitness</h2>
+<p>Let <span class="math inline">\(x\)</span> denote the traits of the resident community and <span class="math inline">\(x^\prime\)</span> the traits of a rare mutant. We focus on phenotype-dependent fitness: the combined consequences of those traits for growth, fecundity, and mortality in the non-linear competitive environment created by the residents. We do not model the genetic basis of trait inheritance or expression. Following the standard rare-mutant assumption, the mutant has a negligible effect on the competitive environment—in this formulation, the canopy-light profile—in which it grows <span class="citation" data-cites="Geritz-1998">(<a href="#ref-Geritz-1998" role="doc-biblioref">Geritz, Kisdi, Meszéna, &amp; Metz, 1998</a>)</span>.</p>
+<p>In general, invasion fitness is the long-term per-capita growth rate of a rare mutant in the environment determined by the residents <span class="citation" data-cites="Metz-1992">(<a href="#ref-Metz-1992" role="doc-biblioref">Metz, Nisbet, &amp; Geritz, 1992</a>)</span>. That rate is difficult to calculate directly in a structured metacommunity because plants differ in size and occupy patches of different ages <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>.</p>
+<p>At demographic equilibrium, we can instead use the <strong>basic reproduction ratio</strong>: the expected number of new dispersers ultimately produced by one dispersing seed. This ratio gives the same evolutionary ordering as the long-term per-capita growth rate, so it can be used to decide whether a mutant invades <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>.</p>
+<p>We denote by <span class="math inline">\(R\left(x^\prime, x\right)\)</span> the mutant’s basic reproduction ratio in the competitive environment created by residents <span class="math inline">\(x\)</span>. Patches of age <span class="math inline">\(a\)</span> have frequency-density <span class="math inline">\(P(a)\)</span> in the landscape, as derived on the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page. More precisely, the probability that a randomly dispersed seed lands in a patch with age in a small interval <span class="math inline">\(\mathrm{d}a\)</span> is <span class="math inline">\(P(a)\mathrm{d}a\)</span>.</p>
+<p>The mutant may therefore land in a young, open patch or an old, shaded one. Its overall reproduction ratio averages its return over all those possible arrival ages: <span id="eq-invfit"><span class="math display">\[
+R\left(x^\prime,x\right) = \int _0^{\infty} P\left(a\right) \, \tilde{R}\left(x^\prime, a, \infty \right) \, {\rm d}a ,
+\tag{1}\]</span></span></p>
+<p>Here <span class="math inline">\(\tilde{R}\left(x^\prime, a_0, a \right)\)</span> is the expected number of dispersing offspring produced by one mutant seed that arrives when the patch is age <span class="math inline">\(a_0\)</span>, counted up to patch age <span class="math inline">\(a\)</span> <span class="citation" data-cites="Gyllenberg-2001 Metz-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>. In <a href="#eq-invfit" class="quarto-xref">Equation&nbsp;1</a> the endpoint is infinity, so the entire remaining lifetime of the patch is included.</p>
+<p>That lifetime return is itself another integral: <span id="eq-tilder"><span class="math display">\[
+\tilde{R}(x^\prime, a_0, \infty) = \int_{a_0}^{\infty} S_{\rm D} \, f(x^\prime, H(x^\prime, a_0, a), E_{a}) \, S_{\rm I} (x^\prime, a_0, a) \, S_{\rm P} (a_0, a) \, {\rm d} a.
+\tag{2}\]</span></span></p>
+<p>The integrand is a product of four pieces:</p>
+<ul>
+<li><span class="math inline">\(f\)</span> is the mutant’s fecundity at its current height and light environment;</li>
+<li><span class="math inline">\(S_{\rm I}\)</span> is the probability that the mutant is still alive;</li>
+<li><span class="math inline">\(S_{\rm P}\)</span> is the probability that the patch has not yet been disturbed; and</li>
+<li><span class="math inline">\(S_{\rm D}\)</span> is the fraction of offspring that survive dispersal.</li>
+</ul>
+<p>The individual and patch survival probabilities are defined on the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page. Multiplying the four terms gives expected viable offspring production at patch age <span class="math inline">\(a\)</span>; integrating from arrival age <span class="math inline">\(a_0\)</span> onward gives the seed’s expected lifetime return.</p>
+<section id="reading-the-result" class="level3">
+<h3 class="anchored" data-anchor-id="reading-the-result">Reading the result</h3>
+<p>The threshold is replacement:</p>
+<ul>
+<li><span class="math inline">\(R(x^\prime, x) &gt; 1\)</span>: one mutant seed produces more than one dispersing seed on average, so the mutant can invade;</li>
+<li><span class="math inline">\(R(x^\prime, x) &lt; 1\)</span>: it fails to replace itself and cannot invade; and</li>
+<li><span class="math inline">\(R(x^\prime, x) = 1\)</span>: it exactly replaces itself in that resident environment.</li>
+</ul>
+<p>Repeating this calculation across mutant trait values gives an invasion-fitness landscape. A resident that cannot be invaded by nearby alternatives is evolutionarily stable. That is distinct from convergence stability: a trait can be approached by gradual evolution yet still be invasible once reached, in which case it can be an evolutionary branching point rather than an endpoint. The <a href="../theory/adaptive-dynamics/index.html">adaptive-dynamics examples</a> show both kinds of outcome.</p>
+</section>
+</section>
+<section id="references" class="level2">
 
 
 
@@ -819,13 +944,13 @@ Metz, J. A. J., Nisbet, R. M., &amp; Geritz, S. A. H. (1992). How should we defi
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../theory/soil-water.html" class="pagination-link" aria-label="Soil water &amp; root uptake">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Soil water &amp; root uptake</span>
+      <a href="../theory/models/k93.html" class="pagination-link" aria-label="K93">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">K93</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../theory/models/index.html" class="pagination-link" aria-label="Models">
-        <span class="nav-page-text">Models</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../theory/adaptive-dynamics/index.html" class="pagination-link" aria-label="Adaptive-dynamics models in regnans">
+        <span class="nav-page-text">Adaptive-dynamics models in regnans</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

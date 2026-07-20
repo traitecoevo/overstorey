@@ -23,7 +23,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -32,8 +52,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../theory/implementation/index.html" rel="next">
-<link href="../../theory/models/k93.html" rel="prev">
+<link href="../../theory/soil-water.html" rel="next">
+<link href="../../theory/assimilation-hydraulics.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -42,7 +62,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1461e13f5cda75d3dcfce56afc980b53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -175,7 +195,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">Models</a></li><li class="breadcrumb-item"><a href="../../theory/models/tf24.html">TF24</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../../theory/models/tf24.html">TF24</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -195,13 +215,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Core</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">1. Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
@@ -226,30 +246,12 @@ window.Quarto = {
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Assimilation &amp; hydraulics</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Soil water &amp; root uptake</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Adaptive dynamics</span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Models</span></a>
+ <span class="menu-text">2. Models and physiology</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -269,8 +271,8 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../theory/models/k93.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">K93</span></a>
+  <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assimilation &amp; hydraulics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -279,17 +281,100 @@ window.Quarto = {
  <span class="menu-text">TF24</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/k93.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">K93</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Implementation</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">3. Adaptive dynamics</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive dynamics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive-dynamics models in regnans</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/DD99.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DD99: competition and evolutionary branching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/GK98.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GK98: adaptation across different habitats</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/GM99.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GM99: the evolution of seed size</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/JJ12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">JJ12: the evolution of migratory arrival time</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/solving_attractors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Finding evolutionary attractors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Community assembly with simple models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/assembly_fitmax.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Maximum-fitness community assembly</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/assembly_stochastic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stochastic assembly</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">4. Implementation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
@@ -322,6 +407,23 @@ window.Quarto = {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">5. Prediction and reproducibility</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/scientific-versioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scientific versioning of models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -332,7 +434,15 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#how-tf24-relates-to-ff16" id="toc-how-tf24-relates-to-ff16" class="nav-link active" data-scroll-target="#how-tf24-relates-to-ff16">How TF24 relates to FF16</a></li>
+  <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
+  <li><a href="#how-tf24-relates-to-ff16" id="toc-how-tf24-relates-to-ff16" class="nav-link" data-scroll-target="#how-tf24-relates-to-ff16">How TF24 relates to FF16</a></li>
+  <li><a href="#model-origin-and-scope" id="toc-model-origin-and-scope" class="nav-link" data-scroll-target="#model-origin-and-scope">Model origin and scope</a>
+  <ul class="collapse">
+  <li><a href="#two-different-optimisations" id="toc-two-different-optimisations" class="nav-link" data-scroll-target="#two-different-optimisations">Two different optimisations</a></li>
+  </ul></li>
+  <li><a href="#from-carbon-gain-to-height-growth" id="toc-from-carbon-gain-to-height-growth" class="nav-link" data-scroll-target="#from-carbon-gain-to-height-growth">From carbon gain to height growth</a></li>
+  <li><a href="#traits-that-connect-hydraulics-to-growth" id="toc-traits-that-connect-hydraulics-to-growth" class="nav-link" data-scroll-target="#traits-that-connect-hydraulics-to-growth">Traits that connect hydraulics to growth</a></li>
+  <li><a href="#how-the-paper-relates-to-current-tf24" id="toc-how-the-paper-relates-to-current-tf24" class="nav-link" data-scroll-target="#how-the-paper-relates-to-current-tf24">How the paper relates to current TF24</a></li>
   <li><a href="#soil-water-and-root-uptake" id="toc-soil-water-and-root-uptake" class="nav-link" data-scroll-target="#soil-water-and-root-uptake">Soil water and root uptake</a></li>
   <li><a href="#tf24f-acclimation-lag-instead-of-instantaneous-re-optimisation" id="toc-tf24f-acclimation-lag-instead-of-instantaneous-re-optimisation" class="nav-link" data-scroll-target="#tf24f-acclimation-lag-instead-of-instantaneous-re-optimisation">TF24f: acclimation lag instead of instantaneous re-optimisation</a>
   <ul class="collapse">
@@ -344,7 +454,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">Models</a></li><li class="breadcrumb-item"><a href="../../theory/models/tf24.html">TF24</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../../theory/models/tf24.html">TF24</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">TF24</h1>
 </div>
@@ -366,11 +476,33 @@ window.Quarto = {
 <div class="eyebrow">
 <p>model</p>
 </div>
-<p>TF24 is the hydraulically-explicit strategy. It keeps the trait-based functional-balance growth and allocation machinery of <a href="../../theory/models/ff16.html">FF16</a> but replaces FF16’s fixed light-use efficiency with a mechanistic leaf model: at each instant the plant chooses stomatal conductance to <strong>maximise carbon profit net of the hydraulic cost</strong> of transpiration.</p>
-<p>That leaf-level optimisation — photosynthetic revenue from the Farquhar model, hydraulic cost from a xylem vulnerability curve, and the golden-section search that balances them — is the heart of TF24 and is documented in full on the core theory page:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This page builds on <a href="../../theory/overview.html">The big picture</a> and the <a href="../../theory/models/ff16.html">FF16 model</a>. The <a href="../../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a> page gives the leaf-level equations in more detail.</p>
+</div>
+</div>
+<section id="the-idea-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
+<p>TF24 adds explicit plant hydraulics to the trait-based growth framework used by <a href="../../theory/models/ff16.html">FF16</a>. It was developed to ask how plant water use, tissue costs, and growth interact as water availability and atmospheric conditions change <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers, O’Reilly-Nugent, Sabot, Vesk, &amp; Falster, 2024</a>)</span>.</p>
+<p>The central idea is simple. Opening stomata allows carbon dioxide to enter a leaf, supporting photosynthesis, but it also allows water to escape through transpiration. Replacing that water puts the xylem under tension and increases the risk of losing hydraulic conductivity. TF24 therefore chooses an operating point that <strong>maximises photosynthetic carbon gain after accounting for a carbon-equivalent hydraulic cost</strong>.</p>
+<p>The cost is expressed in carbon units so it can be subtracted from photosynthetic gain. In the original formulation, it represents the carbon needed to restore xylem conductivity lost through cavitation.</p>
+<p>This operating point is not prescribed by an empirical stomatal-response curve. It emerges from the interaction among leaf biochemistry, atmospheric demand, soil water, plant size, and hydraulic traits. The calculation combines:</p>
 <ul>
-<li><strong><a href="../../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a></strong> — the profit-maximisation leaf model, equation by equation, with worked examples.</li>
+<li>the Farquhar model of C3 photosynthesis;</li>
+<li>a vulnerability curve describing how xylem conductivity declines as water potential becomes more negative;</li>
+<li>a water-supply calculation linking soil, xylem, and transpiration; and</li>
+<li>a numerical search for the point where photosynthetic benefit minus hydraulic cost is greatest.</li>
 </ul>
+<p>The <a href="../../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a> page develops this leaf-level calculation equation by equation. The sections below explain why it was added to the model and how it connects to whole-plant growth.</p>
+</section>
 <section id="how-tf24-relates-to-ff16" class="level2">
 <h2 class="anchored" data-anchor-id="how-tf24-relates-to-ff16">How TF24 relates to FF16</h2>
 <table class="caption-top table">
@@ -389,7 +521,7 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td>Carbon income</td>
-<td>fixed leaf-level light-use efficiency</td>
+<td>prescribed saturating light-response curve</td>
 <td>Farquhar photosynthesis coupled to stomatal conductance</td>
 </tr>
 <tr class="even">
@@ -409,15 +541,67 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p>Everything below the leaf model — how assimilate is turned into height, diameter, and tissue pools, and how those feed the <a href="../../theory/size-structured-pde.html">size-structured PDE</a> — is inherited from FF16.</p>
+<p>TF24 changes how the plant calculates carbon income at the leaf. The subsequent steps are inherited from FF16: assimilated carbon is allocated to height, diameter, and tissue pools, and these individual-level rates feed into the <a href="../../theory/size-structured-pde.html">size-structured PDE</a>.</p>
+</section>
+<section id="model-origin-and-scope" class="level2">
+<h2 class="anchored" data-anchor-id="model-origin-and-scope">Model origin and scope</h2>
+<p>Earlier versions of the <code>plant</code> framework could explain how traits affect growth through tissue construction, allocation, respiration, and turnover, but water availability entered that framework only indirectly. Towers et al. connected those whole-plant growth rules to an explicit stomatal and hydraulic model. This made it possible to follow a continuous chain from the environment to plant performance:</p>
+<ol type="1">
+<li>soil water and atmospheric conditions constrain water supply and demand;</li>
+<li>the leaf chooses a stomatal and hydraulic operating point;</li>
+<li>that operating point determines net carbon assimilation;</li>
+<li>respiration, tissue turnover, and hydraulic costs reduce the carbon available for growth; and</li>
+<li>the plant’s allocation and allometry determine how that growth changes its height and tissue pools <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</li>
+</ol>
+<p>The paper and its supporting information provide the scientific basis for this new carbon-income calculation. Biochemical demand for carbon dioxide is set by Rubisco activity and electron transport, while diffusive supply depends on stomatal conductance. TF24 solves for the intercellular carbon dioxide concentration at which supply and demand agree. Leaf respiration is also linked to structural and photosynthetic nitrogen, so photosynthetic machinery provides a benefit but also carries a maintenance cost <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</p>
+<section id="two-different-optimisations" class="level3">
+<h3 class="anchored" data-anchor-id="two-different-optimisations">Two different optimisations</h3>
+<p>The article uses the word <em>optimisation</em> at two different levels. Keeping them separate prevents a common misunderstanding.</p>
+<ul>
+<li><strong>The leaf operating-point optimisation is part of TF24.</strong> The model varies water potential and the associated stomatal conductance to maximise instantaneous photosynthetic gain minus hydraulic cost. TF24 repeats this calculation as the plant and environment change.</li>
+<li><strong>The trait-strategy optimisation was part of the paper’s analysis.</strong> The researchers varied leaf mass per area, Huber value, wood density, and sapwood conductivity to find the strategy with the fastest height growth in each environment. This outer search is not part of an ordinary TF24 run.</li>
+</ul>
+<p>In other words, an individual in a standard TF24 run does not continually evolve or re-optimise its leaf mass per area, wood density, or other strategy traits. Those values define the strategy being simulated. The paper compared many possible strategies to ask which one would grow in height fastest under each set of conditions <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</p>
+</section>
+</section>
+<section id="from-carbon-gain-to-height-growth" class="level2">
+<h2 class="anchored" data-anchor-id="from-carbon-gain-to-height-growth">From carbon gain to height growth</h2>
+<p>TF24 does not treat photosynthesis as the final measure of plant performance. Carbon income is only the start of the growth calculation. A trait can increase photosynthesis while also making leaves, sapwood, bark, or roots more expensive to build and maintain.</p>
+<p>As in FF16, TF24 expresses height growth as a chain of four relationships:</p>
+<p><span id="eq-tf24-height-growth"><span class="math display">\[
+\frac{dH}{dt}
+=
+\frac{dH}{dA_l}
+\frac{dA_l}{dM_a}
+\frac{dM_a}{dB}
+\frac{dB}{dt}.
+\tag{1}\]</span></span></p>
+<p>Read from right to left, new biomass production (<span class="math inline">\(dB/dt\)</span>) is allocated to living tissue (<span class="math inline">\(dM_a/dB\)</span>); that investment supports additional leaf area (<span class="math inline">\(dA_l/dM_a\)</span>); and the plant’s allometry translates added leaf area into height growth (<span class="math inline">\(dH/dA_l\)</span>). This is the same kind of functional-balance logic used by FF16. The hydraulic leaf model changes the carbon income entering the right-hand side, while traits can also change the construction and maintenance terms further along the chain <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</p>
+<p>This complete chain matters because traits can affect more than carbon income. They can also change tissue construction, maintenance, turnover, and allometry. TF24 therefore evaluates their combined consequences for whole-plant growth; their effects cannot be inferred from photosynthesis or biomass production alone <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</p>
+</section>
+<section id="traits-that-connect-hydraulics-to-growth" class="level2">
+<h2 class="anchored" data-anchor-id="traits-that-connect-hydraulics-to-growth">Traits that connect hydraulics to growth</h2>
+<p>Towers et al.&nbsp;focused on four measurable traits that connect water transport to the wider carbon budget. In TF24, each trait can help one part of the plant’s carbon-water economy while imposing a cost elsewhere.</p>
+<ul>
+<li><strong>Leaf mass per area</strong>, <span class="math inline">\(\phi\)</span>, is the dry leaf mass needed to deploy a unit of leaf area. Higher values make each unit of leaf area more expensive to build, but the leaves turn over more slowly. Leaf respiration also changes with the nitrogen investment associated with this trait.</li>
+<li><strong>Huber value</strong>, <span class="math inline">\(\theta\)</span>, is the cross-sectional sapwood area supplying a unit of leaf area. More sapwood improves water supply, but the extra sapwood and bark must be built and maintained. A larger sapwood volume can also incur a larger absolute hydraulic repair cost.</li>
+<li><strong>Wood density</strong>, <span class="math inline">\(\rho\)</span>, is sapwood mass per unit volume. It makes a given volume of sapwood more expensive to construct. In the current default parameterisation, it does <strong>not</strong> change cavitation resistance: the density-to-<code>d_I</code>, density-to-<code>g1_TF24</code>, and density-to-<code>k_s</code> exponents are all zero. Those links can be enabled by changing their hyperparameters, but they are inactive by default.</li>
+<li><strong>Maximum sapwood-specific conductivity</strong>, <span class="math inline">\(K_{s,\max}\)</span>, describes how quickly a unit of sapwood can transport water at maximum conductivity. High conductivity improves water transport. In the current parameterisation it also determines <span class="math inline">\(p_{50}\)</span> and, through it, the vulnerability-curve parameters <span class="math inline">\(c\)</span>, <span class="math inline">\(b\)</span>, and <span class="math inline">\(\psi_{crit}\)</span>; this is the model’s hydraulic safety–efficiency trade-off.</li>
+</ul>
+<p>These are not four independent “good” or “bad” settings. For example, increasing Huber value improves water supply per unit leaf area but also diverts more biomass into supporting tissue. Whether that change improves height growth depends on plant size and on the current soil, light, carbon dioxide, and atmospheric conditions <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</p>
+</section>
+<section id="how-the-paper-relates-to-current-tf24" class="level2">
+<h2 class="anchored" data-anchor-id="how-the-paper-relates-to-current-tf24">How the paper relates to current TF24</h2>
+<p>Towers et al.&nbsp;introduced the physiological module and used it in an outer trait-optimisation analysis. That analysis is best read as a worked application of TF24: it shows how the model can be used to investigate trait-environment trade-offs, but its predicted trait responses are not rules built into the strategy. A normal TF24 simulation uses fixed strategy traits unless the user places it inside a separate evolutionary or optimisation analysis <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</p>
+<p>The distinction between the published experiment and the current <code>plant</code> implementation is also important. Towers et al.&nbsp;supplied a fixed soil water potential and did not simulate competition, reproduction, mortality, or a changing soil water balance. The current TF24 strategy can instead receive water from the dynamic, multi-layer soil-water and root-uptake model described below. The paper is therefore the source for TF24’s physiological logic and original tests, while the linked theory pages describe the broader model in which that physiology now operates.</p>
 </section>
 <section id="soil-water-and-root-uptake" class="level2">
 <h2 class="anchored" data-anchor-id="soil-water-and-root-uptake">Soil water and root uptake</h2>
-<p>TF24’s hydraulics terminate at the root collar. The supply side — the soil water balance and multi-layer root water uptake that feed water to it — is documented on its own core theory page:</p>
+<p>The leaf model needs to know how much water the roots can supply. In TF24, the plant’s hydraulic calculation extends down to the root collar. A separate soil water model tracks the water balance and calculates uptake from multiple soil layers, providing the water supply at that boundary. These calculations are described on their own core theory page:</p>
 <ul>
 <li><strong><a href="../../theory/soil-water.html">Soil water &amp; root uptake</a></strong> — the multi-layer bucket model, infiltration and drainage, the retention curve, and the root-collar solve that couples soil moisture into the leaf model.</li>
 </ul>
-<p>The original prototyping and benchmarking of this machinery lives in the notebook:</p>
+<p>The notebooks below record the original prototyping and benchmarking work:</p>
 <ul>
 <li><a href="../../posts/index.html">The AWRA soil-water bucket model</a> <!-- TODO: point at the migrated awra-soil-water post slug once created --></li>
 <li><a href="../../posts/index.html">Multi-layer root water uptake</a> <!-- TODO: point at the migrated root-water-uptake post slug --></li>
@@ -429,29 +613,30 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Strategy-level documentation is partial
+<span class="screen-reader-only">Note</span>Scope of this page
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The original <code>strategy_TF24</code> vignette was an empty stub. This page assembles TF24 from its documented parts (the leaf model and the inherited FF16 machinery). A full strategy-level write-up — the exact coupling of the leaf model into whole-plant growth, and the complete TF24 parameter set — is still <strong>TODO</strong> and should be supplied by the model authors rather than guessed.</p>
+<p>This page explains the scientific logic of TF24 and how the published model connects leaf hydraulics to the FF16 growth framework. It is not a parameter reference. The exact current parameter set and its links to the whole-plant implementation still need a separate, version-specific account.</p>
 </div>
 </div>
 </section>
 <section id="tf24f-acclimation-lag-instead-of-instantaneous-re-optimisation" class="level2">
 <h2 class="anchored" data-anchor-id="tf24f-acclimation-lag-instead-of-instantaneous-re-optimisation">TF24f: acclimation lag instead of instantaneous re-optimisation</h2>
-<p>TF24f is a variant of TF24, not a different physiology. It subclasses <code>TF24_Strategy</code> and reuses TF24’s leaf model, its xylem vulnerability curve, and its soil-water coupling untouched — every carbon-income and water-transport calculation is exactly the one described on <a href="../../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a>. The one thing TF24f changes is <em>how the plant finds its operating point on the profit curve</em>.</p>
-<p>TF24 treats stomatal/hydraulic behaviour as quasi-steady-state: at every ODE step it re-solves the profit-maximisation problem from scratch, using a golden-section search over root-collar water potential to find the <span class="math inline">\(\psi\)</span> that maximises the profit <span class="math inline">\(P(\psi_l)\)</span> defined on the <a href="../../theory/assimilation-hydraulics.html#eq-profit">assimilation &amp; hydraulics</a> page. This assumes the plant’s hydraulic operating point adjusts instantaneously to its physical and environmental optimum at every instant — a reasonable simplification, but one that leaves no room for a plant that is still adjusting.</p>
-<p>TF24f relaxes that assumption. It adds a sixth ODE state, <code>opt_root_psi_state</code>, that tracks the plant’s <em>current</em> root-collar water potential and lets it climb toward the profit-maximising optimum by gradient ascent, rather than jumping straight to it:</p>
+<p>TF24 assumes that stomata and hydraulics adjust immediately when conditions change. At every ODE step, the model solves the profit-maximisation problem again and places the plant directly at the new optimum. This quasi-steady-state assumption is useful, but it cannot represent a plant that is still adjusting to a change in its environment.</p>
+<p>TF24f introduces that adjustment time. It uses the same physiology as TF24: the same leaf model, xylem vulnerability curve, and soil-water coupling. The implementation subclasses <code>TF24_Strategy</code>, so the carbon-income and water-transport calculations described on <a href="../../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a> are inherited unchanged. The only difference is <em>how the plant moves towards the most profitable hydraulic operating point</em>.</p>
+<p>In TF24, a golden-section search over root-collar water potential is used at every step to find the <span class="math inline">\(\psi\)</span> that maximises the profit <span class="math inline">\(P(\psi_l)\)</span> defined on the <a href="../../theory/assimilation-hydraulics.html#eq-profit">assimilation &amp; hydraulics</a> page. TF24f instead adds a sixth ODE state, <code>opt_root_psi_state</code>, which records the plant’s current root-collar water potential. Gradient ascent then moves this state towards the profit-maximising value rather than allowing it to jump there immediately:</p>
 <p><span class="math display">\[
 \frac{d\psi}{dt} = k_{\text{acclim}} \cdot \frac{dP}{d\psi}
 \]</span></p>
-<p>Instead of a golden-section search, TF24f’s leaf-solve step evaluates profit at the <em>tracked</em> <span class="math inline">\(\psi\)</span> and hands the local profit gradient <span class="math inline">\(dP/d\psi\)</span> back to the ODE system, which integrates the state forward. The tracked state is seeded at the true optimum at establishment, so there is no birth transient — the lag only shows up once the environment moves the optimum away from where the plant is sitting.</p>
-<p>The gradient itself can be computed two ways, controlled by <code>use_ad_gradient</code>:</p>
+<p>Here, <span class="math inline">\(k_{\text{acclim}}\)</span> controls how quickly the operating point changes, and <span class="math inline">\(dP/d\psi\)</span> indicates which direction increases profit. At each leaf-solve step, TF24f evaluates profit at the <em>current tracked</em> value of <span class="math inline">\(\psi\)</span>. It then passes the local gradient <span class="math inline">\(dP/d\psi\)</span> to the ODE system, which advances the state through time.</p>
+<p>At establishment, the tracked state begins at the true optimum. There is therefore no artificial adjustment period at birth. A lag appears only after the environment changes and shifts the optimum away from the plant’s current operating point.</p>
+<p>The <code>use_ad_gradient</code> setting selects one of two ways to calculate the gradient:</p>
 <ul>
-<li><strong><code>use_ad_gradient = true</code></strong> (the default) — an exact gradient, <code>Leaf::dprofit_droot_collar_psi</code>, built from forward-mode automatic differentiation of the photosynthesis/cost algebra, the implicit-function theorem applied at the <span class="math inline">\(\psi_l \to C_i\)</span> root-find, and analytic spline derivatives for the transport terms.</li>
-<li><strong><code>use_ad_gradient = false</code></strong> — a finite-difference approximation, stepping <span class="math inline">\(\psi\)</span> by <code>psi_fd_step</code> (MPa) and differencing profit either side.</li>
+<li><strong><code>use_ad_gradient = true</code></strong> (the default) uses the exact gradient <code>Leaf::dprofit_droot_collar_psi</code>. It combines forward-mode automatic differentiation of the photosynthesis and cost calculations, the implicit-function theorem at the <span class="math inline">\(\psi_l \to C_i\)</span> root-find, and analytic spline derivatives for the transport terms.</li>
+<li><strong><code>use_ad_gradient = false</code></strong> uses a finite-difference approximation. It steps <span class="math inline">\(\psi\)</span> by <code>psi_fd_step</code> (MPa) and compares the profit on either side.</li>
 </ul>
-<p><code>k_acclim</code> is the acclimation-rate knob, and it is what makes TF24f a family of behaviours rather than a single alternative to TF24:</p>
+<p>The parameter <code>k_acclim</code> controls the acclimation rate. Changing it produces a range of behaviours rather than one fixed alternative to TF24:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -477,9 +662,9 @@ window.Quarto = {
 <td>quasi-steady-state recovered as a limiting case</td>
 </tr>
 <tr class="odd">
-<td>Cost</td>
-<td>—</td>
-<td>cheaper: no per-step search, just one gradient evaluation</td>
+<td>Calculation at each evaluation</td>
+<td>one gradient evaluation</td>
+<td>one gradient evaluation; a stiff state may require more ODE steps</td>
 </tr>
 <tr class="even">
 <td>Risk</td>
@@ -536,13 +721,19 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p>Reach for TF24f when the question is about <em>dynamics of acclimation</em> — how quickly a plant’s stomatal/hydraulic behaviour can respond to a shifting environment — rather than assuming it is always instantaneously optimal, or when running many individuals/steps makes TF24’s per-step search the bottleneck and a large <code>k_acclim</code> is an acceptable stand-in for the instantaneous optimum. Stick with TF24 when the quasi-steady-state assumption is the thing you want (no extra state, no acclimation-rate parameter to choose), or when you need results that match TF24 exactly rather than approach it as <span class="math inline">\(k_{\text{acclim}} \to \infty\)</span>.</p>
+<p>Use TF24f when the timing of acclimation matters—for example, when asking how quickly stomatal or hydraulic behaviour can respond to a changing environment. It can also be useful when TF24’s repeated optimisation becomes a computational bottleneck across many individuals or time steps, provided that a large <code>k_acclim</code> is an acceptable approximation to instantaneous adjustment.</p>
+<p>Use TF24 when the quasi-steady-state assumption is appropriate and you do not want to introduce an extra state or choose an acclimation-rate parameter. TF24 is also the right choice when results must match TF24 exactly: TF24f approaches its behaviour as <span class="math inline">\(k_{\text{acclim}} \to \infty\)</span>, but does not reproduce it bit for bit.</p>
+
 
 
 </section>
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-Towers-2024" class="csl-entry" role="listitem">
+Towers, I. R., O’Reilly-Nugent, A., Sabot, M. E. B., Vesk, P. A., &amp; Falster, D. S. (2024). Optimising height-growth predicts trait responses to water availability and other environmental drivers. <em>Plant, Cell &amp; Environment</em>, <em>47</em>(12), 4849–4869. doi:<a href="https://doi.org/10.1111/pce.15042">10.1111/pce.15042</a>
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -945,13 +1136,13 @@ window.Quarto = {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../theory/models/k93.html" class="pagination-link" aria-label="K93">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">K93</span>
+      <a href="../../theory/assimilation-hydraulics.html" class="pagination-link" aria-label="Assimilation &amp; hydraulics">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Assimilation &amp; hydraulics</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../theory/implementation/index.html" class="pagination-link" aria-label="Implementation">
-        <span class="nav-page-text">Implementation</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../theory/soil-water.html" class="pagination-link" aria-label="Soil water &amp; root uptake">
+        <span class="nav-page-text">Soil water &amp; root uptake</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

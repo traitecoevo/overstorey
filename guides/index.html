@@ -41,7 +41,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1461e13f5cda75d3dcfce56afc980b53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -203,6 +203,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../guides/initialising-a-patch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Initialising a patch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../guides/strategies.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Strategies &amp; traits</span></a>
   </div>
@@ -250,6 +256,29 @@ ul.task-list li input[type="checkbox"] {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">TF24 in depth</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-hydraulics-and-acclimation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: hydraulics, and a fast acclimating variant</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-nsc-storage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: carbohydrate storage, buffered growth and mortality</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -281,13 +310,14 @@ ul.task-list li input[type="checkbox"] {
 <div class="eyebrow">
 <p>task-oriented · start here</p>
 </div>
-<p>Practical, sequential walkthroughs. For the <em>why</em>, read the <a href="../theory/index.html">theory</a>; for function signatures, the <a href="https://traitecoevo.github.io/plant/reference/">reference site</a>.</p>
+<p>These guides are for readers who want to learn <code>plant</code> by running small, complete examples. If you are new to the package, work through <strong>Getting started</strong> in order, then move on to patches, strategies, and environmental drivers. For the ideas behind the model, read the <a href="../theory/index.html">theory</a>. For function arguments and return values, use the <a href="https://traitecoevo.github.io/plant/reference/">reference site</a>.</p>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
 <ul>
-<li><a href="../guides/install.html">Installation</a></li>
+<li><a href="../guides/install.html">Installation</a> — install <code>plant</code> and check that it loads.</li>
 <li><a href="../guides/first-individual.html">Your first individual</a> — grow a single plant and read its state, rates, and trajectory.</li>
 </ul>
+<p>After these two pages, continue to <a href="../guides/patch-dynamics.html">Patch dynamics</a>. A patch is the smallest simulation in which plants compete with one another.</p>
 </section>
 <section id="running-the-model" class="level2">
 <h2 class="anchored" data-anchor-id="running-the-model">Running the model</h2>
@@ -295,7 +325,7 @@ ul.task-list li input[type="checkbox"] {
 <li><a href="../guides/patch-dynamics.html">Patch dynamics</a> — grow a patch of competing plants and explore the light environment.</li>
 <li><a href="../guides/strategies.html">Strategies &amp; traits</a> — change parameters, build trait matrices, and set control accuracy.</li>
 <li><a href="../guides/extrinsic-drivers.html">Extrinsic drivers</a> — drive a run with time-varying rainfall or birth rates.</li>
-<li><a href="../guides/calibration.html">Calibration</a></li>
+<li><a href="../guides/calibration.html">Calibration</a> — understand what calibration requires and where it sits in the wider <code>plant</code> workflow.</li>
 </ul>
 </section>
 <section id="worked-examples" class="level2">
@@ -304,6 +334,13 @@ ul.task-list li input[type="checkbox"] {
 <li><a href="../guides/example-analysis.html">Example analysis</a> — the full pipeline, setup to results.</li>
 <li><a href="../guides/self-thinning.html">Self-thinning</a> — recover the classic size–density line.</li>
 <li><a href="../guides/emergent-properties.html">Emergent properties</a> — integrate patch outputs up to the metapopulation.</li>
+</ul>
+</section>
+<section id="tf24-in-depth" class="level2">
+<h2 class="anchored" data-anchor-id="tf24-in-depth">TF24 in depth</h2>
+<ul>
+<li><a href="../guides/tf24-hydraulics-and-acclimation.html">Hydraulics and acclimation</a> — compare instantaneous optimisation with a gradually acclimating hydraulic state.</li>
+<li><a href="../guides/tf24-nsc-storage.html">Non-structural carbohydrate storage</a> — follow how carbon reserves buffer growth and mortality through changing conditions.</li>
 </ul>
 
 

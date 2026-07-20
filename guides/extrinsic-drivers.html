@@ -77,7 +77,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1461e13f5cda75d3dcfce56afc980b53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -268,6 +268,12 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../guides/initialising-a-patch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Initialising a patch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../guides/strategies.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Strategies &amp; traits</span></a>
   </div>
@@ -315,6 +321,29 @@ window.Quarto = {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">TF24 in depth</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-hydraulics-and-acclimation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: hydraulics, and a fast acclimating variant</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-nsc-storage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: carbohydrate storage, buffered growth and mortality</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -325,8 +354,7 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#rainfall" id="toc-rainfall" class="nav-link" data-scroll-target="#rainfall">Rainfall</a></li>
+  <li><a href="#rainfall" id="toc-rainfall" class="nav-link active" data-scroll-target="#rainfall">Rainfall</a></li>
   <li><a href="#the-full-climate-driver-set" id="toc-the-full-climate-driver-set" class="nav-link" data-scroll-target="#the-full-climate-driver-set">The full climate driver set</a></li>
   <li><a href="#birth-rates" id="toc-birth-rates" class="nav-link" data-scroll-target="#birth-rates">Birth rates</a></li>
   </ul>
@@ -360,31 +388,27 @@ window.Quarto = {
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>All models in plant take extrinsic drivers as inputs. At their simplest these are constants. Or they could be variables that change over time. The Extrinsic Drivers class is setup to enable verstaile input.</p>
-<p>Extrinsic Drivers are configured as functions over time that are used as inputs in the <code>plant</code> solver (SCM). Due to the flexibility of the implementation, the functions can be set up as either constants or time-varying inputs. This document goes through examples of setting up Extrinsic Drivers throughout <code>plant</code>.</p>
-<p>When handling functions that vary over time, Extrinsic Drivers are created via interpolation. Control points are passed as input, and the system creates a smooth function that interpolates the control points:</p>
+<p>Environmental conditions and recruitment can change while a patch develops. <code>plant</code> represents these outside inputs as <strong>extrinsic drivers</strong>: named functions that return a value for any simulation time.</p>
+<p>Use a constant driver when conditions remain fixed. Use a variable driver when they change, supplying time (<code>x</code>) and value (<code>y</code>) control points from which <code>plant</code> constructs a smooth interpolation:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="https://en.wikipedia.org/wiki/Polynomial_interpolation"><img src="../assets/Interpolation_example_polynomial.svg" class="img-fluid figure-img" width="400"></a></p>
 <figcaption>Example of polynomial interpolation</figcaption>
 </figure>
 </div>
-<p>Under the hood, every driver is stored under a name (<code>"rainfall"</code>, <code>"ca"</code>, <code>"birth_rate"</code>, …) as either a constant value or a spline built from <code>x</code>/<code>y</code> control points — the same two-case <code>Function</code> object regardless of which driver it backs. By default a spline will not extrapolate past the range of its control points (evaluating outside that range is an error); this can be relaxed with an extrapolation toggle. The rest of this guide walks through setting drivers of both kinds, starting with <code>rainfall</code> and then covering the rest of the set.</p>
-</section>
+<p>Every driver—such as <code>"rainfall"</code>, <code>"ca"</code>, or <code>"birth_rate"</code>—uses this same constant-or-spline interface. By default, a spline cannot be evaluated outside the time range supplied by its control points. Make sure those points cover the whole simulation unless you deliberately enable extrapolation.</p>
 <section id="rainfall" class="level2">
 <h2 class="anchored" data-anchor-id="rainfall">Rainfall</h2>
-<p>Rainfall is handled inside <code>TF24_Environment</code>, and is set upon construction. Rainfall drives the soil-water balance that the <a href="../theory/models/tf24.html">TF24</a> strategy couples growth to, via the leaf-level water economy described in <a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a>. If nothing is passed to the <code>Environment()</code> constructor, rainfall will default to a value of <code>1</code>:</p>
+<p>In TF24, rainfall supplies water to the soil balance and therefore affects the leaf-level water economy and growth. A new TF24 environment provides a constant rainfall driver with value <code>1</code>:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Otherwise, it can either be a constant:</p>
+<p>Replace it with a different constant when rainfall is fixed:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_constant</span>(<span class="st">"rainfall"</span>, <span class="fl">3.14</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>… or varying over time, by providing a list with <code>x</code> and <code>y</code> control points (ie the point pairs are <code>(x[i], y[i])</code>):</p>
+<p>For changing rainfall, supply paired time and rainfall values. Between these control points, the driver is interpolated smoothly:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x_pts <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">200</span>, <span class="dv">1</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>rain <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
@@ -394,14 +418,14 @@ window.Quarto = {
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_variable</span>(<span class="st">"rainfall"</span>, rain<span class="sc">$</span>x, rain<span class="sc">$</span>y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The resulting function of rainfall over time can then be evaluated at any time. Note how the point of evaluation was not one of the control points passed in - we are able to get rainfall at time <code>5.634</code> because of the smooth interpolated function.</p>
+<p>The resulting driver can be evaluated at any time inside the supplied range. The time <code>5.634</code> was not one of the control points, so this value comes from the interpolation:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">extrinsic_drivers_evaluate</span>(<span class="st">"rainfall"</span>, <span class="fl">5.634</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.3977089</code></pre>
 </div>
 </div>
-<p>We can also evaluate the function at a list of times, and get a list of rainfall values at those times as a result:</p>
+<p>We can also evaluate the function at a vector of times and get a numeric vector of rainfall values:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">extrinsic_drivers_evaluate_range</span>(<span class="st">"rainfall"</span>, <span class="fu">c</span>(<span class="dv">5</span>, <span class="fl">1.2</span>, <span class="fl">78.345</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -411,7 +435,7 @@ window.Quarto = {
 </section>
 <section id="the-full-climate-driver-set" class="level2">
 <h2 class="anchored" data-anchor-id="the-full-climate-driver-set">The full climate driver set</h2>
-<p><code>rainfall</code> is one of a whole family of named drivers that <a href="../theory/models/tf24.html">TF24</a> (and its acclimation variant, TF24f) register on the environment via <code>extrinsic_drivers_set_constant()</code> at construction time, with the defaults below:</p>
+<p>Rainfall is only one of the climate drivers used by <a href="../theory/models/tf24.html">TF24</a> and TF24f. You do not need to change all of them; use this table to find the input relevant to your scenario.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 21%">
@@ -463,13 +487,13 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p>Alongside these, <code>birth_rate</code> is a further named driver — set per species rather than on the environment — covered in <a href="#birth-rates">Birth rates</a> below.</p>
+<p><code>birth_rate</code> uses the same driver machinery but is set separately for each species rather than on the environment.</p>
 <p>Each of these is configured exactly the same way as <code>rainfall</code> above: a constant with <code>extrinsic_drivers_set_constant()</code>, or a time-varying spline with <code>extrinsic_drivers_set_variable()</code>. For example, to hold CO2 fixed at a different concentration than the TF24 default:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_constant</span>(<span class="st">"ca"</span>, <span class="dv">60</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>… or to drive it with a spline over time, passing <code>x</code>/<code>y</code> control points the same way as the sinusoidal rainfall example:</p>
+<p>To vary it through time, pass <code>x</code> and <code>y</code> control points just as for rainfall:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>x_pts <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">200</span>, <span class="dv">1</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ca_ramp <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
@@ -487,11 +511,12 @@ window.Quarto = {
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_variable</span>(<span class="st">"rainfall"</span>, x_pts, drought_y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Only the TF24 and TF24f strategies read the atmospheric/leaf drivers (<code>atm_vpd</code>, <code>ca</code>, <code>leaf_temp</code>, <code>atm_o2_kpa</code>, <code>atm_kpa</code>) and couple them into the leaf-level water economy described in <a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a>. FF16 and K93 are light-only strategies: they read <code>PPFD</code> (light) and <code>birth_rate</code>, but setting the other climate drivers on their environment has no effect on growth.</p>
+<p>Only the TF24 and TF24f strategies read these atmospheric and leaf drivers (<code>atm_vpd</code>, <code>ca</code>, <code>leaf_temp</code>, <code>atm_o2_kpa</code>, <code>atm_kpa</code>) and couple them into the leaf-level water economy described in <a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a>. FF16 and K93 instead use their canopy light profile; they do not read these TF24 climate drivers. All strategies can receive the separate, per-species <code>birth_rate</code> driver described below.</p>
 </section>
 <section id="birth-rates" class="level2">
 <h2 class="anchored" data-anchor-id="birth-rates">Birth rates</h2>
-<p>Per species birth rates set the seed rain arriving into each patch — the boundary condition of the <a href="../theory/size-structured-pde.html">size-structured PDE</a> that the solver integrates. They are set via the <code>add_strategies()</code> function. Each object in the list is either a constant number or an embedded list with <code>x</code> and <code>y</code> control points. There must be the same number of items in the list as there are species:</p>
+<p>A species’ birth rate describes the seed rain entering each patch. In the <a href="../theory/size-structured-pde.html">size-structured PDE</a>, it is the boundary condition that introduces new plants.</p>
+<p>Pass birth rates to <code>add_strategies()</code>. Each species needs one entry: either a constant number or a list of <code>x</code> and <code>y</code> control points.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"TF24"</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>p0<span class="sc">$</span>max_patch_lifetime <span class="ot">&lt;-</span> <span class="dv">25</span>      <span class="co"># short patch keeps the hydraulic solve fast</span></span>
@@ -509,20 +534,17 @@ window.Quarto = {
 <span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">keep_existing =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">birth_rate =</span> birth_rates)</span>
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co"># TF24 needs a configured soil-water environment: layered soil with an initial</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co"># moisture state and a rainfall driver whose mean stays above zero. A bare</span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="co"># `Environment("TF24")` would halt with `psi_soil = nan`. See the</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co"># [Example analysis](example-analysis.qmd) guide for the full recipe.</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">set_soil_number_of_depths</span>(<span class="dv">15</span>)</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">set_soil_water_state</span>(<span class="fu">rep</span>(<span class="fl">0.2</span>, <span class="dv">15</span>))</span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>rain_t <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, p0<span class="sc">$</span>max_patch_lifetime, <span class="at">length.out =</span> <span class="dv">1000</span>)</span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_variable</span>(<span class="st">"rainfall"</span>, rain_t, <span class="fl">0.25</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> rain_t) <span class="sc">+</span> <span class="fl">1.0</span>)</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p1, env, ctrl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Customise the default TF24 soil column and rainfall trajectory for this run.</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">set_soil_number_of_depths</span>(<span class="dv">15</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">set_soil_water_state</span>(<span class="fu">rep</span>(<span class="fl">0.2</span>, <span class="dv">15</span>))</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>rain_t <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, p0<span class="sc">$</span>max_patch_lifetime, <span class="at">length.out =</span> <span class="dv">1000</span>)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_variable</span>(<span class="st">"rainfall"</span>, rain_t, <span class="fl">0.25</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> rain_t) <span class="sc">+</span> <span class="fl">1.0</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p1, env, ctrl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Evaluating the birth rate can be done with the scm</p>
+<p>Inspecting the driver at a particular time is a useful check that the species received the intended recruitment schedule:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>patch<span class="sc">$</span>species[[<span class="dv">1</span>]]<span class="sc">$</span>extrinsic_drivers<span class="sc">$</span><span class="fu">evaluate</span>(<span class="st">"birth_rate"</span>, <span class="dv">7</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">

@@ -23,6 +23,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -42,7 +77,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1461e13f5cda75d3dcfce56afc980b53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -178,7 +213,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/overview.html">The big picture</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">1. Foundations</a></li><li class="breadcrumb-item"><a href="../theory/overview.html">The big picture</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -199,7 +234,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Core</span></a>
+ <span class="menu-text">1. Foundations</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -229,35 +264,17 @@ window.Quarto = {
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Assimilation &amp; hydraulics</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../theory/soil-water.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Soil water &amp; root uptake</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Adaptive dynamics</span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Models</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">2. Models and physiology</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/models/index.html" class="sidebar-item-text sidebar-link">
@@ -272,8 +289,8 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/models/k93.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">K93</span></a>
+  <a href="../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assimilation &amp; hydraulics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -282,17 +299,100 @@ window.Quarto = {
  <span class="menu-text">TF24</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/models/k93.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">K93</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Implementation</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">3. Adaptive dynamics</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive dynamics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive-dynamics models in regnans</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/DD99.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DD99: competition and evolutionary branching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/GK98.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GK98: adaptation across different habitats</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/GM99.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GM99: the evolution of seed size</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/JJ12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">JJ12: the evolution of migratory arrival time</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/solving_attractors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Finding evolutionary attractors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Community assembly with simple models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/assembly_fitmax.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Maximum-fitness community assembly</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/adaptive-dynamics/assembly_stochastic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stochastic assembly</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">4. Implementation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
@@ -325,6 +425,23 @@ window.Quarto = {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">5. Prediction and reproducibility</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/models/scientific-versioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scientific versioning of models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -335,23 +452,30 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#what-plant-models" id="toc-what-plant-models" class="nav-link active" data-scroll-target="#what-plant-models">What <code>plant</code> models</a></li>
-  <li><a href="#the-core-idea-traits-not-species" id="toc-the-core-idea-traits-not-species" class="nav-link" data-scroll-target="#the-core-idea-traits-not-species">The core idea: traits, not species</a></li>
-  <li><a href="#three-nested-scales" id="toc-three-nested-scales" class="nav-link" data-scroll-target="#three-nested-scales">Three nested scales</a></li>
-  <li><a href="#two-halves-biology-and-bookkeeping" id="toc-two-halves-biology-and-bookkeeping" class="nav-link" data-scroll-target="#two-halves-biology-and-bookkeeping">Two halves: biology and bookkeeping</a>
+  <li><a href="#what-goes-into-the-model" id="toc-what-goes-into-the-model" class="nav-link active" data-scroll-target="#what-goes-into-the-model">What goes into the model</a></li>
+  <li><a href="#biology-and-population-dynamics" id="toc-biology-and-population-dynamics" class="nav-link" data-scroll-target="#biology-and-population-dynamics">Biology and population dynamics</a></li>
+  <li><a href="#the-ff16-example-traits-affect-many-processes" id="toc-the-ff16-example-traits-affect-many-processes" class="nav-link" data-scroll-target="#the-ff16-example-traits-affect-many-processes">The FF16 example: traits affect many processes</a>
   <ul class="collapse">
-  <li><a href="#inside-a-strategy-a-plants-carbon-economy" id="toc-inside-a-strategy-a-plants-carbon-economy" class="nav-link" data-scroll-target="#inside-a-strategy-a-plants-carbon-economy">Inside a strategy: a plant’s carbon economy</a></li>
-  <li><a href="#meet-the-strategies" id="toc-meet-the-strategies" class="nav-link" data-scroll-target="#meet-the-strategies">Meet the strategies</a></li>
+  <li><a href="#the-ff16-carbon-balance" id="toc-the-ff16-carbon-balance" class="nav-link" data-scroll-target="#the-ff16-carbon-balance">The FF16 carbon balance</a></li>
   </ul></li>
-  <li><a href="#what-the-model-tracks-cohorts-and-the-size-distribution" id="toc-what-the-model-tracks-cohorts-and-the-size-distribution" class="nav-link" data-scroll-target="#what-the-model-tracks-cohorts-and-the-size-distribution">What the model tracks: cohorts and the size distribution</a></li>
-  <li><a href="#competition-is-a-feedback-loop" id="toc-competition-is-a-feedback-loop" class="nav-link" data-scroll-target="#competition-is-a-feedback-loop">Competition is a feedback loop</a></li>
-  <li><a href="#disturbance-and-the-patch-mosaic" id="toc-disturbance-and-the-patch-mosaic" class="nav-link" data-scroll-target="#disturbance-and-the-patch-mosaic">Disturbance and the patch mosaic</a></li>
-  <li><a href="#paying-for-itself-the-birth-rate-loop" id="toc-paying-for-itself-the-birth-rate-loop" class="nav-link" data-scroll-target="#paying-for-itself-the-birth-rate-loop">Paying for itself: the birth-rate loop</a></li>
-  <li><a href="#the-big-payoff-which-strategies-win" id="toc-the-big-payoff-which-strategies-win" class="nav-link" data-scroll-target="#the-big-payoff-which-strategies-win">The big payoff: which strategies win?</a></li>
-  <li><a href="#what-you-can-measure-emergent-properties" id="toc-what-you-can-measure-emergent-properties" class="nav-link" data-scroll-target="#what-you-can-measure-emergent-properties">What you can measure: emergent properties</a></li>
-  <li><a href="#the-life-of-a-simulation" id="toc-the-life-of-a-simulation" class="nav-link" data-scroll-target="#the-life-of-a-simulation">The life of a simulation</a></li>
-  <li><a href="#from-idea-to-code" id="toc-from-idea-to-code" class="nav-link" data-scroll-target="#from-idea-to-code">From idea to code</a></li>
-  <li><a href="#a-quick-glossary" id="toc-a-quick-glossary" class="nav-link" data-scroll-target="#a-quick-glossary">A quick glossary</a></li>
+  <li><a href="#from-an-individual-to-a-landscape" id="toc-from-an-individual-to-a-landscape" class="nav-link" data-scroll-target="#from-an-individual-to-a-landscape">From an individual to a landscape</a>
+  <ul class="collapse">
+  <li><a href="#individual" id="toc-individual" class="nav-link" data-scroll-target="#individual">Individual</a></li>
+  <li><a href="#patch" id="toc-patch" class="nav-link" data-scroll-target="#patch">Patch</a></li>
+  <li><a href="#metacommunity" id="toc-metacommunity" class="nav-link" data-scroll-target="#metacommunity">Metacommunity</a></li>
+  </ul></li>
+  <li><a href="#competition-within-a-patch" id="toc-competition-within-a-patch" class="nav-link" data-scroll-target="#competition-within-a-patch">Competition within a patch</a></li>
+  <li><a href="#disturbance-and-patch-age" id="toc-disturbance-and-patch-age" class="nav-link" data-scroll-target="#disturbance-and-patch-age">Disturbance and patch age</a></li>
+  <li><a href="#seed-input-and-demographic-equilibrium" id="toc-seed-input-and-demographic-equilibrium" class="nav-link" data-scroll-target="#seed-input-and-demographic-equilibrium">Seed input and demographic equilibrium</a></li>
+  <li><a href="#what-can-be-learned-from-a-simulation" id="toc-what-can-be-learned-from-a-simulation" class="nav-link" data-scroll-target="#what-can-be-learned-from-a-simulation">What can be learned from a simulation?</a>
+  <ul class="collapse">
+  <li><a href="#patch-development" id="toc-patch-development" class="nav-link" data-scroll-target="#patch-development">Patch development</a></li>
+  <li><a href="#landscape-averages" id="toc-landscape-averages" class="nav-link" data-scroll-target="#landscape-averages">Landscape averages</a></li>
+  <li><a href="#evolutionary-and-community-questions" id="toc-evolutionary-and-community-questions" class="nav-link" data-scroll-target="#evolutionary-and-community-questions">Evolutionary and community questions</a></li>
+  </ul></li>
+  <li><a href="#a-basic-plant-workflow" id="toc-a-basic-plant-workflow" class="nav-link" data-scroll-target="#a-basic-plant-workflow">A basic <code>plant</code> workflow</a></li>
+  <li><a href="#important-assumptions-and-limits" id="toc-important-assumptions-and-limits" class="nav-link" data-scroll-target="#important-assumptions-and-limits">Important assumptions and limits</a></li>
+  <li><a href="#glossary" id="toc-glossary" class="nav-link" data-scroll-target="#glossary">Glossary</a></li>
   <li><a href="#where-to-go-next" id="toc-where-to-go-next" class="nav-link" data-scroll-target="#where-to-go-next">Where to go next</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/overview.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -359,7 +483,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">Core</a></li><li class="breadcrumb-item"><a href="../theory/overview.html">The big picture</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">1. Foundations</a></li><li class="breadcrumb-item"><a href="../theory/overview.html">The big picture</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">The big picture</h1>
 </div>
@@ -381,191 +505,248 @@ window.Quarto = {
 <div class="eyebrow">
 <p>theory · start here</p>
 </div>
-<p>If you are meeting <code>plant</code> for the first time, start here. This page gives you the whole mental model — what the model tracks, how the pieces fit together, what questions it can answer, and where each idea shows up in the code — without any equations. When you want the maths, the <a href="../theory/maths-primer.html">gentle maths primer</a> builds up the equations one step at a time, and the <a href="../theory/size-structured-pde.html">size-structured PDE</a> page has the full treatment.</p>
-<section id="what-plant-models" class="level2">
-<h2 class="anchored" data-anchor-id="what-plant-models">What <code>plant</code> models</h2>
-<p><code>plant</code> is a simulator for <strong>forests of competing plants</strong>. Given one or more plant <em>strategies</em> — ways of being a plant, such as cheap fast-growing leaves versus dense slow wood — it works out how a patch of ground fills with vegetation over time, how those plants shade and out-compete one another, how the stand thins and matures, and which strategies can persist over the long run.</p>
-<p>The defining feature is that <code>plant</code> builds everything <strong>from the bottom up</strong>. Nothing about the forest is imposed in advance: stand structure, size distributions, self-thinning, succession, and coexistence all <em>emerge</em> from the growth, death, and seeding of individual plants, each responding to the light it experiences. If you change how a single plant works, the whole forest that grows out of it changes too.</p>
-<p>That makes <code>plant</code> useful for questions like:</p>
-<ul>
-<li>How does a patch of forest develop from bare ground to mature stand?</li>
-<li>How do plants with different traits compete, and who wins where?</li>
-<li>What mix of strategies can coexist in a disturbed landscape?</li>
-<li>Which trait values are evolutionarily stable — the “best” way to be a plant in a given environment?</li>
-</ul>
-</section>
-<section id="the-core-idea-traits-not-species" class="level2">
-<h2 class="anchored" data-anchor-id="the-core-idea-traits-not-species">The core idea: traits, not species</h2>
-<p><code>plant</code> does not think in terms of named species. It thinks in terms of <strong>functional traits</strong> — measurable properties that shape how a plant grows and survives. A “strategy” is just a choice of trait values.</p>
-<p>The default <a href="../theory/models/ff16.html">FF16</a> model is built around four key traits:</p>
+<p><code>plant</code> is an R package for modelling how plants grow and compete within forest patches. Rather than simulating every tree as an independent object, its main solver describes a population by the distribution of plant sizes and follows how that distribution changes through growth, mortality, and recruitment.</p>
+<p>The biological details are supplied by a <strong>strategy</strong>. A strategy determines how an individual plant responds to its size and surroundings: how quickly it grows, how likely it is to die, how many seeds it produces, and how it affects its competitors. The population solver then applies those rates across all the plants in a patch.</p>
+<p>This page introduces that structure without equations. Most examples use <a href="../theory/models/ff16.html">FF16</a>, the default trait-based strategy. The same demographic machinery also supports strategies with different biology, including <a href="../theory/models/tf24.html">TF24</a>, which adds explicit plant hydraulics, and <a href="../theory/models/k93.html">K93</a>, which represents size and competition differently.</p>
+<section id="what-goes-into-the-model" class="level2">
+<h2 class="anchored" data-anchor-id="what-goes-into-the-model">What goes into the model</h2>
+<p>A <code>plant</code> simulation combines several choices:</p>
 <table class="caption-top table">
+<caption>The main components of a <code>plant</code> simulation.</caption>
 <colgroup>
-<col style="width: 21%">
-<col style="width: 24%">
-<col style="width: 54%">
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>What you provide</th>
+<th>What it controls</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Strategy</strong></td>
+<td>A model such as FF16, TF24, or K93</td>
+<td>How individual plants grow, reproduce, die, and affect competitors</td>
+</tr>
+<tr class="even">
+<td><strong>Traits and parameters</strong></td>
+<td>Values describing the simulated plants</td>
+<td>Differences among plant strategies</td>
+</tr>
+<tr class="odd">
+<td><strong>External environment</strong></td>
+<td>For example, above-canopy light; TF24 can also use rainfall and atmospheric drivers</td>
+<td>Conditions experienced by the plants</td>
+</tr>
+<tr class="even">
+<td><strong>Seed input</strong></td>
+<td>A birth rate for each strategy</td>
+<td>Recruitment into the patch</td>
+</tr>
+<tr class="odd">
+<td><strong>Disturbance regime</strong></td>
+<td>The duration and age weighting of patches</td>
+<td>How a patch trajectory is scaled up to a landscape</td>
+</tr>
+</tbody>
+</table>
+<p>These inputs are specified by the user. What is not specified directly is the resulting stand structure. Plant sizes, population densities, canopy structure, self-thinning, and changes in community composition arise from the simulated growth, death, recruitment, and competition.</p>
+</section>
+<section id="biology-and-population-dynamics" class="level2">
+<h2 class="anchored" data-anchor-id="biology-and-population-dynamics">Biology and population dynamics</h2>
+<p>It helps to separate two parts of the model.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+accTitle: Biology and population dynamics in plant
+accDescr: A strategy converts plant state and surroundings into demographic rates. The demographic solver applies those rates to the population through time.
+  A["Plant state&lt;br/&gt;and surroundings"] --&gt; B["Strategy&lt;br/&gt;individual biology"]
+  B --&gt; C["Growth, mortality,&lt;br/&gt;and fecundity rates"]
+  C --&gt; D["Demographic solver&lt;br/&gt;population change"]
+  D --&gt; E["Patch structure&lt;br/&gt;through time"]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>The <strong>strategy</strong> contains the biology. Given the state of a plant and its environmental and competitive conditions, it returns instantaneous rates of growth, mortality, and fecundity. Depending on the strategy, this calculation may include photosynthesis, tissue turnover, carbon allocation, hydraulics, or phenomenological relationships fitted directly to size and competition.</p>
+<p>The <strong>demographic solver</strong> keeps track of how those individual rates change the population. It integrates growth and mortality through time, introduces new recruits, and updates the competitive environment as the population changes. The solver does not need to know how photosynthesis or hydraulics were calculated; it only needs the rates supplied by the strategy.</p>
+<p>This separation is central to <code>plant</code>. Changing the strategy changes the individual biology, while leaving the size-structured demographic machinery in place.</p>
+</section>
+<section id="the-ff16-example-traits-affect-many-processes" class="level2">
+<h2 class="anchored" data-anchor-id="the-ff16-example-traits-affect-many-processes">The FF16 example: traits affect many processes</h2>
+<p>In the default FF16 workflow, a strategy is commonly specified by a small set of functional traits. These are measurable plant properties that affect several parts of the model at once.</p>
+<table class="caption-top table">
+<caption>The four main traits used by the FF16 hyper-parameterisation.</caption>
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>Trait</th>
 <th>Symbol</th>
-<th>What it captures</th>
+<th>Contrast represented in FF16</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>Leaf mass per area (LMA)</td>
 <td><span class="math inline">\(\phi\)</span></td>
-<td>cheap, thin, short-lived leaves ↔︎ tough, dense, long-lived leaves</td>
+<td>Thin, inexpensive, short-lived leaves versus denser, longer-lived leaves</td>
 </tr>
 <tr class="even">
 <td>Wood density</td>
 <td><span class="math inline">\(\rho\)</span></td>
-<td>light fast-growing wood ↔︎ dense durable wood</td>
+<td>Less construction-expensive wood versus denser, more construction-expensive wood</td>
 </tr>
 <tr class="odd">
 <td>Seed mass</td>
 <td><span class="math inline">\(\omega\)</span></td>
-<td>many small seeds ↔︎ few large, well-provisioned seeds</td>
+<td>Many small seeds versus fewer, better-provisioned seeds</td>
 </tr>
 <tr class="even">
 <td>Maximum height</td>
 <td><span class="math inline">\(H_{\rm mat}\)</span></td>
-<td>short understorey plant ↔︎ tall canopy tree</td>
+<td>Shorter understorey plants versus taller canopy plants</td>
 </tr>
 </tbody>
 </table>
-<p>The power of this approach is <strong>trade-offs</strong>. A single trait pulls on many parts of the plant’s biology at once. Cheap leaves (low LMA), for instance, are productive per gram but wear out fast — so choosing a low LMA raises both photosynthesis <em>and</em> leaf turnover together. <code>plant</code> encodes these linkages through <em>hyper-parameterisation</em>: you set a trait, and the model derives the whole bundle of physiological parameters that trait implies. This is why a handful of trait numbers can stand in for an entire way of life.</p>
-</section>
-<section id="three-nested-scales" class="level2">
-<h2 class="anchored" data-anchor-id="three-nested-scales">Three nested scales</h2>
-<p>The model is organised as three scales nested inside one another. Each scale is built out of the one below it.</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"nodeSpacing": 45, "rankSpacing": 55}}}%%
-flowchart TD
-  M["🌍 Metacommunity&lt;br/&gt;patches of every age,&lt;br/&gt;linked by dispersing seeds"]
-  P["🌳 Patch&lt;br/&gt;competing individuals&lt;br/&gt;sharing one light environment"]
-  I["🌱 Individual&lt;br/&gt;grows, dies, sets seed"]
-  M --&gt;|"a mosaic of many"| P
-  P --&gt;|"a stand of many"| I
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-<ul>
-<li><strong>Individual</strong> — a single plant with a set of traits and a size (its height). It intercepts light, builds tissue, risks dying, and produces seeds.</li>
-<li><strong>Patch</strong> — a small area of ground where many individuals grow together. They compete by shading one another, so every plant in the patch shares one common <strong>light environment</strong>. A disturbance (fire, storm, landslide…) can wipe a patch clean and reset it to bare ground.</li>
-<li><strong>Metacommunity</strong> — the whole landscape: a large collection of patches, each at a different age since its last disturbance, all connected because seeds disperse freely between them.</li>
-</ul>
-<p>A key simplification makes this tractable: because seeds mix across the whole landscape, <strong>one patch followed through its entire life stands in for the whole metacommunity</strong>. Simulating a single patch from bare ground to old age, and knowing how common patches of each age are, is enough to describe everything.</p>
-</section>
-<section id="two-halves-biology-and-bookkeeping" class="level2">
-<h2 class="anchored" data-anchor-id="two-halves-biology-and-bookkeeping">Two halves: biology and bookkeeping</h2>
-<p>Internally, <code>plant</code> separates cleanly into two parts, and it helps to keep them apart in your head.</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"subGraphTitleMargin": {"top": 8, "bottom": 14}, "padding": 12, "nodeSpacing": 45, "rankSpacing": 45}}}%%
-flowchart LR
-  subgraph S["Strategy — the biology"]
-    direction TB
-    s1["a plant's size&lt;br/&gt;+ its light environment"] --&gt; s2["growth, death,&lt;br/&gt;seed rates"]
-  end
-  subgraph D["Demographic core — the bookkeeping"]
-    direction TB
-    d1["rates, tracked&lt;br/&gt;over time"] --&gt; d2["how the whole&lt;br/&gt;population changes"]
-  end
-  S --&gt;|"rates plug in"| D
-  models["FF16 · K93 · TF24 · TF24f"] -.-&gt;|"pick one"| S
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-<ul>
-<li>The <strong>strategy</strong> is the biology. Given a plant’s size and the light it experiences, it returns three instantaneous rates: how fast the plant grows, how likely it is to die, and how many seeds it makes. This is where photosynthesis, carbon budgets, and hydraulics live.</li>
-<li>The <strong>demographic core</strong> is the bookkeeping. It knows nothing about photosynthesis; it just takes those rates and integrates them over time to work out how a population of plants grows, thins, and reproduces. Swap the strategy and you swap the biology; the bookkeeping stays the same.</li>
-</ul>
-<p>This split is why the <a href="../theory/index.html">theory</a> is organised into <em>Core</em> (the bookkeeping, shared by everything) and <em>Models</em> (the strategies).</p>
-<section id="inside-a-strategy-a-plants-carbon-economy" class="level3">
-<h3 class="anchored" data-anchor-id="inside-a-strategy-a-plants-carbon-economy">Inside a strategy: a plant’s carbon economy</h3>
-<p>It is worth peeking inside the “biology” box, because it explains where growth, death, and seeds actually come from. In the FF16 model, all three rates trace back to a single quantity: the <strong>net biomass</strong> a plant produces each year.</p>
+<p>Changing one of these traits can change several physiological parameters. For example, LMA affects leaf construction cost, turnover, and respiration. Leaf nitrogen per area, which can also be supplied to the hyper-parameterisation, controls the photosynthetic response. <code>plant</code> uses a mapping from these input values to the lower-level physiological parameters needed by FF16. This mapping is called a <strong>hyper-parameterisation</strong> and is described in the <a href="../guides/strategies.html">Strategies and traits</a> guide.</p>
+<p>Wood density also changes construction costs and respiration per unit mass. Although the hyper-parameterisation can link wood density to mortality and sapwood turnover, those two relationships are switched off in the current default settings. Denser wood should therefore not automatically be interpreted as more durable in a default FF16 run.</p>
+<p>This trait-based parameterisation is an important use of <code>plant</code>, but it is not the definition of a strategy. More generally, a strategy is the complete set of functions and parameters that produces a plant’s demographic rates. K93, for example, uses direct relationships between stem diameter, competition, growth, mortality, and fecundity rather than the FF16 trait-based carbon model.</p>
+<section id="the-ff16-carbon-balance" class="level3">
+<h3 class="anchored" data-anchor-id="the-ff16-carbon-balance">The FF16 carbon balance</h3>
+<p>In FF16, growth and seed production are derived from net biomass production. The plant gains carbon through photosynthesis and loses carbon through tissue respiration and turnover. The remaining production can be allocated to new growth or reproduction.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
 <div>
 <pre class="mermaid mermaid-js">flowchart LR
-  L["Light captured&lt;br/&gt;by leaves"] --&gt; P["Photosynthesis&lt;br/&gt;(income)"]
-  P --&gt; B["Net biomass&lt;br/&gt;= income − respiration&lt;br/&gt;− tissue turnover"]
-  B --&gt; SPLIT{"How to&lt;br/&gt;spend it?"}
-  SPLIT --&gt;|"mostly when young"| G["Build tissue →&lt;br/&gt;grow taller (g)"]
-  SPLIT --&gt;|"more when mature"| F["Make seeds (f)"]
-  B -.-&gt;|"low production&lt;br/&gt;raises risk"| D["Mortality (d)"]
+accTitle: Carbon balance in the FF16 strategy
+accDescr: Photosynthesis supplies carbon. Respiration and tissue turnover reduce it. Remaining biomass production is allocated between growth and seed production, while low production can increase one component of mortality.
+  L["Light captured&lt;br/&gt;by leaves"] --&gt; P["Photosynthesis"]
+  P --&gt; B["Net biomass production"]
+  R["Respiration and&lt;br/&gt;tissue turnover"] --&gt;|"subtracted"| B
+  B --&gt; G["Growth"]
+  B --&gt; F["Seed production"]
+  B -.-&gt; D["Growth-dependent&lt;br/&gt;mortality"]
 </pre>
 </div>
 <p></p></figure><p></p>
 </div>
 </div>
 </div>
-<p>A plant earns carbon by photosynthesising, pays it back through respiration and the constant turnover of leaves and roots, and invests whatever is left. Young plants spend that surplus on <strong>growing taller</strong> (chasing light); as they approach their maximum height they divert more of it into <strong>seeds</strong>. And a plant whose production runs low — because it is shaded, say — faces a higher chance of <strong>death</strong>. That single carbon budget, sketched above, is the engine behind every individual in the model. The <a href="../theory/models/ff16.html">FF16 page</a> and the <a href="../theory/assimilation-hydraulics.html">assimilation &amp; hydraulics</a> page give the full detail.</p>
+<p>Young plants allocate most of their production to growth. As a plant approaches its maximum height, a larger share is allocated to reproduction. Low production per unit leaf area also increases the growth-dependent component of mortality. FF16 includes a separate background mortality component that does not depend on current production.</p>
+<p>The <a href="../theory/models/ff16.html">FF16 model page</a> gives the full carbon-allocation model. The <a href="../theory/assimilation-hydraulics.html">Assimilation and hydraulics</a> page explains the leaf-level calculations used by the hydraulically explicit strategies.</p>
 </section>
-<section id="meet-the-strategies" class="level3">
-<h3 class="anchored" data-anchor-id="meet-the-strategies">Meet the strategies</h3>
-<p><code>plant</code> ships with a small family of interchangeable strategies:</p>
+</section>
+<section id="from-an-individual-to-a-landscape" class="level2">
+<h2 class="anchored" data-anchor-id="from-an-individual-to-a-landscape">From an individual to a landscape</h2>
+<p>The ecological model is organised at three scales: individuals, patches, and the metacommunity. <strong>Nodes are not a fourth ecological scale.</strong> They are the numerical objects that the solver uses to represent groups of similar plants within a patch.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+accTitle: Ecological scales and their numerical representation in plant
+accDescr: Similar individuals are grouped into cohorts represented numerically by nodes. Nodes describe a size-structured population within one patch. Patch states at different ages are weighted together to represent the landscape-scale metacommunity.
+  I["Individuals&lt;br/&gt;biological plants"] --&gt; C["Cohorts&lt;br/&gt;same strategy and recruitment time"]
+  C -. "represented by" .-&gt; N["Nodes&lt;br/&gt;numerical objects"]
+  N --&gt; P["Patch&lt;br/&gt;one local competing population"]
+  P --&gt; M["Metacommunity&lt;br/&gt;implicit landscape representation"]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>The distinction can be summarised as follows:</p>
+<table class="caption-top table">
+<caption>The relationship between nodes, patches, and the metacommunity.</caption>
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>What it is</th>
+<th>What makes another one different?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Node</strong></td>
+<td>One numerical representation of a cohort within a patch</td>
+<td>A different strategy or recruitment time produces a different cohort and therefore a different node</td>
+</tr>
+<tr class="even">
+<td><strong>Patch</strong></td>
+<td>One local community followed through time after disturbance</td>
+<td>A different time since disturbance gives a different patch age and community state</td>
+</tr>
+<tr class="odd">
+<td><strong>Metacommunity</strong></td>
+<td>The landscape represented by patches of different ages, connected through a shared seed pool</td>
+<td>It combines patch-level states rather than adding more nodes to a single patch</td>
+</tr>
+</tbody>
+</table>
+<p>Here is a concrete way to picture the nesting. Consider a patch that is 40 years old. It contains plants that recruited at different times during those 40 years. For each strategy, the solver uses nodes to represent these cohorts: an early node might represent a small number of large survivors, while a recent node might represent many small recruits. Together, all the nodes describe the current population in that one patch.</p>
+<p>Now zoom out to the landscape. Some patches were disturbed recently and are young; others have developed for decades. The metacommunity combines the modelled states of these different patch ages, weighting each age by how common it is. This is an <strong>implicit</strong> representation: the deterministic solver does not create a separate object for every physical patch or for the metacommunity. Instead, one patch trajectory supplies the community state at each possible patch age. Thus, <strong>nodes are combined to describe a patch, while patch ages are combined to describe the metacommunity</strong>.</p>
+<section id="individual" class="level3">
+<h3 class="anchored" data-anchor-id="individual">Individual</h3>
+<p>An individual is one biological plant governed by a strategy. Its state includes a size coordinate and, for some strategies, additional physiological variables. FF16, TF24, and TF24f use height as the main size coordinate. K93 uses stem diameter.</p>
+<p>One implementation detail can otherwise be confusing when reading K93 output. The shared solver calls its first size state <code>height</code> for every strategy, so K93’s stem diameter is stored in a column named <code>height</code>, even though its biological meaning and units are DBH in centimetres.</p>
+<p>The strategy uses that state and the plant’s surroundings to calculate growth, mortality, fecundity, and its contribution to competition.</p>
+</section>
+<section id="patch" class="level3">
+<h3 class="anchored" data-anchor-id="patch">Patch</h3>
+<p>A patch is a local population of competing plants. The deterministic size-structured solver does not store every literal individual. It represents the population by a <strong>size distribution</strong>: the density of plants at each size, for each strategy, at a given patch age.</p>
+<p>The numerical method follows a finite set of <strong>nodes</strong> along this distribution. Each node belongs to one strategy and represents plants that recruited at a particular patch age, so those plants follow the same deterministic trajectory. As the patch develops, the node’s position records the cohort’s changing size, while its density records how many plants from that cohort remain per unit area. New nodes are introduced to represent continuing recruitment.</p>
+<p>The words <em>individual</em>, <em>cohort</em>, and <em>node</em> therefore refer to related but different things:</p>
 <ul>
-<li><strong><a href="../theory/models/ff16.html">FF16</a></strong> — the default. A detailed, trait-based carbon economy (the one sketched above). Start here unless you have a reason not to.</li>
-<li><strong><a href="../theory/models/k93.html">K93</a></strong> — Kohyama’s 1993 model. Growth, death, and fecundity are written as direct functions of stem diameter and stand basal area, with no explicit carbon budget. A compact, fast, “phenomenological” strategy.</li>
-<li><strong><a href="../theory/models/tf24.html">TF24</a></strong> — extends the leaf model with explicit plant <strong>hydraulics</strong> and stomatal behaviour: the plant chooses how much to open its stomata to balance carbon gain against the risk of drying out. Use it when water and drought matter.</li>
-<li><strong><a href="../theory/models/tf24.html">TF24f</a></strong> — a faster variant of TF24. Instead of re-solving the leaf’s optimal state from scratch at every step, it lets that state <em>acclimate</em> over time, tracking a changing environment with a short lag. Same hydraulics, cheaper to run.</li>
+<li>an <strong>individual</strong> is one biological plant;</li>
+<li>a <strong>cohort</strong> is a group of plants sharing a recruitment time and strategy;</li>
+<li>a <strong>node</strong> is the numerical point used to represent that cohort and sample the continuous size distribution.</li>
 </ul>
-<p>You can also <a href="../contributing/implementing-a-strategy.html">write your own</a> — the demographic core will run it unchanged.</p>
+<p>Following nodes as they grow is an application of the <a href="../theory/implementation/characteristic-method.html">method of characteristics</a>. The <a href="../theory/implementation/node-spacing.html">node-spacing algorithm</a> chooses enough node introduction times to approximate the distribution accurately without making the calculation unnecessarily expensive.</p>
+</section>
+<section id="metacommunity" class="level3">
+<h3 class="anchored" data-anchor-id="metacommunity">Metacommunity</h3>
+<p>At the landscape scale, <code>plant</code> represents a forest as a collection of patches with different ages since their last disturbance. Seed dispersal connects these patches, producing a shared seed pool for each strategy.</p>
+<p>The prefix <em>meta-</em> signals that this is a community of communities: each patch contains its own local plant community, and the metacommunity connects those local communities at the landscape scale. In the standard model, this connection occurs through seeds rather than through nodes. A node never moves from one patch to another; it is only part of the numerical description of one patch trajectory.</p>
+<p>Under the standard metacommunity assumptions, patches begin from the same empty state after disturbance, receive the same constant seed rain, and differ only in age. In that setting, one simulated patch trajectory can represent all patch ages. Patch-level results are averaged using the frequency of patches at each age to obtain landscape-level quantities. Demographic equilibrium adds a further condition: the seed rain must be consistent with the seeds produced across the metacommunity.</p>
+<p>Constant seed rain is the usual assumption for the demographic-equilibrium calculation, not a restriction of the solver. <code>plant</code> can also accept birth rates that vary with patch age when a different ecological scenario requires them.</p>
+<p>This reduction depends on those assumptions. It is not a general claim that one physical forest patch represents every heterogeneous landscape.</p>
 </section>
 </section>
-<section id="what-the-model-tracks-cohorts-and-the-size-distribution" class="level2">
-<h2 class="anchored" data-anchor-id="what-the-model-tracks-cohorts-and-the-size-distribution">What the model tracks: cohorts and the size distribution</h2>
-<p>Inside a patch, <code>plant</code> does not follow every individual plant separately. Instead it tracks a <strong>size distribution</strong>: how many plants of each height are present in the patch at a given age. Early on the distribution is a dense crowd of tiny seedlings; as the patch ages it spreads out, thins, and a few tall winners pull ahead.</p>
-<p>The clever part is <em>how</em> it follows that distribution. Rather than chopping height into fixed bins, <code>plant</code> tracks a handful of <strong>cohorts</strong> — groups of plants that germinated at the same moment — and lets each one ride its own growth trajectory upward.</p>
+<section id="competition-within-a-patch" class="level2">
+<h2 class="anchored" data-anchor-id="competition-within-a-patch">Competition within a patch</h2>
+<p>FF16, TF24, and TF24f all include competition for light. Plants add leaf area to the canopy. The combined leaf area determines a vertical profile of canopy openness, and that profile affects later photosynthesis, growth, reproduction, and survival.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
 <div>
 <pre class="mermaid mermaid-js">flowchart LR
-  s1["seed pulse&lt;br/&gt;at age 0"] --&gt; c1["cohort 1&lt;br/&gt;rises in height"]
-  s2["seed pulse&lt;br/&gt;at age 5"] --&gt; c2["cohort 2&lt;br/&gt;rises behind it"]
-  s3["seed pulse&lt;br/&gt;at age 20"] --&gt; c3["cohort 3"]
-  c1 --&gt; canopy["tall, sparse&lt;br/&gt;survivors"]
-  c2 --&gt; mid["mid-canopy"]
-  c3 --&gt; under["shaded&lt;br/&gt;understorey"]
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-<p>Each cohort is a moving point on the height axis, carrying a “how many plants are here” density with it. Following a few well-placed cohorts is far cheaper than resolving the whole distribution on a grid, yet it stays accurate — this is the <em>characteristic method</em>, and the number and timing of cohorts is chosen automatically. (The <a href="../theory/implementation/characteristic-method.html">characteristic method</a> and <a href="../theory/implementation/node-spacing.html">node-spacing</a> pages cover the machinery.)</p>
-</section>
-<section id="competition-is-a-feedback-loop" class="level2">
-<h2 class="anchored" data-anchor-id="competition-is-a-feedback-loop">Competition is a feedback loop</h2>
-<p>Everything interesting in <code>plant</code> comes from one feedback loop. Plants deploy leaf area; leaf area casts shade; shade changes the light every plant experiences; and that light feeds straight back into how fast each plant grows and how likely it is to survive.</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A["Plants deploy&lt;br/&gt;leaf area"] --&gt; B["Canopy casts shade —&lt;br/&gt;the light environment"]
-  B --&gt; C["Less light below&lt;br/&gt;slows growth,&lt;br/&gt;raises mortality"]
-  C --&gt; D["Size distribution&lt;br/&gt;shifts: some win,&lt;br/&gt;some die"]
+accTitle: Feedback between plants and the canopy light profile
+accDescr: Plant leaf area changes the canopy light profile. The light profile changes demographic rates, which alter the size distribution and therefore future leaf area.
+  A["Plant leaf area"] --&gt; B["Vertical canopy&lt;br/&gt;light profile"]
+  B --&gt; C["Growth, mortality,&lt;br/&gt;and fecundity"]
+  C --&gt; D["Population size&lt;br/&gt;distribution"]
   D --&gt; A
 </pre>
 </div>
@@ -573,192 +754,203 @@ flowchart LR
 </div>
 </div>
 </div>
-<p>Because taller plants shade shorter ones but not vice versa, competition for light is <strong>asymmetric</strong> — a small head start compounds. This one loop is what produces <strong>self-thinning</strong> (crowded stands shed stems as they grow), <strong>succession</strong> (the mix of winners changes over time), and the layered vertical structure of a real forest — none of it built in by hand.</p>
+<p>All plants in the patch contribute to one shared canopy-light profile, but they do not all receive the same amount of light. The light available to a plant depends on its height and on how its leaves are distributed through its crown.</p>
+<p>This competition is strongly size-asymmetric. Taller plants usually shade a larger fraction of a shorter plant’s crown than the shorter plant shades of the taller plant’s crown. As a result, small initial differences can grow through time. The feedback can produce self-thinning, canopy stratification, and changes in which strategies dominate as a patch ages.</p>
+<p>TF24 and TF24f add another shared resource. Plants take up water from the same soil profile, so their density-weighted root uptake changes soil moisture for the rest of the patch. The updated soil-water state then feeds back into plant hydraulics and carbon gain.</p>
+<p>K93 uses a different competitive environment. Its demographic rates depend on stem diameter and the cumulative basal area of larger neighbours rather than an explicit canopy-light profile. This is an example of how the demographic solver can support different biological models of competition.</p>
 </section>
-<section id="disturbance-and-the-patch-mosaic" class="level2">
-<h2 class="anchored" data-anchor-id="disturbance-and-the-patch-mosaic">Disturbance and the patch mosaic</h2>
-<p>No patch lasts forever. Fires, storms, landslides, and other disturbances periodically reset a patch to bare ground. Because these strike at random across the landscape, at any moment the landscape is a <strong>mosaic of patches of every age</strong> — some freshly cleared, some mid-succession, a few very old.</p>
-<p><code>plant</code> summarises this mosaic with a single number: the <strong>mean interval between disturbances</strong>. From it, the model works out how common patches of each age are. Young patches are common (most patches have been disturbed fairly recently); very old patches are rare (they have usually been reset before reaching old age). This age distribution is what lets a single simulated patch represent the whole landscape: to average over the metacommunity, you average over patch age, weighting by how common each age is.</p>
+<section id="disturbance-and-patch-age" class="level2">
+<h2 class="anchored" data-anchor-id="disturbance-and-patch-age">Disturbance and patch age</h2>
+<p>Disturbance resets a patch and begins a new patch trajectory. In the standard model, this is a stand-replacing event: all plants are removed and the patch starts empty. At any one time, the landscape contains young, intermediate, and old patches.</p>
+<p>The default <code>plant</code> parameters use a Weibull disturbance regime with a fixed shape. The user-facing <code>max_patch_lifetime</code> parameter sets the duration of the simulated patch and parameterises this regime; its mean disturbance interval is a derived quantity. The model uses the resulting patch-age distribution to weight outputs from different points along the patch trajectory.</p>
+<p>For example, suppose biomass in a simulated patch rises as the stand develops. Landscape-average biomass is not the biomass at one chosen patch age. It is the average across the complete trajectory, weighted by how common patches of each age are under the disturbance regime.</p>
+<p>The <a href="../theory/size-structured-pde.html">size-structured PDE</a> page develops this age weighting formally. The <a href="../guides/emergent-properties.html">Emergent properties</a> guide shows how to calculate landscape summaries from model output.</p>
 </section>
-<section id="paying-for-itself-the-birth-rate-loop" class="level2">
-<h2 class="anchored" data-anchor-id="paying-for-itself-the-birth-rate-loop">Paying for itself: the birth-rate loop</h2>
-<p>There is one more loop, at the landscape scale. Seeds produced in patches disperse across the whole metacommunity and rain back down to start new plants. For the metacommunity to be at equilibrium, a strategy must <strong>pay for itself</strong>: the seeds it exports over a patch’s lifetime must match the seeds arriving to sustain it.</p>
-<p><code>plant</code> finds that balance by solving a fixed point — guessing a seed-arrival rate, running a patch to see how many seeds come back out, and adjusting until the two agree.</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A["Guess a seed-&lt;br/&gt;arrival rate"] --&gt; B["Run one patch&lt;br/&gt;through its whole life"]
-  B --&gt; C["Count the seeds&lt;br/&gt;it exports"]
-  C --&gt; Q{"exported =&lt;br/&gt;assumed?"}
-  Q --&gt;|"no"| E["Adjust the rate"]
-  E --&gt; B
-  Q --&gt;|"yes"| F["Equilibrium —&lt;br/&gt;the strategy&lt;br/&gt;pays for itself"]
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-<p>This is exactly what happens when you call <code>run_scm(..., refine_schedule = TRUE)</code> in the guides. A strategy that cannot export as many seeds as it consumes is, in the long run, a loser — it dwindles toward extinction. One that produces a surplus can spread. That observation is the doorway to the deepest question the model was built for.</p>
+<section id="seed-input-and-demographic-equilibrium" class="level2">
+<h2 class="anchored" data-anchor-id="seed-input-and-demographic-equilibrium">Seed input and demographic equilibrium</h2>
+<p>Each strategy has a birth rate describing the arrival of seeds into a patch. Given these birth rates, <code>run_scm()</code> simulates the patch and reports offspring production and the <strong>net reproduction ratio</strong> for each strategy.</p>
+<p>At demographic equilibrium, the seed input must be consistent with the seed output from the metacommunity. For each resident strategy, one incoming seed must produce one successful dispersing seed on average. In terms of the net reproduction ratio, equilibrium requires a value of one.</p>
+<p>This is a fixed-point problem in the birth rates, but it is separate from running a patch once. The current <code>plant</code> API does not expose a general function that automatically finds equilibrium birth rates. A user must supply birth rates or perform an outer search based on the reported reproduction ratios.</p>
+<p>The option <code>run_scm(..., refine_schedule = TRUE)</code> has a different purpose: it adaptively refines the numerical node-introduction schedule. It improves the accuracy with which the size distribution is integrated; it does not adjust the birth rates.</p>
 </section>
-<section id="the-big-payoff-which-strategies-win" class="level2">
-<h2 class="anchored" data-anchor-id="the-big-payoff-which-strategies-win">The big payoff: which strategies win?</h2>
-<p>Once you can find the self-consistent birth rate for a resident community, you can ask whether a <strong>rare mutant</strong> with slightly different traits could invade it. You drop a handful of the mutant’s seeds into the landscape <em>without</em> letting them change the light environment (they are too rare to matter yet), and ask: over its lifetime, does one seed produce more than one seed in return?</p>
+<section id="what-can-be-learned-from-a-simulation" class="level2">
+<h2 class="anchored" data-anchor-id="what-can-be-learned-from-a-simulation">What can be learned from a simulation?</h2>
+<p>Different questions use different parts of the model.</p>
+<section id="patch-development" class="level3">
+<h3 class="anchored" data-anchor-id="patch-development">Patch development</h3>
+<p>A run with supplied birth rates describes how a patch changes through time. Its outputs can be used to examine:</p>
 <ul>
-<li><strong>More than one</strong> → the mutant grows in number; it can invade.</li>
-<li><strong>Fewer than one</strong> → the mutant fades out; the resident holds.</li>
+<li>plant height or diameter distributions;</li>
+<li>population density and self-thinning;</li>
+<li>canopy structure and light availability;</li>
+<li>growth, mortality, and fecundity;</li>
+<li>biomass and its allocation among tissues;</li>
+<li>changes in the relative abundance of strategies.</li>
 </ul>
-<p>This per-seed return is the model’s measure of <strong>invasion fitness</strong>. By scanning across trait values, you can map which strategies beat which, and find the special trait values that <em>no</em> mutant can invade — the evolutionarily stable strategies (ESS), the model’s prediction for how plants “should” be built in a given environment. This is the subject of the <a href="../theory/adaptive-dynamics.html">adaptive dynamics</a> page, and it is where trait-based thinking pays off: the winners are not named species but positions in trait space.</p>
+<p>These are transient patch dynamics. They do not require solving for demographic equilibrium first.</p>
 </section>
-<section id="what-you-can-measure-emergent-properties" class="level2">
-<h2 class="anchored" data-anchor-id="what-you-can-measure-emergent-properties">What you can measure: emergent properties</h2>
-<p>Because the forest is built from the bottom up, a huge range of stand- and landscape-level patterns fall out of a run as <strong>emergent</strong> results — you read them off, you don’t program them in:</p>
-<ul>
-<li><strong>Self-thinning</strong> — the classic size–density line, stems lost as they grow (see the <a href="../guides/self-thinning.html">self-thinning</a> guide).</li>
-<li><strong>Stand structure</strong> — height and density profiles, canopy layering, leaf-area distribution through the canopy.</li>
-<li><strong>Biomass and its allocation</strong> — total and per-tissue (leaf, sapwood, bark, heartwood) mass through time.</li>
-<li><strong>Succession &amp; coexistence</strong> — which strategies dominate when, and which combinations can persist together.</li>
-<li><strong>Metacommunity averages</strong> — landscape-scale means obtained by integrating patch outputs over the age distribution (see <a href="../guides/emergent-properties.html">emergent properties</a>).</li>
-</ul>
+<section id="landscape-averages" class="level3">
+<h3 class="anchored" data-anchor-id="landscape-averages">Landscape averages</h3>
+<p>Patch outputs can be integrated over the patch-age distribution to estimate landscape-level means, such as mean biomass, density, or productivity across a disturbance mosaic.</p>
 </section>
-<section id="the-life-of-a-simulation" class="level2">
-<h2 class="anchored" data-anchor-id="the-life-of-a-simulation">The life of a simulation</h2>
-<p>Putting it together, a typical <code>plant</code> run moves through these stages — and each maps onto a step in the guides:</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart TB
-  A["1 · Choose a strategy&lt;br/&gt;and trait values"] --&gt; B["2 · Set the environment&lt;br/&gt;(light, rainfall)"]
-  B --&gt; C["3 · Seed a patch and&lt;br/&gt;grow it from bare ground"]
-  C --&gt; D["4 · Plants grow, shade&lt;br/&gt;each other, thin and die"]
-  D --&gt; E["5 · Find the birth rate&lt;br/&gt;that balances (equilibrium)"]
-  E --&gt; F["6 · Read off outputs:&lt;br/&gt;structure, biomass, fitness"]
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-<p>The <a href="../guides/example-analysis.html">worked example</a> walks through exactly this arc end to end.</p>
+<section id="evolutionary-and-community-questions" class="level3">
+<h3 class="anchored" data-anchor-id="evolutionary-and-community-questions">Evolutionary and community questions</h3>
+<p>If a resident community is at demographic equilibrium, <code>plant</code> can also be used to ask whether a rare alternative strategy could invade. The rare strategy is evaluated in the environment created by the residents without being allowed to alter that environment itself.</p>
+<p>Its basic reproduction ratio is the expected number of dispersing offspring produced per incoming seed. A value greater than one indicates that the rare strategy can increase; a value below one indicates that it cannot invade.</p>
+<p>Repeating this calculation across trait values can identify several kinds of evolutionary outcome. Some resident strategies are uninvadable evolutionary stable strategies. Other trait values can be evolutionary branching points, and community assembly can produce several coexisting strategies. The <a href="../theory/adaptive-dynamics.html">Adaptive dynamics</a> section explains these distinctions and the assumptions behind the analysis.</p>
 </section>
-<section id="from-idea-to-code" class="level2">
-<h2 class="anchored" data-anchor-id="from-idea-to-code">From idea to code</h2>
-<p>Each concept above has a direct counterpart in the package:</p>
+</section>
+<section id="a-basic-plant-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="a-basic-plant-workflow">A basic <code>plant</code> workflow</h2>
+<p>For an FF16 patch, the main code path is short:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"FF16"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  p,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">birth_rate =</span> <span class="dv">20</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p, <span class="at">collect =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">expand_state</span>(result)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This example:</p>
+<ol type="1">
+<li>creates the default FF16 parameters;</li>
+<li>adds one strategy with a specified LMA and birth rate;</li>
+<li>simulates the patch through time;</li>
+<li>collects and expands the state variables into analysis-ready output.</li>
+</ol>
+<p><code>run_scm()</code> constructs the matching environment when one is not supplied. To configure an environment explicitly, use a typed constructor such as <code>Environment("FF16")</code> or <code>Environment("TF24")</code>. The TF24 environment includes default soil-water and atmospheric conditions, which can be changed for a particular scenario.</p>
 <table class="caption-top table">
+<caption>Common tasks and their current <code>plant</code> interfaces.</caption>
 <thead>
 <tr class="header">
-<th>Idea</th>
-<th>In <code>plant</code></th>
-<th>Guide</th>
+<th>Task</th>
+<th>Main <code>plant</code> interface</th>
+<th>Detailed guide</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Pick a strategy &amp; its traits</td>
-<td><code>scm_base_parameters("FF16")</code>, <code>trait_matrix()</code>, <code>add_strategies()</code></td>
-<td><a href="../guides/strategies.html">Strategies &amp; traits</a></td>
+<td>Choose a strategy and parameters</td>
+<td><code>scm_base_parameters("FF16")</code></td>
+<td><a href="../guides/strategies.html">Strategies and traits</a></td>
 </tr>
 <tr class="even">
-<td>Set the light / rainfall environment</td>
-<td><code>Environment()</code></td>
-<td><a href="../guides/extrinsic-drivers.html">Extrinsic drivers</a></td>
+<td>Add trait values and seed input</td>
+<td><code>trait_matrix()</code>, <code>add_strategies()</code></td>
+<td><a href="../guides/strategies.html">Strategies and traits</a></td>
 </tr>
 <tr class="odd">
-<td>Grow a single plant</td>
-<td><code>FF16_Individual()</code></td>
-<td><a href="../guides/first-individual.html">Your first individual</a></td>
+<td>Configure external drivers</td>
+<td><code>Environment("FF16")</code> or <code>Environment("TF24")</code></td>
+<td><a href="../guides/extrinsic-drivers.html">Extrinsic drivers</a></td>
 </tr>
 <tr class="even">
-<td>Run a patch through its life</td>
+<td>Simulate a patch</td>
 <td><code>run_scm()</code></td>
 <td><a href="../guides/patch-dynamics.html">Patch dynamics</a></td>
 </tr>
 <tr class="odd">
-<td>Find the birth rate that balances</td>
+<td>Refine numerical node spacing</td>
 <td><code>run_scm(..., refine_schedule = TRUE)</code></td>
-<td><a href="../guides/self-thinning.html">Self-thinning</a></td>
+<td><a href="../theory/implementation/node-spacing.html">Node-spacing algorithm</a></td>
 </tr>
 <tr class="even">
-<td>Tidy &amp; expand the outputs</td>
+<td>Collect and expand outputs</td>
 <td><code>collect = TRUE</code>, <code>expand_state()</code></td>
 <td><a href="../guides/example-analysis.html">Example analysis</a></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="a-quick-glossary" class="level2">
-<h2 class="anchored" data-anchor-id="a-quick-glossary">A quick glossary</h2>
+<section id="important-assumptions-and-limits" class="level2">
+<h2 class="anchored" data-anchor-id="important-assumptions-and-limits">Important assumptions and limits</h2>
+<p>Every model simplifies. The main assumptions to keep in mind when interpreting the standard deterministic <code>plant</code> workflow are:</p>
+<ul>
+<li>The population is represented as a continuous size distribution. This is appropriate for large populations; <code>plant</code> also contains a stochastic solver for questions about finite populations and demographic randomness.</li>
+<li>FF16 represents competition through canopy light. TF24 and TF24f add a shared soil-water balance, while K93 uses the basal area of larger neighbours. None of these strategies represents every possible interaction among plants.</li>
+<li>The standard metacommunity has well-mixed seed dispersal, identical empty patches after stand-replacing disturbance, and an equilibrium distribution of patch ages.</li>
+<li>Strategy equations and parameters are hypotheses about plant biology. Stand structure emerges from those assumptions; it is not assumption-free.</li>
+<li>A simulation produces conditional model output, not a calibrated forecast with uncertainty bounds. <code>plant</code> does not currently provide a complete calibration, uncertainty-propagation, or forecasting workflow.</li>
+</ul>
+</section>
+<section id="glossary" class="level2">
+<h2 class="anchored" data-anchor-id="glossary">Glossary</h2>
 <table class="caption-top table">
+<caption>Terms used throughout the theory and guides.</caption>
 <colgroup>
-<col style="width: 27%">
-<col style="width: 72%">
+<col style="width: 50%">
+<col style="width: 50%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>Term</th>
-<th>In plain words</th>
+<th>Meaning here</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><strong>Strategy</strong></td>
-<td>A way of being a plant — a set of trait values and the biology they imply.</td>
+<td>The functions and parameters that translate a plant’s state and surroundings into growth, mortality, fecundity, and competition effects</td>
 </tr>
 <tr class="even">
 <td><strong>Trait</strong></td>
-<td>A measurable plant property (LMA, wood density, seed mass, max height) that shapes growth and survival.</td>
+<td>A measurable plant property used to distinguish strategies or derive physiological parameters</td>
 </tr>
 <tr class="odd">
-<td><strong>Individual / node / cohort</strong></td>
-<td>A group of same-aged plants, tracked together as a point moving up the height axis.</td>
+<td><strong>Individual</strong></td>
+<td>One biological plant governed by a strategy</td>
+</tr>
+<tr class="even">
+<td><strong>Cohort</strong></td>
+<td>Plants with the same strategy and recruitment time following the same deterministic trajectory</td>
+</tr>
+<tr class="odd">
+<td><strong>Node</strong></td>
+<td>A numerical point representing a cohort and sampling the continuous size distribution</td>
 </tr>
 <tr class="even">
 <td><strong>Patch</strong></td>
-<td>A stand of competing plants sharing one light environment; reset by disturbance.</td>
+<td>A local population of competing plants followed from disturbance onward</td>
 </tr>
 <tr class="odd">
 <td><strong>Size distribution</strong></td>
-<td>How many plants of each height are present in a patch of a given age.</td>
+<td>Plant density across the model’s size coordinate: height for FF16/TF24 or stem diameter for K93 (stored under the generic state name <code>height</code>)</td>
 </tr>
 <tr class="even">
-<td><strong>Light environment</strong></td>
-<td>How much light reaches each height in the canopy — the medium of competition.</td>
+<td><strong>Competitive environment</strong></td>
+<td>The shared quantity through which plants interact, such as the canopy-light profile or basal area of larger neighbours</td>
 </tr>
 <tr class="odd">
 <td><strong>Metacommunity</strong></td>
-<td>The whole landscape: a mosaic of patches of every age, linked by dispersing seeds.</td>
+<td>A landscape of patches of different ages connected by seed dispersal</td>
 </tr>
 <tr class="even">
-<td><strong>Birth / seed rain</strong></td>
-<td>The rate at which a strategy’s seeds arrive in a patch.</td>
+<td><strong>Birth rate / seed rain</strong></td>
+<td>The rate at which seeds of a strategy arrive in a patch</td>
 </tr>
 <tr class="odd">
-<td><strong>Equilibrium</strong></td>
-<td>The state where seeds exported match seeds arriving — the strategy pays for itself.</td>
+<td><strong>Demographic equilibrium</strong></td>
+<td>A state in which resident seed input and seed output are self-consistent, giving a net reproduction ratio of one</td>
 </tr>
 <tr class="even">
-<td><strong>Invasion fitness</strong></td>
-<td>The per-seed return of a rare mutant; &gt; 1 means it can invade.</td>
-</tr>
-<tr class="odd">
-<td><strong>Emergent property</strong></td>
-<td>A stand- or landscape-level pattern that falls out of the simulation rather than being programmed in.</td>
+<td><strong>Invasion criterion</strong></td>
+<td>Whether a rare strategy produces more than one dispersing offspring per incoming seed in the resident environment</td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="where-to-go-next" class="level2">
 <h2 class="anchored" data-anchor-id="where-to-go-next">Where to go next</h2>
-<p>Pick the path that matches what you want to do:</p>
+<p>Choose the path that matches your question:</p>
 <ul>
-<li><strong>I want to run it.</strong> Head to the <a href="../guides/index.html">guides</a> — start with <a href="../guides/first-individual.html">your first individual</a>, then <a href="../guides/patch-dynamics.html">patch dynamics</a>.</li>
-<li><strong>I want to understand the equations.</strong> Read the <a href="../theory/maths-primer.html">gentle maths primer</a> next, then the full <a href="../theory/size-structured-pde.html">size-structured PDE</a> and <a href="../theory/adaptive-dynamics.html">adaptive dynamics</a> pages.</li>
-<li><strong>I want a strategy’s biology.</strong> See the <a href="../theory/models/index.html">models overview</a>, the <a href="../theory/models/ff16.html">FF16</a> model, and the <a href="../theory/assimilation-hydraulics.html">assimilation &amp; hydraulics</a> page.</li>
+<li><strong>I want to run the model.</strong> Start with <a href="../guides/first-individual.html">Your first individual</a>, then continue to <a href="../guides/patch-dynamics.html">Patch dynamics</a>.</li>
+<li><strong>I want to understand the mathematics.</strong> Read <a href="../theory/maths-primer.html">The maths, gently</a>, followed by <a href="../theory/from-primer-to-pde.html">The maths, worked through</a> and the full <a href="../theory/size-structured-pde.html">size-structured PDE</a>.</li>
+<li><strong>I want to understand a biological strategy.</strong> See the <a href="../theory/models/index.html">models overview</a>, then the pages for <a href="../theory/models/ff16.html">FF16</a>, <a href="../theory/models/k93.html">K93</a>, or <a href="../theory/models/tf24.html">TF24</a>.</li>
+<li><strong>I want to study evolution or community assembly.</strong> Continue to <a href="../theory/adaptive-dynamics.html">Adaptive dynamics</a>.</li>
 </ul>
 
 

@@ -33,7 +33,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
 <link href="../../theory/implementation/characteristic-method.html" rel="next">
-<link href="../../theory/models/tf24.html" rel="prev">
+<link href="../../theory/adaptive-dynamics/assembly_stochastic.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -42,7 +42,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1461e13f5cda75d3dcfce56afc980b53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -74,6 +74,35 @@ ul.task-list li input[type="checkbox"] {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../assets/extras.css">
 </head>
@@ -146,7 +175,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">Implementation</a></li><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">Implementation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">4. Implementation</a></li><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">Implementation</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -166,13 +195,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Core</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">1. Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
@@ -197,35 +226,17 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">The size-structured PDE</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Assimilation &amp; hydraulics</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Soil water &amp; root uptake</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Adaptive dynamics</span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Models</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">2. Models and physiology</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../theory/models/index.html" class="sidebar-item-text sidebar-link">
@@ -240,8 +251,8 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../theory/models/k93.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">K93</span></a>
+  <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assimilation &amp; hydraulics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -250,17 +261,100 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">TF24</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/k93.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">K93</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Implementation</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">3. Adaptive dynamics</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive dynamics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive-dynamics models in regnans</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/DD99.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DD99: competition and evolutionary branching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/GK98.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GK98: adaptation across different habitats</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/GM99.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GM99: the evolution of seed size</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/JJ12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">JJ12: the evolution of migratory arrival time</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/solving_attractors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Finding evolutionary attractors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Community assembly with simple models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/assembly_fitmax.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Maximum-fitness community assembly</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/assembly_stochastic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stochastic assembly</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">4. Implementation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../theory/implementation/index.html" class="sidebar-item-text sidebar-link active">
@@ -293,6 +387,23 @@ ul.task-list li input[type="checkbox"] {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">5. Prediction and reproducibility</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/scientific-versioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scientific versioning of models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -303,16 +414,17 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#characteristic-method" id="toc-characteristic-method" class="nav-link active" data-scroll-target="#characteristic-method">Characteristic method</a></li>
+  <li><a href="#how-the-pieces-fit-together" id="toc-how-the-pieces-fit-together" class="nav-link active" data-scroll-target="#how-the-pieces-fit-together">How the pieces fit together</a></li>
+  <li><a href="#characteristic-method" id="toc-characteristic-method" class="nav-link" data-scroll-target="#characteristic-method">Characteristic method</a></li>
   <li><a href="#ode-stepping" id="toc-ode-stepping" class="nav-link" data-scroll-target="#ode-stepping">ODE stepping</a></li>
   <li><a href="#adaptive-node-spacing" id="toc-adaptive-node-spacing" class="nav-link" data-scroll-target="#adaptive-node-spacing">Adaptive node spacing</a></li>
-  <li><a href="#tk-splines" id="toc-tk-splines" class="nav-link" data-scroll-target="#tk-splines">TK splines</a></li>
+  <li><a href="#canopy-and-shading-models" id="toc-canopy-and-shading-models" class="nav-link" data-scroll-target="#canopy-and-shading-models">Canopy and shading models</a></li>
+  <li><a href="#numerical-tools-inside-the-solver" id="toc-numerical-tools-inside-the-solver" class="nav-link" data-scroll-target="#numerical-tools-inside-the-solver">Numerical tools inside the solver</a>
+  <ul class="collapse">
   <li><a href="#gauss-kronrod-quadrature" id="toc-gauss-kronrod-quadrature" class="nav-link" data-scroll-target="#gauss-kronrod-quadrature">Gauss-Kronrod quadrature</a></li>
   <li><a href="#numerical-derivatives" id="toc-numerical-derivatives" class="nav-link" data-scroll-target="#numerical-derivatives">Numerical derivatives</a></li>
   <li><a href="#trapezium-integration" id="toc-trapezium-integration" class="nav-link" data-scroll-target="#trapezium-integration">Trapezium integration</a></li>
-  <li><a href="#pre-compute-step" id="toc-pre-compute-step" class="nav-link" data-scroll-target="#pre-compute-step">Pre-compute step</a>
-  <ul class="collapse">
-  <li><a href="#approximating-the-light-environment-with-a-spline" id="toc-approximating-the-light-environment-with-a-spline" class="nav-link" data-scroll-target="#approximating-the-light-environment-with-a-spline">Approximating the light environment with a spline</a></li>
+  <li><a href="#adaptive-splines-for-the-light-environment" id="toc-adaptive-splines-for-the-light-environment" class="nav-link" data-scroll-target="#adaptive-splines-for-the-light-environment">Adaptive splines for the light environment</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/implementation/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -320,7 +432,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">Implementation</a></li><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">Implementation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">4. Implementation</a></li><li class="breadcrumb-item"><a href="../../theory/implementation/index.html">Implementation</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Implementation</h1>
 </div>
@@ -342,104 +454,76 @@ ul.task-list li input[type="checkbox"] {
 <div class="eyebrow">
 <p>implementation</p>
 </div>
-<p>This page overviews the numerical methods used in <code>plant</code> and serves as the index for the Implementation section, linking out to detailed pages for each method.</p>
+<p>The biological equations describe what the <code>plant</code> model should do. The implementation determines how a computer solves those equations accurately and efficiently. This section explains the main numerical ideas without assuming that you already know the structure of the C++ code.</p>
+<section id="how-the-pieces-fit-together" class="level2">
+<h2 class="anchored" data-anchor-id="how-the-pieces-fit-together">How the pieces fit together</h2>
+<p>A patch simulation can be understood as a sequence of five connected tasks:</p>
+<ol type="1">
+<li>The <strong>characteristic method</strong> turns the population-level partial differential equation into trajectories for representative cohorts.</li>
+<li>An <strong>ODE solver</strong> advances the size, survival, and reproduction of those cohorts through time.</li>
+<li>The <strong>node-spacing algorithm</strong> decides when another cohort is needed to represent the population accurately.</li>
+<li>The <strong>canopy model</strong> combines the cohorts into a vertical light profile, which then affects their growth.</li>
+<li>Numerical tools such as quadrature, finite differences, and splines make the repeated integrations and derivative calculations practical.</li>
+</ol>
+<p>The first four topics each have a dedicated page. The final part of this page introduces the smaller numerical tools used throughout the solver.</p>
+</section>
 <section id="characteristic-method" class="level2">
 <h2 class="anchored" data-anchor-id="characteristic-method">Characteristic method</h2>
-<p>System of ODEs, IVPs.</p>
-<p>See more detail in <a href="../../theory/implementation/characteristic-method.html">the characteristic method</a>.</p>
+<p>The size-structured population model is written as a partial differential equation (PDE). Rather than solving that PDE on a fixed size grid, <code>plant</code> follows representative cohorts as they grow. Each cohort traces a <em>characteristic</em> through time, turning the original problem into a collection of ordinary differential equations (ODEs).</p>
+<p>Read <a href="../../theory/implementation/characteristic-method.html">The characteristic method</a> for the equations and their connection to growth, survival, reproduction, and population density.</p>
 </section>
 <section id="ode-stepping" class="level2">
 <h2 class="anchored" data-anchor-id="ode-stepping">ODE stepping</h2>
-<p>See more detail in <a href="../../theory/implementation/ode-stepping.html">ODE stepping and control</a>.</p>
+<p>Once the model has been expressed as ODEs, a numerical stepper moves their state forward through time. The default adaptive solver takes small steps when the dynamics change rapidly and larger steps when they are smooth. Its error tolerances control the balance between accuracy and computation time.</p>
+<p>Read <a href="../../theory/implementation/ode-stepping.html">ODE stepping and control</a> for the adaptive RK45 solver, its C++ interface, and the fixed-step alternative.</p>
 </section>
 <section id="adaptive-node-spacing" class="level2">
 <h2 class="anchored" data-anchor-id="adaptive-node-spacing">Adaptive node spacing</h2>
-<p>See more details in <a href="../../theory/implementation/node-spacing.html">the node spacing algorithm</a>.</p>
+<p>Each node represents a cohort of plants born at roughly the same time. Too few nodes give a poor approximation to the population; too many make the simulation unnecessarily expensive. An ordinary run uses the supplied introduction schedule. When greater numerical accuracy is needed, users can opt in to a refinement step that adds nodes only where removing a node would make an important population integral too inaccurate.</p>
+<p>Read <a href="../../theory/implementation/node-spacing.html">The node-spacing algorithm</a> for the refinement test and worked diagnostics.</p>
 </section>
-<section id="tk-splines" class="level2">
-<h2 class="anchored" data-anchor-id="tk-splines">TK splines</h2>
-<!-- dropped: source section was an empty stub heading with no content -->
+<section id="canopy-and-shading-models" class="level2">
+<h2 class="anchored" data-anchor-id="canopy-and-shading-models">Canopy and shading models</h2>
+<p>Every cohort both experiences and contributes to a shared light environment. Different canopy models trade biological detail for speed, so the appropriate choice depends on whether the goal is stand dynamics, demographic equilibrium, or eco-evolutionary analysis.</p>
+<p>Read <a href="../../theory/implementation/canopy-models.html">Canopy models</a> for the available shading models, their computational cost, and the reason PPA requires a smoothed light profile under adaptive ODE stepping.</p>
 </section>
-<section id="gauss-kronrod-quadrature" class="level2">
-<h2 class="anchored" data-anchor-id="gauss-kronrod-quadrature">Gauss-Kronrod quadrature</h2>
-<p>To numerically integrate functions, we use the Gauss-Kronrod quadrature method. This is implemented in the <code>QK</code> and <code>QAG</code> classes.</p>
-<ul>
-<li>General background on the method is available at: <a href="https://en.wikipedia.org/wiki/Gaussian_quadrature" class="uri">https://en.wikipedia.org/wiki/Gaussian_quadrature</a></li>
-<li>The <code>QK</code> class is used to numerically integrate functions using Gauss-Kronrod quadrature.
-<ul>
-<li>The number of points used when numerically integrating the function is defined by the control variable <code>function_integration_rule</code>. The integration has several “rules”, including QK15, QK21, QK31, QK41, QK51, defined in <code>qk_rules.cpp</code>. These determine the numbers of points in the integration. The default number of points is 21.</li>
-<li>The <code>QK</code> code was ported from GSL by Rich FitzJohn.</li>
-</ul></li>
-<li>The <code>QAG</code> class uses the <code>QK</code> class, for adaptive integration using Gauss-Kronrod quadrature. In the adaptive method, the difference between a Gauss quadrature rule and its Kronrod extension is used as an estimate of the approximation error, from which the need for more points is determined.
-<ul>
-<li>The QAG routine is adapted from the “QAG” algorithm in QUADPACK.</li>
-<li>The <code>QAG</code> class calls class <code>QK</code>, which does the actual integration.</li>
-</ul></li>
-</ul>
+<section id="numerical-tools-inside-the-solver" class="level2">
+<h2 class="anchored" data-anchor-id="numerical-tools-inside-the-solver">Numerical tools inside the solver</h2>
+<p>The methods above rely on several smaller numerical operations. Most users do not need to call these directly, but knowing their roles makes the larger algorithm easier to follow.</p>
+<section id="gauss-kronrod-quadrature" class="level3">
+<h3 class="anchored" data-anchor-id="gauss-kronrod-quadrature">Gauss-Kronrod quadrature</h3>
+<p>Gauss–Kronrod quadrature estimates the integral of a function from values at a chosen set of points. <code>plant</code> uses it, for example, to integrate leaf-level assimilation over crown depth.</p>
+<p>The <code>QK</code> class performs the quadrature. The control variable <code>function_integration_rule</code> selects the number and arrangement of evaluation points from rules defined in <code>qk_rules.cpp</code>, including QK15, QK21, QK31, QK41, and QK51. The default rule uses 21 points. This code was ported from the GNU Scientific Library (GSL) by Rich FitzJohn.</p>
+<p>The <code>QAG</code> class adds adaptive refinement around <code>QK</code>. It compares a Gauss rule with its Kronrod extension to estimate approximation error, then adds points where needed. The implementation is adapted from the QAG algorithm in QUADPACK. For general background, see <a href="https://en.wikipedia.org/wiki/Gaussian_quadrature">Gaussian quadrature</a>.</p>
 </section>
-<section id="numerical-derivatives" class="level2">
-<h2 class="anchored" data-anchor-id="numerical-derivatives">Numerical derivatives</h2>
-<p>node introduction</p>
+<section id="numerical-derivatives" class="level3">
+<h3 class="anchored" data-anchor-id="numerical-derivatives">Numerical derivatives</h3>
+<p>The characteristic method needs the derivative of growth rate with respect to plant size when it updates population density. <code>plant</code> estimates this derivative with finite differences and can optionally improve the estimate using Richardson extrapolation. The relevant controls are described on <a href="../../theory/implementation/characteristic-method.html#sec-approximation-of-size-density-distribution-via-the-scm">The characteristic method</a>.</p>
 </section>
-<section id="trapezium-integration" class="level2">
-<h2 class="anchored" data-anchor-id="trapezium-integration">Trapezium integration</h2>
-<p><code>trapezium(xx, yy)</code>.</p>
+<section id="trapezium-integration" class="level3">
+<h3 class="anchored" data-anchor-id="trapezium-integration">Trapezium integration</h3>
+<p>The trapezium rule approximates the area under a curve by joining neighbouring points with straight lines. <code>plant</code> uses this rule to integrate quantities such as leaf area over the discrete cohort distribution. The internal helper is <code>trapezium(xx, yy)</code>; its accuracy therefore depends strongly on node spacing.</p>
 </section>
-<section id="pre-compute-step" class="level2">
-<h2 class="anchored" data-anchor-id="pre-compute-step">Pre-compute step</h2>
-<section id="approximating-the-light-environment-with-a-spline" class="level3">
-<h3 class="anchored" data-anchor-id="approximating-the-light-environment-with-a-spline">Approximating the light environment with a spline</h3>
-<section id="creating-the-light-environment" class="level4">
-<h4 class="anchored" data-anchor-id="creating-the-light-environment">Creating the light environment</h4>
-<p>The patch calls <code>compute_environment</code>,</p>
-<ul>
-<li>which calls <code>environment.compute_environment(f, height_max())</code>, where <code>f = compute_competition</code>
-<ul>
-<li><code>compute_competition</code> passes through species
-<ul>
-<li>in species, <code>compute_competition</code> integrates density over nodes
-<ul>
-<li>in node, <code>compute_competition = density * individual.compute_competition(height_);</code>
-<ul>
-<li>individual passes straight through to strategy
-<ul>
-<li>strategy calculates fraction of <code>leaf above = k_I * area_leaf(height) * Q(z, height);</code></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-<li><code>environment.compute_environment</code> creates a spline of light availability, as a function of height
-<ul>
-<li>to do this, it uses the <code>ResourceSpline</code> class.
-<ul>
-<li><code>ResourceSpline</code> class uses an adaptive routine to sample across the height range to approximate the function
-<ul>
-<li>the function is ultimately approximated with a spline, using the <code>tk</code> class</li>
-</ul></li>
-</ul></li>
-<li>creating the spline is achieved through calls to <code>compute_competition</code>, as described above</li>
-</ul></li>
-</ul>
-<p>For more on light environments, see <a href="../../theory/implementation/canopy-models.html">canopy models</a>.</p>
-<section id="using-the-light-environment" class="level5">
-<h5 class="anchored" data-anchor-id="using-the-light-environment">Using the light environment</h5>
-<ul>
-<li>In <code>compute_rates</code>, environment gets passed from Patch -&gt; Species -&gt; Node -&gt; Individual -&gt; Strategy
-<ul>
-<li>FF16_strategy <code>net_mass_production_dt</code> calls <code>assimilation</code>
-<ul>
-<li>assimilation uses the object <code>quadrature::QK function_integrator</code> to integrate the function <code>assimilation_leaf(environment.get_environment_at_height(z)) * q(z, height)</code> over z, where z is depth in the plant. The function is integrated using Gauss-Kronrod quadrature. The number of points used when numerically integrating the function is defined by the argument <code>function_integration_rule</code> (see above), the default number of points is 21.
-<ul>
-<li>Previously, we used the QAG (instead of QK) class, to enable adaptive integration of the function. The QAG class uses QK, but includes an extra layer to refine the number of points. However, this is slower and isn’t noticeably changing the results. The adaptive routine may take twice as long.</li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+<section id="adaptive-splines-for-the-light-environment" class="level3">
+<h3 class="anchored" data-anchor-id="adaptive-splines-for-the-light-environment">Adaptive splines for the light environment</h3>
+<p>Calculating canopy openness directly at every cohort would make each solver step scale poorly as more nodes are added. Instead, <code>plant</code> calculates openness at an adaptively chosen set of heights, fits a spline, and then evaluates that much cheaper approximation wherever it is needed. The <code>ResourceSpline</code> class manages the adaptive sampling and stores the result in an <code>odelia::interpolator::Interpolator</code>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Following the light calculation through the code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Readers working on the C++ implementation can follow the calculation in two directions.</p>
+<p>To <strong>construct the environment</strong>, the patch calls <code>environment.compute_environment(f, height_max())</code>, with <code>f = compute_competition</code>. That calculation passes from patch to species to node to individual to strategy. At the node level, density weights the individual competitive effect. The strategy ultimately evaluates the leaf area above height <span class="math inline">\(z\)</span> from an expression of the form <code>k_I * area_leaf(height) * Q(z, height)</code>. <code>ResourceSpline</code> samples this result across height and builds the light-availability spline.</p>
+<p>To <strong>use the environment</strong>, <code>compute_rates</code> passes it from patch to species to node to individual to strategy. In <code>FF16_Strategy</code>, <code>net_mass_production_dt</code> calls <code>assimilation</code>. A <code>quadrature::QK</code> integrator then evaluates <code>assimilation_leaf(environment.get_environment_at_height(z)) * q(z, height)</code> over crown depth <span class="math inline">\(z\)</span>. Earlier versions used the adaptive <code>QAG</code> layer here, but it could take about twice as long without noticeably changing results, so the current calculation uses the fixed <code>QK</code> rule selected by <code>function_integration_rule</code>.</p>
+</div>
+</div>
 
 
-</section>
-</section>
 </section>
 </section>
 
@@ -846,8 +930,8 @@ ul.task-list li input[type="checkbox"] {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../theory/models/tf24.html" class="pagination-link" aria-label="TF24">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">TF24</span>
+      <a href="../../theory/adaptive-dynamics/assembly_stochastic.html" class="pagination-link" aria-label="Stochastic assembly">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Stochastic assembly</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

@@ -67,7 +67,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../guides/strategies.html" rel="next">
+<link href="../guides/initialising-a-patch.html" rel="next">
 <link href="../guides/first-individual.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -77,7 +77,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-519dedabd442578fbf05653c31ebbc4d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1461e13f5cda75d3dcfce56afc980b53.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -268,6 +268,12 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../guides/initialising-a-patch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Initialising a patch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../guides/strategies.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Strategies &amp; traits</span></a>
   </div>
@@ -315,6 +321,29 @@ window.Quarto = {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">TF24 in depth</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-hydraulics-and-acclimation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: hydraulics, and a fast acclimating variant</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-nsc-storage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: carbohydrate storage, buffered growth and mortality</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -325,9 +354,9 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a></li>
+  <li><a href="#set-up-the-patch" id="toc-set-up-the-patch" class="nav-link active" data-scroll-target="#set-up-the-patch">Set up the patch</a></li>
   <li><a href="#one-patch" id="toc-one-patch" class="nav-link" data-scroll-target="#one-patch">One patch</a></li>
-  <li><a href="#multiple-patches" id="toc-multiple-patches" class="nav-link" data-scroll-target="#multiple-patches">Multiple patches</a></li>
+  <li><a href="#leaf-area-index-in-one-patch" id="toc-leaf-area-index-in-one-patch" class="nav-link" data-scroll-target="#leaf-area-index-in-one-patch">Leaf area index in one patch</a></li>
   <li><a href="#multi-species-patches" id="toc-multi-species-patches" class="nav-link" data-scroll-target="#multi-species-patches">Multi-species patches</a></li>
   <li><a href="#appendix---ggplot-example" id="toc-appendix---ggplot-example" class="nav-link" data-scroll-target="#appendix---ggplot-example">Appendix - <code>ggplot</code> example</a></li>
   </ul>
@@ -358,11 +387,11 @@ window.Quarto = {
 <div class="eyebrow">
 <p>guide</p>
 </div>
-<p>The most important feature of <code>plant</code> is modelling size distributions for multiple competing species within a patch. A patch is simply an area in which a collection of individuals grow and compete for resources. Having explored the individual elsewhere, the aim here is to use <code>plant</code> to investigate the dynamics of many individuals within a single patch.</p>
-<p>Plant solves these dynamics by integrating along the <em>characteristics</em> of a partial differential equation — see the <a href="../theory/size-structured-pde.html">size-structured PDE</a> being solved and the <a href="../theory/implementation/characteristic-method.html">characteristic method</a> used to solve it.</p>
-<section id="background" class="level2">
-<h2 class="anchored" data-anchor-id="background">Background</h2>
-<p>First we instantiate the basic parameters of the <code>FF16</code> strategy. The length of a patch’s development — and hence its disturbance regime — is governed by <code>max_patch_lifetime</code> (in years). The mean disturbance interval is a derived, read-only property of the disturbance regime rather than a field you set directly; here we simply keep the default (~105 years):</p>
+<p>This guide moves from one individual to a <strong>patch</strong>: an area in which many plants grow and compete for resources. You will run a one-species patch, follow its cohorts through time, inspect its light environment, and then add a second species.</p>
+<p>Rather than simulating every plant separately, <code>plant</code> represents cohorts as <strong>nodes</strong> and follows their changing size and density. These trajectories are the characteristics of the model’s partial differential equation. See the <a href="../theory/size-structured-pde.html">size-structured PDE</a> being solved and the <a href="../theory/implementation/characteristic-method.html">characteristic method</a> used to solve it.</p>
+<section id="set-up-the-patch" class="level2">
+<h2 class="anchored" data-anchor-id="set-up-the-patch">Set up the patch</h2>
+<p>First we instantiate the basic parameters of the <code>FF16</code> strategy. <code>max_patch_lifetime</code> is the oldest patch age integrated by the solver and also parameterises the default disturbance distribution. Its default is about 105 years; the corresponding mean disturbance interval is a separate derived value of 30 years.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -371,16 +400,15 @@ window.Quarto = {
 </section>
 <section id="one-patch" class="level2">
 <h2 class="anchored" data-anchor-id="one-patch">One patch</h2>
-<p>Next, we configure a patch containing a single species:</p>
+<p>Add one species, represented by an LMA value of 0.0825:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>patch <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(params, <span class="fu">trait_matrix</span>(<span class="fl">0.0825</span>, <span class="st">"lma"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<!-- TODO: rename SCM to solve_characteristic_method (issue: #206) -->
-<p>and run the <code>plant</code> characteristic solver to step the equations defining nodes of individuals forward in time:</p>
+<p>Run the characteristic solver and collect the state after every recorded step:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(patch, <span class="at">collect =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><code>run_scm(collect = TRUE)</code> collects information about the state of the system at every ODE step:</p>
+<p>The result contains several components. These are the ones used most often:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(result)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -390,17 +418,46 @@ window.Quarto = {
 [7] "p"                      </code></pre>
 </div>
 </div>
-<p>Entries are:</p>
-<ul>
-<li>steps: a table with one row per ODE step, recording the <code>time</code> of the step and the <code>patch_density</code> (the density of patches of this age in the metapopulation)</li>
-<li>n_spp: the number of species in the patch</li>
-<li>species: a tidy table with one row per node per step. Alongside <code>time</code>, <code>step</code> and <code>node</code> identifiers it records each node’s state, including <code>height</code>, <code>log_density</code> / <code>density</code> and <code>competition_effect</code> (the leaf area of an individual in that node)</li>
-<li>env: a list describing resource availability. This includes <code>light_availability</code>, a table giving canopy openness at a series of heights for each step (the competitive environment of the patch, e.g.&nbsp;canopy openness at a given height in the FF16 strategy)</li>
-<li>offspring_production: the offspring production from the patch during its development</li>
-<li>net_reproduction_ratios: the net reproduction ratio for each species</li>
-<li>p: a copy of the input parameters</li>
-</ul>
-<p>First we explore patch state:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>What it contains</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>steps</code></td>
+<td>One row per recorded step, including patch age (<code>time</code>) and the abundance of patches of that age (<code>patch_density</code>).</td>
+</tr>
+<tr class="even">
+<td><code>species</code></td>
+<td>One row per node per step, including height, density, and individual leaf area (<code>competition_effect</code>).</td>
+</tr>
+<tr class="odd">
+<td><code>env</code></td>
+<td>Resource conditions through time, including the light profile.</td>
+</tr>
+<tr class="even">
+<td><code>offspring_production</code></td>
+<td>Reproductive output during patch development.</td>
+</tr>
+<tr class="odd">
+<td><code>net_reproduction_ratios</code></td>
+<td>Lifetime reproductive output for each species.</td>
+</tr>
+<tr class="even">
+<td><code>p</code></td>
+<td>The parameters used for the run, including any refined schedule.</td>
+</tr>
+</tbody>
+</table>
+<p>The result also records <code>n_spp</code>, the number of species.</p>
+<p>First reshape node heights into a matrix:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>t <span class="ot">&lt;-</span> result<span class="sc">$</span>steps<span class="sc">$</span>time</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>h <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">sdd_matrix</span>(dplyr<span class="sc">::</span><span class="fu">filter</span>(result<span class="sc">$</span>species, species <span class="sc">==</span> <span class="st">"1"</span>), <span class="st">"height"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -412,14 +469,15 @@ window.Quarto = {
 <pre><code>[1] 142 142</code></pre>
 </div>
 </div>
-<p>While the solver ran the patch ODEs for 142 steps, the time points are not evenly distributed:</p>
+<p>The time points recorded by the solver are not evenly distributed:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">signif</span>(t[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">142</span>)], <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sample_steps <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">round</span>(<span class="fu">seq</span>(<span class="dv">1</span>, <span class="fu">length</span>(t), <span class="at">length.out =</span> <span class="dv">5</span>)))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">signif</span>(t[sample_steps], <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0e+00 1e-04 2e-02 2e+01 1e+02</code></pre>
+<pre><code>[1] 0e+00 3e-03 5e-01 4e+01 1e+02</code></pre>
 </div>
 </div>
-<p>higher temporal resolution is needed to resolve early patch development, where small differences are magnified through competitive feedbacks. Our patch ran for 105 yrs, but the solver spent half the recorded steps exploring the first year alone. More on timing can be found in <a href="../theory/implementation/node-spacing.html">The node-spacing algorithm</a>.</p>
+<p>This uneven spacing is deliberate. Early patch development needs higher time resolution because small differences are amplified by competition. Although the patch runs for about 105 years, roughly half the recorded steps occur in the first year. See <a href="../theory/implementation/node-spacing.html">The node-spacing algorithm</a>.</p>
 <p>Nodes are introduced at each time-step, except the last. At time step <span class="math inline">\(i\)</span>, the rows of <code>h</code> record the height of all previously introduced nodes in the patch:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>h[<span class="dv">10</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -453,8 +511,8 @@ NA </code></pre>
 <pre><code>[1] 9</code></pre>
 </div>
 </div>
-<p>With a single species there is always one more time step than node introduction, with the last two steps having the same number of nodes. With multiple species there can be more time steps than node introductions, as we’ll record data every node introduction for <em>either</em> species, each of which will be refined to different schedules.</p>
-<p>In the <code>FF16</code> strategy, Individuals increase in height with respect to time, but because they are competing the growth rate depends on the state of the environment (e.g.&nbsp;the amount of shading above an Individual’s canopy), in addition to size dependent growth.</p>
+<p>With a single species on this schedule there is one more recorded time step than node introduction, with the last two steps having the same number of nodes. With multiple species there can be more time steps than node introductions, as we’ll record data at every node introduction for <em>either</em> species when their schedules differ.</p>
+<p>FF16 individuals grow taller through time, but their growth rate depends on both their size and the light reaching their canopy. Competition therefore causes nodes introduced at different times to follow different trajectories.</p>
 <!-- TODO(#481): Dead link- "(see vignette:plant)" -->
 <p>We can plot the trajectories of nodes developing within a patch over time:</p>
 <div class="cell">
@@ -508,7 +566,7 @@ NA </code></pre>
 </div>
 </div>
 </div>
-<p>initally (bottom right) all nodes in the patch are short and the canopy is rather open (close to one). In later stages of patch development, we see that only the tallest individuals experience an open canopy. Notably, the canopy openness experienced by shorter individuals fluctuates as older individuals die and canopy gaps are filled in.</p>
+<p>Initially, all nodes are short and most of the canopy is open. As the patch develops, only the tallest plants remain in high light. Shorter plants experience changing conditions as older plants die and new growth fills the gaps.</p>
 <p>This is best shown by plotting the canopy openness at ground level over time:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>ground <span class="ot">&lt;-</span> light <span class="sc">|&gt;</span></span>
@@ -525,23 +583,20 @@ NA </code></pre>
 </div>
 </div>
 </div>
-<p>Again, the waves here are show rounds of recruitment and self thinning. Mortality is not instantaneous, so monocultures (patches of one species) recruit to a density that generates a canopy that they cannot survive under.</p>
+<p>The repeated waves reflect recruitment followed by self-thinning. Mortality is not instantaneous, so a one-species patch can briefly recruit more plants than the closed canopy can support.</p>
 </section>
-<section id="multiple-patches" class="level2">
-<h2 class="anchored" data-anchor-id="multiple-patches">Multiple patches</h2>
-<p>In the <code>FF16</code> strategy, leaf area index (LAI) is the driver that controls the canopy openness (via the light extinction coefficient <code>k_I</code>, a strategy parameter at <code>params$strategy_default$pars$k_I</code>, following exponential extinction). The collected output records the leaf area (<code>competition_effect</code>) of an individual in each node, so we can integrate across the size distribution to recover the patch-level competition experienced at ground level (height = 0) in terms of LAI:</p>
+<section id="leaf-area-index-in-one-patch" class="level2">
+<h2 class="anchored" data-anchor-id="leaf-area-index-in-one-patch">Leaf area index in one patch</h2>
+<p>Leaf area index (LAI) is total leaf area per unit ground area. The collected output records individual leaf area as <code>competition_effect</code>; weighting it by node density and integrating over height gives patch-level LAI. FF16 multiplies LAI by the light extinction coefficient <code>k_I</code> to obtain the ground-level optical depth used by its canopy model:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Light extinction coefficient, used to weight leaf area into competition.</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>k_I <span class="ot">&lt;-</span> result<span class="sc">$</span>p<span class="sc">$</span>strategies[[<span class="dv">1</span>]]<span class="sc">$</span>pars<span class="sc">$</span>k_I</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>lai <span class="ot">&lt;-</span> result<span class="sc">$</span>species <span class="sc">|&gt;</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">"1"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(time) <span class="sc">|&gt;</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">lai =</span> <span class="fu">patch_competition</span>(height, density, competition_effect, k_I),</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lai<span class="sc">$</span>time, lai<span class="sc">$</span>lai, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">las=</span><span class="dv">1</span>, <span class="at">xlab=</span><span class="st">"Time (years)"</span>, <span class="at">ylab=</span><span class="st">"Leaf area index"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>lai <span class="ot">&lt;-</span> result<span class="sc">$</span>species <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">"1"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(time) <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">lai =</span> <span class="fu">patch_lai</span>(height, density, competition_effect),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lai<span class="sc">$</span>time, lai<span class="sc">$</span>lai, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">las=</span><span class="dv">1</span>, <span class="at">xlab=</span><span class="st">"Time (years)"</span>, <span class="at">ylab=</span><span class="st">"Leaf area index"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -553,7 +608,7 @@ NA </code></pre>
 </section>
 <section id="multi-species-patches" class="level2">
 <h2 class="anchored" data-anchor-id="multi-species-patches">Multi-species patches</h2>
-<p>If multiple species are grown at once, they compete with one another. This adds a second species – with a higher leaf mass area (LMA) than the first species – to the population:</p>
+<p>Now add a second species with higher leaf mass per area (LMA). Both species use the same light environment, so each changes the conditions experienced by the other:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>patch_2sp <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(patch, <span class="fu">trait_matrix</span>(<span class="fl">0.2625</span>, <span class="st">"lma"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -583,7 +638,7 @@ NA </code></pre>
 </div>
 </div>
 </div>
-<p>Alternatively we can compare the growth of the low LMA species (red) in a patch by itself or with another species:</p>
+<p>To isolate the effect of the competitor, compare the low-LMA species alone (black) with the same species in the two-species patch (red):</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Monoculture patch (black)</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(t, h, <span class="at">lty=</span><span class="dv">1</span>, <span class="at">col=</span><span class="fu">util_colour_set_opacity</span>(<span class="st">"black"</span>, .<span class="dv">25</span>), <span class="at">type=</span><span class="st">"l"</span>,</span>
@@ -599,7 +654,7 @@ NA </code></pre>
 </div>
 </div>
 </div>
-<p>This shows that the additional species does not significantly affect the growth of the <em>initial</em> wave of nodes (because the second species is growing more slowly and is shorter than the first species). However, once canopy closure has occurred (around year 5), subsequent waves of arriving nodes are competitively suppressed, slowed or eliminated.</p>
+<p>The additional species has little effect on the <em>initial</em> wave because it grows more slowly and remains shorter. After canopy closure, around year 5 in this example, later recruits face stronger competition and are slowed, suppressed, or eliminated.</p>
 <p>The dynamics are easier to see when node trajectories are weighted by node density (some of the lines here represent nodes at close to zero density). Log density is available as a characteristic variable of all <code>plant</code> strategies:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Relativise the log densities onto (-4, max)</span></span>
@@ -638,7 +693,7 @@ NA </code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>lai2 <span class="ot">&lt;-</span> result_2sp<span class="sc">$</span>species <span class="sc">|&gt;</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(species, step) <span class="sc">|&gt;</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">lai =</span> <span class="fu">patch_competition</span>(height, density, competition_effect, k_I),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">lai =</span> <span class="fu">patch_lai</span>(height, density, competition_effect),</span>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> lai,</span>
@@ -1141,8 +1196,8 @@ axis(1, at=108, labels="Av")
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../guides/strategies.html" class="pagination-link" aria-label="Strategies &amp; traits">
-        <span class="nav-page-text">Strategies &amp; traits</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../guides/initialising-a-patch.html" class="pagination-link" aria-label="Initialising a patch">
+        <span class="nav-page-text">Initialising a patch</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
