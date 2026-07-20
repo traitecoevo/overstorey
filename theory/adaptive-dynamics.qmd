@@ -5,63 +5,107 @@ title: "Adaptive dynamics"
 theory
 :::
 
-This page builds on the demographic machinery developed for the
-[size-structured PDE](size-structured-pde.qmd) to estimate the fitness of rare
-mutant phenotypes and so reason about evolutionary endpoints in a trait-, size-,
-and patch-structured metacommunity. The approach for calculating fitness
-implemented here follows @Falster-2015.
+::: {.callout-note}
+## Prerequisites
+This page builds on [The big picture](overview.qmd), especially the birth-rate
+loop, and on the demographic quantities defined in
+[The size-structured PDE](size-structured-pde.qmd).
+:::
 
-# Invasion fitness {#sec-invasion-fitness}
+## The idea first
 
-We now consider how to estimate the fitness of a rare mutant individual
-with traits $x^\prime$ growing in the light environment of a resident
-community with traits $x$. We focus on phenotype-dependent components
-of fitness -- describing the aggregate consequences of a given set of traits for growth,
-fecundity, and mortality -- taking into account the non-linear effects of
-competition, but ignoring the underlying genetic
-basis for trait inheritance and expression. We also adhere to standard
-conventions in such analyses by assuming that the mutant phenotype is sufficiently
-rare to have a negligible effect on the light environment where it is growing [@Geritz-1998].
-The approach for calculating fitness implemented here follows the approach
-described by @Falster-2015.
+Adaptive dynamics asks a simple question: if a new strategy appears at very low
+frequency, can it increase in the environment created by the strategies already
+present? The established strategies are called **residents** and the new
+strategy is called a **mutant**. Because the mutant is rare, we assume it
+experiences the residents' competitive environment without noticeably changing
+that environment itself.
 
-In general, invasion fitness is defined as the long-term per capita
-growth rate of a rare mutant phenotype in the environment
-determined by a resident phenotype [@Metz-1992]. Calculating
-per capita growth rates, however, is particularly challenging in a
-structured metacommunity model [@Gyllenberg-2001; @Metz-2001]. As
-an alternative measure of invasion fitness in metacommunities, we can use the basic reproduction
-ratio measuring the expected number of new dispersers arising from a
-single dispersal event. For metacommunities at demographic equilibrium, evolutionary inferences made using basic
-reproduction ratios are equivalent to those made using per capita growth
-rates
+The calculation follows one mutant seed across all the patch ages at which it
+might arrive. In each possible patch, the seed may establish, grow, survive, and
+produce dispersing offspring. Averaging that lifetime return across the
+landscape gives a reproduction ratio: above one the mutant can invade, below
+one it cannot, and at one it exactly replaces itself. The equations below use
+the canopy-light environment developed on the [size-structured
+PDE](size-structured-pde.qmd) page. The fitness calculation follows
+@Falster-2015.
+
+## Invasion fitness {#sec-invasion-fitness}
+
+Let $x$ denote the traits of the resident community and $x^\prime$ the traits
+of a rare mutant. We focus on phenotype-dependent fitness: the combined
+consequences of those traits for growth, fecundity, and mortality in the
+non-linear competitive environment created by the residents. We do not model
+the genetic basis of trait inheritance or expression. Following the standard
+rare-mutant assumption, the mutant has a negligible effect on the competitive
+environment—in this formulation, the canopy-light profile—in which it grows
+[@Geritz-1998].
+
+In general, invasion fitness is the long-term per-capita growth rate of a rare
+mutant in the environment determined by the residents [@Metz-1992]. That rate
+is difficult to calculate directly in a structured metacommunity because plants
+differ in size and occupy patches of different ages
 [@Gyllenberg-2001; @Metz-2001].
 
-We denote by $R\left(x^\prime, x\right)$ the basic reproduction ratio of
-individuals with traits $x^\prime$ growing in the competitive
-light environment of the resident traits $x$. Recalling that patches of age
-$a$ have frequency-density $P(a)$ in the landscape (the equilibrium patch-age
-distribution derived on the [size-structured PDE](size-structured-pde.qmd)
-page), it follows that any seed
-with traits $x^\prime$ has a probability of $P(a)$ of landing in a patch of age
-$a$. The basic reproduction ratio for individuals with traits
-$x^\prime$ is then
+At demographic equilibrium, we can instead use the **basic reproduction
+ratio**: the expected number of new dispersers ultimately produced by one
+dispersing seed. This ratio gives the same evolutionary ordering as the
+long-term per-capita growth rate, so it can be used to decide whether a mutant
+invades [@Gyllenberg-2001; @Metz-2001].
+
+We denote by $R\left(x^\prime, x\right)$ the mutant's basic reproduction ratio
+in the competitive environment created by residents $x$. Patches of age
+$a$ have frequency-density $P(a)$ in the landscape, as derived on the
+[size-structured PDE](size-structured-pde.qmd) page. More precisely, the
+probability that a randomly dispersed seed lands in a patch with age in a small
+interval $\mathrm{d}a$ is $P(a)\mathrm{d}a$.
+
+The mutant may therefore land in a young, open patch or an old, shaded one. Its
+overall reproduction ratio averages its return over all those possible arrival
+ages:
 $$
 R\left(x^\prime,x\right) = \int _0^{\infty} P\left(a\right) \, \tilde{R}\left(x^\prime, a, \infty \right) \, {\rm d}a ,
 $$ {#eq-invfit}
-where $\tilde{R}\left(x^\prime, a_0, a \right)$ is the expected number
-of dispersing offspring produced by a single dispersing seed with traits $x^\prime$ arriving in
-a patch of age $a_0$ up until age $a$
-[@Gyllenberg-2001; @Metz-2001].
-In turn, $\tilde{R}\left(x^\prime, a,\infty\right)$ is calculated by integrating
-an individual's fecundity over the expected lifetime of a patch, taking
-into account competitive shading from residents with traits $x$, the
-individual's probability of surviving, and its traits,
+
+Here $\tilde{R}\left(x^\prime, a_0, a \right)$ is the expected number of
+dispersing offspring produced by one mutant seed that arrives when the patch is
+age $a_0$, counted up to patch age $a$ [@Gyllenberg-2001; @Metz-2001]. In
+@eq-invfit the endpoint is infinity, so the entire remaining lifetime of the
+patch is included.
+
+That lifetime return is itself another integral:
 $$
 \tilde{R}(x^\prime, a_0, \infty) = \int_{a_0}^{\infty} S_{\rm D} \, f(x^\prime, H(x^\prime, a_0, a), E_{a}) \, S_{\rm I} (x^\prime, a_0, a) \, S_{\rm P} (a_0, a) \, {\rm d} a.
 $$ {#eq-tilder}
-Here $S_{\rm I}$ is the individual survival probability and $S_{\rm P}$ the
-patch survival probability, both defined on the
-[size-structured PDE](size-structured-pde.qmd) page.
 
-# References
+The integrand is a product of four pieces:
+
+- $f$ is the mutant's fecundity at its current height and light environment;
+- $S_{\rm I}$ is the probability that the mutant is still alive;
+- $S_{\rm P}$ is the probability that the patch has not yet been disturbed; and
+- $S_{\rm D}$ is the fraction of offspring that survive dispersal.
+
+The individual and patch survival probabilities are defined on the
+[size-structured PDE](size-structured-pde.qmd) page. Multiplying the four terms
+gives expected viable offspring production at patch age $a$; integrating from
+arrival age $a_0$ onward gives the seed's expected lifetime return.
+
+### Reading the result
+
+The threshold is replacement:
+
+- $R(x^\prime, x) > 1$: one mutant seed produces more than one dispersing seed
+  on average, so the mutant can invade;
+- $R(x^\prime, x) < 1$: it fails to replace itself and cannot invade; and
+- $R(x^\prime, x) = 1$: it exactly replaces itself in that resident
+  environment.
+
+Repeating this calculation across mutant trait values gives an invasion-fitness
+landscape. A resident that cannot be invaded by nearby alternatives is
+evolutionarily stable. That is distinct from convergence stability: a trait can
+be approached by gradual evolution yet still be invasible once reached, in
+which case it can be an evolutionary branching point rather than an endpoint.
+The [adaptive-dynamics examples](adaptive-dynamics/index.qmd) show both kinds of
+outcome.
+
+## References

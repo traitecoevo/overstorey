@@ -1,359 +1,475 @@
 ---
 title: "The big picture"
 ---
+
 ::: {.eyebrow}
 theory · start here
 :::
 
-If you are meeting `plant` for the first time, start here. This page gives you
-the whole mental model — what the model tracks, how the pieces fit together, what
-questions it can answer, and where each idea shows up in the code — without any
-equations. When you want the maths, the [gentle maths primer](maths-primer.qmd)
-builds up the equations one step at a time, and the
-[size-structured PDE](size-structured-pde.qmd) page has the full treatment.
+`plant` is an R package for modelling how plants grow and compete within forest
+patches. Rather than simulating every tree as an independent object, its main
+solver describes a population by the distribution of plant sizes and follows
+how that distribution changes through growth, mortality, and recruitment.
 
-## What `plant` models
+The biological details are supplied by a **strategy**. A strategy determines
+how an individual plant responds to its size and surroundings: how quickly it
+grows, how likely it is to die, how many seeds it produces, and how it affects
+its competitors. The population solver then applies those rates across all the
+plants in a patch.
 
-`plant` is a simulator for **forests of competing plants**. Given one or more
-plant *strategies* — ways of being a plant, such as cheap fast-growing leaves
-versus dense slow wood — it works out how a patch of ground fills with vegetation
-over time, how those plants shade and out-compete one another, how the stand
-thins and matures, and which strategies can persist over the long run.
+This page introduces that structure without equations. Most examples use
+[FF16](models/ff16.qmd), the default trait-based strategy. The same demographic
+machinery also supports strategies with different biology, including
+[TF24](models/tf24.qmd), which adds explicit plant hydraulics, and
+[K93](models/k93.qmd), which represents size and competition differently.
 
-The defining feature is that `plant` builds everything **from the bottom up**.
-Nothing about the forest is imposed in advance: stand structure, size
-distributions, self-thinning, succession, and coexistence all *emerge* from the
-growth, death, and seeding of individual plants, each responding to the light it
-experiences. If you change how a single plant works, the whole forest that grows
-out of it changes too.
+## What goes into the model
 
-That makes `plant` useful for questions like:
+A `plant` simulation combines several choices:
 
-- How does a patch of forest develop from bare ground to mature stand?
-- How do plants with different traits compete, and who wins where?
-- What mix of strategies can coexist in a disturbed landscape?
-- Which trait values are evolutionarily stable — the "best" way to be a plant in
-  a given environment?
+| Component | What you provide | What it controls |
+|---|---|---|
+| **Strategy** | A model such as FF16, TF24, or K93 | How individual plants grow, reproduce, die, and affect competitors |
+| **Traits and parameters** | Values describing the simulated plants | Differences among plant strategies |
+| **External environment** | For example, above-canopy light; TF24 can also use rainfall and atmospheric drivers | Conditions experienced by the plants |
+| **Seed input** | A birth rate for each strategy | Recruitment into the patch |
+| **Disturbance regime** | The duration and age weighting of patches | How a patch trajectory is scaled up to a landscape |
 
-## The core idea: traits, not species
+: The main components of a `plant` simulation.
 
-`plant` does not think in terms of named species. It thinks in terms of
-**functional traits** — measurable properties that shape how a plant grows and
-survives. A "strategy" is just a choice of trait values.
+These inputs are specified by the user. What is not specified directly is the
+resulting stand structure. Plant sizes, population densities, canopy structure,
+self-thinning, and changes in community composition arise from the simulated
+growth, death, recruitment, and competition.
 
-The default [FF16](models/ff16.qmd) model is built around four key traits:
+## Biology and population dynamics
 
-| Trait | Symbol | What it captures |
-|-------|--------|------------------|
-| Leaf mass per area (LMA) | $\phi$ | cheap, thin, short-lived leaves ↔ tough, dense, long-lived leaves |
-| Wood density | $\rho$ | light fast-growing wood ↔ dense durable wood |
-| Seed mass | $\omega$ | many small seeds ↔ few large, well-provisioned seeds |
-| Maximum height | $H_{\rm mat}$ | short understorey plant ↔ tall canopy tree |
-
-The power of this approach is **trade-offs**. A single trait pulls on many parts
-of the plant's biology at once. Cheap leaves (low LMA), for instance, are
-productive per gram but wear out fast — so choosing a low LMA raises both
-photosynthesis *and* leaf turnover together. `plant` encodes these linkages
-through *hyper-parameterisation*: you set a trait, and the model derives the
-whole bundle of physiological parameters that trait implies. This is why a
-handful of trait numbers can stand in for an entire way of life.
-
-## Three nested scales
-
-The model is organised as three scales nested inside one another. Each scale is
-built out of the one below it.
-
-```{mermaid}
-%%{init: {"flowchart": {"nodeSpacing": 45, "rankSpacing": 55}}}%%
-flowchart TD
-  M["🌍 Metacommunity<br/>patches of every age,<br/>linked by dispersing seeds"]
-  P["🌳 Patch<br/>competing individuals<br/>sharing one light environment"]
-  I["🌱 Individual<br/>grows, dies, sets seed"]
-  M -->|"a mosaic of many"| P
-  P -->|"a stand of many"| I
-```
-
-- **Individual** — a single plant with a set of traits and a size (its height).
-  It intercepts light, builds tissue, risks dying, and produces seeds.
-- **Patch** — a small area of ground where many individuals grow together. They
-  compete by shading one another, so every plant in the patch shares one common
-  **light environment**. A disturbance (fire, storm, landslide…) can wipe a patch
-  clean and reset it to bare ground.
-- **Metacommunity** — the whole landscape: a large collection of patches, each at
-  a different age since its last disturbance, all connected because seeds
-  disperse freely between them.
-
-A key simplification makes this tractable: because seeds mix across the whole
-landscape, **one patch followed through its entire life stands in for the whole
-metacommunity**. Simulating a single patch from bare ground to old age, and
-knowing how common patches of each age are, is enough to describe everything.
-
-## Two halves: biology and bookkeeping
-
-Internally, `plant` separates cleanly into two parts, and it helps to keep them
-apart in your head.
-
-```{mermaid}
-%%{init: {"flowchart": {"subGraphTitleMargin": {"top": 8, "bottom": 14}, "padding": 12, "nodeSpacing": 45, "rankSpacing": 45}}}%%
-flowchart LR
-  subgraph S["Strategy — the biology"]
-    direction TB
-    s1["a plant's size<br/>+ its light environment"] --> s2["growth, death,<br/>seed rates"]
-  end
-  subgraph D["Demographic core — the bookkeeping"]
-    direction TB
-    d1["rates, tracked<br/>over time"] --> d2["how the whole<br/>population changes"]
-  end
-  S -->|"rates plug in"| D
-  models["FF16 · K93 · TF24 · TF24f"] -.->|"pick one"| S
-```
-
-- The **strategy** is the biology. Given a plant's size and the light it
-  experiences, it returns three instantaneous rates: how fast the plant grows,
-  how likely it is to die, and how many seeds it makes. This is where
-  photosynthesis, carbon budgets, and hydraulics live.
-- The **demographic core** is the bookkeeping. It knows nothing about
-  photosynthesis; it just takes those rates and integrates them over time to work
-  out how a population of plants grows, thins, and reproduces. Swap the strategy
-  and you swap the biology; the bookkeeping stays the same.
-
-This split is why the [theory](index.qmd) is organised into *Core* (the
-bookkeeping, shared by everything) and *Models* (the strategies).
-
-### Inside a strategy: a plant's carbon economy
-
-It is worth peeking inside the "biology" box, because it explains where growth,
-death, and seeds actually come from. In the FF16 model, all three rates trace
-back to a single quantity: the **net biomass** a plant produces each year.
+It helps to separate two parts of the model.
 
 ```{mermaid}
 flowchart LR
-  L["Light captured<br/>by leaves"] --> P["Photosynthesis<br/>(income)"]
-  P --> B["Net biomass<br/>= income − respiration<br/>− tissue turnover"]
-  B --> SPLIT{"How to<br/>spend it?"}
-  SPLIT -->|"mostly when young"| G["Build tissue →<br/>grow taller (g)"]
-  SPLIT -->|"more when mature"| F["Make seeds (f)"]
-  B -.->|"low production<br/>raises risk"| D["Mortality (d)"]
+accTitle: Biology and population dynamics in plant
+accDescr: A strategy converts plant state and surroundings into demographic rates. The demographic solver applies those rates to the population through time.
+  A["Plant state<br/>and surroundings"] --> B["Strategy<br/>individual biology"]
+  B --> C["Growth, mortality,<br/>and fecundity rates"]
+  C --> D["Demographic solver<br/>population change"]
+  D --> E["Patch structure<br/>through time"]
 ```
 
-A plant earns carbon by photosynthesising, pays it back through respiration and
-the constant turnover of leaves and roots, and invests whatever is left. Young
-plants spend that surplus on **growing taller** (chasing light); as they approach
-their maximum height they divert more of it into **seeds**. And a plant whose
-production runs low — because it is shaded, say — faces a higher chance of
-**death**. That single carbon budget, sketched above, is the engine behind every
-individual in the model. The [FF16 page](models/ff16.qmd) and the
-[assimilation & hydraulics](assimilation-hydraulics.qmd) page give the full
-detail.
+The **strategy** contains the biology. Given the state of a plant and its
+environmental and competitive conditions, it returns instantaneous rates of
+growth, mortality, and fecundity. Depending on the strategy, this calculation
+may include photosynthesis, tissue turnover, carbon allocation, hydraulics, or
+phenomenological relationships fitted directly to size and competition.
 
-### Meet the strategies
+The **demographic solver** keeps track of how those individual rates change the
+population. It integrates growth and mortality through time, introduces new
+recruits, and updates the competitive environment as the population changes.
+The solver does not need to know how photosynthesis or hydraulics were
+calculated; it only needs the rates supplied by the strategy.
 
-`plant` ships with a small family of interchangeable strategies:
+This separation is central to `plant`. Changing the strategy changes the
+individual biology, while leaving the size-structured demographic machinery in
+place.
 
-- **[FF16](models/ff16.qmd)** — the default. A detailed, trait-based carbon
-  economy (the one sketched above). Start here unless you have a reason not to.
-- **[K93](models/k93.qmd)** — Kohyama's 1993 model. Growth, death, and fecundity
-  are written as direct functions of stem diameter and stand basal area, with no
-  explicit carbon budget. A compact, fast, "phenomenological" strategy.
-- **[TF24](models/tf24.qmd)** — extends the leaf model with explicit plant
-  **hydraulics** and stomatal behaviour: the plant chooses how much to open its
-  stomata to balance carbon gain against the risk of drying out. Use it when
-  water and drought matter.
-- **[TF24f](models/tf24.qmd)** — a faster variant of TF24. Instead of re-solving
-  the leaf's optimal state from scratch at every step, it lets that state
-  *acclimate* over time, tracking a changing environment with a short lag. Same
-  hydraulics, cheaper to run.
+## The FF16 example: traits affect many processes
 
-You can also [write your own](../contributing/implementing-a-strategy.qmd) — the
-demographic core will run it unchanged.
+In the default FF16 workflow, a strategy is commonly specified by a small set
+of functional traits. These are measurable plant properties that affect
+several parts of the model at once.
 
-## What the model tracks: cohorts and the size distribution
+| Trait | Symbol | Contrast represented in FF16 |
+|---|---|---|
+| Leaf mass per area (LMA) | $\phi$ | Thin, inexpensive, short-lived leaves versus denser, longer-lived leaves |
+| Wood density | $\rho$ | Less construction-expensive wood versus denser, more construction-expensive wood |
+| Seed mass | $\omega$ | Many small seeds versus fewer, better-provisioned seeds |
+| Maximum height | $H_{\rm mat}$ | Shorter understorey plants versus taller canopy plants |
 
-Inside a patch, `plant` does not follow every individual plant separately.
-Instead it tracks a **size distribution**: how many plants of each height are
-present in the patch at a given age. Early on the distribution is a dense crowd of
-tiny seedlings; as the patch ages it spreads out, thins, and a few tall winners
-pull ahead.
+: The four main traits used by the FF16 hyper-parameterisation.
 
-The clever part is *how* it follows that distribution. Rather than chopping height
-into fixed bins, `plant` tracks a handful of **cohorts** — groups of plants that
-germinated at the same moment — and lets each one ride its own growth trajectory
-upward.
+Changing one of these traits can change several physiological parameters. For
+example, LMA affects leaf construction cost, turnover, and respiration. Leaf
+nitrogen per area, which can also be supplied to the hyper-parameterisation,
+controls the photosynthetic response. `plant` uses a mapping from these input
+values to the lower-level physiological parameters needed by FF16. This mapping
+is called a **hyper-parameterisation** and is described in the
+[Strategies and traits](../guides/strategies.qmd) guide.
+
+Wood density also changes construction costs and respiration per unit mass.
+Although the hyper-parameterisation can link wood density to mortality and
+sapwood turnover, those two relationships are switched off in the current
+default settings. Denser wood should therefore not automatically be interpreted
+as more durable in a default FF16 run.
+
+This trait-based parameterisation is an important use of `plant`, but it is not
+the definition of a strategy. More generally, a strategy is the complete set of
+functions and parameters that produces a plant's demographic rates. K93, for
+example, uses direct relationships between stem diameter, competition, growth,
+mortality, and fecundity rather than the FF16 trait-based carbon model.
+
+### The FF16 carbon balance
+
+In FF16, growth and seed production are derived from net biomass production.
+The plant gains carbon through photosynthesis and loses carbon through tissue
+respiration and turnover. The remaining production can be allocated to new
+growth or reproduction.
 
 ```{mermaid}
 flowchart LR
-  s1["seed pulse<br/>at age 0"] --> c1["cohort 1<br/>rises in height"]
-  s2["seed pulse<br/>at age 5"] --> c2["cohort 2<br/>rises behind it"]
-  s3["seed pulse<br/>at age 20"] --> c3["cohort 3"]
-  c1 --> canopy["tall, sparse<br/>survivors"]
-  c2 --> mid["mid-canopy"]
-  c3 --> under["shaded<br/>understorey"]
+accTitle: Carbon balance in the FF16 strategy
+accDescr: Photosynthesis supplies carbon. Respiration and tissue turnover reduce it. Remaining biomass production is allocated between growth and seed production, while low production can increase one component of mortality.
+  L["Light captured<br/>by leaves"] --> P["Photosynthesis"]
+  P --> B["Net biomass production"]
+  R["Respiration and<br/>tissue turnover"] -->|"subtracted"| B
+  B --> G["Growth"]
+  B --> F["Seed production"]
+  B -.-> D["Growth-dependent<br/>mortality"]
 ```
 
-Each cohort is a moving point on the height axis, carrying a "how many plants are
-here" density with it. Following a few well-placed cohorts is far cheaper than
-resolving the whole distribution on a grid, yet it stays accurate — this is the
-*characteristic method*, and the number and timing of cohorts is chosen
-automatically. (The [characteristic method](implementation/characteristic-method.qmd)
-and [node-spacing](implementation/node-spacing.qmd) pages cover the machinery.)
+Young plants allocate most of their production to growth. As a plant approaches
+its maximum height, a larger share is allocated to reproduction. Low production
+per unit leaf area also increases the growth-dependent component of mortality.
+FF16 includes a separate background mortality component that does not depend on
+current production.
 
-## Competition is a feedback loop
+The [FF16 model page](models/ff16.qmd) gives the full carbon-allocation model.
+The [Assimilation and hydraulics](assimilation-hydraulics.qmd) page explains the
+leaf-level calculations used by the hydraulically explicit strategies.
 
-Everything interesting in `plant` comes from one feedback loop. Plants deploy leaf
-area; leaf area casts shade; shade changes the light every plant experiences; and
-that light feeds straight back into how fast each plant grows and how likely it is
-to survive.
+## From an individual to a landscape
+
+The ecological model is organised at three scales: individuals, patches, and
+the metacommunity. **Nodes are not a fourth ecological scale.** They are the
+numerical objects that the solver uses to represent groups of similar plants
+within a patch.
 
 ```{mermaid}
 flowchart LR
-  A["Plants deploy<br/>leaf area"] --> B["Canopy casts shade —<br/>the light environment"]
-  B --> C["Less light below<br/>slows growth,<br/>raises mortality"]
-  C --> D["Size distribution<br/>shifts: some win,<br/>some die"]
+accTitle: Ecological scales and their numerical representation in plant
+accDescr: Similar individuals are grouped into cohorts represented numerically by nodes. Nodes describe a size-structured population within one patch. Patch states at different ages are weighted together to represent the landscape-scale metacommunity.
+  I["Individuals<br/>biological plants"] --> C["Cohorts<br/>same strategy and recruitment time"]
+  C -. "represented by" .-> N["Nodes<br/>numerical objects"]
+  N --> P["Patch<br/>one local competing population"]
+  P --> M["Metacommunity<br/>implicit landscape representation"]
+```
+
+The distinction can be summarised as follows:
+
+| Term | What it is | What makes another one different? |
+|---|---|---|
+| **Node** | One numerical representation of a cohort within a patch | A different strategy or recruitment time produces a different cohort and therefore a different node |
+| **Patch** | One local community followed through time after disturbance | A different time since disturbance gives a different patch age and community state |
+| **Metacommunity** | The landscape represented by patches of different ages, connected through a shared seed pool | It combines patch-level states rather than adding more nodes to a single patch |
+
+: The relationship between nodes, patches, and the metacommunity.
+
+Here is a concrete way to picture the nesting. Consider a patch that is 40
+years old. It contains plants that recruited at different times during those
+40 years. For each strategy, the solver uses nodes to represent these cohorts:
+an early node might represent a small number of large survivors, while a recent
+node might represent many small recruits. Together, all the nodes describe the
+current population in that one patch.
+
+Now zoom out to the landscape. Some patches were disturbed recently and are
+young; others have developed for decades. The metacommunity combines the
+modelled states of these different patch ages, weighting each age by how common
+it is. This is an **implicit** representation: the deterministic solver does not
+create a separate object for every physical patch or for the metacommunity.
+Instead, one patch trajectory supplies the community state at each possible
+patch age. Thus, **nodes are combined to describe a patch, while patch ages are
+combined to describe the metacommunity**.
+
+### Individual
+
+An individual is one biological plant governed by a strategy. Its state
+includes a size coordinate and, for some strategies, additional physiological
+variables. FF16, TF24, and TF24f use height as the main size coordinate. K93
+uses stem diameter.
+
+One implementation detail can otherwise be confusing when reading K93 output.
+The shared solver calls its first size state `height` for every strategy, so
+K93's stem diameter is stored in a column named `height`, even though its
+biological meaning and units are DBH in centimetres.
+
+The strategy uses that state and the plant's surroundings to calculate growth,
+mortality, fecundity, and its contribution to competition.
+
+### Patch
+
+A patch is a local population of competing plants. The deterministic
+size-structured solver does not store every literal individual. It represents
+the population by a **size distribution**: the density of plants at each size,
+for each strategy, at a given patch age.
+
+The numerical method follows a finite set of **nodes** along this distribution.
+Each node belongs to one strategy and represents plants that recruited at a
+particular patch age, so those plants follow the same deterministic trajectory.
+As the patch develops, the node's position records the cohort's changing size,
+while its density records how many plants from that cohort remain per unit
+area. New nodes are introduced to represent continuing recruitment.
+
+The words *individual*, *cohort*, and *node* therefore refer to related but
+different things:
+
+- an **individual** is one biological plant;
+- a **cohort** is a group of plants sharing a recruitment time and strategy;
+- a **node** is the numerical point used to represent that cohort and sample the
+  continuous size distribution.
+
+Following nodes as they grow is an application of the
+[method of characteristics](implementation/characteristic-method.qmd). The
+[node-spacing algorithm](implementation/node-spacing.qmd) chooses enough node
+introduction times to approximate the distribution accurately without making
+the calculation unnecessarily expensive.
+
+### Metacommunity
+
+At the landscape scale, `plant` represents a forest as a collection of patches
+with different ages since their last disturbance. Seed dispersal connects these
+patches, producing a shared seed pool for each strategy.
+
+The prefix *meta-* signals that this is a community of communities: each patch
+contains its own local plant community, and the metacommunity connects those
+local communities at the landscape scale. In the standard model, this
+connection occurs through seeds rather than through nodes. A node never moves
+from one patch to another; it is only part of the numerical description of one
+patch trajectory.
+
+Under the standard metacommunity assumptions, patches begin from the same empty
+state after disturbance, receive the same constant seed rain, and differ only
+in age. In that setting, one simulated patch trajectory can represent all patch
+ages. Patch-level results are averaged using the frequency of patches at each
+age to obtain landscape-level quantities. Demographic equilibrium adds a
+further condition: the seed rain must be consistent with the seeds produced
+across the metacommunity.
+
+Constant seed rain is the usual assumption for the demographic-equilibrium
+calculation, not a restriction of the solver. `plant` can also accept birth
+rates that vary with patch age when a different ecological scenario requires
+them.
+
+This reduction depends on those assumptions. It is not a general claim that one
+physical forest patch represents every heterogeneous landscape.
+
+## Competition within a patch
+
+FF16, TF24, and TF24f all include competition for light. Plants add leaf area
+to the canopy. The combined leaf area determines a vertical profile of canopy
+openness, and that profile affects later photosynthesis, growth, reproduction,
+and survival.
+
+```{mermaid}
+flowchart LR
+accTitle: Feedback between plants and the canopy light profile
+accDescr: Plant leaf area changes the canopy light profile. The light profile changes demographic rates, which alter the size distribution and therefore future leaf area.
+  A["Plant leaf area"] --> B["Vertical canopy<br/>light profile"]
+  B --> C["Growth, mortality,<br/>and fecundity"]
+  C --> D["Population size<br/>distribution"]
   D --> A
 ```
 
-Because taller plants shade shorter ones but not vice versa, competition for light
-is **asymmetric** — a small head start compounds. This one loop is what produces
-**self-thinning** (crowded stands shed stems as they grow), **succession** (the
-mix of winners changes over time), and the layered vertical structure of a real
-forest — none of it built in by hand.
+All plants in the patch contribute to one shared canopy-light profile, but they
+do not all receive the same amount of light. The light available to a plant
+depends on its height and on how its leaves are distributed through its crown.
 
-## Disturbance and the patch mosaic
+This competition is strongly size-asymmetric. Taller plants usually shade a
+larger fraction of a shorter plant's crown than the shorter plant shades of the
+taller plant's crown. As a result, small initial differences can grow through
+time. The feedback can produce self-thinning, canopy stratification, and changes
+in which strategies dominate as a patch ages.
 
-No patch lasts forever. Fires, storms, landslides, and other disturbances
-periodically reset a patch to bare ground. Because these strike at random across
-the landscape, at any moment the landscape is a **mosaic of patches of every
-age** — some freshly cleared, some mid-succession, a few very old.
+TF24 and TF24f add another shared resource. Plants take up water from the same
+soil profile, so their density-weighted root uptake changes soil moisture for
+the rest of the patch. The updated soil-water state then feeds back into plant
+hydraulics and carbon gain.
 
-`plant` summarises this mosaic with a single number: the **mean interval between
-disturbances**. From it, the model works out how common patches of each age are.
-Young patches are common (most patches have been disturbed fairly recently); very
-old patches are rare (they have usually been reset before reaching old age). This
-age distribution is what lets a single simulated patch represent the whole
-landscape: to average over the metacommunity, you average over patch age,
-weighting by how common each age is.
+K93 uses a different competitive environment. Its demographic rates depend on
+stem diameter and the cumulative basal area of larger neighbours rather than an
+explicit canopy-light profile. This is an example of how the demographic solver
+can support different biological models of competition.
 
-## Paying for itself: the birth-rate loop
+## Disturbance and patch age
 
-There is one more loop, at the landscape scale. Seeds produced in patches disperse
-across the whole metacommunity and rain back down to start new plants. For the
-metacommunity to be at equilibrium, a strategy must **pay for itself**: the seeds
-it exports over a patch's lifetime must match the seeds arriving to sustain it.
+Disturbance resets a patch and begins a new patch trajectory. In the standard
+model, this is a stand-replacing event: all plants are removed and the patch
+starts empty. At any one time, the landscape contains young, intermediate, and
+old patches.
 
-`plant` finds that balance by solving a fixed point — guessing a seed-arrival
-rate, running a patch to see how many seeds come back out, and adjusting until the
-two agree.
+The default `plant` parameters use a Weibull disturbance regime with a fixed
+shape. The user-facing `max_patch_lifetime` parameter sets the duration of the
+simulated patch and parameterises this regime; its mean disturbance interval is
+a derived quantity. The model uses the resulting patch-age distribution to
+weight outputs from different points along the patch trajectory.
 
-```{mermaid}
-flowchart LR
-  A["Guess a seed-<br/>arrival rate"] --> B["Run one patch<br/>through its whole life"]
-  B --> C["Count the seeds<br/>it exports"]
-  C --> Q{"exported =<br/>assumed?"}
-  Q -->|"no"| E["Adjust the rate"]
-  E --> B
-  Q -->|"yes"| F["Equilibrium —<br/>the strategy<br/>pays for itself"]
+For example, suppose biomass in a simulated patch rises as the stand develops.
+Landscape-average biomass is not the biomass at one chosen patch age. It is the
+average across the complete trajectory, weighted by how common patches of each
+age are under the disturbance regime.
+
+The [size-structured PDE](size-structured-pde.qmd) page develops this age
+weighting formally. The [Emergent properties](../guides/emergent-properties.qmd)
+guide shows how to calculate landscape summaries from model output.
+
+## Seed input and demographic equilibrium
+
+Each strategy has a birth rate describing the arrival of seeds into a patch.
+Given these birth rates, `run_scm()` simulates the patch and reports offspring
+production and the **net reproduction ratio** for each strategy.
+
+At demographic equilibrium, the seed input must be consistent with the seed
+output from the metacommunity. For each resident strategy, one incoming seed
+must produce one successful dispersing seed on average. In terms of the net
+reproduction ratio, equilibrium requires a value of one.
+
+This is a fixed-point problem in the birth rates, but it is separate from
+running a patch once. The current `plant` API does not expose a general function
+that automatically finds equilibrium birth rates. A user must supply birth
+rates or perform an outer search based on the reported reproduction ratios.
+
+The option `run_scm(..., refine_schedule = TRUE)` has a different purpose: it
+adaptively refines the numerical node-introduction schedule. It improves the
+accuracy with which the size distribution is integrated; it does not adjust the
+birth rates.
+
+## What can be learned from a simulation?
+
+Different questions use different parts of the model.
+
+### Patch development
+
+A run with supplied birth rates describes how a patch changes through time. Its
+outputs can be used to examine:
+
+- plant height or diameter distributions;
+- population density and self-thinning;
+- canopy structure and light availability;
+- growth, mortality, and fecundity;
+- biomass and its allocation among tissues;
+- changes in the relative abundance of strategies.
+
+These are transient patch dynamics. They do not require solving for demographic
+equilibrium first.
+
+### Landscape averages
+
+Patch outputs can be integrated over the patch-age distribution to estimate
+landscape-level means, such as mean biomass, density, or productivity across a
+disturbance mosaic.
+
+### Evolutionary and community questions
+
+If a resident community is at demographic equilibrium, `plant` can also be used
+to ask whether a rare alternative strategy could invade. The rare strategy is
+evaluated in the environment created by the residents without being allowed to
+alter that environment itself.
+
+Its basic reproduction ratio is the expected number of dispersing offspring
+produced per incoming seed. A value greater than one indicates that the rare
+strategy can increase; a value below one indicates that it cannot invade.
+
+Repeating this calculation across trait values can identify several kinds of
+evolutionary outcome. Some resident strategies are uninvadable evolutionary
+stable strategies. Other trait values can be evolutionary branching points,
+and community assembly can produce several coexisting strategies. The
+[Adaptive dynamics](adaptive-dynamics.qmd) section explains these distinctions
+and the assumptions behind the analysis.
+
+## A basic `plant` workflow
+
+For an FF16 patch, the main code path is short:
+
+```r
+library(plant)
+
+p <- scm_base_parameters("FF16")
+
+p <- add_strategies(
+  p,
+  trait_matrix(0.0825, "lma"),
+  birth_rate = 20
+)
+
+result <- run_scm(p, collect = TRUE)
+result <- expand_state(result)
 ```
 
-This is exactly what happens when you call `run_scm(..., refine_schedule = TRUE)`
-in the guides. A strategy that cannot export as many seeds as it consumes is, in
-the long run, a loser — it dwindles toward extinction. One that produces a surplus
-can spread. That observation is the doorway to the deepest question the model was
-built for.
+This example:
 
-## The big payoff: which strategies win?
+1. creates the default FF16 parameters;
+2. adds one strategy with a specified LMA and birth rate;
+3. simulates the patch through time;
+4. collects and expands the state variables into analysis-ready output.
 
-Once you can find the self-consistent birth rate for a resident community, you can
-ask whether a **rare mutant** with slightly different traits could invade it. You
-drop a handful of the mutant's seeds into the landscape *without* letting them
-change the light environment (they are too rare to matter yet), and ask: over its
-lifetime, does one seed produce more than one seed in return?
+`run_scm()` constructs the matching environment when one is not supplied. To
+configure an environment explicitly, use a typed constructor such as
+`Environment("FF16")` or `Environment("TF24")`. The TF24 environment includes
+default soil-water and atmospheric conditions, which can be changed for a
+particular scenario.
 
-- **More than one** → the mutant grows in number; it can invade.
-- **Fewer than one** → the mutant fades out; the resident holds.
+| Task | Main `plant` interface | Detailed guide |
+|---|---|---|
+| Choose a strategy and parameters | `scm_base_parameters("FF16")` | [Strategies and traits](../guides/strategies.qmd) |
+| Add trait values and seed input | `trait_matrix()`, `add_strategies()` | [Strategies and traits](../guides/strategies.qmd) |
+| Configure external drivers | `Environment("FF16")` or `Environment("TF24")` | [Extrinsic drivers](../guides/extrinsic-drivers.qmd) |
+| Simulate a patch | `run_scm()` | [Patch dynamics](../guides/patch-dynamics.qmd) |
+| Refine numerical node spacing | `run_scm(..., refine_schedule = TRUE)` | [Node-spacing algorithm](implementation/node-spacing.qmd) |
+| Collect and expand outputs | `collect = TRUE`, `expand_state()` | [Example analysis](../guides/example-analysis.qmd) |
 
-This per-seed return is the model's measure of **invasion fitness**. By scanning
-across trait values, you can map which strategies beat which, and find the special
-trait values that *no* mutant can invade — the evolutionarily stable strategies
-(ESS), the model's prediction for how plants "should" be built in a given
-environment. This is the subject of the [adaptive dynamics](adaptive-dynamics.qmd)
-page, and it is where trait-based thinking pays off: the winners are not named
-species but positions in trait space.
+: Common tasks and their current `plant` interfaces.
 
-## What you can measure: emergent properties
+## Important assumptions and limits
 
-Because the forest is built from the bottom up, a huge range of stand- and
-landscape-level patterns fall out of a run as **emergent** results — you read them
-off, you don't program them in:
+Every model simplifies. The main assumptions to keep in mind when interpreting
+the standard deterministic `plant` workflow are:
 
-- **Self-thinning** — the classic size–density line, stems lost as they grow
-  (see the [self-thinning](../guides/self-thinning.qmd) guide).
-- **Stand structure** — height and density profiles, canopy layering, leaf-area
-  distribution through the canopy.
-- **Biomass and its allocation** — total and per-tissue (leaf, sapwood, bark,
-  heartwood) mass through time.
-- **Succession & coexistence** — which strategies dominate when, and which
-  combinations can persist together.
-- **Metacommunity averages** — landscape-scale means obtained by integrating
-  patch outputs over the age distribution
-  (see [emergent properties](../guides/emergent-properties.qmd)).
+- The population is represented as a continuous size distribution. This is
+  appropriate for large populations; `plant` also contains a stochastic solver
+  for questions about finite populations and demographic randomness.
+- FF16 represents competition through canopy light. TF24 and TF24f add a shared
+  soil-water balance, while K93 uses the basal area of larger neighbours. None
+  of these strategies represents every possible interaction among plants.
+- The standard metacommunity has well-mixed seed dispersal, identical empty
+  patches after stand-replacing disturbance, and an equilibrium distribution of
+  patch ages.
+- Strategy equations and parameters are hypotheses about plant biology. Stand
+  structure emerges from those assumptions; it is not assumption-free.
+- A simulation produces conditional model output, not a calibrated forecast
+  with uncertainty bounds. `plant` does not currently provide a complete
+  calibration, uncertainty-propagation, or forecasting workflow.
 
-## The life of a simulation
+## Glossary
 
-Putting it together, a typical `plant` run moves through these stages — and each
-maps onto a step in the guides:
+| Term | Meaning here |
+|---|---|
+| **Strategy** | The functions and parameters that translate a plant's state and surroundings into growth, mortality, fecundity, and competition effects |
+| **Trait** | A measurable plant property used to distinguish strategies or derive physiological parameters |
+| **Individual** | One biological plant governed by a strategy |
+| **Cohort** | Plants with the same strategy and recruitment time following the same deterministic trajectory |
+| **Node** | A numerical point representing a cohort and sampling the continuous size distribution |
+| **Patch** | A local population of competing plants followed from disturbance onward |
+| **Size distribution** | Plant density across the model's size coordinate: height for FF16/TF24 or stem diameter for K93 (stored under the generic state name `height`) |
+| **Competitive environment** | The shared quantity through which plants interact, such as the canopy-light profile or basal area of larger neighbours |
+| **Metacommunity** | A landscape of patches of different ages connected by seed dispersal |
+| **Birth rate / seed rain** | The rate at which seeds of a strategy arrive in a patch |
+| **Demographic equilibrium** | A state in which resident seed input and seed output are self-consistent, giving a net reproduction ratio of one |
+| **Invasion criterion** | Whether a rare strategy produces more than one dispersing offspring per incoming seed in the resident environment |
 
-```{mermaid}
-flowchart TB
-  A["1 · Choose a strategy<br/>and trait values"] --> B["2 · Set the environment<br/>(light, rainfall)"]
-  B --> C["3 · Seed a patch and<br/>grow it from bare ground"]
-  C --> D["4 · Plants grow, shade<br/>each other, thin and die"]
-  D --> E["5 · Find the birth rate<br/>that balances (equilibrium)"]
-  E --> F["6 · Read off outputs:<br/>structure, biomass, fitness"]
-```
-
-The [worked example](../guides/example-analysis.qmd) walks through exactly this
-arc end to end.
-
-## From idea to code
-
-Each concept above has a direct counterpart in the package:
-
-| Idea | In `plant` | Guide |
-|------|-----------|-------|
-| Pick a strategy & its traits | `scm_base_parameters("FF16")`, `trait_matrix()`, `add_strategies()` | [Strategies & traits](../guides/strategies.qmd) |
-| Set the light / rainfall environment | `Environment()` | [Extrinsic drivers](../guides/extrinsic-drivers.qmd) |
-| Grow a single plant | `FF16_Individual()` | [Your first individual](../guides/first-individual.qmd) |
-| Run a patch through its life | `run_scm()` | [Patch dynamics](../guides/patch-dynamics.qmd) |
-| Find the birth rate that balances | `run_scm(..., refine_schedule = TRUE)` | [Self-thinning](../guides/self-thinning.qmd) |
-| Tidy & expand the outputs | `collect = TRUE`, `expand_state()` | [Example analysis](../guides/example-analysis.qmd) |
-
-## A quick glossary
-
-| Term | In plain words |
-|------|----------------|
-| **Strategy** | A way of being a plant — a set of trait values and the biology they imply. |
-| **Trait** | A measurable plant property (LMA, wood density, seed mass, max height) that shapes growth and survival. |
-| **Individual / node / cohort** | A group of same-aged plants, tracked together as a point moving up the height axis. |
-| **Patch** | A stand of competing plants sharing one light environment; reset by disturbance. |
-| **Size distribution** | How many plants of each height are present in a patch of a given age. |
-| **Light environment** | How much light reaches each height in the canopy — the medium of competition. |
-| **Metacommunity** | The whole landscape: a mosaic of patches of every age, linked by dispersing seeds. |
-| **Birth / seed rain** | The rate at which a strategy's seeds arrive in a patch. |
-| **Equilibrium** | The state where seeds exported match seeds arriving — the strategy pays for itself. |
-| **Invasion fitness** | The per-seed return of a rare mutant; > 1 means it can invade. |
-| **Emergent property** | A stand- or landscape-level pattern that falls out of the simulation rather than being programmed in. |
+: Terms used throughout the theory and guides.
 
 ## Where to go next
 
-Pick the path that matches what you want to do:
+Choose the path that matches your question:
 
-- **I want to run it.** Head to the [guides](../guides/index.qmd) — start with
-  [your first individual](../guides/first-individual.qmd), then
-  [patch dynamics](../guides/patch-dynamics.qmd).
-- **I want to understand the equations.** Read the
-  [gentle maths primer](maths-primer.qmd) next, then the full
-  [size-structured PDE](size-structured-pde.qmd) and
-  [adaptive dynamics](adaptive-dynamics.qmd) pages.
-- **I want a strategy's biology.** See the [models overview](models/index.qmd),
-  the [FF16](models/ff16.qmd) model, and the
-  [assimilation & hydraulics](assimilation-hydraulics.qmd) page.
+- **I want to run the model.** Start with
+  [Your first individual](../guides/first-individual.qmd), then continue to
+  [Patch dynamics](../guides/patch-dynamics.qmd).
+- **I want to understand the mathematics.** Read
+  [The maths, gently](maths-primer.qmd), followed by
+  [The maths, worked through](from-primer-to-pde.qmd) and the full
+  [size-structured PDE](size-structured-pde.qmd).
+- **I want to understand a biological strategy.** See the
+  [models overview](models/index.qmd), then the pages for
+  [FF16](models/ff16.qmd), [K93](models/k93.qmd), or
+  [TF24](models/tf24.qmd).
+- **I want to study evolution or community assembly.** Continue to
+  [Adaptive dynamics](adaptive-dynamics.qmd).

@@ -5,138 +5,127 @@ title: "Strategies & traits"
 guide
 :::
 
-How to inspect and modify the parameters that define a plant strategy, and how
-trait values propagate through the hyper-parameterisation. For what the
-strategies mean physiologically, see [the model docs](../theory/models/index.qmd).
+A strategy contains the biological settings for one type of plant. This guide
+shows two ways to create one: change a parameter directly, or provide measured
+trait values and let `plant` update the linked parameters. For the equations
+behind each strategy, see [Models](../theory/models/index.qmd).
 
 ```{r}
 library(plant)
 ```
 
-There are a large number of parameters to the physiological model,
-but all are changeable.  The default strategy is detailed in the
-[model docs](../theory/models/index.qmd):
+## Inspect or directly change a strategy
+
+Start with the default FF16 strategy. Printing its names shows that the object
+contains biological parameters, numerical controls, recruitment settings, and
+other model information:
 
 ```{r}
 s <- FF16_Strategy()
 names(s)
 ```
 
-The strategy object here is a special object of class `r class(s)`.
-In contrast with most of the "reference" objects used by `plant`,
-this is simply a list with a class attribute.  Some validation will
-be done on the parameters every time it is passed into the C++ bits
-of the model.
-
-The physiological parameters now live in the nested `pars` element (the
-top-level strategy also carries `control`, birth-rate settings, and a few
-flags). All of the `pars` values are floating point (decimal) numbers:
+The physiological parameters live in the nested `pars` element. They are
+ordinary decimal numbers and can be inspected with familiar R tools:
 
 ```{r}
 unlist(s$pars)
 ```
 
-All of these parameters can be directly changed.  For example, we
-can double the leaf mass per unit leaf area (lma) value:
+For a controlled experiment, you can change one value directly. Here we double
+leaf mass per unit leaf area (`lma`):
 
 ```{r}
 s$pars$lma <- s$pars$lma * 2
 ```
 
-and then from this construct a plant:
+An individual constructed from this strategy uses the revised value:
 
 ```{r}
 pl <- FF16_Individual(s)
 pl$strategy$pars$lma
 ```
 
-`lma` affects a few places in the model; see [the source
-code](https://github.com/traitecoevo/plant/blob/master/src/ff16_strategy.cpp),
-but only really for converting from leaf area to leaf mass (leaf
-mass being leaf area multiplied by leaf mass per unit leaf area).
-However, as a component of the leaf economic spectrum we imagine
-LMA as affecting a number of other components of the model — see
-[FF16](../theory/models/ff16.qmd) for the trait trade-offs this
-functional-balance model builds in.
+This direct edit changes only `lma`. That is useful when deliberately varying
+one model parameter, but biological traits are often linked. In FF16, LMA
+affects leaf mass and seedling allometry directly and is also associated with
+leaf turnover and respiration.
 
-We capture this through what we call a "hyper-parameterisation";
-additional parameters and functions that mean that changing one
-parameter might affect a number of other lower-level parameters.
-Our default hyper-parameterisation is via the
-`FF16_hyperpar` function:
+## Create strategies from traits
+
+`plant` represents these links with a **hyperparameterisation**: an R function
+that translates a small set of input traits into a consistent set of model
+parameters. FF16 uses `FF16_hyperpar()`:
 
 ```{r}
 FF16_hyperpar
 ```
 
-You will rarely need to call this function directly (see below) but
-note how setting of lma affects parameters `k_l`, `a_p1` and `r_l`
+You will rarely call this function directly. Looking at its output is useful,
+however, because it makes the parameter links explicit. Supplying LMA updates
+leaf turnover (`k_l`) and leaf respiration per mass (`r_l`). The output also
+includes photosynthesis per leaf area (`a_p1`), which is derived from leaf
+nitrogen per area (`narea`) rather than LMA itself.
 
 ```{r}
 FF16_hyperpar(trait_matrix(0.1, "lma"), s)
 ```
 
-These are:
+The three returned quantities are:
 
   * `k_l`: Turnover rate for leaves
   * `a_p1`: Leaf photosynthesis per area
   * `r_l`: Leaf respiration per mass
 
-This means that it is possible to implement different trade-offs
-between parameters relatively easily by modifying the
-hyper-parameterisation function in R, rather than having to modify
-the underlying physiological model in C++.
+Because these linking rules live in R, advanced users can define a different
+trait trade-off without changing the underlying physiological model in C++.
 
-The `trait_matrix` function is a simple wrapper that just makes
-sure the trait matrix has the right format:
+`trait_matrix()` puts one or more trait values into the row-and-column format
+expected by the strategy-building functions:
 
 ```{r}
 trait_matrix(0.1, "lma")
 trait_matrix(c(0.1, 500), "rho")
 ```
 
-To make use of the hyper-parameterisation, the preferred way of
-setting parameters is through the utility functions `generate_strategy` and
-`add_strategies`.  These take a `Parameters` object:
+The preferred workflow uses `generate_strategy()` or `add_strategies()`. Both
+start from a `Parameters` object, which collects the settings needed for a
+patch run and stores the default strategy from which new strategies are built:
 
 ```{r}
 p <- FF16_Parameters()
 ```
 
-The Parameters object mostly contains information about the patch:
+Its top-level names show the main groups of settings:
 
 ```{r}
 names(p)
 ```
 
-The default hyper-parameterisation function associated with a `Parameters`
-object is retrieved with `param_hyperpar()`:
+`param_hyperpar()` retrieves the linking function associated with the model:
 
 ```{r}
 identical(param_hyperpar(p), FF16_hyperpar)
 ```
 
-`max_patch_lifetime` sets the patch disturbance interval (in years). The
-physiological parameters (including `k_I`, the light extinction coefficient)
-now live on the strategy under `pars`; the `strategy_default` member is the
-Strategy that all others are built from:
+The `strategy_default` member is the template copied when new strategies are
+generated. Physiological parameters, including the light extinction
+coefficient `k_I`, live under its `pars` element:
 
 ```{r}
 class(p$strategy_default)
 ```
 
-This is the Strategy object that all others will be built from by
-difference.  Running
+Generating a strategy copies that template, sets LMA, and updates the linked
+parameters:
 
 ```{r}
 s <- generate_strategy(p, trait_matrix(0.1, "lma"), birth_rate = 1)[[1]]
 ```
 
-will create a strategy `s` where lma is set but also all the
-parameters that *depend* on lma.
-
-The function `generate_strategy` can be used to create a list of
-strategies:
+The same function can generate several strategies at once. Each row of the
+trait matrix becomes one strategy, so the birth-rate vector also has one value
+per row:
 
 ```{r}
 lma <- trait_matrix(seq(0.1, 0.5, length.out=5), "lma")
@@ -146,7 +135,7 @@ ss <- generate_strategy(p, lma, birth_rate = rep(1, 5))
 length(ss)
 ```
 
-We can then use standard R commands to extract variable from this list
+Standard R functions can compare the resulting parameter values:
 
 ```{r}
 sapply(ss, function(x) x$pars$lma)
@@ -155,22 +144,22 @@ sapply(ss, function(x) x$pars$a_p1)
 sapply(ss, function(x) x$pars$r_l)
 ```
 
-In addition to the physiological parameters there are a large number
-of "control" parameters that affect the behaviour of the various
-numerical algorithms used (note that in contrast to the
-physiological parameters these have a variety of types). These live in a
-separate `Control` object rather than on the `Parameters`:
+## Choose numerical accuracy
+
+Strategies describe plants; `Control` settings describe how the numerical
+solver runs. The controls include time-step, error-tolerance, and node-schedule
+settings, and may be numeric or logical:
 
 ```{r}
 Control()
 ```
 
-The `Control()` defaults are the pragmatic, fast-ish settings used for
-essentially all of plant's runs (`control()` is a lowercase alias for the same
-constructor). When you need a high-accuracy run, `control_accurate()` tightens
-the ODE and schedule tolerances (see [ODE stepping & control](../theory/implementation/ode-stepping.qmd)
-and [The node-spacing algorithm](../theory/implementation/node-spacing.qmd)). We
-can see which fields it changes:
+The `Control()` defaults are appropriate for routine exploration; `control()`
+is a lowercase alias for the same constructor. Use `control_accurate()` when a
+final result needs tighter numerical tolerances, accepting the additional run
+time. The [ODE stepping](../theory/implementation/ode-stepping.qmd) and
+[node-spacing](../theory/implementation/node-spacing.qmd) pages explain these
+trade-offs. The following comparison shows which defaults change:
 
 ```{r}
 ctrl_accurate <- control_accurate()

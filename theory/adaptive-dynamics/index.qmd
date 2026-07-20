@@ -1,0 +1,41 @@
+---
+title: "Adaptive-dynamics models in regnans"
+---
+::: {.eyebrow}
+theory
+:::
+
+`regnans` includes four small adaptive-dynamics models with explicit invasion-
+fitness equations and demographic equilibria. They run quickly and have known
+solutions, which makes them useful for learning the workflow and checking the
+community-assembly and attractor algorithms. The same calculations are much
+more demanding in the full, size-structured `plant` model.
+
+Read the [adaptive dynamics](../adaptive-dynamics.qmd) page first for the main
+ideas. Each page below then introduces one model, explains its fitness equation,
+and works through the corresponding `regnans` code.
+
+| Model | Ecological setting | Main outcome |
+|---|---|---|
+| [DD99](DD99.qmd) | Competition for a continuous resource | Branching when competition is more local than resource use |
+| [GK98](GK98.qmd) | Soft selection across three habitats | Either one stable strategy or a protected pair of strategies |
+| [GM99](GM99.qmd) | Seed-size competition for safe sites | Coexistence of small- and large-seeded strategies |
+| [JJ12](JJ12.qmd) | Competition over migratory arrival time | One stable arrival strategy before the seasonal optimum |
+
+All single-model pages use the same pipeline:
+
+```r
+library(regnans)
+h <- harness_dd99()                                   # or _gk98 / _gm99 / _jj12
+community_start(bounds(x = c(-2, 2)), harness = h) |>
+  community_solve_singularity_1D()                    # -> evolutionary attractor
+```
+
+The DD99, GK98, and GM99 models also support resident communities containing
+more than one strategy. You can therefore move beyond pairwise invasibility
+plots and run the full [community-assembly algorithm](assembly.qmd). The examples
+show how branching and limiting similarity build a multi-strategy community,
+including a two-trait version of DD99.
+
+> Rendering these pages requires `regnans` (and its dependency `plant`) to be
+> installed, not just loaded from source.

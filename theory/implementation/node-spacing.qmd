@@ -7,44 +7,55 @@ implementation
 
 ::: {.callout-note}
 ## Prerequisites
-This page builds on [The size-structured PDE](../size-structured-pde.qmd) and [the method of characteristics](characteristic-method.qmd). Read those first if the notation here is unfamiliar.
+This page builds on [The size-structured PDE](../size-structured-pde.qmd) and
+[the method of characteristics](characteristic-method.qmd). Read those first if
+the notation here is unfamiliar.
 :::
 
 ## The idea first
 
-`plant` never tracks a continuous size distribution directly. Instead it approximates that distribution with a finite collection of cohorts, each one a single representative individual standing in for all the plants born at roughly the same moment. As those cohorts grow and thin over time, the model has to decide two things: when to add a new cohort to the population, and how to space the existing ones so the whole collection still traces out the size distribution faithfully.
+`plant` never tracks a continuous size distribution directly. Instead, it uses
+a finite collection of cohorts. Each cohort contains one representative
+individual that stands in for all plants born at roughly the same time. As the
+cohorts grow and thin, the model must decide when to add a new one and how to
+space them so that the collection still represents the size distribution
+faithfully.
 
-This is a genuine trade-off. Add too few cohorts, or space them too coarsely, and the model smooths over real structure in the population, missing the sharp features that matter for growth and competition. Add too many, or space them too finely, and the simulation grinds through far more bookkeeping than the answer warrants, most of it spent refining regions that were already accurate enough. The art of the node-spacing algorithm is finding, at every point in a patch's development, the smallest set of cohorts that keeps the approximation error below a chosen tolerance, and no smaller.
+This creates a genuine trade-off. Too few or too widely spaced cohorts smooth
+over population structure that matters for growth and competition. Too many
+cohorts spend computation refining parts of the distribution that were already
+accurate enough. The node-spacing algorithm aims to use the smallest set that
+keeps approximation error below a chosen tolerance throughout patch
+development.
 
 The rest of this page makes this precise.
 
 ## Background
 
-As described in the [size-structured PDE](../size-structured-pde.qmd) page,
-the spacing of nodes can affect the accuracy of integration over the
-size-density distribution. `plant` uses an adaptive algorithm to build an
-appropriately spaced node schedule with the desired accuracy at every time
-point, using as few nodes as possible.
+As explained on [The size-structured PDE](../size-structured-pde.qmd), the SCM
+replaces a continuous size distribution with discrete nodes. Integrals over the
+size distribution are therefore approximations, and their accuracy depends on
+how closely those nodes are spaced. An ordinary run uses its supplied schedule.
+You can opt in to adaptive refinement when you need a chosen accuracy without
+adding nodes that contribute little useful information.
 
-The refinement algorithm takes an initial vector of introduction times and
-considers, for each node, whether removing that node causes the error
-introduced when integrating two specified functions over the size-density
-distribution to jump over the allowable error threshold `schedule_eps`. This
-calculation is repeated for every time step in the development of the
-patch. A new node is introduced immediately prior to any node
-failing these tests. The dynamics of the patch are
-then simulated again and the process is repeated, until all integrations at
-all time points have an error below the tolerable limit
-`schedule_eps`. Decreasing `schedule_eps` demands higher
-accuracy from the solver, and thus increases the number of nodes being
-introduced. Note that we are assessing whether removing an existing node
-causes the error to jump above the threshold limit, and using this to decide
-whether an extra node -- in addition to the one used in the test --
-should be introduced. Thus, the actual error is likely to
-be lower than, but at most equal to, `schedule_eps`.
+The algorithm begins with a schedule of node introduction times. For each node,
+it asks a practical question: if this node were removed, would either of two
+important population integrals become too inaccurate? The allowable relative
+error is set by `schedule_eps`. The solver performs this test throughout patch
+development, inserts a new node just before any interval that fails, and then
+simulates the patch again. It repeats the cycle until both integrals remain
+within the tolerance at every time point.
 
-This refinement now lives entirely in C++, inside the `SCM` solver. You trigger
-it from R with:
+A smaller `schedule_eps` requires greater accuracy and usually leads to more
+nodes. The test is deliberately conservative: it measures the error caused by
+*removing* an existing node, then responds by adding another node nearby. The
+error in the final, refined schedule will therefore usually be below the stated
+tolerance.
+
+This optional refinement now lives entirely in C++, inside the `SCM` solver.
+`run_scm()` does not refine the schedule by default
+(`refine_schedule = FALSE`); request it from R with:
 
 ```r
 scm <- run_scm(p, refine_schedule = TRUE)
@@ -59,19 +70,19 @@ the final run are written back into the returned `parameters`, so the
 this work in R via the `build_schedule()` and `run_scm_error()` functions; both
 have been removed in favour of the in-solver implementation.)
 
-This page shows some details of node splitting, most of which happens
-automatically. It's probably not very interesting to most people, only those
-interested in knowing how the SCM technique works in detail.  It also uses a lot
-of non-exported, non-documented functions from plant so you'll see
-a lot of `plant:::` prefixes.
+Most users can use the supplied schedule. The examples below show readers who
+opt in to refinement how the SCM chooses its nodes and how that choice affects
+numerical accuracy. Some examples inspect non-exported `plant` internals, which
+is why they use the `plant:::` prefix. Those interfaces are implementation
+details rather than part of the stable user API.
 
 ## Node introduction times
 
 <!-- TODO(#481): elaborate on why concentrating early helps -->
 
-The default node introduction times are designed to concentrate
-node introductions onto earlier times, based on empirical
-patterns of node refining:
+The default schedule places introductions more densely early in patch
+development. This pattern reflects empirical experience with where refinement
+is most often needed:
 
 ```{r}
 #| label: setup
@@ -93,9 +104,9 @@ plot(times_default, cex=.2, pch=19, ylab="Time (years)", las=1)
 
 <!-- TODO(#481): explain how introducing two species together reduces work -->
 
-The actual differences are stepped in order to increase the chance
-that nodes from different species will be introduced at the same
-time and reduce the total amount of work being done.
+The gaps between introduction times change in steps rather than continuously.
+This makes it more likely that different species introduce nodes at the same
+time, allowing the solver to update them together and reducing the total work.
 
 ```{r}
 #| label: time-differences
@@ -105,12 +116,14 @@ plot(diff(times_default), pch=19, cex=.2, ylab="Time difference (years)", las=1)
 
 ## Estimating error in node spacing
 
-We can assess the impact of node spacing on integration error by examining
-the cumulative offspring production of a patch.
+One way to assess the effect of node spacing is to compare cumulative offspring
+production across schedules. This is a useful diagnostic because offspring
+production integrates individual performance over the development of the
+patch.
 
-Increasing the number of nodes is expected to increase integration accuracy
-at the expense of more computational effort. We can create more refined schedules
-by interleaving points into the existing schedule:
+More nodes should improve integration accuracy, but they also require more
+computation. To make that trade-off visible, we create finer schedules by
+inserting a midpoint between every pair of existing introduction times:
 
 ```{r}
 #| label: interleaved-schedules
@@ -131,9 +144,9 @@ points(times_2x, pch=19, cex=.2, las=1, col = "blue")
 points(times_4x, pch=19, cex=.2, las=1, col = "red")
 ```
 
-Each schedule runs for the same duration, but `times_4x` has 4x as many nodes.
-Running a patch with each node schedule allows us to compare the propagule
-outputs:
+All three schedules cover the same duration, but `times_2x` has roughly twice
+as many nodes as the default and `times_4x` has roughly four times as many. We
+run the same patch with each schedule and compare its propagule output:
 
 ```{r}
 #| label: run-with-times
@@ -157,8 +170,9 @@ offspring_production_range <- c(offspring_production_default, offspring_producti
                      offspring_production_4x)
 ```
 
-Quadrupling the number of nodes results in nearly a 6x increase in runtime,
-eight times the nodes takes roughly 26x longer (the latter not shown).
+In this example, quadrupling the number of nodes increases runtime by nearly a
+factor of six. Using eight times as many nodes takes roughly 26 times as long
+(not shown). The cost therefore rises much faster than the number of nodes.
 
 ```{r}
 #| label: offspring-vs-nodes
@@ -167,22 +181,21 @@ plot(x = node_range, y = offspring_production_range,
      xlab="Number of node introductions", ylab="Offspring production", las=1)
 ```
 
-Offspring production increases as nodes are introduced more finely,
-though at a saturating rate, meaning there are diminishing returns in accuracy
-for additional nodes.
+Estimated offspring production rises as the schedule becomes finer, but the
+curve begins to level off. Each additional round of refinement therefore buys
+less improvement than the previous one.
 
-The differences in offspring production are not actually that striking
-(perhaps
-1%) but
-the introduced  *variation* creates instabilities of sufficient concern.
+The total difference in offspring production is modest---about 1% in this
+example. The more important warning sign is that adding a node at some specific
+positions can produce irregular changes in the result. Those local
+instabilities motivate the adaptive refinement procedure.
 
 ## Individual offspring production contributions
 
-Where is the fitness difference driving change in offspring production coming from?
-
-Consider adding a *single* additional node at one of the points
-along the first vector of times `times_default` and computing the
-output offspring production:
+Why does changing the schedule alter offspring production? To locate the source
+of the difference, we add *one* node at a time to the default schedule. For each
+possible insertion interval, we rerun the model and record the change in total
+offspring production.
 
 The next chunk runs the solver once per insertion position in parallel via
 `mclapply`. It is a heavy computation, so we mark it `#| eval: false` and show
@@ -213,9 +226,9 @@ abline(h=0, col="grey")
 
 ![Difference from default offspring production when inserting a single node at each position.](../../assets/figures/node_spacing/node_spacing_insert-differences-node-1.png)
 
-The biggest deviations in output offspring production come about half way
-through the schedule, though because of the compression of early times
-this occurs fairly early in patch development:
+The largest changes occur around the middle of the node sequence. Because the
+default schedule packs many nodes into the early years, however, the
+corresponding introductions still occur fairly early in patch development.
 
 The next chunk just replots the differences computed above against time, so it
 is also marked `#| eval: false` and shown as a pre-rendered figure.
@@ -233,14 +246,14 @@ abline(h=0, col="grey")
 
 ![The same differences plotted against introduction time.](../../assets/figures/node_spacing/node_spacing_insert-differences-time-1.png)
 
-Now look at the contribution of different nodes to the overall patch output
-(log scaled for clarity).
+We can now ask whether those sensitive insertion points coincide with nodes
+that produce many offspring. The next plot shows each node's contribution to
+the overall patch output on a logarithmic scale.
 
-Each node carries its own lifetime offspring production, accumulated inside the
-ODE and exposed per node via the species'
-`net_reproduction_ratio_by_node`. (This is the unweighted per-node
-contribution; the SCM weights these by the patch-age density and survival
-during dispersal when integrating overall fitness.)
+The ODE accumulates lifetime offspring production separately for each node and
+exposes it through the species' `net_reproduction_ratio_by_node`. This value is
+the node's unweighted contribution. When the SCM calculates overall fitness, it
+also weights contributions by patch-age density and survival during dispersal.
 
 This chunk depends on `times_interpolated`, `top_5` and
 `offspring_production_differences` produced by the parallel chunks above, so it
@@ -266,26 +279,24 @@ abline(v=times_interpolated[top_5], col=c("red", rep("grey", 4)))
 
 <!-- TODO(#481): there might be a clearer way to summarise this point -->
 
-In this case almost all the contribution comes from early nodes
-(this is essentially a single-age stand of pioneers).
+Almost all offspring production in this example comes from early nodes, as we
+would expect for what is essentially a single-age stand of pioneers. The
+vertical lines mark the five insertion points that caused the largest changes
+in total offspring production, with the most influential shown in red.
 
-Overlaid on this are the five nodes where extra refinement
-(i.e. inserting an additional node) causes the largest
-change in overall offspring production output (biggest difference in red).
-
-The difference is not coming from offspring production contributions of those
-nodes, which is basically zero, though it is higher than the
-surrounding nodes.
+These sensitive positions do not correspond to nodes that themselves produce
+many offspring: their direct contributions are close to zero, although still
+slightly higher than those of nearby nodes. The schedule must therefore be
+affecting the result through another pathway.
 
 ## Individual competitive impacts
 
-If the inserted nodes are not altering offspring production through individual
-contributions, they may be altering the output of neighbouring nodes
-through competitive interactions.
+If the inserted nodes are not changing offspring production through their own
+direct contribution, they may instead be changing the performance of nearby
+nodes through competition.
 
-Here we investigate the differences in patch light environment after
-introducing the single node driving the greatest difference in seed output
-identified above.
+To test that idea, we compare the patch light environment with and without the
+single extra node that produced the largest change in seed output above.
 
 First we run patches with and without the extra node, collecting the complete
 set of patch conditions at each timestep with `run_scm(collect = TRUE)`.
@@ -309,10 +320,9 @@ results_default <- collect_with_times(p, times_default)
 results_insert <- collect_with_times(p, times_insert)
 ```
 
-In order to make a direct comparison, we need to interpolate the light
-environment over a common set of heights at each time step.
-
-We reconstruct the light environment spline for both runs, and compute light_availability in both:
+For a direct comparison, both runs must be evaluated at the same heights and
+times. We reconstruct each run's light-environment spline and use it to
+calculate light availability on a common height grid:
 
 ```{r}
 #| label: interpolate-light
@@ -345,11 +355,9 @@ light_availability_spline_difference <- t(light_availability_spline_insert[, -(i
 light_availability_spline_difference[abs(light_availability_spline_difference) < 1e-10] <- NA
 ```
 
-Taking the difference between light environments at each height and timestep,
-the resulting image plot is blue in regions where the refined light environment,
-with the additional node is lighter (higher light_availability)
-and red in regions where the the light environment is darker with the additional
-node.
+We then subtract the default light environment from the refined one at every
+height and time. Blue regions in the image indicate more available light after
+the node was added; red regions indicate less available light.
 
 This image plot depends on the snapshots collected above, so it is shown but not
 executed. (The source did not pre-render this figure.)
@@ -366,27 +374,30 @@ image(results_default$time, heights, light_availability_spline_difference,
       xlab="Time (years)", ylab="Height (m)", las=1, col=pal)
 ```
 
-Shading is lower for ~7 m tall nodes at year 25. This increased competitive intensity
-may be driving differences in offspring production.
+Around year 25, the additional node changes shading for individuals roughly 7 m
+tall. This shift in the competitive environment may explain the change in
+offspring production.
 
 ## Monitoring integration accuracy
 
 <!-- TODO(#481): find more general terms for 'leaf-area error' -->
 
-The SCM monitors two integrations over the size-density distribution as the
-patch develops and uses the larger of the two errors to decide where to refine:
+The exploratory comparisons above show why node placement matters. During a
+normal run, the SCM does not repeat all of those comparisons. Instead, it
+monitors the accuracy of two integrals over the size-density distribution and
+uses the larger error to decide where the schedule needs refinement:
 
 - a **competition (leaf-area) error**, measuring how much removing a node
   changes the estimate of total leaf area in the patch; and
 - an **offspring-production error**, measuring how much removing a node changes
   the estimate of total seed production from the patch.
 
-The relative error of each integration is computed with the
-`local_error_integration` function. The competition error is sampled at every
-introduction step as the patch develops, while the offspring-production error is
-computed once at the end of the run. Both are now accumulated *inside*
-`SCM::run()` when error collection is enabled, and the per-node maximum of the
-two is exposed as `refinement_error_by_node` -- the signal that drives refinement:
+The `local_error_integration` function calculates the relative error for each
+integral. The solver samples competition error at every node introduction as
+the patch develops, then calculates offspring-production error at the end of
+the run. When error collection is enabled, `SCM::run()` accumulates both values
+internally. For each node, the larger value is returned in
+`refinement_error_by_node`; this is the signal used for refinement:
 
 ```{r}
 #| label: combined-error
@@ -405,11 +416,10 @@ abline(h = Control()$schedule_eps, col = "red", lty = 2)
 Nodes whose combined error exceeds the threshold `schedule_eps` (red line) are
 the ones the refinement step will split.
 
-To see how the competition error builds up over the development of the patch we
-can reconstruct the per-step matrix that the solver accumulates internally. We
-run the SCM once collecting a patch snapshot after each introduction, then
-recompute the competition error from each snapshot. Each row is one introduction
-step; each column is a node:
+To see how competition error develops through time, we can reconstruct the
+step-by-step matrix that the solver builds internally. We collect a patch
+snapshot after each introduction and recalculate competition error from every
+snapshot. Rows represent introduction steps and columns represent nodes:
 
 ```{r}
 #| label: competition-error-matrix
@@ -433,8 +443,9 @@ image(times_default, times_default, patch_error_lai,
       xlab="Patch age (years)", ylab="Introduction time (years)", las=1)
 ```
 
-`SCM::refine_schedule()` uses exactly this combined error to find an
-appropriately refined node spacing that minimises both integration errors.
+`SCM::refine_schedule()` uses this combined error to add nodes only where they
+are needed, reducing both sources of integration error without applying a
+uniformly fine schedule everywhere.
 
 ```{r}
 #| label: refine-schedule
@@ -443,9 +454,10 @@ p_refined <- scm_refined$parameters
 offspring_production_refined <- scm_refined$offspring_production
 ```
 
-We can see the impact of this refinement by repeating our earlier analysis --
-inserting a new node at each timestep and extracting the offspring production --
-this time plotting on the *same* vertical scale as the unrefined run above:
+To assess the result, we repeat the earlier sensitivity analysis: insert one
+additional node in each interval, rerun the model, and record offspring
+production. We plot the differences on the *same* vertical scale as the
+unrefined run, so the change in sensitivity can be compared directly.
 
 This final analysis again runs the solver once per insertion position via
 `mclapply` (and depends on `offspring_production_differences` from the earlier
@@ -473,10 +485,9 @@ abline(h = 0, col = "grey")
 
 ![Offspring production differences after refinement, on the same vertical scale as the unrefined run.](../../assets/figures/node_spacing/node_spacing_refined-differences-1.png)
 
-On this common scale it is clear that refinement noticeably shrinks the
-variation introduced by inserting an extra node. In relative terms the largest
-remaining change is only
-0.0017.
-The refined node introduction schedule reaches an offspring production near the
-saturating value identified above, but with 210
-nodes rather than the 561 nodes used in naive interpolation.
+On this common scale, refinement clearly reduces the variation caused by
+inserting an extra node. The largest remaining relative change is only 0.0017.
+The refined schedule also reaches offspring production close to the saturating
+value found above with 210 nodes, compared with 561 nodes under naive uniform
+interpolation. That is the central benefit of adaptive spacing: accuracy close
+to a much finer schedule at substantially lower computational cost.

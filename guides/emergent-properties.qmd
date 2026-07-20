@@ -5,9 +5,10 @@ title: "Emergent properties"
 example
 :::
 
-The aim here is to use the plant package to investigate dynamics
-within a patch of competing individuals, focusing on emergent patch-level
-properties, rather than properties of individuals within the patch.
+An **emergent property** belongs to the whole patch rather than to any one
+plant. It arises from many individuals growing, recruiting, dying, and changing
+one another's light environment. This example moves from node-density profiles
+to leaf area and growth, then averages patch profiles across a metapopulation.
 
 ::: {.callout-note}
 A few steps below reach into plant's internal helpers (`plant:::trapezium`,
@@ -17,7 +18,7 @@ because the example depends on them; treat them as implementation detail
 rather than something to build on.
 :::
 
-We'll work with a single species at birth rate close to demographic equilibrium:
+We'll work with a single species and an illustrative constant birth rate:
 
 ```{r}
 #| label: setup-patch
@@ -47,15 +48,13 @@ sdd_matrix <- function(species_data, var) {
   as.matrix(m[, -1])
 }
 
-# Light extinction coefficient used when weighting leaf area into competition.
-k_I <- patch$strategies[[1]]$pars$k_I
 ```
 
-# Node densities
+## Node-density profiles
 
-There was a bit of hassle in the [patch dynamics guide](patch-dynamics.qmd)
-in plotting all trajectories along with a couple of lines corresponding to focal
-years.  We're going to do the same thing here:
+Patch profiles change continuously, so plotting every recorded age at equal
+emphasis is difficult to read. We retain all trajectories in grey and highlight
+five representative ages:
 
 ```{r}
 #| label: highlight-times
@@ -77,11 +76,8 @@ height      <- sdd_matrix(species_1, "height")
 log_density <- sdd_matrix(species_1, "log_density")
 ```
 
-As with height in the [patch dynamics guide](patch-dynamics.qmd),
-node density is a matrix of time and node identity.  However, to show the
-profiles for a given time slice using `matplot` it is convenient to have each
-column be the state of the system at a given time, so here each row is a node
-and each column is a time step:
+The helper arranges both height and density so rows are nodes and columns are
+recorded times. Each column can therefore be read as one patch-age profile:
 
 ```{r}
 #| label: plot-density-profiles
@@ -92,14 +88,11 @@ matplot(height, density, type="l", lty=1,
         log="y")
 ```
 
-Note that the densities here can be *extremely* low, and yet
-individuals within the nodes continue to grow in size; this is the "[atto-fox problem](http://en.wikipedia.org/wiki/Lotka-Volterra_equation)",
-though here we drop down as low as `r formatC(signif(min(density, na.rm=TRUE) / 1e-24, 1))`
-yocto individuals / m / metre squared (a yocto-x being 1 millionth of an
-atto-x).  *Anyway*....
-
-The trajectories are easier to understand if a few are
-highlighted.
+Some nodes reach extremely small mathematical densities while their
+representative individuals continue to grow. This is a continuous-density
+model, so a value below one does not mean that a literal fraction of a plant is
+present in a particular physical patch. The highlighted ages make the
+consequences easier to see.
 
 ```{r}
 #| label: plot-density-highlighted
@@ -115,31 +108,28 @@ text(height[1, i] + strwidth("x"), density[1, i],
      adj=c(0, 0))
 ```
 
-Early on there is a low density "dip" caused by self thinning (5
-years).  As the stand develops that dip broadens and deepens and
-moves forward in height (these very low density nodes are still
-traveling the [characteristic equations](../theory/implementation/characteristic-method.qmd)
-of the SCM).  Later on (20
-years) additional an second wave of recruitment gives a second
-pulse of high density (around 4 m tall), which can be seen
-traveling along in the 40 year profile to about 13 m.  When the
-patch is very old the stand approaches a stable age distribution,
-though a very narrow window of "missing" heights exists just below
-the top of the canopy.
+At five years, self-thinning creates a dip in density. As the stand develops,
+that dip becomes deeper, broader, and shifts towards taller plants because the
+low-density nodes still follow the model's
+[characteristics](../theory/implementation/characteristic-method.qmd).
 
-# Leaf area
+A later wave of recruitment creates another density peak near 4 m at 20 years;
+by 40 years that cohort has reached roughly 13 m. In old patches, the overall
+size-density profile changes more slowly, although a narrow gap remains just
+below the canopy top.
 
-It's also possible see where the leaf area in the patch is coming
-from; a profile of leaf area with respect to height.  The collected
-output records the leaf area (`competition_effect`) of an individual
-in each node, which we weight by node density and the light
-extinction coefficient `k_I` (see [Canopy & light-environment models](../theory/implementation/canopy-models.qmd))
-to get each node's contribution to patch competition:
+## Leaf-area profiles
+
+Which heights contribute most of the patch's leaf area? The collected output
+records individual leaf area as `competition_effect`. Multiplying it by node
+density gives leaf area density. The canopy model later applies the light
+extinction coefficient `k_I` when computing competition; see
+[Canopy and light environments](../theory/implementation/canopy-models.qmd).
 
 ```{r}
 #| label: plot-leaf-area
 species_1 <- species_1 |>
-  dplyr::mutate(leaf_area = k_I * density * competition_effect)
+  dplyr::mutate(leaf_area = density * competition_effect)
 leaf_area <- sdd_matrix(species_1, "leaf_area")
 
 matplot(height, leaf_area, type="l", lty=1, col="lightgrey",
@@ -152,17 +142,15 @@ text(height[1, i] + strwidth("x"), leaf_area[1, i],
      adj=c(0, 0))
 ```
 
-# Growth rate
+## Height-growth profiles
 
-Finally, we can see where height growth rate is concentrated in the
-population.  This differs from the profile in the [first individual guide](first-individual.qmd)
-because it is reduced depending on the light environment, but that
-environment is the one constructed by the individual itself.
+Where in the size distribution is height growth concentrated? Unlike the fixed
+environment in [Your first individual](first-individual.qmd), this patch has a
+shared light environment created by all its plants.
 
-The collected output records node state rather than instantaneous
-rates, so here we approximate each node's height growth rate by finite
-differences along its trajectory (the change in height between
-successive time steps):
+The collected output records states rather than instantaneous rates. We
+therefore approximate height growth from the change in each node's height
+between successive recorded times:
 
 ```{r}
 #| label: plot-growth-rate
@@ -179,22 +167,23 @@ text(height[1, i] + strwidth("x"), growth_rate[1, i],
      adj=c(0, 0))
 ```
 
-# Integrating over a metapopulation
+## Average across a metapopulation
 
-The above plots show relationships with patches of a given age
-What about the average relationship across the entire metapopulation?
-To get that, we  average (integrate) over the distribution over patch
-(for formula see the [size-structured PDE](../theory/size-structured-pde.qmd) page).
-To achieve this we first need
-the patch-level relationships to a series of fixed heights
+The earlier curves each describe a patch of one age. A metapopulation contains
+patches of many ages, so its average profile weights every patch age by its
+abundance. Before averaging, we must interpolate each patch profile onto the
+same set of heights. See the
+[size-structured PDE](../theory/size-structured-pde.qmd) for the corresponding
+integral.
 
 ```{r}
 #| label: fixed-heights
 hh <- seq_log_range(range(height, na.rm=TRUE), 500)
 ```
 
-We'll use a spline interpolation, on log-log-scaled data, clamped
-so that for x values outside the observed range are set to zero.
+The next block is reusable numerical scaffolding; readers interested mainly in
+the ecological result can skip to the resulting average. It interpolates on a
+log-log scale and returns zero outside the observed height range.
 
 ```{r}
 #| label: interpolation-helpers
@@ -213,14 +202,7 @@ splinefun_loglog <- function(x, y, ...) {
         }
 }
 
-##' Clamp a function to particular values when outside of a given domain (r)
-##'
-##' Things like names on input and return vectors are not dealt with
-##' very well, and would differ if the function was better
-##' constructed.  Values falling outwide the domain are not evaluated
-##' (which is useful if these would cause crashes, warnings, etc).
-##'
-##' @title Clamp function to domain
+##' Clamp a function to a fixed value outside a domain
 ##' @param f A function that takes \code{x} as a first argument.
 ##' @param r Range of values (vector of length 2)
 ##' @param value (Single) value to use when out of domain.
@@ -253,8 +235,7 @@ f <- function(height, density, hout) {
 }
 ```
 
-Now interpolate the height-density relationship in each patch to
-the series of  specified heights
+Interpolate every patch-age profile onto the shared height grid:
 
 ```{r}
 #| label: interpolate-patches
@@ -263,8 +244,7 @@ xx <- lapply(seq_along(result$steps$time),
 n_hh <- plant:::pad_list_to_array(xx)
 ```
 
-For each of these heights, we can now integrate across patches
-(i.e. across rows), weighting by patch abundance
+At each height, integrate across patch ages while weighting by patch abundance:
 
 ```{r}
 #| label: integrate-metapopulation
@@ -273,7 +253,7 @@ n_av <- apply(n_hh, 1,
               function(x) trapezium(result$steps$time, x * result$steps$patch_density))
 ```
 
-Add this average to the plot (red line):
+The red line is the resulting metapopulation-average density profile:
 
 ```{r}
 #| label: plot-metapopulation-average

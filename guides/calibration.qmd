@@ -5,5 +5,44 @@ title: "Calibration"
 guide
 :::
 
-> Stub — migrate the matching `.Rmd` vignette here, switch the chunk
-> engine, and let `freeze: auto` cache heavy runs.
+Calibration means using observations to learn which parameter values make a
+model reproduce the patterns you care about. In `plant`, this usually involves
+three separate choices:
+
+1. **What to compare:** for example, individual growth, stand biomass, size
+   distributions, or recruitment.
+2. **Which parameters to estimate:** restrict this set to parameters that the
+   data can plausibly inform.
+3. **How to measure agreement:** define an observation model or loss function
+   that accounts for the scale and uncertainty of the data.
+
+These choices come before the optimisation or sampling algorithm. A parameter
+set that matches one summary, such as total biomass, may still give the wrong
+size distribution or temporal dynamics.
+
+::: {.callout-important}
+## Current package boundary
+
+`plant` runs individuals and patches for specified parameter values. Fitness,
+demographic-equilibrium, and evolutionary-assembly tools have moved to the
+[`regnans` package](https://github.com/traitecoevo/regnans). Use `regnans` when
+your calibration target depends on invasion fitness or resident equilibrium;
+those functions are no longer part of `plant`.
+:::
+
+## A practical calibration workflow
+
+Before fitting parameters, build a forward simulation that is easy to rerun:
+
+1. create one function that receives a named parameter vector;
+2. construct the `plant` strategy and environment inside that function;
+3. run the model and return only the summaries observed in your data;
+4. test the function at several plausible parameter values;
+5. only then connect it to an optimiser or Bayesian inference method.
+
+Keep the calibration data, units, model version, environmental drivers, and
+random seeds together. These details determine what the fitted values mean and
+whether the analysis can be repeated.
+
+The [Example analysis](example-analysis.qmd) shows how to turn patch output into
+quantities that could be compared with observations.

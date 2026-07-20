@@ -5,25 +5,25 @@ title: "Patch dynamics"
 guide
 :::
 
-The most important feature of `plant` is modelling size distributions for
-multiple competing species within a patch. A patch is simply an area in which
-a collection of individuals grow and compete for resources. Having explored
-the individual elsewhere, the aim here is to use `plant` to investigate the
-dynamics of many individuals within a single patch.
+This guide moves from one individual to a **patch**: an area in which many
+plants grow and compete for resources. You will run a one-species patch, follow
+its cohorts through time, inspect its light environment, and then add a second
+species.
 
-Plant solves these dynamics by integrating along the *characteristics* of a
-partial differential equation — see the
+Rather than simulating every plant separately, `plant` represents cohorts as
+**nodes** and follows their changing size and density. These trajectories are
+the characteristics of the model's partial differential equation. See the
 [size-structured PDE](../theory/size-structured-pde.qmd) being solved and the
 [characteristic method](../theory/implementation/characteristic-method.qmd)
 used to solve it.
 
-## Background
+## Set up the patch
 
-First we instantiate the basic parameters of the `FF16` strategy. The length of
-a patch's development — and hence its disturbance regime — is governed by
-`max_patch_lifetime` (in years). The mean disturbance interval is a derived,
-read-only property of the disturbance regime rather than a field you set
-directly; here we simply keep the default (~105 years):
+First we instantiate the basic parameters of the `FF16` strategy.
+`max_patch_lifetime` is the oldest patch age integrated by the solver and also
+parameterises the default disturbance distribution. Its default is about 105
+years; the corresponding mean disturbance interval is a separate derived value
+of 30 years.
 
 ```{r}
 #| label: setup-params
@@ -50,12 +50,11 @@ sdd_matrix <- function(species_data, var) {
   as.matrix(m[, -1])
 }
 
-# Patch-level competition at ground level (`compute_competition(0)`), integrated
-# across the size distribution with the trapezium rule. `competition_effect` is
-# the leaf area of an individual; the patch effect weights this by node density
-# and the light extinction coefficient `k_I`.
-patch_competition <- function(height, density, competition_effect, k_I) {
-  fc <- k_I * density * competition_effect
+# Leaf area index, integrated across the size distribution with the trapezium
+# rule. `competition_effect` is the leaf area of an individual, so weighting it
+# by node density gives leaf area per unit ground area and per unit height.
+patch_lai <- function(height, density, competition_effect) {
+  fc <- density * competition_effect
   o  <- order(height, decreasing = TRUE)
   h  <- height[o]
   f  <- fc[o]
@@ -65,41 +64,39 @@ patch_competition <- function(height, density, competition_effect, k_I) {
 
 ## One patch
 
-Next, we configure a patch containing a single species:
+Add one species, represented by an LMA value of 0.0825:
 
 ```{r}
 #| label: single-species-patch
 patch <- add_strategies(params, trait_matrix(0.0825, "lma"))
 ```
 
-<!-- TODO: rename SCM to solve_characteristic_method (issue: #206) -->
-and run the `plant` characteristic solver to step the equations defining nodes
-of individuals forward in time:
+Run the characteristic solver and collect the state after every recorded step:
 
 ```{r}
 #| label: run-patch
 result <- run_scm(patch, collect = TRUE)
 ```
 
-`run_scm(collect = TRUE)` collects information about the state of the system at
-every ODE step:
+The result contains several components. These are the ones used most often:
 
 ```{r}
 #| label: result-names
 names(result)
 ```
 
-Entries are:
+| Component | What it contains |
+|---|---|
+| `steps` | One row per recorded step, including patch age (`time`) and the abundance of patches of that age (`patch_density`). |
+| `species` | One row per node per step, including height, density, and individual leaf area (`competition_effect`). |
+| `env` | Resource conditions through time, including the light profile. |
+| `offspring_production` | Reproductive output during patch development. |
+| `net_reproduction_ratios` | Lifetime reproductive output for each species. |
+| `p` | The parameters used for the run, including any refined schedule. |
 
-  * steps: a table with one row per ODE step, recording the `time` of the step and the `patch_density` (the density of patches of this age in the metapopulation)
-  * n_spp: the number of species in the patch
-  * species: a tidy table with one row per node per step. Alongside `time`, `step` and `node` identifiers it records each node's state, including `height`, `log_density` / `density` and `competition_effect` (the leaf area of an individual in that node)
-  * env: a list describing resource availability. This includes `light_availability`, a table giving canopy openness at a series of heights for each step (the competitive environment of the patch, e.g. canopy openness at a given height in the FF16 strategy)
-  * offspring_production: the offspring production from the patch during its development
-  * net_reproduction_ratios: the net reproduction ratio for each species
-  * p: a copy of the input parameters
+The result also records `n_spp`, the number of species.
 
-First we explore patch state:
+First reshape node heights into a matrix:
 
 ```{r}
 #| label: extract-heights
@@ -115,18 +112,18 @@ each column is a *node*:
 dim(h)
 ```
 
-While the solver ran the patch ODEs for 142 steps, the time points are not
-evenly distributed:
+The time points recorded by the solver are not evenly distributed:
 
 ```{r}
 #| label: time-points
-signif(t[c(1, 10, 50, 100, 142)], 1)
+sample_steps <- unique(round(seq(1, length(t), length.out = 5)))
+signif(t[sample_steps], 1)
 ```
 
-higher temporal resolution is needed to resolve early patch development, where
-small differences are magnified through competitive feedbacks. Our patch ran
-for 105 yrs, but the solver spent half the recorded steps exploring the first
-year alone. More on timing can be found in
+This uneven spacing is deliberate. Early patch development needs higher time
+resolution because small differences are amplified by competition. Although
+the patch runs for about 105 years, roughly half the recorded steps occur in
+the first year. See
 [The node-spacing algorithm](../theory/implementation/node-spacing.qmd).
 
 Nodes are introduced at each time-step, except the last. At time step $i$, the
@@ -158,16 +155,15 @@ with `NA` at time steps before it was introduced:
 sum(is.na(h[, 10]))
 ```
 
-With a single species there is always one more time step than node
+With a single species on this schedule there is one more recorded time step than node
 introduction, with the last two steps having the same number of nodes. With
 multiple species there can be more time steps than node introductions, as we'll
-record data every node introduction for *either* species, each of which will be
-refined to different schedules.
+record data at every node introduction for *either* species when their schedules
+differ.
 
-In the `FF16` strategy, Individuals increase in height with respect to time, but
-because they are competing the growth rate depends on the state of the
-environment (e.g. the amount of shading above an Individual's canopy), in
-addition to size dependent growth.
+FF16 individuals grow taller through time, but their growth rate depends on
+both their size and the light reaching their canopy. Competition therefore
+causes nodes introduced at different times to follow different trajectories.
 
 <!-- TODO(#481): Dead link- "(see vignette:plant)" -->
 
@@ -218,11 +214,10 @@ for (i in seq_along(times)) {
 }
 ```
 
-initally (bottom right) all nodes in the patch are short and the canopy is
-rather open (close to one). In later stages of patch development, we see that
-only the tallest individuals experience an open canopy. Notably, the canopy
-openness experienced by shorter individuals fluctuates as older individuals die
-and canopy gaps are filled in.
+Initially, all nodes are short and most of the canopy is open. As the patch
+develops, only the tallest plants remain in high light. Shorter plants
+experience changing conditions as older plants die and new growth fills the
+gaps.
 
 This is best shown by plotting the canopy openness at ground level over time:
 
@@ -236,30 +231,25 @@ plot(ground$time, ground$light_availability, type="l", las=1,
      ylim=c(0, 1), xlab="Time (years)", ylab="Canopy openness")
 ```
 
-Again, the waves here are show rounds of recruitment and self thinning.
-Mortality is not instantaneous, so monocultures (patches of one species) recruit
-to a density that generates a canopy that they cannot survive under.
+The repeated waves reflect recruitment followed by self-thinning. Mortality is
+not instantaneous, so a one-species patch can briefly recruit more plants than
+the closed canopy can support.
 
-## Multiple patches
+## Leaf area index in one patch
 
-In the `FF16` strategy, leaf area index (LAI) is the driver that controls the
-canopy openness (via the light extinction coefficient `k_I`, a strategy
-parameter at `params$strategy_default$pars$k_I`, following
-exponential extinction). The collected output records the leaf area
-(`competition_effect`) of an individual in each node, so we can integrate across
-the size distribution to recover the patch-level competition experienced at
-ground level (height = 0) in terms of LAI:
+Leaf area index (LAI) is total leaf area per unit ground area. The collected
+output records individual leaf area as `competition_effect`; weighting it by
+node density and integrating over height gives patch-level LAI. FF16 multiplies
+LAI by the light extinction coefficient `k_I` to obtain the ground-level
+optical depth used by its canopy model:
 
 ```{r}
 #| label: plot-lai
-# Light extinction coefficient, used to weight leaf area into competition.
-k_I <- result$p$strategies[[1]]$pars$k_I
-
 lai <- result$species |>
   dplyr::filter(species == "1") |>
   dplyr::group_by(time) |>
   dplyr::summarise(
-    lai = patch_competition(height, density, competition_effect, k_I),
+    lai = patch_lai(height, density, competition_effect),
     .groups = "drop"
   )
 plot(lai$time, lai$lai, type="l", las=1, xlab="Time (years)", ylab="Leaf area index")
@@ -267,9 +257,9 @@ plot(lai$time, lai$lai, type="l", las=1, xlab="Time (years)", ylab="Leaf area in
 
 ## Multi-species patches
 
-If multiple species are grown at once, they compete with one another. This adds
-a second species -- with a higher leaf mass area (LMA) than the first species --
-to the population:
+Now add a second species with higher leaf mass per area (LMA). Both species use
+the same light environment, so each changes the conditions experienced by the
+other:
 
 ```{r}
 #| label: two-species-patch
@@ -301,8 +291,8 @@ matplot(t2, h1, lty=1, col=util_colour_set_opacity(cols[[1]], .25), type="l",
 matlines(t2, h2, lty=1, col=util_colour_set_opacity(cols[[2]], .25))
 ```
 
-Alternatively we can compare the growth of the low LMA species (red) in a patch
-by itself or with another species:
+To isolate the effect of the competitor, compare the low-LMA species alone
+(black) with the same species in the two-species patch (red):
 
 ```{r}
 #| label: plot-mono-vs-two
@@ -314,11 +304,10 @@ matplot(t, h, lty=1, col=util_colour_set_opacity("black", .25), type="l",
 matlines(t2, h1, lty=1, col=util_colour_set_opacity(cols[[1]], .25))
 ```
 
-This shows that the additional species does not significantly affect the growth
-of the *initial* wave of nodes (because the second species is growing more
-slowly and is shorter than the first species). However, once canopy closure has
-occurred (around year 5), subsequent waves of arriving nodes are competitively
-suppressed, slowed or eliminated.
+The additional species has little effect on the *initial* wave because it grows
+more slowly and remains shorter. After canopy closure, around year 5 in this
+example, later recruits face stronger competition and are slowed, suppressed,
+or eliminated.
 
 The dynamics are easier to see when node trajectories are weighted by node
 density (some of the lines here represent nodes at close to zero density). Log
@@ -361,7 +350,7 @@ each species:
 lai2 <- result_2sp$species |>
   dplyr::group_by(species, step) |>
   dplyr::summarise(
-    lai = patch_competition(height, density, competition_effect, k_I),
+    lai = patch_lai(height, density, competition_effect),
     .groups = "drop"
   ) |>
   tidyr::pivot_wider(names_from = species, values_from = lai,

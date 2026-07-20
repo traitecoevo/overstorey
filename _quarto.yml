@@ -70,6 +70,7 @@ website:
         - section: "Running the model"
           contents:
             - guides/patch-dynamics.qmd
+            - guides/initialising-a-patch.qmd
             - guides/strategies.qmd
             - guides/extrinsic-drivers.qmd
             - guides/calibration.qmd
@@ -78,32 +79,51 @@ website:
             - guides/example-analysis.qmd
             - guides/self-thinning.qmd
             - guides/emergent-properties.qmd
+        - section: "TF24 in depth"
+          contents:
+            - guides/tf24-hydraulics-and-acclimation.qmd
+            - guides/tf24-nsc-storage.qmd
     - title: "Theory"
       style: floating
+      collapse-level: 1
       contents:
         - theory/index.qmd
-        - section: "Core"
+        - section: "1. Foundations"
           contents:
             - theory/overview.qmd
             - theory/maths-primer.qmd
             - theory/from-primer-to-pde.qmd
             - theory/size-structured-pde.qmd
-            - theory/assimilation-hydraulics.qmd
-            - theory/soil-water.qmd
-            - theory/adaptive-dynamics.qmd
-        - section: "Models"
+        - section: "2. Models and physiology"
           contents:
             - theory/models/index.qmd
             - theory/models/ff16.qmd
-            - theory/models/k93.qmd
+            - theory/assimilation-hydraulics.qmd
             - theory/models/tf24.qmd
-        - section: "Implementation"
+            - theory/soil-water.qmd
+            - theory/models/k93.qmd
+        - section: "3. Adaptive dynamics"
+          contents:
+            - theory/adaptive-dynamics.qmd
+            - theory/adaptive-dynamics/index.qmd
+            - theory/adaptive-dynamics/DD99.qmd
+            - theory/adaptive-dynamics/GK98.qmd
+            - theory/adaptive-dynamics/GM99.qmd
+            - theory/adaptive-dynamics/JJ12.qmd
+            - theory/adaptive-dynamics/solving_attractors.qmd
+            - theory/adaptive-dynamics/assembly.qmd
+            - theory/adaptive-dynamics/assembly_fitmax.qmd
+            - theory/adaptive-dynamics/assembly_stochastic.qmd
+        - section: "4. Implementation"
           contents:
             - theory/implementation/index.qmd
             - theory/implementation/characteristic-method.qmd
             - theory/implementation/ode-stepping.qmd
             - theory/implementation/node-spacing.qmd
             - theory/implementation/canopy-models.qmd
+        - section: "5. Prediction and reproducibility"
+          contents:
+            - theory/models/scientific-versioning.qmd
     - title: "Pipeline"
       style: floating
       contents:

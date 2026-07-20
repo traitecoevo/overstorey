@@ -5,13 +5,13 @@ title: "The maths, gently"
 theory · start here
 :::
 
-This page introduces the equations behind `plant` slowly, one idea at a time, for
-readers who want to understand the maths but find the
-[size-structured PDE](size-structured-pde.qmd) page heavy going. It covers the
-same system of equations — just built up gradually, with every symbol explained
-in words. Once this feels comfortable, [the maths, worked through](from-primer-to-pde.qmd)
-pushes these same equations through one small numerical example, and then that
-page has the full derivations, boundary conditions, and appendices.
+This page introduces the equations behind `plant` one idea at a time. It is for
+readers who want to understand the maths before tackling the denser
+[size-structured PDE](size-structured-pde.qmd) page. The equations are the same,
+but here we build them up gradually and explain every symbol in words. Next,
+[the maths, worked through](from-primer-to-pde.qmd) puts the equations to work in
+one small numerical example. The size-structured PDE page then gives the full
+derivations, boundary conditions, and appendices.
 
 If you have not yet read [the big picture](overview.qmd), do that first; this page
 puts equations on the concepts introduced there. We build up in seven steps:
@@ -24,9 +24,15 @@ puts equations on the concepts introduced there. We build up in seven steps:
 6. patches, disturbance, and the seed-rain balance;
 7. invasion fitness, and reading off averages.
 
+The examples use the FF16 convention: plant size is height and plants compete
+through a canopy-light profile. The same demographic logic can use another
+size coordinate or competition model. [K93](models/k93.qmd), for example, uses
+stem diameter and basal-area competition.
+
 ## The symbols you will meet
 
-Only a handful of symbols do most of the work. Keep this list nearby:
+Most of the page uses the same small set of symbols. Keep this table nearby as
+you read:
 
 | Symbol | Means | In words |
 |--------|-------|----------|
@@ -45,15 +51,18 @@ Only a handful of symbols do most of the work. Keep this list nearby:
 | $Y_x$ | seed rain | rate at which seeds of strategy $x$ arrive in a patch |
 | $k_{\rm I}$ | extinction coefficient | how strongly leaves block light |
 
-A note on integrals: an integral $\int$ here just means "add up continuously over
-time (or over height)." Whenever you see one, read it as a running total.
+One useful way to read an integral $\int$ is "add up continuously over time (or
+over height)." In the first few sections, you can think of each integral as a
+running total.
 
 ## Step 1 — where a plant's rates come from
 
-The demographic core treats the growth, death, and fecundity rates $g$, $d$, $f$
-as given, and asks what population they produce. But it helps to know where they
-come from. In the default [FF16](models/ff16.qmd) model, all three trace back to
-one quantity: the **net biomass** a plant produces per unit time.
+The demographic core takes the growth, death, and fecundity rates $g$, $d$, and
+$f$ as inputs, then uses them to work out how the population changes. Before we
+do that, it helps to see where those rates come from. In the default
+[FF16](models/ff16.qmd) model, growth and fecundity are tied directly to the
+**net biomass** a plant produces per unit time. Net biomass also affects one
+component of mortality.
 
 $$
 \underbrace{\frac{{\rm d}B}{{\rm d}t}}_{\text{net biomass}}
@@ -62,10 +71,11 @@ $$
 \; - \; \underbrace{\text{tissue turnover}}_{\text{replacement}}.
 $$
 
-Photosynthesis scales with how much leaf area the plant has and how much light
-that leaf area sees; respiration and turnover are the running costs of keeping
-leaves, wood, and roots alive. Whatever is left over, the plant invests — and how
-it splits that investment gives the three demographic rates:
+Photosynthesis depends on how much leaf area the plant has and how much light
+reaches those leaves. Respiration and turnover are the continuing costs of
+maintaining leaves, wood, and roots. The plant can invest whatever remains.
+That investment, together with the model's mortality assumptions, determines
+the three demographic rates:
 
 - **Growth** $g$ is the share of net biomass spent building tissue, converted into
   height gain. Young plants spend most of their surplus here.
@@ -74,16 +84,19 @@ it splits that investment gives the three demographic rates:
 - **Mortality** $d$ has a baseline part plus a part that *rises as production
   falls* — a starving, shaded plant is more likely to die.
 
-So the same carbon budget drives all three rates, and a plant's traits (its LMA,
-wood density, and so on) set the terms of that budget. The full equations are on
-the [FF16](models/ff16.qmd) and
-[assimilation & hydraulics](assimilation-hydraulics.qmd) pages; here we simply take
-$g$, $d$, and $f$ as functions the strategy hands us.
+The carbon budget therefore drives growth and fecundity directly and links low
+production to an increased risk of death. Background mortality remains a
+separate part of the model. A plant's traits — its LMA, wood density, and so on
+— determine the terms of that budget. The full equations are on the
+[FF16](models/ff16.qmd) and
+[assimilation & hydraulics](assimilation-hydraulics.qmd) pages. For now, we will
+treat $g$, $d$, and $f$ as rates supplied by the chosen strategy.
 
 ## Step 2 — one plant, three running totals
 
-Now follow a single plant of traits $x$ that germinated at patch age $a_0$.
-Everything about its life is a running total of those three rates.
+Now consider a single plant with traits $x$ that germinated when the patch was
+age $a_0$. Its growth, survival, and seed production can each be written as a
+running total of the three rates above.
 
 **Its height** is its starting height plus all the growth it has accumulated:
 
@@ -99,9 +112,9 @@ $$
 S_{\rm I}(a) = S_{\rm G} \, \exp\!\left(- \int_{a_0}^{a} d \, {\rm d}a'\right).
 $$
 
-The exponential is the standard way to turn an accumulating risk into a survival
-probability: no risk yet means survival $1$; as risk piles up, survival decays
-towards $0$.
+The exponential converts accumulated death risk into a survival probability. If
+no risk has accumulated, the exponential factor is 1, so survival equals
+$S_{\rm G}$. As the risk grows, survival approaches 0.
 
 **Its total seeds so far** add up fecundity over time — but only counting plants
 that are still alive to produce them, hence the survival factor:
@@ -110,20 +123,21 @@ $$
 \tilde{R}(a) = \int_{a_0}^{a} f \, S_{\rm I}(a') \, {\rm d}a'.
 $$
 
-That is the whole life of one plant: grow, survive, seed — three integrals of the
-rates from Step 1. In practice `plant` does not compute these integrals directly;
-it writes each as a small differential equation and steps it forward in time with
-an [ODE solver](implementation/ode-stepping.qmd).
+These three integrals describe the plant growing, surviving, and producing seed.
+In practice, `plant` rewrites them as small differential equations and advances
+them through time with an [ODE solver](implementation/ode-stepping.qmd), rather
+than evaluating the integrals directly.
 
 ## Step 3 — from one plant to a distribution
 
-A patch holds many plants, so instead of tracking them individually we track a
-**size-density distribution** $N(H \mid x, a)$: at patch age $a$, how many plants
-of traits $x$ have height $H$. Picture it as a curve over height whose shape
-changes as the patch ages.
+A patch contains many plants. Rather than list each plant separately, we describe
+them with a **size-density distribution** $N(H \mid x, a)$. At patch age $a$, this
+distribution tells us how many plants with traits $x$ occur around each height
+$H$. You can picture it as a curve over height that changes shape as the patch
+ages.
 
-Two things move that curve, and they map onto the two rates that are *not* about
-reproduction:
+Two processes change that curve: growth moves plants between heights, while death
+removes them. These are the two rates that do not describe reproduction:
 
 ```{mermaid}
 flowchart LR
@@ -138,14 +152,14 @@ $$
 \frac{\partial N}{\partial a} = \underbrace{-\, d \, N}_{\text{deaths remove plants}} \;\underbrace{-\, \frac{\partial}{\partial H}\big(g \, N\big)}_{\text{growth carries plants upward}}.
 $$
 
-Read it as a conveyor belt. Growth $g$ carries plants along the height axis (the
-second term is the *flow* of that belt); death $d$ removes a fraction of them
-wherever they are (the first term). The left-hand side is simply how the
-distribution changes as the patch gets older.
+A conveyor belt is a useful analogy. Growth $g$ carries plants along the height
+axis; the second term describes that flow. Death $d$ removes plants wherever they
+are; the first term describes those losses. The left-hand side records the
+combined change in the distribution as the patch gets older.
 
-New plants enter at the bottom of the height axis. This is the PDE's **boundary
-condition**: the flux of plants across the smallest height must equal the rate at
-which viable seedlings appear,
+New plants enter at the smallest height. The PDE needs a rule for this entry
+point, called a **boundary condition**: the flow of plants into the distribution
+must equal the rate at which viable seedlings appear,
 
 $$
 g(H_0) \, N(H_0 \mid x, a) = Y_x \, S_{\rm G},
@@ -157,9 +171,9 @@ feeds back into a single patch.
 
 ## Step 4 — how the PDE is actually solved
 
-Solving a PDE on a fixed grid of heights would be expensive and inaccurate. `plant`
-instead uses the **method of characteristics**: rather than watching fixed heights,
-it *rides along with the plants*.
+Solving the PDE on a fixed grid would mean repeatedly moving plants from one
+height cell to the next. `plant` instead uses the **method of characteristics**:
+rather than watching fixed heights, it follows plants as they grow.
 
 Follow one cohort — a group of plants that all germinated together. Its height
 simply obeys the growth rate,
@@ -168,32 +182,33 @@ $$
 \frac{{\rm d}H}{{\rm d}a} = g,
 $$
 
-so the cohort traces a curve rising up the height axis (a *characteristic* of the
-PDE). Along that curve, the cohort's density changes for two reasons: plants die,
-*and* the cohort stretches or compresses as growth speeds up or slows down. Both
-effects combine into one tidy equation,
+so the cohort traces a curve along the height axis. That curve is a
+*characteristic* of the PDE. As the cohort moves, its density changes for two
+reasons: plants die, and neighbouring cohorts spread apart or bunch together as
+growth speeds up or slows down. Both effects appear in one equation,
 
 $$
 \frac{{\rm d}}{{\rm d}a}\ln N = -\left(\, d + \frac{\partial g}{\partial H}\,\right).
 $$
 
-The $d$ term is deaths, as before. The $\partial g / \partial H$ term is the new
-piece: if growth *slows* with height ($\partial g/\partial H < 0$), successive
-cohorts bunch up and the density rises; if growth speeds up, they spread out and
-density falls. Nothing is lost compared with the PDE — this is the same equation,
-just viewed from the plants' moving frame.
+The $d$ term represents deaths, as before. The $\partial g / \partial H$ term
+describes how growth changes with height. If growth *slows* with height
+($\partial g/\partial H < 0$), successive cohorts bunch together and density
+rises. If growth speeds up, they spread apart and density falls. This is the same
+population change described by the PDE, viewed while moving with a cohort.
 
-So a whole patch becomes a modest set of cohorts, each carrying two numbers — its
-height and its (log) density — that march forward together under simple
-differential equations. How many cohorts, and when each is introduced, is chosen
-adaptively (see [node spacing](implementation/node-spacing.qmd)).
+The calculation therefore represents a whole patch with a finite set of cohorts.
+Each cohort carries two values — its height and its log density — which advance
+together under simple differential equations. `plant` adaptively chooses how many
+cohorts to use and when to introduce them (see
+[node spacing](implementation/node-spacing.qmd)).
 
 ## Step 5 — competition through shade
 
-The rates $g$ and $d$ are not fixed: they depend on light, and light depends on
-all the other plants. `plant` uses a shading law borrowed from optics (Beer's
-law): light falls off exponentially with the amount of leaf area stacked above
-you.
+In a light-competition strategy, the rates $g$ and $d$ are not fixed. They depend
+on light, while the light available at each height depends on all the plants in
+the patch. `plant` represents shading with Beer's law, borrowed from optics: light
+falls exponentially as the leaf area above a point increases.
 
 $$
 E_a(z) = \exp\!\left(-k_{\rm I} \times (\text{leaf area above height } z)\right).
@@ -205,25 +220,25 @@ block light). The "leaf area above $z$" is itself found by adding up the leaf ar
 of every cohort taller than $z$ — that is, by integrating over the size
 distribution $N$.
 
-This closes the feedback loop from [the big picture](overview.qmd): the
-distribution $N$ sets the leaf area, the leaf area sets the light $E_a$, and the
-light feeds back into the growth and death rates that reshape $N$. Because
-taller plants shade shorter ones but not the reverse, the competition is
-asymmetric.
+We can now close the feedback loop from [the big picture](overview.qmd). The
+distribution $N$ determines leaf area; leaf area determines the light $E_a$; and
+light changes the growth and death rates that reshape $N$. Taller plants
+usually shade a larger fraction of a shorter plant's crown than the reverse,
+so this competition is strongly size-asymmetric.
 
 ## Step 6 — patches, disturbance, and the seed-rain balance
 
-**The patch mosaic.** Zoom out to the landscape. Disturbances strike patches at
-random, so at any moment the landscape contains patches of every age. $P(a)$
-describes how common patches of age $a$ are, and it decays as older patches keep
-getting knocked back to age zero:
+**The patch mosaic.** Now zoom out from one patch to the landscape. Disturbances
+reset patches at different times, so the landscape contains patches of many ages.
+$P(a)$ describes how common patches of age $a$ are. It declines with age because
+older patches have had more time to be disturbed and reset:
 
 $$
 \frac{{\rm d}P}{{\rm d}a} = -\, d_{\rm P}(a) \, P(a),
 $$
 
-where $d_{\rm P}(a)$ is the chance a patch of age $a$ is disturbed. Solving this
-gives the chance a patch has *escaped* disturbance up to age $a$,
+where $d_{\rm P}(a)$ is the disturbance rate for a patch of age $a$. Solving this
+equation gives the chance that a patch has *escaped* disturbance up to age $a$,
 
 $$
 S_{\rm P}(a) = \exp\!\left(-\int_0^a d_{\rm P}(a')\,{\rm d}a'\right),
@@ -237,12 +252,14 @@ and $P(a)$ is proportional to $S_{\rm P}(a)$. Two cases matter:
   young patches almost always survive, old ones almost never do. This gives a
   **Weibull** distribution, $S_{\rm P}(a) = \exp(-\lambda a^{2})$.
 
-Either way, the whole age distribution is pinned down by one number: $\bar a$, the
-**mean interval between disturbances**.
+Once the shape of the disturbance-risk curve has been chosen, its scale can be
+set using $\bar a$, the **mean interval between disturbances**. A different
+risk curve with the same mean can still produce a different distribution of
+patch ages.
 
-**The seed-rain balance.** Now the two scales meet. Across the whole landscape, a
-strategy's total seed output is found by adding up the seeds made in every patch,
-weighted by how common patches of that age are:
+**The seed-rain balance.** This is where the patch and landscape scales meet. To
+find a strategy's seed output across the landscape, we add the seeds produced in
+patches of every age and weight each age by how common it is:
 
 $$
 Y_x = \int_0^\infty \int_0^\infty P(a) \, S_{\rm D} \, f \, N \, {\rm d}H \, {\rm d}a.
@@ -252,28 +269,32 @@ The inner integral adds seed production over all plant heights in a patch; the
 outer integral averages over patches of all ages; $S_{\rm D}$ is the fraction of
 seeds surviving dispersal.
 
-Here is the catch: the seed rain $Y_x$ *feeds the patches* (it set the boundary
-condition in Step 3) **and** *comes out of them* (the equation above). Write the
-output as a function of the assumed input, $Y_x^{\text{out}} = \Phi(Y_x)$. At
-equilibrium the two must agree,
+The same seed rain $Y_x$ appears on both sides of the calculation. It *feeds the
+patches* through the boundary condition in Step 3, and it is also *produced by
+those patches* through the equation above. We can write the output seed rain as a
+function of the assumed input, $Y_x^{\text{out}} = \Phi(Y_x)$. At equilibrium,
+input and output must agree,
 
 $$
 Y_x = \Phi(Y_x),
 $$
 
-which is a **fixed-point** (root-finding) problem — exactly the loop drawn in
-[the big picture](overview.qmd). For a single strategy it is a one-dimensional
-root find, solved by simple bisection; for several competing strategies it becomes
-a harder multi-dimensional solve.
+This is a **fixed-point** (root-finding) problem: we seek an input that
+reproduces itself as output. It is the same loop drawn in [the big
+picture](overview.qmd). For one strategy this is a one-dimensional numerical
+problem; with several competing strategies it becomes a more difficult
+multi-dimensional solve. The current package does not expose a general
+equilibrium seed-rain solver, so this section describes the mathematical
+condition rather than a ready-made user workflow.
 
 ## Step 7 — invasion fitness and reading off answers
 
-**Can a mutant invade?** Once the resident community is at its balanced seed rain,
-we can test a rare mutant with traits $x'$. Because it is rare, it does not change
-the light environment — it just grows in the residents' shade. Its **invasion
-fitness** is the expected number of dispersing offspring produced by one of its
-seeds over a full patch lifetime, averaged over the age of patch it happens to land
-in:
+**Can a mutant invade?** Once the resident community has reached its balanced seed
+rain, we can test a rare mutant with traits $x'$. The mutant is assumed to be too
+rare to change the light environment, so it grows in the shade created by the
+residents. Its **invasion fitness** is the expected number of dispersing offspring
+produced by one mutant seed over a full patch lifetime, averaged over the ages of
+the patches where that seed might land:
 
 $$
 R(x', x) = \int_0^\infty P(a_0) \, \tilde{R}(x', a_0) \, {\rm d}a_0,
@@ -286,12 +307,13 @@ also discounted by patch survival $S_{\rm P}$). The reading is simple:
 - $R(x', x) < 1$ → the mutant fades out; the resident holds.
 
 Trait values that *no* mutant can beat ($R \le 1$ for every $x'$) are
-evolutionarily stable — the model's prediction for how plants "should" be built.
-This is the whole content of the [adaptive dynamics](adaptive-dynamics.qmd) page.
+evolutionarily stable. They are the trait combinations predicted to resist
+invasion under the model's assumptions. The
+[adaptive dynamics](adaptive-dynamics.qmd) page develops this idea in full.
 
-**Reading off averages.** Finally, any quantity you care about is an average over
-the size distribution, weighted by how common each patch age is. For some quantity
-$w$ (density, biomass, mortality…), its landscape average is
+**Reading off averages.** Finally, suppose we want a landscape-scale summary of a
+quantity $w$, such as biomass or mortality. We first average over the size
+distribution within each patch, then weight patches by how common each age is:
 
 $$
 \hat{w}(x) = \frac{1}{\hat N(x)}\int_0^\infty \int_0^\infty P(a) \, N \, w \; {\rm d}H \, {\rm d}a,
@@ -299,15 +321,17 @@ $$
 \hat N(x) = \int_0^\infty \int_0^\infty P(a) \, N \; {\rm d}H \, {\rm d}a,
 $$
 
-where $\hat N(x)$ is just the average total density (the same integral with
-$w = 1$), used to normalise. Total stem density, leaf area, biomass, and the
-size–density (self-thinning) relationship all come out of this one
-weighted-integral pattern — see the
-[emergent properties](../guides/emergent-properties.qmd) guide for it in action.
+Here $\hat N(x)$ is the average total density: the same integral with $w = 1$.
+Dividing by it normalises the weighted total. The same pattern can be used to
+calculate stem density, leaf area, biomass, and the size–density relationship
+behind self-thinning. The
+[emergent properties](../guides/emergent-properties.qmd) guide shows these
+calculations in practice.
 
 ## Where to go next
 
-You now have the skeleton of the whole model. To go deeper:
+You now have the main mathematical structure of the model. Choose the next page
+according to what you want to understand:
 
 - [The maths, worked through](from-primer-to-pde.qmd) — the gentlest next step:
   the same equations pushed through one small numerical example, one plant at a

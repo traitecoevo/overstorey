@@ -13,34 +13,34 @@ This page builds on [The big picture](../overview.qmd). Read it first if the not
 
 ## The idea first
 
-Imagine a forest where every tree of a given size behaves the same way,
-regardless of species. A tree's diameter alone tells you roughly how fast it
-grows, how likely it is to die, and how many offspring it produces, once you
-also account for how much basal area — a proxy for crowding — sits above it
-in the canopy. That is the whole idea behind the K93 model: growth,
-mortality, and fecundity are simple, size-dependent rules shaped by
-competition from larger neighbours, not by any species-specific strategy.
+K93 is easiest to understand as a size-based demographic model. For each tree,
+the model asks two main questions:
 
-This is a deliberately different starting point from the trait-based FF16
-model described elsewhere in this documentation. FF16 asks what an
-individual plant should do given its own physiological traits, such as leaf
-economics or wood density, and derives vital rates from first principles.
-K93 instead asks what pattern of vital rates, fitted directly to size and
-competition, allows many species to coexist in a stand over the long run. It
-is a statistical description of a forest rather than a mechanistic model of
-a plant. The rest of this page makes this precise.
+1. How large is the tree?
+2. How much basal area is contributed by trees larger than it?
 
-This document outlines the `K93` physiological model used in the `plant`
-package. This model was first described, and has primarily been developed,
-elsewhere, in particular in @Kohyama-1993. The model's equations are presented
-here not as original findings, but rather so that users can understand the full
-system of equations being solved within `plant`.
+The second quantity is a measure of competition. A small tree beneath many
+larger neighbours experiences more competition than a large tree with little
+basal area above it. K93 uses the tree's diameter and this competition measure
+to calculate its growth, mortality, and fecundity.
 
-The purpose of a physiological model in `plant` is to take a plant's current
-size, light environment, and physiological parameters as inputs, and return its
-growth, mortality, and fecundity rates. In the `K93` physiological model, these
-vital rates are all estimated using simple phenomenological equations, as
-functions of diameter and competition.
+All species use the same *form* of these equations, but they need not behave
+identically. Species can have different coefficient values, and those values
+change how strongly size and competition affect their vital rates. The
+three-species example near the end of this page illustrates this distinction.
+
+This is a different starting point from the trait-based FF16 model. FF16 links
+traits such as leaf mass per area and wood density to a mechanistic carbon
+budget, then derives vital rates from that budget. K93 instead describes vital
+rates directly as functions of observed size and competition. In that sense,
+K93 is a phenomenological model of forest demography rather than a mechanistic
+model of plant physiology.
+
+The model was introduced in @Kohyama-1993. This page does not present the
+equations as new results; it explains how `plant` represents and solves them.
+Within the package, K93 is implemented through the same broad interface as the
+other physiological models: an individual's current state and environment are
+used to calculate its growth, mortality, and fecundity rates.
 
 ```{r}
 #| echo: false
@@ -48,9 +48,15 @@ functions of diameter and competition.
 library(plant)
 ```
 
-# Model description
+## Model description
 
-## Growth
+The equations below share one important environmental quantity:
+$B(t,a,x)$, the cumulative basal area of trees larger than a focal tree of size
+$x$. A large value of $B$ means that the focal tree has many, or very large,
+competitors above it. The [competition equation](#size-structured-competition)
+defines this quantity in full.
+
+### Growth
 
 Eq. 10 of @Kohyama-1993:
 
@@ -58,7 +64,13 @@ $$
 G(t, a, x) = x \cdot \Bigg(b_0 - b_1 \cdot \ln{x} - b_2 \cdot B(t, a, x)\Bigg)
 $$ {#eq-k93-growth}
 
-## Fecundity
+The growth rate $G$ is proportional to current diameter $x$. Inside the
+parentheses, $b_0$ sets the baseline growth rate, $b_1$ controls how growth
+changes with size, and $b_2$ controls the reduction caused by competition.
+As the tree becomes larger, the $b_1\ln{x}$ term reduces its proportional
+growth rate. More basal area above the tree also reduces growth.
+
+### Fecundity
 
 Eq. 12 of @Kohyama-1993:
 
@@ -66,20 +78,29 @@ $$
 R(t, a, x_0) = d_0 \cdot B_0 \cdot \exp{(-d_1 \cdot B(t, a, x_0))}
 $$ {#eq-k93-fecundity}
 
-*$B_0$ re-interpreted as an individual basal area, integrated over the whole
-stand, providing equivalent total reproductive output as Eq. 9.*
+Fecundity $R$ increases with the focal tree's basal area, $B_0$, and decreases
+exponentially as competition increases. The coefficient $d_0$ sets reproductive
+output per unit basal area, while $d_1$ determines how strongly competition
+suppresses that output.
 
-## Mortality
+In the `plant` implementation, $B_0$ is interpreted as the basal area of one
+individual. Integrating these individual contributions across the stand gives
+the same total reproductive output as Eq. 9 of @Kohyama-1993.
+
+### Mortality
 
 Eq. 11 of @Kohyama-1993:
 
 $$
-\mu(t, a, x) = - c_0 + c_1 \cdot B(t, a, x_0)
+\mu(t, a, x) = - c_0 + c_1 \cdot B(t, a, x)
 $$ {#eq-k93-mortality}
 
-*Growth independent mortality provided by disturbance regime.*
+Competition-dependent mortality $\mu$ rises linearly with basal area above the
+focal tree. The implementation does not allow this component to become
+negative, so values below zero are set to zero. Mortality associated with
+large-scale disturbance is handled separately by the patch disturbance regime.
 
-## Size structured competition
+### Size structured competition
 
 Eq. 8 of @Kohyama-1993:
 
@@ -87,19 +108,31 @@ $$
 B(t, a, x) = \frac{\pi}{4 \cdot s(t, a)} \int_{x}^{x_{max}} y^2 \cdot f(t, a, y) \, dy
 $$ {#eq-k93-competition}
 
-*Added additional smoothing parameter to interpolate competitive effect using a
-continuous function. $\eta = 12.0$.*
+This integral sums the basal area of trees with diameters between the focal
+tree's diameter, $x$, and the largest diameter in the stand, $x_{max}$. The
+function $f(t,a,y)$ describes the density of trees of size $y$, while $s(t,a)$
+provides the patch-level scaling used in the original formulation. Because the
+calculation includes only trees at least as large as the focal tree, small trees
+generally experience more competition than large ones.
 
-## Dispersal and establishment
+The `plant` implementation adds a smoothing parameter, $\eta = 12.0$, so that
+the competitive effect can be interpolated with a continuous function.
 
-Dispersal and establishment are fixtures of the `plant` framework, but not used
-in the original formulation of Kohyama. We set them both to $1.0$.
+### Dispersal and establishment
 
-# Examples
+The wider `plant` framework includes dispersal and establishment effects. They
+were not part of the original K93 formulation, so both are set to $1.0$. This
+choice makes them neutral: neither process changes the number of recruits.
 
-## Individuals
+## Examples
 
-Instantiate a K93 individual then examine the state of each characteristic:
+The examples move from one individual to a whole patch. They use the
+package's generic state names, so a column or state labelled `height` should be
+read as diameter at breast height (DBH) for K93.
+
+### Individuals
+
+First, create a K93 individual and inspect its state variables:
 
 ```{r}
 #| label: k93-individual
@@ -118,10 +151,12 @@ p$ode_state
 p$ode_state <- c(50, 0, 0)
 ```
 
-*Note the size characteristic is currently hardcoded as 'height'.*
+The size characteristic is currently labelled `height` by the shared package
+interface, but K93 interprets it as DBH in centimetres.
 
-An environment is required to compute the rate of characteristic change (i.e.
-gradients):
+An individual alone is not enough to calculate rates: the model also needs an
+environment. Here we create a fixed environment, then ask the individual to
+calculate the instantaneous rates of change in its state variables:
 
 ```{r}
 #| label: fixed-environment
@@ -134,18 +169,15 @@ p$compute_rates(env)
 p$ode_rates
 ```
 
-Here, a fixed environment means that individuals of any height experience the
-same competitive conditions. A `plant` environment is expressed on a
-proportional scale (between zero and one) describing the availability of
-resources. Environment values near one mean that individuals receive their full
-allocation of resources (e.g. light in an open canopy, with no shading), while
-values near zero mean that few resources are available.
+In a fixed environment, every individual experiences the same competitive
+conditions, regardless of its size. The generic `plant` environment represents
+resource availability on a proportional scale from zero to one. Values near one
+represent high availability; values near zero represent strong limitation.
 
-The Kohyama model describes the environment in terms of cumulative basal area of
-surrounding trees larger than the focal individual (@eq-k93-competition). We back
-transform the environmental value into cumulative basal area such that the
-smallest individuals receive the largest competitive effects from their
-neighbours:
+K93 itself describes the environment as cumulative basal area above the focal
+individual (@eq-k93-competition). The package maps that competition measure onto
+the generic zero-to-one scale. We can reverse the mapping to recover cumulative
+basal area from the fixed environmental value:
 
 ```{r}
 #| label: growth-rate
@@ -153,32 +185,40 @@ neighbours:
 s <- p$strategy
 
 # backtransform environment to cumulative basal area
-k_I <- K93_Strategy()$k_I
+k_I <- K93_Strategy()$pars$k_I
 basal_area_above <- function(e) -log(e) / k_I
 
 # growth has both size and competition dependent terms
 x <- p$ode_state[1]
-x * (s$b_0 - s$b_1 * log(x) - s$b_2 * basal_area_above(e))
+x * (s$pars$b_0 - s$pars$b_1 * log(x) -
+       s$pars$b_2 * basal_area_above(e))
 ```
 
-*The extinction coefficient $k_I$ is set to 0.01 by default (it lives on the
-strategy, `K93_Strategy()$k_I`).*
+The extinction coefficient $k_I$ controls the mapping between environmental
+availability and cumulative basal area. Its default value is $0.01$, and it is
+stored in the strategy's biological parameters as
+`K93_Strategy()$pars$k_I`.
 
-Fecundity is proportional to basal area — in the original formulation this is
-calculated for the whole forest, but here we calculate individual contributions:
+Fecundity is proportional to an individual's basal area. The original model
+expresses reproduction at the level of the whole forest; here, we calculate one
+individual's contribution to that total:
 
 ```{r}
 #| label: fecundity
 # basal area
 basal_area <- pi / 4 * x^2
 
-s$d_0 * basal_area * exp(-s$d_1 * basal_area_above(e))
+s$pars$d_0 * basal_area * exp(-s$pars$d_1 * basal_area_above(e))
 ```
 
-Like in the original paper, mortality is split into competition dependent and
-independent processes, the latter described by the average disturbance
-interval/frequency of the patch and is initially zero, but will increase as the
-patch develops over time.
+As in the original paper, mortality has two parts. Competition-dependent
+mortality acts on individuals, while competition-independent mortality comes
+from the patch disturbance regime. The disturbance regime describes how the
+risk of patch-ending disturbance changes as the patch ages. The following code
+shows its mean interval. It also reports the death probability implied by the
+individual's accumulated competition-dependent mortality state. That
+probability is still zero here because we calculated instantaneous rates but
+did not advance the individual through time:
 
 ```{r}
 #| label: disturbance-mortality
@@ -186,28 +226,31 @@ patch develops over time.
 disturbance <- Weibull_Disturbance_Regime(K93_Parameters()$max_patch_lifetime)
 disturbance$mean_interval()
 
-# cumulative hazard
+# current death probability implied by the accumulated hazard
 p$mortality_probability
 ```
 
-We focus here on competition dependent mortality of an individual:
+Next, isolate the competition-dependent mortality rate. With the default
+extinction coefficient, the rate is small. Reducing $k_I$ means that the same
+environmental value corresponds to more basal area above the tree, and hence to
+stronger competition:
 
 ```{r}
 #| label: competition-mortality
 # small, but matches the mortality rate computed above
-max(-s$c_0 + s$c_1 * basal_area_above(e), 0)
+max(-s$pars$c_0 + s$pars$c_1 * basal_area_above(e), 0)
 
 # but increasing intensity of competition increases the rate of mortality
 k_I <- 1e-6
--s$c_0 + s$c_1 * basal_area_above(e)
+-s$pars$c_0 + s$pars$c_1 * basal_area_above(e)
 ```
 
-which we confirm by rebuilding our K93_Individual with the lower extinction
-coefficient (`k_I` lives on the strategy):
+We can confirm this result by rebuilding the individual with the modified
+strategy and calculating its rates again:
 
 ```{r}
 #| label: rebuild-individual
-s$k_I <- 1e-6
+s$pars$k_I <- 1e-6
 p <- K93_Individual(s)
 p$ode_state <- c(50, 0, 0)
 p$compute_rates(env)
@@ -215,11 +258,12 @@ p$compute_rates(env)
 p$ode_rates[2]
 ```
 
-## Patches
+### Patches
 
-First we need to add a species to the model parameters, then we run the
-characteristic solver `scm`, collecting the results at each timestep. Finally, we
-plot the height of each cohort of individuals over time:
+To move from an individual to a patch, we add its strategy to a parameter
+object and run the size-structured community model with `run_scm()`. Setting
+`collect = TRUE` retains the state at each output time. We then reshape the
+result and plot the DBH trajectory of every cohort:
 
 ```{r}
 #| label: plot-patch
@@ -242,11 +286,11 @@ ggplot(tidy, aes(time, height, group = node)) +
   theme_bw()
 ```
 
-The run stops at around 105 years because that is the default
-`max_patch_lifetime` for `K93` — the patch is still developing when it ends.
-Increasing the maximum patch lifetime extends the simulation to 700 years and
-allows the first cohorts to reach their maximum size of 136cm DBH, matching
-Fig. 2 of @Kohyama-1993:
+The run stops at about 105 years because that is the default
+`max_patch_lifetime` for K93. At that point, the simulated patch is still
+developing. Extending its maximum lifetime to 700 years allows the oldest
+cohorts to approach their maximum size of 136 cm DBH, as in Fig. 2 of
+@Kohyama-1993:
 
 ```{r}
 #| label: plot-patch-extended
@@ -261,8 +305,8 @@ ggplot(tidy, aes(time, height, group = node)) +
   theme_bw()
 ```
 
-*Note: we obtain more interesting results using the fast control parameters
-provided by the convenience function `scm_base_parameters`.*
+The convenience function `scm_base_parameters()` supplies faster numerical
+control settings. These settings make it practical to explore the longer run:
 
 ```{r}
 #| label: plot-patch-fast
@@ -280,7 +324,10 @@ ggplot(tidy, aes(time, height, group = node)) +
   theme_bw()
 ```
 
-Weighting each cohort by its density shows how gap-formation can occur:
+The previous lines give every cohort the same visual weight, even when few
+individuals remain in it. Mapping line transparency to cohort density makes the
+changing abundance of trees visible and helps reveal the formation of canopy
+gaps:
 
 ```{r}
 #| label: plot-density-weighted
@@ -294,7 +341,10 @@ tidy %>%
   theme_bw()
 ```
 
-The Kohyama model also describes a patch with three species:
+Finally, reproduce the three-species setup described by Kohyama. Each row of
+the trait matrix supplies a different set of vital-rate coefficients. The
+species therefore share the K93 equation structure but differ in their growth,
+mortality, and fecundity responses:
 
 ```{r}
 #| label: plot-three-species
@@ -310,9 +360,9 @@ sp <- trait_matrix(c(0.042, 0.063, 0.052,
 
 fast_par2 <- scm_base_parameters("K93")
 fast_par2$max_patch_lifetime <- 700
-fast_par2$strategy_default$k_I <- 1e-6
+fast_par2$strategy_default$pars$k_I <- 1e-6
 
-sp_par <- expand_parameters(sp, fast_par2, birth_rate_list = rep(1, 3))
+sp_par <- add_strategies(fast_par2, sp, birth_rate = rep(1, 3))
 
 sp_results <- run_scm(sp_par, collect = TRUE)
 
@@ -330,3 +380,12 @@ ggplot(sp_tidy, aes(time, height, colour = species,
        alpha = "Density") +
   theme_bw()
 ```
+
+## What to take away
+
+K93 reduces a complex forest to a clear demographic picture: trees change in
+diameter, and larger trees suppress smaller ones through cumulative basal area.
+Species differ through the coefficients in their vital-rate equations, not
+through an explicit carbon budget or a set of physiological traits. The
+`plant` package then embeds those individual rules in its shared framework for
+cohorts, patches, recruitment, and disturbance.

@@ -5,5 +5,66 @@ title: "Install"
 guide
 :::
 
-> Stub — migrate the matching `.Rmd` vignette here, switch the chunk
-> engine, and let `freeze: auto` cache heavy runs.
+`plant` is an R package with compiled C++ code. This page gives you the shortest
+route from a new R session to a working installation.
+
+## Before you install
+
+You need R 4.5.0 or newer and a compiler that supports C++20. Recent versions
+of clang and gcc work on macOS and Linux. On Windows, install the version of
+[Rtools](https://cran.r-project.org/bin/windows/Rtools/) that matches your R
+installation.
+
+`plant` is installed from GitHub rather than CRAN. Install the `remotes`
+package once, then use it to install `plant` and its dependencies:
+
+```r
+install.packages("remotes")
+remotes::install_github("traitecoevo/plant", dependencies = TRUE)
+```
+
+This installs the current default branch. If you need a particular release for
+a reproducible analysis, choose a tag from the
+[`plant` releases](https://github.com/traitecoevo/plant/releases) and include it
+after `@`. For example:
+
+```r
+remotes::install_github("traitecoevo/plant@v2.0.0", dependencies = TRUE)
+```
+
+## Check the installation
+
+Start a fresh R session and run:
+
+```r
+library(plant)
+packageVersion("plant")
+
+p <- scm_base_parameters("FF16")
+p <- add_strategies(p, trait_matrix(0.0825, "lma"))
+results <- run_scm(p, collect = TRUE)
+```
+
+If this completes without an error, the package and its compiled code are
+working. `results` contains the changing state of a patch of plants; later
+guides explain how to inspect it.
+
+::: {.callout-tip}
+## Next step
+
+Continue to [Your first individual](first-individual.qmd) to meet the main
+objects and learn how a single plant grows before adding competition.
+:::
+
+## Installing from a local checkout
+
+Building from a cloned repository is mainly useful when you want to contribute
+to `plant` or test unreleased changes. Clone the repository, open R in that
+directory, and run:
+
+```r
+devtools::install_deps()
+devtools::install()
+```
+
+Use the GitHub installation above if you only want to run the model.

@@ -5,102 +5,142 @@ title: "Implementation"
 implementation
 :::
 
-This page overviews the numerical methods used in `plant` and serves as the
-index for the Implementation section, linking out to detailed pages for each
-method.
+The biological equations describe what the `plant` model should do. The
+implementation determines how a computer solves those equations accurately and
+efficiently. This section explains the main numerical ideas without assuming
+that you already know the structure of the C++ code.
+
+## How the pieces fit together
+
+A patch simulation can be understood as a sequence of five connected tasks:
+
+1. The **characteristic method** turns the population-level partial
+   differential equation into trajectories for representative cohorts.
+2. An **ODE solver** advances the size, survival, and reproduction of those
+   cohorts through time.
+3. The **node-spacing algorithm** decides when another cohort is needed to
+   represent the population accurately.
+4. The **canopy model** combines the cohorts into a vertical light profile,
+   which then affects their growth.
+5. Numerical tools such as quadrature, finite differences, and splines make the
+   repeated integrations and derivative calculations practical.
+
+The first four topics each have a dedicated page. The final part of this page
+introduces the smaller numerical tools used throughout the solver.
 
 ## Characteristic method
 
-System of ODEs, IVPs.
+The size-structured population model is written as a partial differential
+equation (PDE). Rather than solving that PDE on a fixed size grid, `plant`
+follows representative cohorts as they grow. Each cohort traces a
+*characteristic* through time, turning the original problem into a collection
+of ordinary differential equations (ODEs).
 
-See more detail in [the characteristic method](characteristic-method.qmd).
+Read [The characteristic method](characteristic-method.qmd) for the equations
+and their connection to growth, survival, reproduction, and population density.
 
 ## ODE stepping
 
-See more detail in [ODE stepping and control](ode-stepping.qmd).
+Once the model has been expressed as ODEs, a numerical stepper moves their state
+forward through time. The default adaptive solver takes small steps when the
+dynamics change rapidly and larger steps when they are smooth. Its error
+tolerances control the balance between accuracy and computation time.
+
+Read [ODE stepping and control](ode-stepping.qmd) for the adaptive RK45 solver,
+its C++ interface, and the fixed-step alternative.
 
 ## Adaptive node spacing
 
-See more details in [the node spacing algorithm](node-spacing.qmd).
+Each node represents a cohort of plants born at roughly the same time. Too few
+nodes give a poor approximation to the population; too many make the simulation
+unnecessarily expensive. An ordinary run uses the supplied introduction
+schedule. When greater numerical accuracy is needed, users can opt in to a
+refinement step that adds nodes only where removing a node would make an
+important population integral too inaccurate.
 
-## TK splines
+Read [The node-spacing algorithm](node-spacing.qmd) for the refinement test and
+worked diagnostics.
 
-<!-- dropped: source section was an empty stub heading with no content -->
+## Canopy and shading models
 
-## Gauss-Kronrod quadrature
+Every cohort both experiences and contributes to a shared light environment.
+Different canopy models trade biological detail for speed, so the appropriate
+choice depends on whether the goal is stand dynamics, demographic equilibrium,
+or eco-evolutionary analysis.
 
-To numerically integrate functions, we use the Gauss-Kronrod quadrature
-method. This is implemented in the `QK` and `QAG` classes.
+Read [Canopy models](canopy-models.qmd) for the available shading models, their
+computational cost, and the reason PPA requires a smoothed light profile under
+adaptive ODE stepping.
 
-- General background on the method is available at:
-  <https://en.wikipedia.org/wiki/Gaussian_quadrature>
-- The `QK` class is used to numerically integrate functions using
-  Gauss-Kronrod quadrature.
-  - The number of points used when numerically integrating the function is
-    defined by the control variable `function_integration_rule`. The
-    integration has several "rules", including QK15, QK21, QK31, QK41, QK51,
-    defined in `qk_rules.cpp`. These determine the numbers of points in the
-    integration. The default number of points is 21.
-  - The `QK` code was ported from GSL by Rich FitzJohn.
-- The `QAG` class uses the `QK` class, for adaptive integration using
-  Gauss-Kronrod quadrature. In the adaptive method, the difference between a
-  Gauss quadrature rule and its Kronrod extension is used as an estimate of the
-  approximation error, from which the need for more points is determined.
-  - The QAG routine is adapted from the "QAG" algorithm in QUADPACK.
-  - The `QAG` class calls class `QK`, which does the actual integration.
+## Numerical tools inside the solver
 
-## Numerical derivatives
+The methods above rely on several smaller numerical operations. Most users do
+not need to call these directly, but knowing their roles makes the larger
+algorithm easier to follow.
 
-node introduction
+### Gauss-Kronrod quadrature
 
-## Trapezium integration
+Gauss–Kronrod quadrature estimates the integral of a function from values at a
+chosen set of points. `plant` uses it, for example, to integrate leaf-level
+assimilation over crown depth.
 
-`trapezium(xx, yy)`.
+The `QK` class performs the quadrature. The control variable
+`function_integration_rule` selects the number and arrangement of evaluation
+points from rules defined in `qk_rules.cpp`, including QK15, QK21, QK31, QK41,
+and QK51. The default rule uses 21 points. This code was ported from the GNU
+Scientific Library (GSL) by Rich FitzJohn.
 
-## Pre-compute step
+The `QAG` class adds adaptive refinement around `QK`. It compares a Gauss rule
+with its Kronrod extension to estimate approximation error, then adds points
+where needed. The implementation is adapted from the QAG algorithm in QUADPACK.
+For general background, see
+[Gaussian quadrature](https://en.wikipedia.org/wiki/Gaussian_quadrature).
 
-### Approximating the light environment with a spline
+### Numerical derivatives
 
-#### Creating the light environment
+The characteristic method needs the derivative of growth rate with respect to
+plant size when it updates population density. `plant` estimates this derivative
+with finite differences and can optionally improve the estimate using
+Richardson extrapolation. The relevant controls are described on
+[The characteristic method](characteristic-method.qmd#sec-approximation-of-size-density-distribution-via-the-scm).
 
-The patch calls `compute_environment`,
+### Trapezium integration
 
-- which calls `environment.compute_environment(f, height_max())`, where
-  `f = compute_competition`
-  - `compute_competition` passes through species
-    - in species, `compute_competition` integrates density over nodes
-      - in node,
-        `compute_competition = density * individual.compute_competition(height_);`
-        - individual passes straight through to strategy
-          - strategy calculates fraction of
-            `leaf above = k_I * area_leaf(height) * Q(z, height);`
-- `environment.compute_environment` creates a spline of light availability, as
-  a function of height
-  - to do this, it uses the `ResourceSpline` class.
-    - `ResourceSpline` class uses an adaptive routine to sample across the
-      height range to approximate the function
-      - the function is ultimately approximated with a spline, using the `tk`
-        class
-  - creating the spline is achieved through calls to `compute_competition`, as
-    described above
+The trapezium rule approximates the area under a curve by joining neighbouring
+points with straight lines. `plant` uses this rule to integrate quantities such
+as leaf area over the discrete cohort distribution. The internal helper is
+`trapezium(xx, yy)`; its accuracy therefore depends strongly on node spacing.
 
-For more on light environments, see [canopy models](canopy-models.qmd).
+### Adaptive splines for the light environment
 
-##### Using the light environment
+Calculating canopy openness directly at every cohort would make each solver
+step scale poorly as more nodes are added. Instead, `plant` calculates openness
+at an adaptively chosen set of heights, fits a spline, and then evaluates that
+much cheaper approximation wherever it is needed. The `ResourceSpline` class
+manages the adaptive sampling and stores the result in an
+`odelia::interpolator::Interpolator`.
 
-- In `compute_rates`, environment gets passed from Patch -> Species -> Node ->
-  Individual -> Strategy
-  - FF16_strategy `net_mass_production_dt` calls `assimilation`
-    - assimilation uses the object `quadrature::QK function_integrator` to
-      integrate the function
-      `assimilation_leaf(environment.get_environment_at_height(z)) * q(z, height)`
-      over z, where z is depth in the plant. The function is integrated using
-      Gauss-Kronrod quadrature. The number of points used when numerically
-      integrating the function is defined by the argument
-      `function_integration_rule` (see above), the default number of points
-      is 21.
-      - Previously, we used the QAG (instead of QK) class, to enable adaptive
-        integration of the function. The QAG class uses QK, but includes an
-        extra layer to refine the number of points. However, this is slower and
-        isn't noticeably changing the results. The adaptive routine may take
-        twice as long.
+::: {.callout-note}
+## Following the light calculation through the code
+
+Readers working on the C++ implementation can follow the calculation in two
+directions.
+
+To **construct the environment**, the patch calls
+`environment.compute_environment(f, height_max())`, with
+`f = compute_competition`. That calculation passes from patch to species to
+node to individual to strategy. At the node level, density weights the
+individual competitive effect. The strategy ultimately evaluates the leaf area
+above height $z$ from an expression of the form
+`k_I * area_leaf(height) * Q(z, height)`. `ResourceSpline` samples this result
+across height and builds the light-availability spline.
+
+To **use the environment**, `compute_rates` passes it from patch to species to
+node to individual to strategy. In `FF16_Strategy`, `net_mass_production_dt`
+calls `assimilation`. A `quadrature::QK` integrator then evaluates
+`assimilation_leaf(environment.get_environment_at_height(z)) * q(z, height)`
+over crown depth $z$. Earlier versions used the adaptive `QAG` layer here, but
+it could take about twice as long without noticeably changing results, so the
+current calculation uses the fixed `QK` rule selected by
+`function_integration_rule`.
+:::
