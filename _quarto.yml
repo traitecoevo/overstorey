@@ -79,6 +79,9 @@ website:
             - guides/example-analysis.qmd
             - guides/self-thinning.qmd
             - guides/emergent-properties.qmd
+        - section: "Scaling up"
+          contents:
+            - guides/running-in-parallel.qmd
         - section: "TF24 in depth"
           contents:
             - guides/tf24-hydraulics-and-acclimation.qmd

@@ -41,6 +41,12 @@ patch is the smallest simulation in which plants compete with one another.
 - [Emergent properties](emergent-properties.qmd) — integrate patch outputs up
   to the metapopulation.
 
+## Scaling up
+
+- [Running sweeps in parallel](running-in-parallel.qmd) — run a parameter grid
+  across cores with `mclapply()`, then with a `targets` pipeline that knows
+  which results are still current.
+
 ## TF24 in depth
 
 - [Hydraulics and acclimation](tf24-hydraulics-and-acclimation.qmd) — compare
