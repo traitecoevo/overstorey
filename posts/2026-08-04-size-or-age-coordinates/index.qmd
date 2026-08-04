@@ -1,6 +1,6 @@
 ---
 title: "Size or age: a choice only a characteristics solver gets to make"
-description: "PR #590 lets the SCM carry its size distribution as a density in birth date instead of in height. The transport term disappears, several long-standing awkwardnesses go with it — and the reason we can switch at all is that plant integrates along characteristics rather than on a fixed grid. Which puts us next to de Roos's Escalator Boxcar Train."
+description: "PR #590 lets the SCM carry its size distribution as a density in birth date instead of in height. The transport term disappears, several long-standing awkwardnesses go with it — and the reason we can switch at all is that plant integrates along characteristics rather than on a fixed grid. A partial return to de Roos's Escalator Boxcar Train: we have adopted its conservation law, not its representation."
 date: 2026-08-04
 plant-ref: "develop"
 plant-sha: "53d0a200a54f3939dae0f835929c3d0cea25fa1c"
@@ -212,39 +212,63 @@ refinement moving neither toward the other. The competitive-exclusion conclusion
 recorded for reserve-gated growth is therefore coordinate-dependent and needs
 re-deriving.
 
-## Relationship to the Escalator Boxcar Train
+## A partial return to the Escalator Boxcar Train
 
-None of this is a new scheme, which is the reassuring part.
+There is a history here. `plant`'s earliest incarnation — before this repository
+— *was* an Escalator Boxcar Train [@Deroos-1988; @Deroos-1992]. Daniel's
+recollection of why it did not stay one is the instructive part: he still found
+himself needing to track the boundary cohort's sizes, and ended up adding
+densities at the boundary, at which point the cohort moments looked like
+machinery being carried for no return. The model moved to densities along
+characteristics and stayed there for the next decade and a half.
 
-The characteristics method as conventionally presented — @Deroos-1997,
-@Angulo-2004, and the form `plant` implemented — carries the **density** $N$
-along each characteristic, complete with the $-\partial g/\partial H$ term. The
-Escalator Boxcar Train [@Deroos-1988; @Deroos-1992] is the other standard
-variant: it carries each cohort's **abundance** (and the mean state within it),
-precisely so that the growth rate never has to be differentiated. Conservation
-of cohort number does the work that the compression term does in the density
-formulation.
+So #590 is a return journey. But it is worth being exact about which leg of it
+we have travelled, because the two schemes differ in something more fundamental
+than their bookkeeping — and we have not become an EBT.
 
-So these were always the two options, and `plant` took one. #590 takes the
-other. Our $\nu$ is the EBT's cohort abundance, and
-$\partial\nu/\partial a = -d\,\nu$ is its cohort-number equation.
+**What is shared is the conservation principle.** The characteristics method as
+conventionally presented [@Deroos-1997; @Angulo-2004] — the form `plant` has
+implemented since — carries the density $N$ along each characteristic,
+compression term and all. The EBT instead conserves each cohort's *abundance*,
+precisely so that the growth rate never has to be differentiated.
+$\partial\nu/\partial a = -d\,\nu$ contains no derivative of $g$, and that is the
+EBT's insight.
 
-Two differences worth keeping straight:
+**What is not shared is the representation, and that is not a detail.** The EBT
+does not represent a density at all. It discretises the population as a sum of
+**point masses**: an internal cohort is a number $N_i$ sitting at a
+representative state $X_i$, and a population integral is the exact sum
+$\sum_i N_i\,f(X_i)$. There is no quadrature rule, and no notion of the distance
+between neighbouring cohorts — spacing does not enter.
 
-- **Boxcar moments.** The EBT proper tracks abundance *and* the mean state inside
-  each boxcar, which lets it use rather few, rather wide cohorts. `plant` keeps
-  one characteristic per cohort and lets the adaptive schedule set their
-  spacing, so we carry abundance but no within-cohort moments. We are EBT-like in
-  *what* we conserve, and unchanged in *how* we discretise.
-- **The boundary cohort.** The EBT's distinctive machinery is its treatment of
-  the youngest boxcar, which accumulates new recruits and is then "internalised"
-  into the interior. `plant`'s boundary node and its scheduled introductions play
-  the same role. The reason both schemes need special handling there is the same:
-  the boundary is where abundance enters, and where the map to size is steepest.
+`plant` remains a density method. Each node carries $\nu$, a density *per unit
+birth date*, and population integrals are trapezium quadratures
+$\int f(x(\tau))\,\nu(\tau)\,{\rm d}\tau$ over the node grid. The spacing between
+adjacent nodes is load-bearing: it *is* the ${\rm d}\tau$. So $\nu$ is not the
+EBT's cohort abundance — $\nu\,{\rm d}\tau$ is what corresponds to $N_i$ — and
+the adaptive schedule that sets our spacing has no counterpart in an EBT at all.
 
-The practical upshot for reading the literature: the birth-date branch is closer
-to @Deroos-1988 than to @Deroos-1997, and results from the EBT tradition are the
-relevant comparison for it.
+The two therefore have different **error structures**, which is the clearest
+evidence they are not the same method. The EBT's error comes from representing a
+cohort with real internal spread by a single point, which is what the first
+moment on its boundary cohort exists to mitigate. Ours is quadrature error in
+$\tau$, controlled by refining the schedule. That is why the convergence tables
+above are the right way to validate this change — and why they would be
+meaningless for an EBT, which has no spacing to refine.
+
+The boundary treatment differs for that reason rather than for a shared one. The
+EBT's boundary cohort accumulates recruits arriving continuously across an
+interval, so a point mass cannot represent it: it carries a first moment until it
+is "internalised" into the interior. `plant`'s boundary node needs no moment — it
+carries a density value, `birth_rate · pr_estab`, and the exact Jacobian
+$-g(H_0)$, with the spread represented by the interval to its neighbour. Both
+schemes need special handling at the boundary; they need *different* handling,
+and the original migration ran along precisely this seam.
+
+Net: we have adopted the EBT's conservation law while keeping the
+density-on-a-moving-grid discretisation of @Deroos-1997. That is one leg of a
+two-leg journey, and there is no plan to walk the second — the moments were
+dropped for a reason, and nothing here has changed it.
 
 ## What it costs
 
