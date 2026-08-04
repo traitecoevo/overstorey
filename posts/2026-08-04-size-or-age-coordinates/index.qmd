@@ -25,7 +25,19 @@ boundary special case disappears, a class of numerical blow-up becomes
 structurally impossible, the solver gets about twice as fast, and — for TF24 —
 one two-species run changes from competitive exclusion to coexistence.
 
-This post is about why the choice exists, why it is a choice *we* get to make
+::: {.callout-important}
+## Credit
+This is **Andrew O'Reilly-Nugent's** discovery. Chasing why the solver behaved
+oddly once TF24 gained a carbohydrate store, he worked out that the compression
+term the SCM computes stops being the quantity the transport equation asks for as
+soon as growth depends on any state other than size — then identified the
+birth-date coordinate as the fix, implemented it behind a flag, and validated it
+against an independent solver. The
+[write-up](https://github.com/aornugent/plant-dev/blob/claude/plant-storage-scm-analysis-efiolz/docs/reports/13-carried-state-invalidates-the-compression-term.md)
+is the primary source for everything below; this post is a gloss on it.
+:::
+
+What follows is about why the choice exists, why it is a choice *we* get to make
 and a fixed-grid solver does not, and where that puts us relative to
 @Deroos-1988.
 
@@ -110,7 +122,7 @@ The general statement: a characteristics solver can choose its coordinate
 because its unknowns are labelled rather than located. That freedom is not
 available to a grid, and it is the reason this switch is even expressible.
 
-## What went wrong, and why we looked
+## What Andrew found
 
 The prompt was NSC storage. TF24 carries a reserve pool that gates growth
 through $G(r)$, $r = S/S_{\max}$ — so height growth is no longer a function of
@@ -128,12 +140,14 @@ and re-running the physiology. For FF16 and K93 those coincide exactly, because
 their non-height states are pure accumulators that never feed back into the
 rates — which is why this was correct for a decade. For TF24 they do not.
 
-The mechanism matters more than the discrepancy. The probe moves height while
-holding *absolute* carbon fixed, so it shifts the reserve fraction; a real cohort
-grows with $r$ roughly constant. The finite difference is therefore accurate
-about a physiological state the plant never occupies. That is a different
-derivative, not a worse estimate of the right one — which is why the error is
-large rather than a few percent.
+Andrew's sharpest observation is about the mechanism rather than the size of the
+discrepancy. The probe moves height while holding *absolute* carbon fixed, so it
+shifts the reserve fraction; a real cohort grows with $r$ roughly constant. The
+finite difference is therefore accurate about a physiological state the plant
+never occupies. In his phrasing, the estimate "stops computing the required
+quantity — not approximately, but at all — as soon as growth depends on any state
+other than size." That is why the error is large rather than a few percent, and
+he derives the omitted term for TF24 in closed form.
 
 ## What we gain
 
@@ -146,9 +160,9 @@ compressed band of height space.
 
 **Density runaway becomes structurally impossible.** `plant` carries a hard
 `log_density` ceiling of 50 because $N \sim 1/|\partial h/\partial\tau|$ can
-diverge. Across a run the maximum reached is $+2.4168$ in height and $-0.0015$
-in birth date — the latter being the predicted bound, since $\nu$ can only
-decrease. It is worth being precise about what that guard was catching: in a
+diverge. Andrew measures the maximum reached across a run as $+2.4168$ in height
+against $-0.0015$ in birth date — the latter being the predicted bound, since
+$\nu$ can only decrease. It is worth being precise about what that guard was catching: in a
 *stationary* patch the height-coordinate density genuinely diverges as
 $N \sim (h_{\max}-h)^{d/c-1}$ when $d < c$ (background mortality below the rate
 at which growth shuts off), and `log_density_dt → c - d > 0`, so it grows
@@ -159,7 +173,7 @@ coordinate where it is singular.
 **Age is monotone by construction; size is monotone only by assumption.** The
 size coordinate is valid only while $\tau \mapsto H$ stays invertible, i.e. while
 cohorts never converge in height. Reserve-gated growth can violate that — under
-full-amplitude seasonal stress we measure 66 crossings among 10,011 interior
+full-amplitude seasonal stress Andrew counts 66 crossings among 10,011 interior
 pairs, against zero under a constant environment. Age needs no such assumption:
 ${\rm d}\alpha/{\rm d}a = 1 > 0$ always, so cohorts can never overtake one
 another in age, and their ordering is fixed at birth. The fragility was
@@ -184,7 +198,7 @@ three-species K93 cases, per species, including a competitively marginal species
 ~90× below the dominant one.
 
 **Speed.** `growth_rate_gradient` is not called, which removes a leaf solve per
-cohort per Runge–Kutta stage: 1.91–2.39× on the runs measured.
+cohort per Runge–Kutta stage: Andrew measures 1.91–2.39×.
 
 **It is indifferent to state dimension.** $\partial\log\nu/\partial a = -d$ is
 unchanged for one state or twenty, because the label space has the dimension of
