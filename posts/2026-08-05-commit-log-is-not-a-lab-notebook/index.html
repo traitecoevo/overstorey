@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-06-18">
-<meta name="description" content="A profiling-driven pass over the FF16 solver: ~2.7-3.5x faster on the benchmark scenarios, achieved entirely through bit-identical C++ changes guided by Rprof and native sampling.">
+<meta name="dcterms.date" content="2026-08-05">
+<meta name="description" content="Squash merges make every pull-request description permanent, and ours grew about tenfold in six months. The measurements, the disproved hypotheses and the branch bookkeeping are all worth writing down — just not in git log.">
 
-<title>Overstorey – Optimising the FF16 hot paths</title>
+<title>Overstorey – The commit log is not a lab notebook</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -154,30 +154,28 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#headline-numbers" id="toc-headline-numbers" class="nav-link active" data-scroll-target="#headline-numbers">Headline numbers</a></li>
-  <li><a href="#where-the-time-was-going" id="toc-where-the-time-was-going" class="nav-link" data-scroll-target="#where-the-time-was-going">Where the time was going</a></li>
-  <li><a href="#how-it-was-done" id="toc-how-it-was-done" class="nav-link" data-scroll-target="#how-it-was-done">How it was done</a></li>
-  <li><a href="#notes-on-measurement-discipline" id="toc-notes-on-measurement-discipline" class="nav-link" data-scroll-target="#notes-on-measurement-discipline">Notes on measurement discipline</a></li>
+  <li><a href="#the-measurement" id="toc-the-measurement" class="nav-link active" data-scroll-target="#the-measurement">The measurement</a></li>
+  <li><a href="#what-filled-the-space" id="toc-what-filled-the-space" class="nav-link" data-scroll-target="#what-filled-the-space">What filled the space</a></li>
+  <li><a href="#relocation-not-deletion" id="toc-relocation-not-deletion" class="nav-link" data-scroll-target="#relocation-not-deletion">Relocation, not deletion</a></li>
+  <li><a href="#doing-it-retroactively" id="toc-doing-it-retroactively" class="nav-link" data-scroll-target="#doing-it-retroactively">Doing it retroactively</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-06-18-ff16-hot-path-optimisation/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-08-05-commit-log-is-not-a-lab-notebook/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Optimising the FF16 hot paths</h1>
+<h1 class="title">The commit log is not a lab notebook</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">ff16</div>
-    <div class="quarto-category">performance</div>
-    <div class="quarto-category">develop</div>
     <div class="quarto-category">engineering</div>
+    <div class="quarto-category">conventions</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    A profiling-driven pass over the FF16 solver: ~2.7-3.5x faster on the benchmark scenarios, achieved entirely through bit-identical C++ changes guided by Rprof and native sampling.
+    Squash merges make every pull-request description permanent, and ours grew about tenfold in six months. The measurements, the disproved hypotheses and the branch bookkeeping are all worth writing down — just not in <code>git log</code>.
   </div>
 </div>
 
@@ -188,7 +186,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 18, 2026</p>
+      <p class="date">August 5, 2026</p>
     </div>
   </div>
   
@@ -200,126 +198,73 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p><span class="version-badge version-badge--dev">plant @develop f8dbc4c</span></p>
-<p>This post summarises a profiling-driven optimisation pass over the FF16 solver (<a href="https://github.com/traitecoevo/plant/pull/471">PR #471</a>). The work was guided by <code>Rprof()</code> plus native <code>/usr/bin/sample</code> profiles of the <code>run_plant_benchmarks()</code> FF16 scenarios, and the governing constraint was that every accepted change be <strong>bit-identical</strong> against <code>HEAD</code> (or its trajectory shift quantified) before being kept. The headline result: roughly <strong>2.7-3.5x</strong> on the FF16 benchmarks, with the science provably unchanged.</p>
-<section id="headline-numbers" class="level2">
-<h2 class="anchored" data-anchor-id="headline-numbers">Headline numbers</h2>
-<p>Measured as one-iteration <code>bench::mark()</code> timings (FF16 scenario):</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Stage</th>
-<th style="text-align: right;"><code>scm</code></th>
-<th style="text-align: right;"><code>build_schedule</code></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Original baseline (<code>4b5c43d1</code>)</td>
-<td style="text-align: right;">242 ms</td>
-<td style="text-align: right;">656 ms</td>
-</tr>
-<tr class="even">
-<td>After the optimisation pass</td>
-<td style="text-align: right;">~85 ms</td>
-<td style="text-align: right;">~186 ms</td>
-</tr>
-<tr class="odd">
-<td><strong>Speedup</strong></td>
-<td style="text-align: right;"><strong>~2.7x</strong></td>
-<td style="text-align: right;"><strong>~3.5x</strong></td>
-</tr>
-</tbody>
-</table>
-<p>The gains accumulated across ~15 individual changes, each profiled and verified in turn rather than landed as one big rewrite.</p>
-</section>
-<section id="where-the-time-was-going" class="level2">
-<h2 class="anchored" data-anchor-id="where-the-time-was-going">Where the time was going</h2>
-<p>Native profiling pointed at a handful of hot regions, all on the per-node, per-step physiology path:</p>
-<ol type="1">
-<li><strong>Crown assimilation quadrature</strong> — <code>std::function</code> callable overhead and redundant canopy-shape work dominated the integrand.</li>
-<li><strong>Spline / interpolator lookups</strong> — repeated, bounds-checked evaluations and per-point binary searches during assimilation.</li>
-<li><strong>Competition / environment recomputation</strong> — inverse-height competition ratios recomputed every call.</li>
-<li><strong>Gradient calculation</strong> — physiology copied and recomputed via a per-call <code>Internals</code> allocation.</li>
-<li><strong>String/map lookups</strong> — state and aux variables addressed by name on the hot path.</li>
-</ol>
-</section>
-<section id="how-it-was-done" class="level2">
-<h2 class="anchored" data-anchor-id="how-it-was-done">How it was done</h2>
-<p>Each row below is an independently profiled, bit-identical change. Where machine drift between sessions made cumulative ratios unreliable, the honest figure was re-measured as a same-session A/B/A comparison (documented in the tracking note).</p>
+<p>Every repository in the plant family squash-merges its pull requests. That is a good default: one commit per reviewed change, a linear history, and a subject line that carries the PR number so the discussion is a click away. It also has a consequence that is easy to state and easy to forget — <strong>the PR title and body are the commit message.</strong> GitHub copies them verbatim into permanent history and appends <code>(#NNN)</code> to the subject.</p>
+<p>Nobody wrote a bad commit message on purpose. What happened is that the PR description became the place to show your work, which is a reasonable thing for a PR description to be, and then squash merge quietly promoted all of it to the permanent record.</p>
+<section id="the-measurement" class="level2">
+<h2 class="anchored" data-anchor-id="the-measurement">The measurement</h2>
+<p>Here is <code>plant</code>’s <code>develop</code> branch, comparing the last 40 commits against the 40 before 2026 (measured 2026-08-05, walking back from <code>a307198d</code>):</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 15%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Target</th>
-<th>Change</th>
-<th>Effect</th>
+<th></th>
+<th style="text-align: right;">subject median</th>
+<th style="text-align: right;">body lines median</th>
+<th style="text-align: right;">body words median</th>
+<th style="text-align: right;">body words max</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Assimilation quadrature</td>
-<td>Direct-lambda integrand (drop <code>std::function</code>); eta-specialised canopy shape (issue #465); ratio-based <code>q()</code> path</td>
-<td>Largest single contributor — ~1.4-1.5x from the canopy-shape specialisation alone</td>
+<td>June–July 2026</td>
+<td style="text-align: right;">68.5</td>
+<td style="text-align: right;">34.5</td>
+<td style="text-align: right;">171</td>
+<td style="text-align: right;">1204</td>
 </tr>
 <tr class="even">
-<td>Spline lookups</td>
-<td>Inline interpolator accessors + unchecked eval; hoist <code>spline.max()</code> out of the integrand; O(1)-guess + nudge lookup replacing per-point binary search</td>
-<td>~3.5x on <code>build_schedule</code> traces back largely here</td>
-</tr>
-<tr class="odd">
-<td>Competition</td>
-<td>Cache the inverse-height competition ratio; dependent-aux height-inverse cache</td>
-<td>~1.7x cumulative on competition-bound paths</td>
-</tr>
-<tr class="even">
-<td>Gradients</td>
-<td>Reuse a thread-local scratch <code>Individual</code> (no per-call <code>Internals</code> alloc)</td>
-<td>Removed per-gradient heap churn</td>
-</tr>
-<tr class="odd">
-<td>State/rate addressing</td>
-<td>Direct hot-path state/aux indices instead of string/map lookups</td>
-<td>~1.9x on the indexed paths</td>
-</tr>
-<tr class="even">
-<td>Allocation derivatives</td>
-<td>Dedup <code>pow()</code> and reuse <code>area_sapwood</code>/<code>mass_sapwood</code> from <code>net_mass_production_dt</code></td>
-<td>Bit-identical, timing-neutral hygiene; kept for clarity</td>
-</tr>
-<tr class="odd">
-<td>FF16 strategy</td>
-<td>Inline competition helpers + <code>area_leaf</code> into <code>ff16_strategy.h</code>; inline <code>util::is_finite</code> into a header</td>
-<td>~1.2-1.3x from removing call overhead on the tightest loops</td>
+<td>pre-2026</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">155</td>
 </tr>
 </tbody>
 </table>
+<p>Roughly ten times the words, and about seventeen times the line count. The extracted leaf package is further along the same curve: a median body of 450 words and a maximum of 1822.</p>
+<p>The most useful number in that table is not in it. Split the recent commits by how they were made, and the median body is <strong>40 lines for squash merges and 1 line for commits typed by hand at a terminal</strong>. The same people, the same week, the same repository. Nobody’s commit-writing habits changed — the PR description grew, and squash merge did the rest. Which is encouraging, because it means the fix is not a matter of discipline. It is a matter of which box on the page the text goes in.</p>
 </section>
-<section id="notes-on-measurement-discipline" class="level2">
-<h2 class="anchored" data-anchor-id="notes-on-measurement-discipline">Notes on measurement discipline</h2>
-<p>A recurring theme — and the reason the tracking note is so long — is that these runs are short (hundreds of ms) with a ~10% run-to-run noise floor, and the macOS <code>/usr/bin/sample</code> profiler perturbs <code>Rprof</code> totals when it attaches successfully. Several apparent “regressions” were measurement artefacts:</p>
-<ul>
-<li>A <strong>Sampler-Effect Audit</strong> isolated the inflation caused by concurrent sampling; the sample-off figures are the ones to trust for small changes.</li>
-<li>Cross-session comparisons were re-grounded with same-session A/B/A re-measurements before any speedup was claimed.</li>
-<li>An <strong>LTO experiment</strong> (issue #470) showed no measurable gain and was declined rather than kept speculatively.</li>
-</ul>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Bit-identical optimisations that turned out to be timing-neutral were deliberately kept where they improved clarity (e.g.&nbsp;the <code>pow()</code> dedup), and declined where they added complexity for no measured benefit (LTO). “Faster” was never allowed to mean “different answer” — the FF16 reference baselines gate the whole pass.</p>
-</div>
-</div>
+<section id="what-filled-the-space" class="level2">
+<h2 class="anchored" data-anchor-id="what-filled-the-space">What filled the space</h2>
+<p>Reading back through it, the excess falls into recognisable classes. Benchmark tables and sweep grids. Test-suite counts and lists of new test filenames. Per-file changelogs, which are <code>git diff --stat</code> written out longhand. Branch bookkeeping — <em>“now targets <code>develop</code> directly”</em>, <em>“rebased onto master”</em> — which is dead the moment the commit exists. Replies to review comments. Unchecked <code>- [ ]</code> boxes from PR templates, ten of them across forty commits.</p>
+<p>And, distinctively, the reasoning trail: hypotheses recorded and then disproved in the same message, alternatives argued down at length, self-corrections. Two commits in the leaf package exist for nothing but correcting an earlier commit message; one of them fixes an arithmetic error in a previous message’s count of replayed commits.</p>
+<p>The clearest illustration is a 147-line, 1204-word commit that contains this:</p>
+<blockquote class="blockquote">
+<p>It is non-monotone in every axis — fails at θ₀ = 0.005–0.03 but not 0.001 or ≥ 0.05, at 3 and 5 layers but not 1, 2, 8, 10, 15, 20 — so a knife-edge, not a threshold.</p>
+</blockquote>
+<p>That was genuinely valuable when it was written. It is a precise characterisation of a bug that had just been cornered, and it is exactly what you want in front of you while hunting the cause. But it sat in a section headed <em>“What this does not fix”</em>, the next PR fixed it, and the paragraph is now permanently attached to a commit while describing behaviour the code no longer has. It has gone from evidence to misinformation without anyone touching it.</p>
+<p>That is the real cost, and it is worse than verbosity. A long commit message wastes a reader’s time once. A long commit message full of superseded reasoning actively misleads whoever finds it by <code>git blame</code> in three years, with none of the surrounding conversation in view to tell them it has expired.</p>
+</section>
+<section id="relocation-not-deletion" class="level2">
+<h2 class="anchored" data-anchor-id="relocation-not-deletion">Relocation, not deletion</h2>
+<p>The obvious response — write less down — is the wrong one. The measurements were worth taking. The disproved hypothesis was worth recording, because the next person to have the same idea should find out it was tried.</p>
+<p>So the rule we have settled on moves the text rather than cutting it. <strong>The PR title and body are the commit message: short, durable, written for someone reading <code>git log</code> in three years. Everything else goes in the first comment on the PR</strong>, posted as soon as it is opened.</p>
+<p>Nothing is lost by that, which is the part worth being explicit about. A PR comment is exactly as permanent as a commit message, and the <code>(#NNN)</code> that squash merge appends to the subject is a link straight to it. A reader who wants the reasoning trail is one click away, and — more to the point — a reader who <em>doesn’t</em> want it is not made to scroll past it to find out what the change did.</p>
+<p>What stays in the commit is short: what changed in observable behaviour, why it was needed, what breaks and how to migrate, and one line of magnitude if results moved. A subject under 50 characters as typed, since GitHub adds the number. A body under twenty lines. If a sentence only makes sense relative to the PR conversation, it belongs in the comment.</p>
+</section>
+<section id="doing-it-retroactively" class="level2">
+<h2 class="anchored" data-anchor-id="doing-it-retroactively">Doing it retroactively</h2>
+<p>Guidelines that only apply to future work tend to stay theoretical, so we retrofitted the nine open PRs the same day: post the original description verbatim as a comment, then rewrite the description down to what belongs in a commit. That took 5458 words of PR description to 1316 — about a quarter — with none of it deleted, and the nine titles from a median of 82 characters to 45.</p>
+<p>Two mechanical things are worth checking, and one of them caught us out. A repository has to be set to build its squash message from the PR title and body rather than from the individual commit subjects, or the description never reaches history at all; all ten family repos already were. We had assumed that setting was also the source of the rows of <code>-------</code> scattered through the log, and it isn’t — that is GitHub’s own separator above the <code>Co-authored-by:</code> block it assembles from the squashed commits, and there is nothing to fix. Worth recording as a small example of the general problem: a plausible mechanism, asserted rather than checked, and it would have been asserted permanently.</p>
+<p>The other is to keep any <code>PULL_REQUEST_TEMPLATE.md</code> minimal, because a PR body reaches the commit message with its HTML comments intact — so a commented-out questionnaire ends up in permanent history too.</p>
+<p>The family guideline, with the split set out as a table, is <a href="https://github.com/traitecoevo/plant-meta/blob/main/governance/commit-messages.md"><code>commit-messages.md</code></a> in <code>plant-meta</code>.</p>
+<p>The underlying mistake is worth naming, because it is not really about git. A lab notebook and a changelog have different readers and different half-lives. A notebook is chronological, provisional, and valuable precisely because it records what you believed at the time. A changelog is none of those things. We had been writing the first and committing it as the second.</p>
 
 
 </section>
@@ -733,7 +678,7 @@ Note
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-06-18-ff16-hot-path-optimisation/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-08-05-commit-log-is-not-a-lab-notebook/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item">
