@@ -103,12 +103,19 @@ as a comment, then rewrite the description down to what belongs in a commit. Tha
 took 5458 words of PR description to 1316 — about a quarter — with none of it
 deleted, and the nine titles from a median of 82 characters to 45.
 
-Two repository settings do more than the prose does. Set the squash defaults to use
-the PR title and body rather than concatenating commit subjects, or GitHub
-interleaves both and leaves rows of `-------` in your history. And keep any
-`PULL_REQUEST_TEMPLATE.md` minimal: a PR body reaches the commit message with its
-HTML comments intact, so a commented-out questionnaire ends up in permanent
-history too.
+Two mechanical things are worth checking, and one of them caught us out. A
+repository has to be set to build its squash message from the PR title and body
+rather than from the individual commit subjects, or the description never reaches
+history at all; all ten family repos already were. We had assumed that setting was
+also the source of the rows of `-------` scattered through the log, and it isn't —
+that is GitHub's own separator above the `Co-authored-by:` block it assembles from
+the squashed commits, and there is nothing to fix. Worth recording as a small
+example of the general problem: a plausible mechanism, asserted rather than
+checked, and it would have been asserted permanently.
+
+The other is to keep any `PULL_REQUEST_TEMPLATE.md` minimal, because a PR body
+reaches the commit message with its HTML comments intact — so a commented-out
+questionnaire ends up in permanent history too.
 
 The family guideline, with the split set out as a table, is
 [`commit-messages.md`](https://github.com/traitecoevo/plant-meta/blob/main/governance/commit-messages.md)
