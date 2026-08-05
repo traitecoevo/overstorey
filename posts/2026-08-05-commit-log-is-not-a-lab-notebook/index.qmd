@@ -1,0 +1,121 @@
+---
+title: "The commit log is not a lab notebook"
+description: "Squash merges make every pull-request description permanent, and ours grew about tenfold in six months. The measurements, the disproved hypotheses and the branch bookkeeping are all worth writing down — just not in `git log`."
+date: 2026-08-05
+categories: [engineering, conventions]
+reading-time: true
+---
+
+Every repository in the plant family squash-merges its pull requests. That is a
+good default: one commit per reviewed change, a linear history, and a subject line
+that carries the PR number so the discussion is a click away. It also has a
+consequence that is easy to state and easy to forget — **the PR title and body are
+the commit message.** GitHub copies them verbatim into permanent history and
+appends ` (#NNN)` to the subject.
+
+Nobody wrote a bad commit message on purpose. What happened is that the PR
+description became the place to show your work, which is a reasonable thing for a
+PR description to be, and then squash merge quietly promoted all of it to the
+permanent record.
+
+## The measurement
+
+Here is `plant`'s `develop` branch, comparing the last 40 commits against the 40
+before 2026 (measured 2026-08-05, walking back from `a307198d`):
+
+| | subject median | body lines median | body words median | body words max |
+|---|---:|---:|---:|---:|
+| June–July 2026 | 68.5 | 34.5 | 171 | 1204 |
+| pre-2026 | 38 | 2 | 17 | 155 |
+
+Roughly ten times the words, and about seventeen times the line count. The
+extracted leaf package is further along the same curve: a median body of 450 words
+and a maximum of 1822.
+
+The most useful number in that table is not in it. Split the recent commits by how
+they were made, and the median body is **40 lines for squash merges and 1 line for
+commits typed by hand at a terminal**. The same people, the same week, the same
+repository. Nobody's commit-writing habits changed — the PR description grew, and
+squash merge did the rest. Which is encouraging, because it means the fix is not a
+matter of discipline. It is a matter of which box on the page the text goes in.
+
+## What filled the space
+
+Reading back through it, the excess falls into recognisable classes. Benchmark
+tables and sweep grids. Test-suite counts and lists of new test filenames.
+Per-file changelogs, which are `git diff --stat` written out longhand. Branch
+bookkeeping — *"now targets `develop` directly"*, *"rebased onto master"* — which
+is dead the moment the commit exists. Replies to review comments. Unchecked
+`- [ ]` boxes from PR templates, ten of them across forty commits.
+
+And, distinctively, the reasoning trail: hypotheses recorded and then disproved
+in the same message, alternatives argued down at length, self-corrections. Two
+commits in the leaf package exist for nothing but correcting an earlier commit
+message; one of them fixes an arithmetic error in a previous message's count of
+replayed commits.
+
+The clearest illustration is a 147-line, 1204-word commit that contains this:
+
+> It is non-monotone in every axis — fails at θ₀ = 0.005–0.03 but not 0.001 or
+> ≥ 0.05, at 3 and 5 layers but not 1, 2, 8, 10, 15, 20 — so a knife-edge, not a
+> threshold.
+
+That was genuinely valuable when it was written. It is a precise characterisation
+of a bug that had just been cornered, and it is exactly what you want in front of
+you while hunting the cause. But it sat in a section headed *"What this does not
+fix"*, the next PR fixed it, and the paragraph is now permanently attached to a
+commit while describing behaviour the code no longer has. It has gone from
+evidence to misinformation without anyone touching it.
+
+That is the real cost, and it is worse than verbosity. A long commit message
+wastes a reader's time once. A long commit message full of superseded reasoning
+actively misleads whoever finds it by `git blame` in three years, with none of the
+surrounding conversation in view to tell them it has expired.
+
+## Relocation, not deletion
+
+The obvious response — write less down — is the wrong one. The measurements were
+worth taking. The disproved hypothesis was worth recording, because the next
+person to have the same idea should find out it was tried.
+
+So the rule we have settled on moves the text rather than cutting it. **The PR
+title and body are the commit message: short, durable, written for someone reading
+`git log` in three years. Everything else goes in the first comment on the PR**,
+posted as soon as it is opened.
+
+Nothing is lost by that, which is the part worth being explicit about. A PR
+comment is exactly as permanent as a commit message, and the ` (#NNN)` that squash
+merge appends to the subject is a link straight to it. A reader who wants the
+reasoning trail is one click away, and — more to the point — a reader who *doesn't*
+want it is not made to scroll past it to find out what the change did.
+
+What stays in the commit is short: what changed in observable behaviour, why it was
+needed, what breaks and how to migrate, and one line of magnitude if results moved.
+A subject under 50 characters as typed, since GitHub adds the number. A body under
+twenty lines. If a sentence only makes sense relative to the PR conversation, it
+belongs in the comment.
+
+## Doing it retroactively
+
+Guidelines that only apply to future work tend to stay theoretical, so we
+retrofitted the nine open PRs the same day: post the original description verbatim
+as a comment, then rewrite the description down to what belongs in a commit. That
+took 5458 words of PR description to 1316 — about a quarter — with none of it
+deleted, and the nine titles from a median of 82 characters to 45.
+
+Two repository settings do more than the prose does. Set the squash defaults to use
+the PR title and body rather than concatenating commit subjects, or GitHub
+interleaves both and leaves rows of `-------` in your history. And keep any
+`PULL_REQUEST_TEMPLATE.md` minimal: a PR body reaches the commit message with its
+HTML comments intact, so a commented-out questionnaire ends up in permanent
+history too.
+
+The family guideline, with the split set out as a table, is
+[`commit-messages.md`](https://github.com/traitecoevo/plant-meta/blob/main/governance/commit-messages.md)
+in `plant-meta`.
+
+The underlying mistake is worth naming, because it is not really about git. A lab
+notebook and a changelog have different readers and different half-lives. A
+notebook is chronological, provisional, and valuable precisely because it records
+what you believed at the time. A changelog is none of those things. We had been
+writing the first and committing it as the second.
