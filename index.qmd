@@ -16,10 +16,13 @@ format:
     <p class="eyebrow">Overstorey · a field guide to <code>plant</code></p>
     <h1 class="hero-title">Plants competing<br>for light, resolved<br>down the canopy.</h1>
     <p class="hero-lede">
-      <code>plant</code> integrates the demography of a size-structured
+      <code>plant</code> is a model which integrates the demography of a size-structured
       population through a light environment its own individuals create —
       assimilation, growth, and mortality emerging from leaf-level
       physiology rather than fitted curves.
+      <!-- SY: Is 'integrates' in the mathematical sense? Is it a bit technical? -->
+      <!-- SY: Good to say `plant` is a model -->
+      <!-- SY: What does 'rather than fitted curves' mean? -->
     </p>
     <div class="hero-actions">
       <a class="btn-sun" href="guides/first-individual.html">Run your first individual →</a>
@@ -85,12 +88,14 @@ format:
 
 ::: {.g-col-12 .g-col-md-4}
 ### Mechanistic, not fitted
-Growth and mortality fall out of a carbon budget — assimilation minus respiration and turnover — so trait effects propagate the way they do in a plant.
+Growth and mortality emerge from a carbon budget — assimilation minus respiration and turnover — so trait effects propagate the way they do in a plant.
+<!-- SY: 'trait effects propagate the way they do in a plant' might need rewording -->
 :::
 
 ::: {.g-col-12 .g-col-md-4}
 ### Emergent competition
 Each individual shades those below it. The light environment is solved as a fixed point of the community, not imposed.
+<!-- SY: I'm not really sure what it means by a 'solved as a fixed point of the community'. -->
 :::
 
 ::: {.g-col-12 .g-col-md-4}
@@ -101,5 +106,6 @@ Every page here is frozen against a pinned `renv` lockfile and a recorded packag
 :::
 
 ::: {.callout-tip}
-New here? Start with [installation](guides/install.qmd), then [your first individual](guides/first-individual.qmd). Looking for function-level docs? They live in the [reference site](https://traitecoevo.github.io/plant/reference/).
+New here? Start with [Guides](guides/index.qmd), for readers who want to learn `plant` by running small, complete examples. Interested in the theory behind the model? Start [here](theory/index.qmd). Looking for function-level docs? They live in the [reference site](https://traitecoevo.github.io/plant/reference/).
 :::
+<!-- SY: Maybe instead of the tip callout box it should be more prominent -->

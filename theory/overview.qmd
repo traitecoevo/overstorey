@@ -50,10 +50,10 @@ It helps to separate two parts of the model.
 flowchart LR
 accTitle: Biology and population dynamics in plant
 accDescr: A strategy converts plant state and surroundings into demographic rates. The demographic solver applies those rates to the population through time.
-  A["Plant state<br/>and surroundings"] --> B["Strategy<br/>individual biology"]
-  B --> C["Growth, mortality,<br/>and fecundity rates"]
-  C --> D["Demographic solver<br/>population change"]
-  D --> E["Patch structure<br/>through time"]
+  A["**Plant state<br/>and surroundings**"] --> B["**Strategy**<br/>Individual biology"]
+  B --> C["**Growth, mortality,<br/>and fecundity rates**"]
+  C --> D["**Demographic solver**<br/>Population change"]
+  D --> E["*Patch structure<br/>through time*"]
 ```
 
 The **strategy** contains the biology. Given the state of a plant and its
@@ -139,7 +139,7 @@ leaf-level calculations used by the hydraulically explicit strategies.
 ## From an individual to a landscape
 
 The ecological model is organised at three scales: individuals, patches, and
-the metacommunity. **Nodes are not a fourth ecological scale.** They are the
+the metacommunity. **Nodes are not a fourth ecological scale;** they are the
 numerical objects that the solver uses to represent groups of similar plants
 within a patch.
 
