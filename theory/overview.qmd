@@ -149,7 +149,7 @@ current production.
 
 The [FF16 model page](models/ff16.qmd) gives the full carbon-allocation model.
 The [Assimilation and hydraulics](assimilation-hydraulics.qmd) page explains the
-leaf-level calculations used by the hydraulically explicit strategies.
+leaf-level calculations with explicitly modelled plant hydraulics.
 
 ## From an individual to a landscape
 
@@ -162,10 +162,10 @@ within a patch.
 flowchart LR
 accTitle: Ecological scales and their numerical representation in plant
 accDescr: Similar individuals are grouped into cohorts represented numerically by nodes. Nodes describe a size-structured population within one patch. Patch states at different ages are weighted together to represent the landscape-scale metacommunity.
-  I["Individuals<br/>biological plants"] --> C["Cohorts<br/>same strategy and recruitment time"]
-  C -. "represented by" .-> N["Nodes<br/>numerical objects"]
-  N --> P["Patch<br/>one local competing population"]
-  P --> M["Metacommunity<br/>implicit landscape representation"]
+  I["**Individuals**<br/>Biological plants"] --> C["**Cohorts**<br/>Same strategy and recruitment time"]
+  C -. "represented by" .-> N["**Nodes**<br/>Numerical objects"]
+  N --> P["**Patch**<br/>One local competing population"]
+  P --> M["**Metacommunity**<br/>Implicit landscape representation"]
 ```
 
 The distinction can be summarised as follows:
@@ -177,7 +177,7 @@ The distinction can be summarised as follows:
 | **Metacommunity** | The landscape represented by patches of different ages, connected through a shared seed pool | It combines patch-level states rather than adding more nodes to a single patch |
 
 : The relationship between nodes, patches, and the metacommunity.
-<!-- SY: Does disturbance remove all individuals in a patch? Could be worth explicitly defining it? -->
+<!-- SY: Does disturbance remove all individuals in a patch? Could be worth explicitly defining it? I see disturbance is defined explicitly later, but a short definition might be useful here. -->
 Here is a concrete way to picture the nesting. Consider a patch that is 40
 years old. It contains plants that recruited at different times during those
 40 years. For each strategy, the solver uses nodes to represent these cohorts:
@@ -322,6 +322,8 @@ shape. The user-facing `max_patch_lifetime` parameter sets the duration of the
 simulated patch and parameterises this regime; its mean disturbance interval is
 a derived quantity. The model uses the resulting patch-age distribution to
 weight outputs from different points along the patch trajectory.
+<!-- SY: Second sentence seems to contain lots of ideas, perhaps their relatedness to the reader is not clear. Could be reordered to explain the steps more clearly?
+The idea that `max_patch_lifetime` parameterises the regime but also sets the duration of one simulated patch, but also the mean disturbance interval is derived (how?) -->
 
 For example, suppose biomass in a simulated patch rises as the stand develops.
 Landscape-average biomass is not the biomass at one chosen patch age. It is the
@@ -337,21 +339,25 @@ guide shows how to calculate landscape summaries from model output.
 Each strategy has a birth rate describing the arrival of seeds into a patch.
 Given these birth rates, `run_scm()` simulates the patch and reports offspring
 production and the **net reproduction ratio** for each strategy.
+<!-- SY: Is it the strategy (growth model) or the demographic solver that has a birth rate? -->
 
 At demographic equilibrium, the seed input must be consistent with the seed
 output from the metacommunity. For each resident strategy, one incoming seed
 must produce one successful dispersing seed on average. In terms of the net
 reproduction ratio, equilibrium requires a value of one.
+<!-- Define resident in the glossary? Maybe add footnotes or indicators that word meanings can be found in the glossary? -->
 
 This is a fixed-point problem in the birth rates, but it is separate from
 running a patch once. The current `plant` API does not expose a general function
 that automatically finds equilibrium birth rates. A user must supply birth
 rates or perform an outer search based on the reported reproduction ratios.
+<!-- SY: What is a fixed-point problem and outer search? Is this paragraph a bit technical? -->
 
 The option `run_scm(..., refine_schedule = TRUE)` has a different purpose: it
 adaptively refines the numerical node-introduction schedule. It improves the
 accuracy with which the size distribution is integrated; it does not adjust the
 birth rates.
+<!-- SY: Is this also too technical for this page? -->
 
 ## What can be learned from a simulation?
 
@@ -390,11 +396,11 @@ produced per incoming seed. A value greater than one indicates that the rare
 strategy can increase; a value below one indicates that it cannot invade.
 
 Repeating this calculation across trait values can identify several kinds of
-evolutionary outcome. Some resident strategies are uninvadable evolutionary
+evolutionary outcomes. Some resident strategies are uninvadable evolutionary
 stable strategies. Other trait values can be evolutionary branching points,
 and community assembly can produce several coexisting strategies. The
 [Adaptive dynamics](adaptive-dynamics.qmd) section explains these distinctions
-and the assumptions behind the analysis.
+and the assumptions behind these analyses.
 
 ## A basic `plant` workflow
 
@@ -421,12 +427,14 @@ This example:
 2. adds one strategy with a specified LMA and birth rate;
 3. simulates the patch through time;
 4. collects and expands the state variables into analysis-ready output.
+<!-- SY: Note that strategy has been confusingly used to describe both the growth model and the trait parameterisations throughout -->
 
-`run_scm()` constructs the matching environment when one is not supplied. To
+`run_scm()` constructs the matching environment when one is not supplied. To 
 configure an environment explicitly, use a typed constructor such as
 `Environment("FF16")` or `Environment("TF24")`. The TF24 environment includes
 default soil-water and atmospheric conditions, which can be changed for a
 particular scenario.
+<!-- SY: What is 'the matching environment'? What is a 'typed constructor'? -->
 
 | Task | Main `plant` interface | Detailed guide |
 |---|---|---|
@@ -441,8 +449,8 @@ particular scenario.
 
 ## Important assumptions and limits
 
-Every model simplifies. The main assumptions to keep in mind when interpreting
-the standard deterministic `plant` workflow are:
+Every model is a simplification. The main assumptions to keep in mind when interpreting
+the standard `plant` workflow are:
 
 - The population is represented as a continuous size distribution. This is
   appropriate for large populations; `plant` also contains a stochastic solver
@@ -452,12 +460,13 @@ the standard deterministic `plant` workflow are:
   of these strategies represents every possible interaction among plants.
 - The standard metacommunity has well-mixed seed dispersal, identical empty
   patches after stand-replacing disturbance, and an equilibrium distribution of
-  patch ages.
+  patch ages. <!-- SY: What's an equilibrium distribution of patch ages? -->
 - Strategy equations and parameters are hypotheses about plant biology. Stand
   structure emerges from those assumptions; it is not assumption-free.
 - A simulation produces conditional model output, not a calibrated forecast
   with uncertainty bounds. `plant` does not currently provide a complete
   calibration, uncertainty-propagation, or forecasting workflow.
+<!-- SY: a forecasting / calibration workflow is in the works though, you could say? -->
 
 ## Glossary
 
