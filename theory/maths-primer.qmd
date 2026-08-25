@@ -57,7 +57,7 @@ running total.
 
 ## Step 1 — where a plant's rates come from
 
-The demographic core takes the growth, death, and fecundity rates $g$, $d$, and
+The demographic core takes the growth, death, and fecundity rates $g$, $d$, and <!-- SY: of all individuals in a patch? --> 
 $f$ as inputs, then uses them to work out how the population changes. Before we
 do that, it helps to see where those rates come from. In the default
 [FF16](models/ff16.qmd) model, growth and fecundity are tied directly to the
@@ -104,6 +104,8 @@ $$
 H(a) = H_0 + \int_{a_0}^{a} g \, {\rm d}a'.
 $$
 
+<!-- SY: What is a' here? -->
+
 **Its chance of still being alive** falls off as death accumulates. Survival is
 the germination probability $S_{\rm G}$ times the exponential of *minus* the total
 death risk so far:
@@ -118,6 +120,7 @@ $S_{\rm G}$. As the risk grows, survival approaches 0.
 
 **Its total seeds so far** add up fecundity over time — but only counting plants
 that are still alive to produce them, hence the survival factor:
+<!-- SY: I'm a bit loss on whether these rates are being calculated per individual or cohort or something else -->
 
 $$
 \tilde{R}(a) = \int_{a_0}^{a} f \, S_{\rm I}(a') \, {\rm d}a'.
@@ -214,7 +217,7 @@ $$
 E_a(z) = \exp\!\left(-k_{\rm I} \times (\text{leaf area above height } z)\right).
 $$
 
-Here $z$ is a height in the canopy, $E_a(z)$ is the fraction of open-sky light
+Here $z$ is a height in the canopy, $E_a(z)$ is the fraction of open-sky light 
 reaching it, and $k_{\rm I}$ is the extinction coefficient (how strongly leaves
 block light). The "leaf area above $z$" is itself found by adding up the leaf area
 of every cohort taller than $z$ — that is, by integrating over the size
