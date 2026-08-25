@@ -10,18 +10,29 @@ theory · start here
 patches. Rather than simulating every tree as an independent object, its main
 solver describes a population by the distribution of plant sizes and follows
 how that distribution changes through growth, mortality, and recruitment.
+<!-- SY: What is its 'main solver'? Should this be assumed knowledge? -->
 
 The biological details are supplied by a **strategy**. A strategy determines
 how an individual plant responds to its size and surroundings: how quickly it
 grows, how likely it is to die, how many seeds it produces, and how it affects
 its competitors. The population solver then applies those rates across all the
 plants in a patch.
+<!-- SY: Suggest renaming strategy, as strategy implies trait combinations, whereas 
+this is more a model. It makes it sound like all plants in a patch have the same
+trait combination but it's more that they all follow the same model of growth. Need
+to search on the use of 'strategy' throughout. Also 'patch' hasn't been explained yet. -->
 
 This page introduces that structure without equations. Most examples use
 [FF16](models/ff16.qmd), the default trait-based strategy. The same demographic
 machinery also supports strategies with different biology, including
 [TF24](models/tf24.qmd), which adds explicit plant hydraulics, and
 [K93](models/k93.qmd), which represents size and competition differently.
+<!-- SY: Could be good to explain here what is meant by a trait-based model. It's
+something intuitive to us in a trait-focused lab but maybe not to others. Something
+like a model that uses functional traits to define different strategies of growth. -->
+<!-- SY: Demographic machinery hasn't been explained yet. 'The same demographic
+machinery' doesn't mean much currently. I think you could just explain what the
+different types of models are (after renaming from 'strategy'). -->
 
 ## What goes into the model
 
@@ -41,6 +52,9 @@ These inputs are specified by the user. What is not specified directly is the
 resulting stand structure. Plant sizes, population densities, canopy structure,
 self-thinning, and changes in community composition arise from the simulated
 growth, death, recruitment, and competition.
+<!-- SY: Would it be worth mentioning here that seed input can be defined by the
+eco-evolutionary dynamics in the regnans package? -->
+<!-- SY: It's not clear to me how disturbance regime is linked to 'the duration and age weighting of patches' and 'how a patch trajectory is scaled up to a landscape' -->
 
 ## Biology and population dynamics
 
@@ -131,6 +145,7 @@ its maximum height, a larger share is allocated to reproduction. Low production
 per unit leaf area also increases the growth-dependent component of mortality.
 FF16 includes a separate background mortality component that does not depend on
 current production.
+<!-- SY: Last two sentences are confusing. What does 'the growth-dependent component of mortality' mean? -->
 
 The [FF16 model page](models/ff16.qmd) gives the full carbon-allocation model.
 The [Assimilation and hydraulics](assimilation-hydraulics.qmd) page explains the
@@ -162,13 +177,15 @@ The distinction can be summarised as follows:
 | **Metacommunity** | The landscape represented by patches of different ages, connected through a shared seed pool | It combines patch-level states rather than adding more nodes to a single patch |
 
 : The relationship between nodes, patches, and the metacommunity.
-
+<!-- SY: Does disturbance remove all individuals in a patch? Could be worth explicitly defining it? -->
 Here is a concrete way to picture the nesting. Consider a patch that is 40
 years old. It contains plants that recruited at different times during those
 40 years. For each strategy, the solver uses nodes to represent these cohorts:
 an early node might represent a small number of large survivors, while a recent
 node might represent many small recruits. Together, all the nodes describe the
 current population in that one patch.
+<!-- SY: Is it accurate to call them early and recent nodes? Is a node based on size or recruitment time? -->
+<!-- SY: Why 'for each strategy'? -->
 
 Now zoom out to the landscape. Some patches were disturbed recently and are
 young; others have developed for decades. The metacommunity combines the
@@ -178,6 +195,7 @@ create a separate object for every physical patch or for the metacommunity.
 Instead, one patch trajectory supplies the community state at each possible
 patch age. Thus, **nodes are combined to describe a patch, while patch ages are
 combined to describe the metacommunity**.
+<!-- SY: Last two sentences lost me -->
 
 ### Individual
 
@@ -190,12 +208,13 @@ One implementation detail can otherwise be confusing when reading K93 output.
 The shared solver calls its first size state `height` for every strategy, so
 K93's stem diameter is stored in a column named `height`, even though its
 biological meaning and units are DBH in centimetres.
+<!-- SY: Does this fit in the big picture/overview section? -->
 
 The strategy uses that state and the plant's surroundings to calculate growth,
 mortality, fecundity, and its contribution to competition.
 
 ### Patch
-
+<!-- SY: A few terms that are assumed knowledge in here and previously; maybe would be cool to have a separate primer or glossary page for people less familiar with modelling? Like deterministic, size-structured, solver, etc. -->
 A patch is a local population of competing plants. The deterministic
 size-structured solver does not store every literal individual. It represents
 the population by a **size distribution**: the density of plants at each size,
@@ -207,6 +226,7 @@ particular patch age, so those plants follow the same deterministic trajectory.
 As the patch develops, the node's position records the cohort's changing size,
 while its density records how many plants from that cohort remain per unit
 area. New nodes are introduced to represent continuing recruitment.
+<!-- SY: So a patch can have individuals with different growth models? Is that what's meant by strategy? -->
 
 The words *individual*, *cohort*, and *node* therefore refer to related but
 different things:
@@ -221,6 +241,7 @@ Following nodes as they grow is an application of the
 [node-spacing algorithm](implementation/node-spacing.qmd) chooses enough node
 introduction times to approximate the distribution accurately without making
 the calculation unnecessarily expensive.
+<!-- SY: Is this big picture? -->
 
 ### Metacommunity
 
@@ -235,7 +256,7 @@ connection occurs through seeds rather than through nodes. A node never moves
 from one patch to another; it is only part of the numerical description of one
 patch trajectory.
 
-Under the standard metacommunity assumptions, patches begin from the same empty
+Under the default metacommunity assumptions, patches begin from the same empty
 state after disturbance, receive the same constant seed rain, and differ only
 in age. In that setting, one simulated patch trajectory can represent all patch
 ages. Patch-level results are averaged using the frequency of patches at each
@@ -244,12 +265,13 @@ further condition: the seed rain must be consistent with the seeds produced
 across the metacommunity.
 
 Constant seed rain is the usual assumption for the demographic-equilibrium
-calculation, not a restriction of the solver. `plant` can also accept birth
-rates that vary with patch age when a different ecological scenario requires
-them.
+calculation, not a restriction of the solver. `plant` also allows a different
+ecological scenario where seed rain varies with patch age.
+<!-- SY: A bit confused about the difference between an assumption and a restriction. Could we not just remove the first sentence and merge the second sentence into the previous paragraph? -->
 
 This reduction depends on those assumptions. It is not a general claim that one
 physical forest patch represents every heterogeneous landscape.
+<!-- SY: What reduction? What are those assumptions? -->
 
 ## Competition within a patch
 

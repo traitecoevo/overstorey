@@ -89,13 +89,13 @@ format:
 ::: {.g-col-12 .g-col-md-4}
 ### Mechanistic, not fitted
 Growth and mortality emerge from a carbon budget — assimilation minus respiration and turnover — so trait effects propagate the way they do in a plant.
-<!-- SY: 'trait effects propagate the way they do in a plant' might need rewording -->
+<!-- SY: 'trait effects propagate the way they do in a plant' might need to be more explicitly explained -->
 :::
 
 ::: {.g-col-12 .g-col-md-4}
 ### Emergent competition
 Each individual shades those below it. The light environment is solved as a fixed point of the community, not imposed.
-<!-- SY: I'm not really sure what it means by a 'solved as a fixed point of the community'. -->
+<!-- SY: I'm not really sure what it means by a 'solved as a fixed point of the community'. Is this a bit too technical? -->
 :::
 
 ::: {.g-col-12 .g-col-md-4}

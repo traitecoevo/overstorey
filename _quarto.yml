@@ -54,9 +54,9 @@ website:
       - text: "Pipeline"
         file: develop.qmd
       - icon: github
-        href: "https://github.com/traitecoevo/plant"
+        href: "https://github.com/traitecoevo/overstorey"
         target: _blank
-        aria-label: plant source on GitHub
+        aria-label: overstorey source on GitHub
 
   sidebar:
     - title: "Guides"
