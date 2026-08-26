@@ -130,6 +130,7 @@ website:
         - develop.qmd
         - section: "Contributing"
           contents:
+            - contributing/how-we-work.qmd
             - contributing/package-organisation.qmd
             - contributing/implementing-a-strategy.qmd
             - contributing/profiling.qmd
