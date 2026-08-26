@@ -114,13 +114,16 @@ $$
 S_{\rm I}(a) = S_{\rm G} \, \exp\!\left(- \int_{a_0}^{a} d \, {\rm d}a'\right).
 $$
 
+<!-- SY: So the survival probability of an individual includes how likely it was to first germinate? -->
+
 The exponential converts accumulated death risk into a survival probability. If
 no risk has accumulated, the exponential factor is 1, so survival equals
 $S_{\rm G}$. As the risk grows, survival approaches 0.
 
 **Its total seeds so far** add up fecundity over time — but only counting plants
 that are still alive to produce them, hence the survival factor:
-<!-- SY: I'm a bit loss on whether these rates are being calculated per individual or cohort or something else -->
+<!-- SY: I'm a bit loss on whether these rates are being calculated per individual or cohort or something else.
+Step 2 says it's a single plant. -->
 
 $$
 \tilde{R}(a) = \int_{a_0}^{a} f \, S_{\rm I}(a') \, {\rm d}a'.
@@ -130,6 +133,8 @@ These three integrals describe the plant growing, surviving, and producing seed.
 In practice, `plant` rewrites them as small differential equations and advances
 them through time with an [ODE solver](implementation/ode-stepping.qmd), rather
 than evaluating the integrals directly.
+<!-- SY: What is meant by a small differential equation -->
+<!-- SY: Add $\tilde{R}$ to the table? -->
 
 ## Step 3 — from one plant to a distribution
 
@@ -154,11 +159,20 @@ equation (PDE)**:
 $$
 \frac{\partial N}{\partial a} = \underbrace{-\, d \, N}_{\text{deaths remove plants}} \;\underbrace{-\, \frac{\partial}{\partial H}\big(g \, N\big)}_{\text{growth carries plants upward}}.
 $$
+$\partial N / \partial a$ is a partial derivative holding $H$ fixed. Picture 
+yourself standing at one specific height on the axis — say, "plants exactly 2 m tall" 
+— and watching the patch age. The number of plants stacked up right there rises and 
+falls over time, based on the processes encapsulated on the right-hand side (RHS) of 
+the equation. 
 
 A conveyor belt is a useful analogy. Growth $g$ carries plants along the height
-axis; the second term describes that flow. Death $d$ removes plants wherever they
-are; the first term describes those losses. The left-hand side records the
-combined change in the distribution as the patch gets older.
+axis; the second term describes that flow. $gN$ is the number of plants crossing 
+a given height per unit time, which depends on the given
+height; for example, the number of plants crossing a given height is typically higher
+for small, young plants because they invest more into growth. Death $d$ removes plants wherever 
+they are; the first term describes those losses. The left-hand side records the combined 
+change in the distribution as the patch gets older.
+<!-- SY: I added more to explain the intuition behind the partial derivatives. Please review if it's accurate or helpful. -->
 
 New plants enter at the smallest height. The PDE needs a rule for this entry
 point, called a **boundary condition**: the flow of plants into the distribution
@@ -205,6 +219,7 @@ Each cohort carries two values — its height and its log density — which adva
 together under simple differential equations. `plant` adaptively chooses how many
 cohorts to use and when to introduce them (see
 [node spacing](implementation/node-spacing.qmd)).
+<!-- SY: I'm wondering about the biological vs model implementation meaning of introducing cohorts. They signify a group of recruiting individuals but what if the system being modelled usually ties recruitment to particular events, or there is only periodic recruitment because of the species' biology? -->
 
 ## Step 5 — competition through shade
 
@@ -222,7 +237,7 @@ reaching it, and $k_{\rm I}$ is the extinction coefficient (how strongly leaves
 block light). The "leaf area above $z$" is itself found by adding up the leaf area
 of every cohort taller than $z$ — that is, by integrating over the size
 distribution $N$.
-
+<!-- SY: Why z and not H? -->
 We can now close the feedback loop from [the big picture](overview.qmd). The
 distribution $N$ determines leaf area; leaf area determines the light $E_a$; and
 light changes the growth and death rates that reshape $N$. Taller plants
@@ -271,8 +286,9 @@ $$
 The inner integral adds seed production over all plant heights in a patch; the
 outer integral averages over patches of all ages; $S_{\rm D}$ is the fraction of
 seeds surviving dispersal.
+<!-- SY: Should $S_D$ be added to the table at the start? -->
 
-The same seed rain $Y_x$ appears on both sides of the calculation. It *feeds the
+The same seed rain $Y_x$ appears on both sides of the calculation. It *feeds the <!-- SY: Which calculation? -->
 patches* through the boundary condition in Step 3, and it is also *produced by
 those patches* through the equation above. We can write the output seed rain as a
 function of the assumed input, $Y_x^{\text{out}} = \Phi(Y_x)$. At equilibrium,
@@ -289,6 +305,7 @@ problem; with several competing strategies it becomes a more difficult
 multi-dimensional solve. The current package does not expose a general
 equilibrium seed-rain solver, so this section describes the mathematical
 condition rather than a ready-made user workflow.
+<!-- SY: This feels a bit technical for a gentle maths primer -->
 
 ## Step 7 — invasion fitness and reading off answers
 
@@ -298,13 +315,13 @@ rare to change the light environment, so it grows in the shade created by the
 residents. Its **invasion fitness** is the expected number of dispersing offspring
 produced by one mutant seed over a full patch lifetime, averaged over the ages of
 the patches where that seed might land:
-
+<!-- SY: What determines the ages of the patches where the seed might land? -->
 $$
 R(x', x) = \int_0^\infty P(a_0) \, \tilde{R}(x', a_0) \, {\rm d}a_0,
 $$
 
 where $\tilde{R}(x', a_0)$ is that one seed's lifetime seed output (Step 2, now
-also discounted by patch survival $S_{\rm P}$). The reading is simple:
+also discounted by patch survival $S_{\rm P}$). The reading is simple: <!-- SY: Which equation does it say it's also discounted by patch survival? -->
 
 - $R(x', x) > 1$ → one seed makes more than one seed; the mutant **can invade**.
 - $R(x', x) < 1$ → the mutant fades out; the resident holds.
