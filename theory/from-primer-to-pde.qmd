@@ -80,6 +80,7 @@ Evaluating the equations at a few patch ages gives a small life-history table:
 The plant grows at a steady rate, while its probability of survival declines.
 Cumulative seed production rises quickly at first, then more slowly because fewer
 plants remain alive to reproduce. Each column shows one of the three integrals.
+<!-- SY: I thought we were talking about one plant here, or is it a cohort? See the use of 'fewer plants remain alive' -->
 
 ## Step 2 — from one plant to a distribution
 
@@ -174,16 +175,16 @@ balance, from one cohort in one patch.
 ## Now you are ready
 
 The toy example has now connected each mathematical layer: three integrals
-describe one plant; cohorts sample a size distribution; the characteristic
+describe one plant; cohorts sample a size distribution; the [characteristic](implementation/characteristic-method.qmd)
 equation follows that distribution in a moving frame; shading links the cohorts;
 and patch-age averaging connects one patch to the landscape. The
 [size-structured PDE](size-structured-pde.qmd) page develops the same structure
 formally, including:
 
-- the PDE and its boundary condition, derived rather than assembled;
+- the PDE and its boundary condition, derived rather than assembled; <!-- SY: what does it mean here by derived rather than assembled? -->
 - the method of characteristics in general, with the $\partial g/\partial H$ term
   carrying its full weight;
-- the patch-age distribution and the Weibull appendix;
+- the patch-age distribution and the Weibull appendix; <!-- SY: what is meant by appendix here? -->
 - the seed-rain fixed point for one and for many competing strategies.
 
 Where the rates $g$, $d$, and $f$ actually come from is the subject of the
