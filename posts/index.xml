@@ -458,6 +458,206 @@
   <pubDate>Tue, 04 Aug 2026 00:00:00 GMT</pubDate>
 </item>
 <item>
+  <title>Size or age: a choice only a characteristics solver gets to make</title>
+  <link>https://traitecoevo.github.io/overstorey/posts/2026-08-04-size-or-age-coordinates/</link>
+  <description><![CDATA[ 
+
+
+
+
+<p><span class="version-badge version-badge--dev">plant @develop 53d0a20</span></p>
+<p><a href="https://github.com/traitecoevo/plant/pull/590">PR #590</a> adds <code>Control$node_density_in_birth_date</code> (default <code>FALSE</code>). With it on, the SCM carries its size distribution as a density per unit <strong>birth date</strong> rather than per unit <strong>height</strong>.</p>
+<p>That sounds like a bookkeeping preference. It is closer to a change of footing. The <code>∂g/∂h</code> term in the transport equation stops being computed at all, a boundary special case disappears, a class of numerical blow-up becomes structurally impossible, the solver gets about twice as fast, and — for TF24 — one two-species run changes from competitive exclusion to coexistence.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Credit
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is <strong>Andrew O’Reilly-Nugent’s</strong> discovery. Chasing why the solver behaved oddly once TF24 gained a carbohydrate store, he worked out that the compression term the SCM computes stops being the quantity the transport equation asks for as soon as growth depends on any state other than size — then identified the birth-date coordinate as the fix, implemented it behind a flag, and validated it against an independent solver. The <a href="https://github.com/aornugent/plant-dev/blob/claude/plant-storage-scm-analysis-efiolz/docs/reports/13-carried-state-invalidates-the-compression-term.md">write-up</a> is the primary source for everything below; this post is a gloss on it.</p>
+</div>
+</div>
+<p>What follows is about why the choice exists, why it is a choice <em>we</em> get to make and a fixed-grid solver does not, and where that puts us relative to <span class="citation" data-cites="Deroos-1988">De Roos (1988)</span>.</p>
+<section id="two-coordinates-one-population" class="level2">
+<h2 class="anchored" data-anchor-id="two-coordinates-one-population">Two coordinates, one population</h2>
+<p>The size-structured PDE is a conservation law. Expanding its flux:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B%5Cpartial%20N%7D%7B%5Cpartial%20a%7D%20+%20g%5Cfrac%7B%5Cpartial%20N%7D%7B%5Cpartial%20H%7D%20+%20N%5Cfrac%7B%5Cpartial%20g%7D%7B%5Cpartial%20H%7D%20=%20-d%5C,N%0A"></p>
+<p>The first two terms move density along the height axis. The third is a <em>compression</em> term: where growth slows with size, neighbouring trajectories converge and density piles up. It is the term that requires knowing how the growth rate varies with size, and it is the whole difficulty.</p>
+<p>Now change variables. Let <img src="https://latex.codecogs.com/png.latex?%5Ctau"> be a cohort’s introduction time — constant along its characteristic, by definition. Write <img src="https://latex.codecogs.com/png.latex?J%20=%20%5Cpartial%20H/%5Cpartial%5Ctau"> for the Jacobian of the map, and define <img src="https://latex.codecogs.com/png.latex?%5Cnu%20=%20N%5C,%7CJ%7C">: abundance per unit birth date rather than per unit height. The first two terms are exactly the material derivative and collapse into <img src="https://latex.codecogs.com/png.latex?%5Cpartial/%5Cpartial%20a%7C_%5Ctau">; the third is precisely the rate of change of <img src="https://latex.codecogs.com/png.latex?%5Clog%7CJ%7C"> and cancels against the Jacobian in <img src="https://latex.codecogs.com/png.latex?%5Cnu">. What is left is</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B%5Cpartial%20%5Cnu%7D%7B%5Cpartial%20a%7D%5Cbigg%7C_%5Ctau%20=%20-d%5C,%5Cnu%0A"></p>
+<p>The compression term has not been approximated or moved. It has been absorbed into the coordinate change.</p>
+<p>Three ways to say the same thing:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>coordinate</th>
+<th>transport velocity</th>
+<th>compression term</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>size <img src="https://latex.codecogs.com/png.latex?H"></td>
+<td><img src="https://latex.codecogs.com/png.latex?g(x,%20E_a)"> — state- and environment-dependent</td>
+<td><img src="https://latex.codecogs.com/png.latex?%5Cpartial%20g/%5Cpartial%20H%20%5Cneq%200"></td>
+</tr>
+<tr class="even">
+<td>birth date <img src="https://latex.codecogs.com/png.latex?%5Ctau"></td>
+<td><img src="https://latex.codecogs.com/png.latex?0"> (a label; constant along characteristics)</td>
+<td><img src="https://latex.codecogs.com/png.latex?0"></td>
+</tr>
+<tr class="odd">
+<td>age <img src="https://latex.codecogs.com/png.latex?%5Calpha%20=%20a%20-%20%5Ctau"></td>
+<td><img src="https://latex.codecogs.com/png.latex?1">, exactly and always</td>
+<td><img src="https://latex.codecogs.com/png.latex?0"></td>
+</tr>
+</tbody>
+</table>
+<p>The third row is the classical McKendrick–Von Foerster age-structured equation <span class="citation" data-cites="Mckendrick-1926 Vonfoerster-1959">(McKendrick, 1926; Foerster, 1959)</span>. Age-structured models do not lack a compression term because they are simpler models — they lack it because their transport velocity is a <strong>constant</strong>, and the divergence of a constant field is zero. All the nonlinearity has moved out of the transport operator and into the rate functions, where nothing has to be differentiated.</p>
+<p>And the biology stays size-structured throughout. Mortality and fecundity are still functions of the full state and the environment; the state is still obtained by integrating the size ODEs, at unchanged cost; the competition kernel is still <img src="https://latex.codecogs.com/png.latex?A_%7B%5Crm%20l%7D(H)%5C,Q(z,H)"> evaluated at <img src="https://latex.codecogs.com/png.latex?H(%5Ctau,a)">. Only the coordinate in which abundance is <em>booked</em> changes.</p>
+</section>
+<section id="why-the-choice-depends-on-how-you-solve" class="level2">
+<h2 class="anchored" data-anchor-id="why-the-choice-depends-on-how-you-solve">Why the choice depends on how you solve</h2>
+<p>Here is the part that is easy to miss. <strong>The coordinate is not free to choose; it is downstream of the discretisation.</strong></p>
+<p>An <strong>Eulerian</strong> solver puts a fixed grid in state space and lets the population flow through it. Its unknowns are densities in fixed size bins. Because the grid does not move with the population, the flux divergence is unavoidable — the whole content of the scheme is bookkeeping how much mass crosses each bin boundary. That is a perfectly good engineering choice: bounded work per step, no schedule to tune, trivially parallel, no cohorts accumulating over time. It is what finite-volume schemes and Integral Projection Model transition matrices do. But such a solver has no birth-date coordinate available to it, because <em>its grid is the coordinate</em>. Asking it to count by birth date would mean discarding the grid.</p>
+<p>A <strong>Lagrangian</strong> solver moves its unknowns with the population. Each unknown is a cohort travelling along a characteristic. Here the coordinate is a <em>label</em>, and the obvious label is the birth date. The transport term vanishes identically, not approximately.</p>
+<p><code>plant</code> is Lagrangian and always has been — the SCM <em>is</em> a characteristics method, following <span class="citation" data-cites="Deroos-1997">De Roos, Taljapurkar, &amp; Caswell (1997)</span> and <span class="citation" data-cites="Angulo-2004">Angulo &amp; López-Marcos (2004)</span>. Which means the size-structured PDE was always the <strong>derivation</strong>, never the implementation. The <code>∂g/∂h</code> term was the last vestige of the Eulerian formulation the model was derived from, sitting inside a scheme that had otherwise left it behind. #590 does not bolt a special case onto the solver; it removes a seam.</p>
+<p>The general statement: a characteristics solver can choose its coordinate because its unknowns are labelled rather than located. That freedom is not available to a grid, and it is the reason this switch is even expressible.</p>
+</section>
+<section id="what-andrew-found" class="level2">
+<h2 class="anchored" data-anchor-id="what-andrew-found">What Andrew found</h2>
+<p>The prompt was NSC storage. TF24 carries a reserve pool that gates growth through <img src="https://latex.codecogs.com/png.latex?G(r)">, <img src="https://latex.codecogs.com/png.latex?r%20=%20S/S_%7B%5Cmax%7D"> — so height growth is no longer a function of size and environment alone.</p>
+<p>The compression term the PDE needs is the <strong>total</strong> derivative of <img src="https://latex.codecogs.com/png.latex?g"> along a cohort’s own trajectory:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B%5Crm%20d%7D%7B%7B%5Crm%20d%7Da%7D%5Clog%20N%20=%20-d%20-%20%5Csum_k%20%5Cfrac%7B%5Cpartial%20g_H%7D%7B%5Cpartial%20x_k%7D%5C,%5Cfrac%7B%7B%5Crm%20d%7Dx_k%7D%7B%7B%5Crm%20d%7DH%7D%5Cbigg%7C_%7B%5Ctext%7Bcohort%20curve%7D%7D%0A"></p>
+<p><code>Node::growth_rate_gradient</code> computed only the <img src="https://latex.codecogs.com/png.latex?k%20=%20H"> term, by perturbing height and re-running the physiology. For FF16 and K93 those coincide exactly, because their non-height states are pure accumulators that never feed back into the rates — which is why this was correct for a decade. For TF24 they do not.</p>
+<p>Andrew’s sharpest observation is about the mechanism rather than the size of the discrepancy. The probe moves height while holding <em>absolute</em> carbon fixed, so it shifts the reserve fraction; a real cohort grows with <img src="https://latex.codecogs.com/png.latex?r"> roughly constant. The finite difference is therefore accurate about a physiological state the plant never occupies. In his phrasing, the estimate “stops computing the required quantity — not approximately, but at all — as soon as growth depends on any state other than size.” That is why the error is large rather than a few percent, and he derives the omitted term for TF24 in closed form.</p>
+</section>
+<section id="what-we-gain" class="level2">
+<h2 class="anchored" data-anchor-id="what-we-gain">What we gain</h2>
+<p><strong>The boundary special case disappears.</strong> The height coordinate’s boundary condition divides by the growth rate, with a <code>g &gt; 0</code> branch and a requirement that <img src="https://latex.codecogs.com/png.latex?S_%7B%5Crm%20G%7D/g%20%5Cto%200"> as <img src="https://latex.codecogs.com/png.latex?g%20%5Cto%200"> <span class="citation" data-cites="Falster-2011">(Falster, Brännström, Dieckmann, &amp; Westoby, 2011)</span>. In birth date the birth density is <code>birth_rate · pr_estab</code> — finite always. The zero-density cohorts we had catalogued as expected SCM behaviour are ordinary cohorts occupying a compressed band of height space.</p>
+<p><strong>Density runaway becomes structurally impossible.</strong> <code>plant</code> carries a hard <code>log_density</code> ceiling of 50 because <img src="https://latex.codecogs.com/png.latex?N%20%5Csim%201/%7C%5Cpartial%20h/%5Cpartial%5Ctau%7C"> can diverge. Andrew measures the maximum reached across a run as <img src="https://latex.codecogs.com/png.latex?+2.4168"> in height against <img src="https://latex.codecogs.com/png.latex?-0.0015"> in birth date — the latter being the predicted bound, since <img src="https://latex.codecogs.com/png.latex?%5Cnu"> can only decrease. It is worth being precise about what that guard was catching: in a <em>stationary</em> patch the height-coordinate density genuinely diverges as <img src="https://latex.codecogs.com/png.latex?N%20%5Csim%20(h_%7B%5Cmax%7D-h)%5E%7Bd/c-1%7D"> when <img src="https://latex.codecogs.com/png.latex?d%20%3C%20c"> (background mortality below the rate at which growth shuts off), and <code>log_density_dt → c - d &gt; 0</code>, so it grows without bound. Any long run with a low-mortality strategy is guaranteed to trip that ceiling — and it is not an error, it is the correct solution viewed in a coordinate where it is singular.</p>
+<p><strong>Age is monotone by construction; size is monotone only by assumption.</strong> The size coordinate is valid only while <img src="https://latex.codecogs.com/png.latex?%5Ctau%20%5Cmapsto%20H"> stays invertible, i.e.&nbsp;while cohorts never converge in height. Reserve-gated growth can violate that — under full-amplitude seasonal stress Andrew counts 66 crossings among 10,011 interior pairs, against zero under a constant environment. Age needs no such assumption: <img src="https://latex.codecogs.com/png.latex?%7B%5Crm%20d%7D%5Calpha/%7B%5Crm%20d%7Da%20=%201%20%3E%200"> always, so cohorts can never overtake one another in age, and their ordering is fixed at birth. The fragility was inherited from the coordinate, not from the biology.</p>
+<p><strong>Accuracy, at the same cost.</strong> For FF16 and K93 the two coordinates must converge, and do — but the gap is almost entirely the height coordinate’s error. Over successive halvings of the node spacing, FF16’s offspring production:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>schedule</th>
+<th>height</th>
+<th>birth date</th>
+<th>gap</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>default</td>
+<td>18.5071</td>
+<td>18.6956</td>
+<td>1.0e-2</td>
+</tr>
+<tr class="even">
+<td>×2</td>
+<td>18.6211</td>
+<td>18.6989</td>
+<td>4.2e-3</td>
+</tr>
+<tr class="odd">
+<td>×4</td>
+<td>18.6777</td>
+<td>18.6996</td>
+<td>1.2e-3</td>
+</tr>
+<tr class="even">
+<td>×8</td>
+<td>18.6941</td>
+<td>18.6996</td>
+<td>2.9e-4</td>
+</tr>
+</tbody>
+</table>
+<p>The birth-date answer barely moves; the height answer climbs toward it. At the default schedule birth date is within <code>2e-4</code> of converged and height is <code>1.0e-2</code> away — roughly <strong>50× more accurate for the same number of nodes</strong>. K93 behaves the same way (<code>2.6e-3 → 3.5e-5</code>), and so do the two-species FF16 and three-species K93 cases, per species, including a competitively marginal species ~90× below the dominant one.</p>
+<p><strong>Speed.</strong> <code>growth_rate_gradient</code> is not called, which removes a leaf solve per cohort per Runge–Kutta stage: Andrew measures 1.91–2.39×.</p>
+<p><strong>It is indifferent to state dimension.</strong> <img src="https://latex.codecogs.com/png.latex?%5Cpartial%5Clog%5Cnu/%5Cpartial%20a%20=%20-d"> is unchanged for one state or twenty, because the label space has the dimension of the <em>birth manifold</em>, not of the state space. With acclimation and further NSC states coming to TF24, this is arguably the most valuable property of the lot.</p>
+<p><strong>And it can change the answer.</strong> On the two-species TF24 case, the height coordinate excludes the slower species (offspring production <code>1.4e-4</code> against <code>503</code>) while birth date has the two coexisting (<code>1004</code> against <code>2707</code>), with refinement moving neither toward the other. The competitive-exclusion conclusion recorded for reserve-gated growth is therefore coordinate-dependent and needs re-deriving.</p>
+</section>
+<section id="a-partial-return-to-the-escalator-boxcar-train" class="level2">
+<h2 class="anchored" data-anchor-id="a-partial-return-to-the-escalator-boxcar-train">A partial return to the Escalator Boxcar Train</h2>
+<p>There is a history here. <code>plant</code>’s earliest incarnation — before this repository — <em>was</em> an Escalator Boxcar Train <span class="citation" data-cites="Deroos-1988 Deroos-1992">(De Roos, 1988; De Roos, Diekmann, &amp; Metz, 1992)</span>. Daniel’s recollection of why it did not stay one is the instructive part: he still found himself needing to track the boundary cohort’s sizes, and ended up adding densities at the boundary, at which point the cohort moments looked like machinery being carried for no return. The model moved to densities along characteristics and stayed there for the next decade and a half.</p>
+<p>So #590 is a return journey. But it is worth being exact about which leg of it we have travelled, because the two schemes differ in something more fundamental than their bookkeeping — and we have not become an EBT.</p>
+<p><strong>What is shared is the conservation principle.</strong> The characteristics method as conventionally presented <span class="citation" data-cites="Deroos-1997 Angulo-2004">(De Roos et al., 1997; Angulo &amp; López-Marcos, 2004)</span> — the form <code>plant</code> has implemented since — carries the density <img src="https://latex.codecogs.com/png.latex?N"> along each characteristic, compression term and all. The EBT instead conserves each cohort’s <em>abundance</em>, precisely so that the growth rate never has to be differentiated. <img src="https://latex.codecogs.com/png.latex?%5Cpartial%5Cnu/%5Cpartial%20a%20=%20-d%5C,%5Cnu"> contains no derivative of <img src="https://latex.codecogs.com/png.latex?g">, and that is the EBT’s insight.</p>
+<p><strong>What is not shared is the representation, and that is not a detail.</strong> The EBT does not represent a density at all. It discretises the population as a sum of <strong>point masses</strong>: an internal cohort is a number <img src="https://latex.codecogs.com/png.latex?N_i"> sitting at a representative state <img src="https://latex.codecogs.com/png.latex?X_i">, and a population integral is the exact sum <img src="https://latex.codecogs.com/png.latex?%5Csum_i%20N_i%5C,f(X_i)">. There is no quadrature rule, and no notion of the distance between neighbouring cohorts — spacing does not enter.</p>
+<p><code>plant</code> remains a density method. Each node carries <img src="https://latex.codecogs.com/png.latex?%5Cnu">, a density <em>per unit birth date</em>, and population integrals are trapezium quadratures <img src="https://latex.codecogs.com/png.latex?%5Cint%20f(x(%5Ctau))%5C,%5Cnu(%5Ctau)%5C,%7B%5Crm%20d%7D%5Ctau"> over the node grid. The spacing between adjacent nodes is load-bearing: it <em>is</em> the <img src="https://latex.codecogs.com/png.latex?%7B%5Crm%20d%7D%5Ctau">. So <img src="https://latex.codecogs.com/png.latex?%5Cnu"> is not the EBT’s cohort abundance — <img src="https://latex.codecogs.com/png.latex?%5Cnu%5C,%7B%5Crm%20d%7D%5Ctau"> is what corresponds to <img src="https://latex.codecogs.com/png.latex?N_i"> — and the adaptive schedule that sets our spacing has no counterpart in an EBT at all.</p>
+<p>The two therefore have different <strong>error structures</strong>, which is the clearest evidence they are not the same method. The EBT’s error comes from representing a cohort with real internal spread by a single point, which is what the first moment on its boundary cohort exists to mitigate. Ours is quadrature error in <img src="https://latex.codecogs.com/png.latex?%5Ctau">, controlled by refining the schedule. That is why the convergence tables above are the right way to validate this change — and why they would be meaningless for an EBT, which has no spacing to refine.</p>
+<p>The boundary treatment differs for that reason rather than for a shared one. The EBT’s boundary cohort accumulates recruits arriving continuously across an interval, so a point mass cannot represent it: it carries a first moment until it is “internalised” into the interior. <code>plant</code>’s boundary node needs no moment — it carries a density value, <code>birth_rate · pr_estab</code>, and the exact Jacobian <img src="https://latex.codecogs.com/png.latex?-g(H_0)">, with the spread represented by the interval to its neighbour. Both schemes need special handling at the boundary; they need <em>different</em> handling, and the original migration ran along precisely this seam.</p>
+<p>Net: we have adopted the EBT’s conservation law while keeping the density-on-a-moving-grid discretisation of <span class="citation" data-cites="Deroos-1997">De Roos et al. (1997)</span>. That is one leg of a two-leg journey, and there is no plan to walk the second — the moments were dropped for a reason, and nothing here has changed it.</p>
+</section>
+<section id="what-it-costs" class="level2">
+<h2 class="anchored" data-anchor-id="what-it-costs">What it costs</h2>
+<p>The size distribution stops being a primitive of the model and becomes a derived output. Since the coordinate ought to be an implementation detail, <code>plant</code> converts at the reporting boundary: <code>Species$log_densities</code>, <code>Patch$state</code>, and therefore everything downstream in <code>tidy_outputs.R</code> and the plots, always receive a density in <strong>height</strong>, whichever coordinate was carried. The conversion is <img src="https://latex.codecogs.com/png.latex?N%20=%20%5Cnu/%7C%7B%5Crm%20d%7Dh/%7B%5Crm%20d%7D%5Ctau%7C">, with the Jacobian from central differences of adjacent node heights against their birth dates, and exactly <img src="https://latex.codecogs.com/png.latex?-g(H_0)"> at the boundary node, which is recorded at birth. The typical node agrees with an otherwise identical height-coordinate run to <code>1.7e-3</code> in log space — 0.17% in density.</p>
+<p>The honest caveat: the <em>worst</em> node does not improve with refinement. <img src="https://latex.codecogs.com/png.latex?%7C%7B%5Crm%20d%7Dh/%7B%5Crm%20d%7D%5Ctau%7C"> is a ratio of two differences that both shrink, so cancellation sets a floor, and refining adds nodes in the near-empty tail where that floor is worst. Aggregate and plotting use is sound; individual node densities far out in the tail are not. Fixing it properly means evolving <img src="https://latex.codecogs.com/png.latex?%5Cpartial%20h/%5Cpartial%5Ctau"> as its own state, whose rate is the compression term this change exists to avoid — so it would be an opt-in extra carried purely for reporting fidelity.</p>
+</section>
+<section id="where-the-equivalence-stops" class="level2">
+<h2 class="anchored" data-anchor-id="where-the-equivalence-stops">Where the equivalence stops</h2>
+<p>Worth stating plainly, because it closes the loop with the grid-versus- characteristics theme. The coordinate change needs <strong>deterministic characteristics from a finite-dimensional birth manifold</strong>. <code>plant</code> satisfies that: birth state is a deterministic function of introduction time, so the label space is one-dimensional however many state variables a strategy carries.</p>
+<p>Structured population models in general do not. If individual growth is stochastic, the governing equation is advection–diffusion rather than pure transport, characteristics do not exist, and age no longer determines state — individuals of the same age have a <em>distribution</em> of sizes. That is exactly the case for Integral Projection Models, whose kernel <em>is</em> a growth distribution. And a model with no characteristics has no choice but to be Eulerian in size.</p>
+<p>So the ordering is: the biology decides whether characteristics exist; that decides whether a Lagrangian scheme is available; and only a Lagrangian scheme gets to choose its coordinate. <code>plant</code> sits at the end of that chain, which is why this switch is ours to make.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Status
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The flag is <strong>off by default</strong> and the solver is bit-identical with it off. Before it becomes the default: the competitive-exclusion result for reserve-gated growth needs re-deriving in the new coordinate, and the thermal-damage work of issue #566 was evaluated on the old one. The theory pages (<a href="../../theory/size-structured-pde.html">the size-structured PDE</a>, <a href="../../theory/implementation/characteristic-method.html">the characteristic method</a>) still present the height-coordinate derivation, including the <code>g &gt; 0</code> boundary caveat that this change retires.</p>
+</div>
+</div>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2">
+<div id="ref-Angulo-2004" class="csl-entry">
+Angulo, O., &amp; López-Marcos, J. C. (2004). Numerical integration of fully nonlinear size-structured population models. <em>Applied <span>Numerical</span> <span>Mathematics</span></em>, <em>50</em>(3-4), 291–327. doi:<a href="https://doi.org/10.1016/j.apnum.2004.01.007">10.1016/j.apnum.2004.01.007</a>
+</div>
+<div id="ref-Deroos-1988" class="csl-entry">
+De Roos, A. M. (1988). Numerical methods for structured population models: The <span>Escalator Boxcar Train</span>. <em>Numerical Methods for Partial Differential Equations</em>, <em>4</em>(3), 173–195. doi:<a href="https://doi.org/10.1002/num.1690040303">10.1002/num.1690040303</a>
+</div>
+<div id="ref-Deroos-1992" class="csl-entry">
+De Roos, A. M., Diekmann, O., &amp; Metz, J. A. J. (1992). Studying the dynamics of structured population models: A versatile technique and its application to daphnia. <em>American Naturalist</em>, <em>139</em>(1), 123. doi:<a href="https://doi.org/abs/10.1086/285316">abs/10.1086/285316</a>
+</div>
+<div id="ref-Deroos-1997" class="csl-entry">
+De Roos, A. M., Taljapurkar, S., &amp; Caswell, H. (1997). A gentle introduction to physiologically structured population models. In <em>Structured population models in marine, terrestrial and fresh-water systems</em> (pp. 119–204). New York: Chapman &amp; Hall.
+</div>
+<div id="ref-Falster-2011" class="csl-entry">
+Falster, D. S., Brännström, Å., Dieckmann, U., &amp; Westoby, M. (2011). Influence of four major plant traits on average height, leaf-area cover, net primary productivity, and biomass density in single-species forests: A theoretical investigation. <em>Journal of Ecology</em>, <em>99</em>(1), 148–164. doi:<a href="https://doi.org/10.1111/j.1365-2745.2010.01735.x">10.1111/j.1365-2745.2010.01735.x</a>
+</div>
+<div id="ref-Vonfoerster-1959" class="csl-entry">
+Foerster, H. V. (1959). Some remarks on changing populations. In F. Stohlman (Ed.), <em>The kinetics of cellular proliferation</em> (pp. 382–407). Grune et Stratton, New York.
+</div>
+<div id="ref-Mckendrick-1926" class="csl-entry">
+McKendrick, A. G. (1926). Applications of mathematics to medical problems. <em>Proceedings of the Edinburgh Mathematical Society</em>, <em>44</em>, 1–34.
+</div>
+</div></section></div> ]]></description>
+  <category>scm</category>
+  <category>theory</category>
+  <category>numerics</category>
+  <category>develop</category>
+  <guid>https://traitecoevo.github.io/overstorey/posts/2026-08-04-size-or-age-coordinates/</guid>
+  <pubDate>Tue, 04 Aug 2026 00:00:00 GMT</pubDate>
+</item>
+<item>
   <title>Moving cohort refining into C++</title>
   <link>https://traitecoevo.github.io/overstorey/posts/2026-06-20-cohort-refining-cpp/</link>
   <description><![CDATA[ 

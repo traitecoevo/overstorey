@@ -2,242 +2,246 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://traitecoevo.github.io/overstorey/develop.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/first-individual.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/example-analysis.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/calibration.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/install.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/initialising-a-patch.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/self-thinning.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/maths-primer.html</loc>
-    <lastmod>2026-08-26T08:13:33.722Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/size-structured-pde.html</loc>
-    <lastmod>2026-08-26T08:13:33.723Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.378Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/adaptive-dynamics/GK98.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/adaptive-dynamics/JJ12.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/adaptive-dynamics/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/adaptive-dynamics/GM99.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/adaptive-dynamics/assembly_stochastic.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/overview.html</loc>
-    <lastmod>2026-08-26T08:13:33.723Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.378Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/models/k93.html</loc>
-    <lastmod>2026-08-26T08:13:33.723Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.378Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/models/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.723Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.378Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/soil-water.html</loc>
-    <lastmod>2026-08-26T08:13:33.723Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.378Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/implementation/ode-stepping.html</loc>
-    <lastmod>2026-08-26T08:13:33.722Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/implementation/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.722Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/contributing/profiling.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/contributing/package-organisation.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-19-root-water-uptake-prototype/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.718Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/posts/2026-08-04-differentiate-the-equation/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.719Z</lastmod>
-  </url>
-  <url>
-    <loc>https://traitecoevo.github.io/overstorey/posts/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.720Z</lastmod>
-  </url>
-  <url>
-    <loc>https://traitecoevo.github.io/overstorey/posts/2026-08-05-commit-log-is-not-a-lab-notebook/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.719Z</lastmod>
-  </url>
-  <url>
-    <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-10-hydraulics-benchmark/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.718Z</lastmod>
-  </url>
-  <url>
-    <loc>https://traitecoevo.github.io/overstorey/posts/2016-02-23-plant-key-technologies/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.718Z</lastmod>
-  </url>
-  <url>
-    <loc>https://traitecoevo.github.io/overstorey/posts/2026-08-20-flat-maximum-half-your-digits/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.719Z</lastmod>
-  </url>
-  <url>
-    <loc>https://traitecoevo.github.io/overstorey/posts/reproductions.html</loc>
-    <lastmod>2026-08-26T08:13:33.720Z</lastmod>
-  </url>
-  <url>
-    <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-15-awra-soil-water/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.718Z</lastmod>
-  </url>
-  <url>
-    <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-19-root-water-uptake-performance/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.718Z</lastmod>
-  </url>
-  <url>
-    <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-18-ff16-hot-path-optimisation/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.718Z</lastmod>
-  </url>
-  <url>
-    <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-19-tf24-leaf-code-review/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.718Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/posts/2025-07-29-richards-equation-instability/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.718Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-19-tf24-leaf-code-review/index.html</loc>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-18-ff16-hot-path-optimisation/index.html</loc>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-19-root-water-uptake-performance/index.html</loc>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-15-awra-soil-water/index.html</loc>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/reproductions.html</loc>
+    <lastmod>2026-08-26T08:18:14.376Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/2026-08-20-flat-maximum-half-your-digits/index.html</loc>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/2016-02-23-plant-key-technologies/index.html</loc>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-10-hydraulics-benchmark/index.html</loc>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/2026-08-05-commit-log-is-not-a-lab-notebook/index.html</loc>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/index.html</loc>
+    <lastmod>2026-08-26T08:18:14.376Z</lastmod>
+  </url>
+  <url>
+    <loc>https://traitecoevo.github.io/overstorey/posts/2026-08-04-size-or-age-coordinates/index.html</loc>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/posts/2024-05-22-water-bucket-model/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.718Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/posts/2026-06-20-cohort-refining-cpp/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.718Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.374Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/contributing/implementing-a-strategy.html</loc>
-    <lastmod>2026-08-26T08:13:33.715Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.371Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/implementation/node-spacing.html</loc>
-    <lastmod>2026-08-26T08:13:33.722Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/implementation/canopy-models.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/implementation/characteristic-method.html</loc>
-    <lastmod>2026-08-26T08:13:33.722Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/models/tf24.html</loc>
-    <lastmod>2026-08-26T08:13:33.723Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.378Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/models/scientific-versioning.html</loc>
-    <lastmod>2026-08-26T08:13:33.723Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.378Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/models/ff16.html</loc>
-    <lastmod>2026-08-26T08:13:33.722Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/from-primer-to-pde.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/adaptive-dynamics/assembly.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/adaptive-dynamics/DD99.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/adaptive-dynamics/assembly_fitmax.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/adaptive-dynamics/solving_attractors.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.722Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/adaptive-dynamics.html</loc>
-    <lastmod>2026-08-26T08:13:33.720Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.376Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/theory/assimilation-hydraulics.html</loc>
-    <lastmod>2026-08-26T08:13:33.721Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.377Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/emergent-properties.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/extrinsic-drivers.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/patch-dynamics.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/index.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/tf24-nsc-storage.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/tf24-hydraulics-and-acclimation.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
   <url>
     <loc>https://traitecoevo.github.io/overstorey/guides/strategies.html</loc>
-    <lastmod>2026-08-26T08:13:33.716Z</lastmod>
+    <lastmod>2026-08-26T08:18:14.373Z</lastmod>
   </url>
 </urlset>
