@@ -27,6 +27,9 @@ website:
   description: "a field guide to the plant model"
   site-url: "https://traitecoevo.github.io/overstorey"
   repo-url: "https://github.com/traitecoevo/overstorey"
+  # Must be set: Quarto defaults repo-branch to `main`, and this repo's default
+  # branch is `master`, so without it every "Edit this page" link 404s.
+  repo-branch: master
   repo-actions: [edit, issue]
   reader-mode: true
   page-navigation: true
@@ -53,7 +56,11 @@ website:
     right:
       - text: "Pipeline"
         file: develop.qmd
-      - icon: github
+      # Labelled deliberately: this points at the *model* source, not at this
+      # site's repo, which a bare GitHub icon in a navbar is usually read as.
+      # overstorey itself is reachable from the repo-actions links on every page.
+      - text: "plant source"
+        icon: github
         href: "https://github.com/traitecoevo/plant"
         target: _blank
         aria-label: plant source on GitHub
