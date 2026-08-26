@@ -10,7 +10,19 @@ for contributors
 
 Every change to a plant-family package — `plant`, `odelia`, `regnans`, `phylloptim`, `logpile`, `phytofile`, `overstorey`, `standviz`, `floracle` — travels the same short loop: an **issue** says what we are doing and why, a **feature branch** does it, **automated checks** say whether it still builds and passes, a **pull request** gets read by a human, and a **squash merge** puts exactly one commit on the default branch.
 
-None of that is unusual. What is worth writing down is *why each step is there*, because each one is doing a specific job, and when a step is skipped it is usually because someone has forgotten which job it was doing. This page is the reasoning; the mechanical detail (label names, board fields, commit-message shape) lives in [`plant-meta/governance/`](https://github.com/traitecoevo/plant-meta/tree/main/governance) and is linked from each section rather than repeated here.
+If you have worked in software, that will read as unremarkable — it is close to how most open-source projects operate. If you came to code the way most of us did, through a research question, with the code as a means to an end, it can look like a lot of ceremony for a one-line change. So it is worth saying plainly why it isn't.
+
+Every step in the loop is an answer to a problem that does not exist when one person works on one script for one week, and becomes acute the moment that stops being true. A model that several people modify, that underpins published figures, and that has to still produce the same number in three years has a different characteristic failure from an analysis script. The failure is not that it crashes — it is that it quietly gives a *different* answer, and nobody can say when that started or which paper was affected. Most of the loop exists to make that question answerable:
+
+- **The issue** records why a decision was taken, so it is not re-litigated from memory two years later by someone who wasn't there.
+- **The branch** keeps half-finished work off the version everyone else is building against, so your afternoon can't break someone else's run.
+- **The checks** catch the class of breakage that is invisible on your own machine — a missing dependency, a platform difference, a test you didn't know you'd broken.
+- **The review** means at least one other person has read the change before it becomes permanent.
+- **The squash merge** leaves a history you can bisect: given a number that moved, you can find the change that moved it. That is the difference between an afternoon and a fortnight.
+
+None of it is about tidiness, and none of it assumes anyone is careless. It is about a codebase outliving the memory of the people editing it. The practical upshot is that the cost is paid in small, predictable amounts — a minute writing an issue, ten minutes reading a diff — instead of in one unpredictable week, later, when a figure won't reproduce.
+
+The rest of this page is that reasoning, step by step. The mechanical detail (label names, board fields, commit-message shape) lives in [`plant-meta/governance/`](https://github.com/traitecoevo/plant-meta/tree/main/governance) and is linked from each section rather than repeated here.
 
 ## Planning happens on issues
 
@@ -30,9 +42,14 @@ Full detail: [`issue-guide.md`](https://github.com/traitecoevo/plant-meta/blob/m
 
 ## Feature branches
 
-The model is [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow), lightly applied. There is a default branch that integrates work, a release branch where a release branch exists, and a short-lived branch per change.
+The model is [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow), lightly applied. In `plant`, which is where it matters most, there are two long-lived branches:
 
-**Check the default branch before you branch — they differ across the family.** `plant` integrates on `develop` and releases from `master`; most of the rest are single-branch. As currently configured:
+- **`master`** — the stable, released version. This is what a user installs, what a published result was computed against, and what carries the version tags. It only ever changes by a release.
+- **`develop`** — where work is integrated. Everything lands here first and accumulates until a release moves it to `master`.
+
+Each change then gets a **short-lived feature branch** off `develop`, which is merged back when it is done and deleted. We do not use Gitflow's release or hotfix branches; those two branches plus feature branches is the whole of it.
+
+**Check the default branch before you branch — the family is not uniform.** Only `plant` keeps the `master`/`develop` split; the rest are single-branch, and the one branch they have is variously called `master` or `main`. As currently configured:
 
 | Repo | Default branch |
 |---|---|
@@ -109,9 +126,13 @@ It is not a proof of correctness, and treating it as one makes people avoid it. 
 
 ### The requirement, and overruling it
 
-We are a small team with experienced developers, and review is not enforced by branch protection. Anyone who judges a change small, urgent, or obvious enough can merge their own PR. That is a deliberate choice, not an oversight — a hard approval gate on a two-person repo mostly teaches people to route around it.
+Review is not *enforced*: no family repo requires an approving review before a merge, and `plant`'s `master` is the only branch carrying any protection rule at all (checked 2026-08-26).
 
-But note that **even with the ability to skip review entirely, most of us still work through PRs**, and that is the part worth internalising. The value is not the approving click. It is that opening a PR forces you to look at your own diff as a diff — separated from the reasoning that produced it, in the order a stranger will read it — and that alone catches a surprising amount. Self-review is the floor, not a formality. If nobody else is going to read it, read it yourself, properly, before you merge.
+Merging is a privilege, though, not something everyone has. It needs write access to the repo, so a contributor without it opens a PR — from a fork if need be — and a maintainer merges it. If you can merge, you already know you can.
+
+For those who *do* have that access, the latitude is real: a change small, urgent, or obvious enough can be merged without waiting for anyone, and sometimes is. That is a deliberate choice rather than an oversight, because a hard approval gate on a repo with two active developers mostly teaches people to route around it.
+
+The point worth internalising is what those same people do in practice. **Almost everything still goes through a PR, including work by the maintainers who could skip it, and including changes nobody else was ever going to look at.** The value is not the approving click. It is that opening a PR forces you to look at your own diff *as a diff* — separated from the reasoning that produced it, in the order a stranger will read it — and that alone catches a surprising amount. Self-review is the floor, not a formality. If nobody else is going to read it, read it yourself, properly, before you merge.
 
 ### Reviewing code you did not write yourself
 
