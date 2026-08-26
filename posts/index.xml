@@ -10,7 +10,215 @@
 <atom:link href="https://traitecoevo.github.io/overstorey/posts/index.xml" rel="self" type="application/rss+xml"/>
 <description>a field guide to the plant model</description>
 <generator>quarto-1.10.18</generator>
-<lastBuildDate>Wed, 05 Aug 2026 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 20 Aug 2026 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>A flat maximum costs you half your digits</title>
+  <link>https://traitecoevo.github.io/overstorey/posts/2026-08-20-flat-maximum-half-your-digits/</link>
+  <description><![CDATA[ 
+
+
+
+
+<p><span class="version-badge version-badge--dev">plant @develop 39c0c65</span></p>
+<p>The TF24 leaf chooses its operating point by optimising. Given soil water and light, it picks the root-collar water potential <img src="https://latex.codecogs.com/png.latex?%5Cpsi"> that maximises carbon profit <img src="https://latex.codecogs.com/png.latex?%5CPi"> — assimilation minus the hydraulic cost of the water that bought it. Which one-dimensional optimiser does that job reads like the most boring possible implementation detail. Bracket the maximum, shrink the bracket, return the middle.</p>
+<p>It ran on golden-section search for years, and the decision was defended each time it came up, on a reason that sounded exactly right: the argmax feeds a gradient, so it has to vary <em>smoothly</em> with the model’s inputs, and golden section takes a fixed number of comparison steps where an interpolating method takes a data-dependent number. Fixed beats adaptive when you need smoothness.</p>
+<p>That reasoning is wrong, and it was wrong in an expensive direction. Golden section was resolving the operating point to about three digits while reporting seventeen, and the trait derivatives built on top of it came back either exactly zero or, for traits in the hydraulic path, <strong>smooth, plausible and sign-inverted</strong>. Replacing it with a root-find on the first-order condition improved the residual by eleven orders of magnitude and was 24.5% faster as a side effect.</p>
+<p>The lesson underneath is not about golden section. It is about which <em>question</em> you ask a solver.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Where the numbers come from
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Measurements are as recorded in <a href="https://github.com/traitecoevo/phylloptim"><code>phylloptim</code></a> — the leaf model extracted from plant’s TF24 strategy — on macOS/arm64 at <code>-O2</code>, against its 288-point operating-point grid. plant consumes the same headers; the pin above is plant’s <code>develop</code>. Timings are min-of-N with the two binaries interleaved, which on this benchmark is the difference between measuring an effect and inventing one.</p>
+</div>
+</div>
+<section id="three-solvers-and-bracketing-does-not-separate-them" class="level2">
+<h2 class="anchored" data-anchor-id="three-solvers-and-bracketing-does-not-separate-them">Three solvers, and “bracketing” does not separate them</h2>
+<p>It is worth being precise about the alternatives first, because the word <em>bracketing</em> gets used for all of them and so distinguishes none of them. All three below maintain an interval containing the answer and never leave it. They differ in <strong>what they evaluate</strong> and <strong>how they choose the next point</strong>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>evaluates</th>
+<th>step rule</th>
+<th>convergence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>golden section</td>
+<td><img src="https://latex.codecogs.com/png.latex?%5CPi"></td>
+<td>fixed ratio 0.618, comparisons only</td>
+<td>linear</td>
+</tr>
+<tr class="even">
+<td>Brent’s <code>fmin</code></td>
+<td><img src="https://latex.codecogs.com/png.latex?%5CPi"></td>
+<td>parabola through the 3 best points, golden fallback</td>
+<td>superlinear</td>
+</tr>
+<tr class="odd">
+<td>TOMS748</td>
+<td><img src="https://latex.codecogs.com/png.latex?%5CPi'"></td>
+<td>inverse cubic interpolation, bisection safeguard</td>
+<td>superlinear (~2.7)</td>
+</tr>
+</tbody>
+</table>
+<p>The first two answer <em>where is the largest value</em>. The third answers <em>where does the derivative change sign</em>. Those are the same point on a smooth interior maximum and they are not the same question, which is the whole of this post.</p>
+</section>
+<section id="brent-beats-golden-section-and-it-is-the-smaller-story" class="level2">
+<h2 class="anchored" data-anchor-id="brent-beats-golden-section-and-it-is-the-smaller-story">Brent beats golden section, and it is the smaller story</h2>
+<p>Take the first two against each other, since that is the comparison people usually have in mind.</p>
+<p>Golden section is <strong>comparison-based</strong>. It evaluates <img src="https://latex.codecogs.com/png.latex?%5CPi"> at two interior points and learns exactly one thing: which is higher. That single bit lets it discard a fixed fraction of the bracket, and no more — the bracket shrinks by <img src="https://latex.codecogs.com/png.latex?0.618"> per evaluation whatever the function is doing, because the algorithm has thrown away the values and kept only their order.</p>
+<p>Brent’s <code>fmin</code> keeps the values. It fits a parabola through the three best points and jumps to its vertex, which is <em>exact</em> for a quadratic — and every smooth maximum is locally quadratic, so the fit gets better as it converges. When the parabolic step looks unsafe (not comfortably inside the bracket, or not shrinking it) it takes a golden step instead, so it never loses the bracketing guarantee it started with.</p>
+<p>Fewer evaluations for the same final bracket width. In this package that was measured at <strong>2.3–2.6×</strong> on the single-layer optimisers, and it is a real, worthwhile, constant-factor win.</p>
+<p>It also does not touch the problem.</p>
+</section>
+<section id="the-square-root" class="level2">
+<h2 class="anchored" data-anchor-id="the-square-root">The square root</h2>
+<p>Here is what neither of them can fix. Near its maximum the objective is flat — that is what being a maximum means:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5CPi(%5Cpsi)%20%5C;%5Capprox%5C;%20%5CPi%5E%5C*%20-%20k%5C,(%5Cpsi%20-%20%5Cpsi%5E%5C*)%5E2%20,%0A"></p>
+<p>with curvature <img src="https://latex.codecogs.com/png.latex?k%20%5Capprox%201.0"> measured directly at the worst points on our grid. Invert it. If your method can only distinguish profit <em>values</em> down to <img src="https://latex.codecogs.com/png.latex?%5Cdelta">, the best it can possibly say about the <em>location</em> is</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%7C%5Cpsi%20-%20%5Cpsi%5E%5C*%7C%20%5C;%5Capprox%5C;%20%5Csqrt%7B%5Cdelta%20/%20k%7D.%0A"></p>
+<p>The error in the answer is the square root of the error in the objective. In digits: <strong>you get half of them.</strong> Profit at our defaults is around 2.5, so double precision gives <img src="https://latex.codecogs.com/png.latex?%5Cdelta%20%5Capprox%205%5Ctimes10%5E%7B-16%7D"> and the ceiling on any value-comparison method is <img src="https://latex.codecogs.com/png.latex?%5Cpsi%5E%5C*"> to about <img src="https://latex.codecogs.com/png.latex?2%5Ctimes10%5E%7B-8%7D"> — eight digits, from an objective known to sixteen. Brent’s parabola gets you to that ceiling in fewer evaluations than golden section. It does not raise it, because the ceiling belongs to the question, not to the algorithm.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>The square root is visible in the golden file
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is not a blackboard argument. <code>phylloptim</code> compares 576 solved operating points bit-exactly on the platform that generated them, and with a tolerance elsewhere, which gives a free measurement of how far the nine reported fields move between Apple’s libm and glibc:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>field</th>
+<th style="text-align: right;">worst cross-platform difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>profit</code> — the maximum <em>value</em></td>
+<td style="text-align: right;"><strong>2.14e-09</strong></td>
+</tr>
+<tr class="even">
+<td>the other eight — evaluated <em>at the argmax</em></td>
+<td style="text-align: right;"><strong>1.4e-04</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Five orders of magnitude, from one perturbation, split exactly along value-versus-location. It is a mechanism rather than an identity — <img src="https://latex.codecogs.com/png.latex?%5Csqrt%7B2.14%5Ctimes10%5E%7B-9%7D%7D%20=%204.6%5Ctimes10%5E%7B-5%7D"> against the <img src="https://latex.codecogs.com/png.latex?1.4%5Ctimes10%5E%7B-4%7D"> observed, because the two column maxima fall at different operating points — but the class is unmistakable. If you need a portable check of this solve, check <code>profit</code>. It is the only reported field that is well-conditioned.</p>
+</div>
+</div>
+<p>And golden section was nowhere near even that ceiling, for a second reason. It terminates on <strong>bracket width</strong>, and the width it was given was <code>GSS_tol_abs</code> <img src="https://latex.codecogs.com/png.latex?=%2010%5E%7B-3%7D">. So the operating point was printed to seventeen significant figures and determined to about three.</p>
+</section>
+<section id="ask-the-derivative-instead" class="level2">
+<h2 class="anchored" data-anchor-id="ask-the-derivative-instead">Ask the derivative instead</h2>
+<p><img src="https://latex.codecogs.com/png.latex?%5CPi'"> has none of this. At an interior optimum it crosses zero <em>transversally</em>, with slope <img src="https://latex.codecogs.com/png.latex?-2k">:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5CPi'(%5Cpsi)%20%5C;%5Capprox%5C;%20-2k%5C,(%5Cpsi%20-%20%5Cpsi%5E%5C*).%0A"></p>
+<p>A residual <img src="https://latex.codecogs.com/png.latex?r"> therefore displaces the located root by <img src="https://latex.codecogs.com/png.latex?r/2k"> — <strong>linear</strong>, not square-rooted. Full double precision is reachable, and the safeguarded bracket is still there: TOMS748 keeps opposite signs at the endpoints throughout, so a kinked or non-monotone case degrades toward bisection instead of diverging the way Newton would.</p>
+<p>What that bought, on the 240 feasible grid rows:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>golden section on <img src="https://latex.codecogs.com/png.latex?%5CPi"></th>
+<th>TOMS748 on <img src="https://latex.codecogs.com/png.latex?%5CPi'"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img src="https://latex.codecogs.com/png.latex?%5Clvert%5CPi'%5Crvert"> at the returned collar (198 interior rows)</td>
+<td>median 7.8e-04</td>
+<td><strong>median 5.6e-15</strong></td>
+</tr>
+<tr class="even">
+<td>distinct argmax values over 11 trait steps</td>
+<td>6 / 11</td>
+<td><strong>11 / 11</strong></td>
+</tr>
+<tr class="odd">
+<td>argmax second differences in a trait</td>
+<td>3.9e-04 (= the step size: noise)</td>
+<td><strong>3.4e-07</strong></td>
+</tr>
+<tr class="even">
+<td>µs/solve, interleaved at reps=2000</td>
+<td>3.51</td>
+<td><strong>2.65</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Eleven orders of magnitude on the residual, improved on <strong>240 of 240</strong> rows with none worse. The 24.5% on the clock is the least interesting row in that table.</p>
+<p>This is only affordable because <img src="https://latex.codecogs.com/png.latex?%5CPi'"> is cheap: the implicit function theorem turns the derivative of the nested solve into a closed-form expression costing 7% of a solve, which is <a href="../../posts/2026-08-04-differentiate-the-equation/">the previous post</a>. Without that, root-finding the first-order condition would mean differentiating an iterative solver, and the trade would look very different.</p>
+</section>
+<section id="why-anyone-should-care-the-argmax-is-an-input" class="level2">
+<h2 class="anchored" data-anchor-id="why-anyone-should-care-the-argmax-is-an-input">Why anyone should care: the argmax is an input</h2>
+<p>An operating point good to three digits sounds fine for a leaf. It is not fine, because the argmax is not the output — it is an input to a derivative.</p>
+<p>Golden section’s leftover offset inside its <img src="https://latex.codecogs.com/png.latex?10%5E%7B-3%7D"> bracket is not a small random error. It wanders <strong>discontinuously</strong> as the comparison sequence flips: the same sequence of comparisons returns the same offset, and the sequence changes in jumps. So <img src="https://latex.codecogs.com/png.latex?%5Cpsi%5E%5C*(%5Ctheta)"> was a <em>staircase</em> in trait space, tread width <img src="https://latex.codecogs.com/png.latex?%5Capprox"> <code>GSS_tol_abs</code>. Six distinct values across eleven trait steps, as the table shows.</p>
+<p>Difference a staircase and you get one of two answers, both wrong:</p>
+<ul>
+<li><strong>Exactly zero</strong>, whenever the step lands inside a tread. A finite difference in a photosynthetic trait returned identically zero for any relative step below <img src="https://latex.codecogs.com/png.latex?10%5E%7B-4%7D">, silently dropping a whole term of <img src="https://latex.codecogs.com/png.latex?%5Cmathrm%7Bd%7DA/%5Cmathrm%7Bd%7D%5Ctheta">.</li>
+<li><strong>A plausible number with the wrong sign</strong>, whenever the step happens to straddle risers unevenly. For <code>root_b</code> the composite gradient came back at <img src="https://latex.codecogs.com/png.latex?-2.6%5Ctimes10%5E%7B-3%7D"> where the truth is <img src="https://latex.codecogs.com/png.latex?+2.6%5Ctimes10%5E%7B-4%7D">: smooth, stable, believable, and pointing the wrong way.</li>
+</ul>
+<p>The second is the one that should worry you. A gradient-based calibration handed that number walks the trait <em>away</em> from the data, converges to something, and reports it with a straight face. Nothing in the output looks wrong. After the change, finite differences agree to ~4 digits at any relative step from <img src="https://latex.codecogs.com/png.latex?10%5E%7B-8%7D"> to <img src="https://latex.codecogs.com/png.latex?10%5E%7B-2%7D">.</p>
+<p><strong>A fixed iteration count is not smoothness.</strong> That was the error in the original defence of golden section — the requirement it named was real, and the algorithm it chose to meet it was the one that failed it worst.</p>
+</section>
+<section id="what-the-root-find-costs" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-root-find-costs">What the root-find costs</h2>
+<p>Three things, and they are not free.</p>
+<p><strong>It needs a derivative you trust.</strong> An analytic <img src="https://latex.codecogs.com/png.latex?%5CPi'"> that provably agrees with the <img src="https://latex.codecogs.com/png.latex?%5CPi"> everything else reports. A value search needs no such thing.</p>
+<p><strong>A stationary point is not a maximum.</strong> The first-order condition is satisfied at minima too, so the solver has to be told which it found. When profit falls away from <em>both</em> ends into the interval, the interior stationary point is a minimum and the answer is at one of the bounds — reporting whichever bound the ordering of the tests happened to reach first would be a plausible, finite, wrong answer, so that case is tagged and refused rather than guessed.</p>
+<p><strong>Not every maximum is stationary.</strong> The first-order condition is blind to an optimum pinned to a constraint, and those are not exotic here: <strong>42 of the 240 feasible grid rows</strong> are pinned, 24 at the wet end and 18 at the dry, all at soil potentials of 3–4 MPa where profit is negative and the best the leaf can do is barely transpire. Handling them is explicit code, not a fallthrough.</p>
+<p>Value searches have the mirror defect, and it is worse because nothing announces it. <code>brent_fmin</code> steps in from the bounds by construction, so it can return neither an endpoint nor the global maximum. Both happen in this model. At an air temperature of 50 °C with the thermal cost on, ProfitMax profit is highest at <strong>full stomatal closure</strong> — <img src="https://latex.codecogs.com/png.latex?-1.5314"> at <img src="https://latex.codecogs.com/png.latex?%5Cpsi_%7B%5Ctext%7Bsoil%7D%7D">, against <img src="https://latex.codecogs.com/png.latex?-1.5510"> and <img src="https://latex.codecogs.com/png.latex?-1.5459"> at two interior points — and the solver returned <img src="https://latex.codecogs.com/png.latex?%5Cpsi%20=%201.643">, reporting an open stoma where the objective says shut.</p>
+<p>The general form is worth keeping:</p>
+<blockquote class="blockquote">
+<p>A bracketing optimiser answers <em>where is the interior maximum</em>. That is not the same question as <em>where is the maximum</em>.</p>
+</blockquote>
+</section>
+<section id="a-note-on-checking-a-change-like-this" class="level2">
+<h2 class="anchored" data-anchor-id="a-note-on-checking-a-change-like-this">A note on checking a change like this</h2>
+<p>One methodological trap, because it cost real time here. When you swap the collar solver, the obvious thing to check is whether profit went up. Don’t.</p>
+<p>Profit is the maximum, so it is flat, so it is exactly the quantity that cannot resolve a change in the argmax — and its own floor is set by the nested CO₂ root-find. When this change landed, two of 288 rows came out ~<img src="https://latex.codecogs.com/png.latex?6%5Ctimes10%5E%7B-7%7D"> <em>lower</em> in profit while their first-order residual improved by ten orders of magnitude. Read as a profit comparison, the change looks like a marginal regression on those rows. Read as a residual, it is 240 of 240 improved with none worse.</p>
+<p><strong>Check the condition you claim to be solving, not the objective you claim to be maximising.</strong> The residual has teeth precisely where the objective has none.</p>
+</section>
+<section id="what-generalises" class="level2">
+<h2 class="anchored" data-anchor-id="what-generalises">What generalises</h2>
+<p><strong>The conditioning belongs to the question, not the algorithm.</strong> Golden section and Brent’s <code>fmin</code> both ask “which <img src="https://latex.codecogs.com/png.latex?%5Cpsi"> gives the biggest <img src="https://latex.codecogs.com/png.latex?%5CPi">”, and both inherit the square root that comes with asking it. Switching between them is a constant factor. Switching to “where does <img src="https://latex.codecogs.com/png.latex?%5CPi'"> change sign” is a change of exponent — same bracketing safety, different conditioning, eleven orders on the residual.</p>
+<p><strong>If an argmax feeds anything downstream, it has half the precision you think it does.</strong> Whatever tolerance your optimiser reports is a tolerance on the objective; the location carries the square root of it. That is fine when the argmax is the answer a human reads and fatal when it is the point a derivative is evaluated at.</p>
+<p><strong>Smoothness is about the termination criterion, not the iteration count.</strong> A method that stops on bracket <em>width</em> leaves an offset inside that width, and if the offset is chosen by comparisons it is a staircase rather than a smooth error. A method that stops on a <em>residual</em> leaves an error proportional to that residual. Only the second one differentiates.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>tf24</category>
+  <category>hydraulics</category>
+  <category>numerics</category>
+  <category>performance</category>
+  <guid>https://traitecoevo.github.io/overstorey/posts/2026-08-20-flat-maximum-half-your-digits/</guid>
+  <pubDate>Thu, 20 Aug 2026 00:00:00 GMT</pubDate>
+</item>
 <item>
   <title>The commit log is not a lab notebook</title>
   <link>https://traitecoevo.github.io/overstorey/posts/2026-08-05-commit-log-is-not-a-lab-notebook/</link>
@@ -95,6 +303,159 @@
   <category>conventions</category>
   <guid>https://traitecoevo.github.io/overstorey/posts/2026-08-05-commit-log-is-not-a-lab-notebook/</guid>
   <pubDate>Wed, 05 Aug 2026 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Differentiate the equation, not the algorithm</title>
+  <link>https://traitecoevo.github.io/overstorey/posts/2026-08-04-differentiate-the-equation/</link>
+  <description><![CDATA[ 
+
+
+
+
+<p><span class="version-badge version-badge--dev">plant @develop a307198</span></p>
+<p>The TF24 leaf model finds its operating point by optimising. Given a soil water potential and light, it chooses the root-collar water potential <img src="https://latex.codecogs.com/png.latex?%5Cpsi"> that maximises carbon profit, and inside every candidate <img src="https://latex.codecogs.com/png.latex?%5Cpsi"> there is a further root-find for intercellular CO₂. Calibrating the model against measured gas exchange means asking for something the model has never provided: the derivative of its outputs with respect to its <em>traits</em>.</p>
+<p>The obvious way to get that is automatic differentiation, and the obvious mode is reverse. Our calibration problem has 40 parameters and one scalar log-posterior; forward-mode AD costs one sweep per input, reverse costs one per output, so reverse should win by a factor of 40. That is the textbook answer and it is what we assumed.</p>
+<p>It is wrong, and the reason is worth writing down, because the mistake is not about AD at all. It is about differentiating the <em>algorithm</em> when you should be differentiating the <em>equation the algorithm solved</em>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Where the numbers come from
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Measurements are from <a href="https://github.com/traitecoevo/phylloptim"><code>phylloptim</code></a> at <code>d22907a</code> — the leaf model extracted from plant’s TF24 strategy — on macOS/arm64 at <code>-O2</code>. plant consumes the same code; the pin above is plant’s <code>develop</code>. The package was called <code>leaf_cpp</code> when that commit was made, and was renamed on 2026-08-05.</p>
+</div>
+</div>
+<section id="the-problem-has-solvers-nested-two-deep" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem-has-solvers-nested-two-deep">The problem has solvers nested two deep</h2>
+<p>Write the solve at a fixed collar potential <img src="https://latex.codecogs.com/png.latex?%5Cpsi">. Transport to the stem is closed form: the soil-to-collar uptake <img src="https://latex.codecogs.com/png.latex?E_%7B%5Ctext%7Bup%7D%7D(%5Cpsi)"> is analytic, and the vulnerability curve is pre-integrated into a pair of <img src="https://latex.codecogs.com/png.latex?C%5E2"> splines <img src="https://latex.codecogs.com/png.latex?S"> and its inverse <img src="https://latex.codecogs.com/png.latex?P">, so</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpsi_%7B%5Ctext%7Bstem%7D%7D%20=%20P%5C!%5Cleft(%20%5Cfrac%7BE_%7B%5Ctext%7Bup%7D%7D(%5Cpsi)%7D%7Bk_%7B%5Cmax%7D%7D%20+%20S(%5Cpsi)%20%5Cright).%0A"></p>
+<p>Stomatal conductance follows from the transpiration those two potentials imply, <img src="https://latex.codecogs.com/png.latex?g_c(%5Cpsi_%7B%5Ctext%7Bstem%7D%7D,%20%5Cpsi)">. Intercellular CO₂ is then <em>not</em> closed form — it is the root of a demand-equals-supply residual,</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0Ag(c;%5C,%20%5Cpsi_%7B%5Ctext%7Bstem%7D%7D,%20%5Cpsi)%20%5C;=%5C;%20u%5C,A(c)%20%5C;-%5C;%20g_c(%5Cpsi_%7B%5Ctext%7Bstem%7D%7D,%20%5Cpsi)%5C,%5Cfrac%7Bc_a%20-%20c%7D%7BP_%7B%5Ctext%7Batm%7D%7D%7D%20%5C;=%5C;%200,%0A"></p>
+<p>solved by TOMS748. With <img src="https://latex.codecogs.com/png.latex?c%5E%5C*"> in hand, profit is assimilation minus hydraulic cost,</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5CPi(%5Cpsi)%20=%20A(c%5E%5C*)%20-%20C(%5Cpsi_%7B%5Ctext%7Bstem%7D%7D).%0A"></p>
+<p>And the model maximises <img src="https://latex.codecogs.com/png.latex?%5CPi"> over <img src="https://latex.codecogs.com/png.latex?%5Cpsi"> — which, since <a href="https://github.com/traitecoevo/phylloptim/pull/36">a recent change</a>, it does by solving the first-order condition <img src="https://latex.codecogs.com/png.latex?%5CPi'(%5Cpsi)%20=%200"> rather than by searching.</p>
+<p>So there are two solvers stacked: a root-find for <img src="https://latex.codecogs.com/png.latex?c"> inside a root-find for <img src="https://latex.codecogs.com/png.latex?%5Cpsi">. Differentiating <em>through</em> both is the thing that looks unavoidable.</p>
+</section>
+<section id="why-mathrmdpimathrmdpsi-is-cheap" class="level2">
+<h2 class="anchored" data-anchor-id="why-mathrmdpimathrmdpsi-is-cheap">Why <img src="https://latex.codecogs.com/png.latex?%5Cmathrm%7Bd%7D%5CPi/%5Cmathrm%7Bd%7D%5Cpsi"> is cheap</h2>
+<p>It is not unavoidable, and the reason is the implicit function theorem. Take the chain rule on <img src="https://latex.codecogs.com/png.latex?%5CPi">:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B%5Cmathrm%7Bd%7D%5CPi%7D%7B%5Cmathrm%7Bd%7D%5Cpsi%7D%0A=%20A'(c)%5C,%5Cfrac%7B%5Cmathrm%7Bd%7Dc%7D%7B%5Cmathrm%7Bd%7D%5Cpsi%7D%0A-%20C'(%5Cpsi_%7B%5Ctext%7Bstem%7D%7D)%5C,%5Cfrac%7B%5Cmathrm%7Bd%7D%5Cpsi_%7B%5Ctext%7Bstem%7D%7D%7D%7B%5Cmathrm%7Bd%7D%5Cpsi%7D.%0A"></p>
+<p>Two pieces look hard. Neither is.</p>
+<p><strong>The transport derivative is analytic</strong>, because <img src="https://latex.codecogs.com/png.latex?S"> and <img src="https://latex.codecogs.com/png.latex?P"> are splines that carry their own derivatives and <img src="https://latex.codecogs.com/png.latex?E_%7B%5Ctext%7Bup%7D%7D'"> is a conductance we can write down:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B%5Cmathrm%7Bd%7D%5Cpsi_%7B%5Ctext%7Bstem%7D%7D%7D%7B%5Cmathrm%7Bd%7D%5Cpsi%7D%0A=%20P'(E_%7B%5Ctext%7Bstem%7D%7D)%20%5Cleft%5B%20%5Cfrac%7BE_%7B%5Ctext%7Bup%7D%7D'(%5Cpsi)%7D%7Bk_%7B%5Cmax%7D%7D%20+%20S'(%5Cpsi)%20%5Cright%5D.%0A"></p>
+<p><strong>The CO₂ derivative comes from the residual, not from the solver.</strong> We never re-run the root-find. At the converged <img src="https://latex.codecogs.com/png.latex?c%5E%5C*"> the residual vanishes identically, so differentiating <img src="https://latex.codecogs.com/png.latex?g%20=%200"> gives</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B%5Cpartial%20c%7D%7B%5Cpartial%20p%7D%20=%20-%5C,%5Cfrac%7B%5Cpartial%20g/%5Cpartial%20p%7D%7B%5Cpartial%20g/%5Cpartial%20c%7D,%0A%5Cqquad%0A%5Cfrac%7B%5Cpartial%20g%7D%7B%5Cpartial%20c%7D%20=%20u%5C,A'(c)%20+%20%5Cfrac%7Bg_c%7D%7BP_%7B%5Ctext%7Batm%7D%7D%7D,%0A"></p>
+<p>for <img src="https://latex.codecogs.com/png.latex?p"> either <img src="https://latex.codecogs.com/png.latex?%5Cpsi_%7B%5Ctext%7Bstem%7D%7D"> or <img src="https://latex.codecogs.com/png.latex?%5Cpsi">. The collar enters both explicitly and through the stem, so</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B%5Cmathrm%7Bd%7Dc%7D%7B%5Cmathrm%7Bd%7D%5Cpsi%7D%0A=%20%5Cfrac%7B%5Cpartial%20c%7D%7B%5Cpartial%20%5Cpsi_%7B%5Ctext%7Bstem%7D%7D%7D%5Cfrac%7B%5Cmathrm%7Bd%7D%5Cpsi_%7B%5Ctext%7Bstem%7D%7D%7D%7B%5Cmathrm%7Bd%7D%5Cpsi%7D%0A+%20%5Cleft.%5Cfrac%7B%5Cpartial%20c%7D%7B%5Cpartial%20%5Cpsi%7D%5Cright%7C_%7B%5Ctext%7Bexplicit%7D%7D.%0A"></p>
+<p>Look at what is left on the right-hand side of all of that: <img src="https://latex.codecogs.com/png.latex?A'"> and <img src="https://latex.codecogs.com/png.latex?C'">, which are derivatives of small closed-form kernels; <img src="https://latex.codecogs.com/png.latex?S'"> and <img src="https://latex.codecogs.com/png.latex?P'">, which the splines supply; and <img src="https://latex.codecogs.com/png.latex?E_%7B%5Ctext%7Bup%7D%7D'">, which is analytic. <strong>No iteration appears anywhere.</strong> The root-find’s job was to tell us <em>where</em> to evaluate — the point <img src="https://latex.codecogs.com/png.latex?(c%5E%5C*,%20%5Cpsi_%7B%5Ctext%7Bstem%7D%7D)"> — and once we know that, the derivative is a single pass of arithmetic.</p>
+<p>That is the whole trick, and it shows up directly in the cost:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">µs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>one full solve (iterative)</td>
+<td style="text-align: right;"><strong>3.607</strong></td>
+</tr>
+<tr class="even">
+<td><code>dprofit_droot_collar_psi</code> (closed form)</td>
+<td style="text-align: right;"><strong>0.256</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The derivative of the solve costs <strong>7%</strong> of the solve.</p>
+</section>
+<section id="the-same-move-again-one-level-up" class="level2">
+<h2 class="anchored" data-anchor-id="the-same-move-again-one-level-up">The same move again, one level up</h2>
+<p>Now the trait derivative. The optimum <img src="https://latex.codecogs.com/png.latex?%5Cpsi%5E%5C*"> is defined implicitly by stationarity, and that condition holds identically in the traits <img src="https://latex.codecogs.com/png.latex?%5Ctheta">:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AF(%5Cpsi%5E%5C*(%5Ctheta);%5C,%20%5Ctheta)%20%5C;%5Cequiv%5C;%20%5Cleft.%5Cfrac%7B%5Cpartial%20%5CPi%7D%7B%5Cpartial%20%5Cpsi%7D%5Cright%7C_%7B%5Cpsi%5E%5C*%7D%20=%200.%0A"></p>
+<p>Differentiate the identity in <img src="https://latex.codecogs.com/png.latex?%5Ctheta"> and rearrange:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cboxed%7B%5C;%0A%5Cfrac%7B%5Cmathrm%7Bd%7D%5Cpsi%5E%5C*%7D%7B%5Cmathrm%7Bd%7D%5Ctheta%7D%0A=%20-%5C,%5Cfrac%7B%5Cpartial%5E2%20%5CPi%20/%20%5Cpartial%20%5Cpsi%5C,%20%5Cpartial%20%5Ctheta%7D%7B%5Cpartial%5E2%20%5CPi%20/%20%5Cpartial%20%5Cpsi%5E2%7D%0A%5C;%7D%0A"></p>
+<p>Both second derivatives are derivatives of <img src="https://latex.codecogs.com/png.latex?%5CPi'">, which we just established is closed form. The denominator is the curvature at the optimum — measured between <img src="https://latex.codecogs.com/png.latex?-1.56"> and <img src="https://latex.codecogs.com/png.latex?-61.4"> across our benchmark grid, so never near zero. The numerator is a mixed partial, and because <img src="https://latex.codecogs.com/png.latex?%5Cpsi"> is held fixed while <img src="https://latex.codecogs.com/png.latex?%5Ctheta"> moves, <em>no argmax is involved</em>: a plain difference quotient in <img src="https://latex.codecogs.com/png.latex?%5Ctheta"> is stable to seven significant figures across five decades of step size.</p>
+<p>The quantity a calibration actually wants then composes:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B%5Cmathrm%7Bd%7DA%7D%7B%5Cmathrm%7Bd%7D%5Ctheta%7D%0A=%20%5Cunderbrace%7B%5Cleft.%5Cfrac%7B%5Cpartial%20A%7D%7B%5Cpartial%20%5Ctheta%7D%5Cright%7C_%7B%5Cpsi%7D%7D_%7B%5Ctext%7Bdirect%7D%7D%0A+%20%5Cunderbrace%7B%5Cfrac%7B%5Cpartial%20A%7D%7B%5Cpartial%20%5Cpsi%7D%5C,%5Cfrac%7B%5Cmathrm%7Bd%7D%5Cpsi%5E%5C*%7D%7B%5Cmathrm%7Bd%7D%5Ctheta%7D%7D_%7B%5Ctext%7Bthrough%20the%20optimum%7D%7D.%0A"></p>
+<p>That second term is not a correction. For four of the eight traits we measured it is <strong>100%</strong> of the answer — the trait moves the operating point and nothing else — and for <code>vcmax_25</code> it is 52%. A finite difference taken on the solved output used to drop it silently, returning exactly zero, which is the bug that motivated all of this.</p>
+</section>
+<section id="so-where-does-the-time-go" class="level2">
+<h2 class="anchored" data-anchor-id="so-where-does-the-time-go">So where does the time go?</h2>
+<p>Per trait gradient at 40 parameters:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 28%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>route</th>
+<th>work</th>
+<th style="text-align: right;">µs</th>
+<th style="text-align: right;">speed-up</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>finite differences on the solve</td>
+<td><img src="https://latex.codecogs.com/png.latex?2N"> solves</td>
+<td style="text-align: right;">288.6</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr class="even">
+<td>IFT, differences on <img src="https://latex.codecogs.com/png.latex?%5CPi'"></td>
+<td>1 solve + <img src="https://latex.codecogs.com/png.latex?2N"> closed-form</td>
+<td style="text-align: right;"><strong>24.1</strong></td>
+<td style="text-align: right;"><strong>12×</strong></td>
+</tr>
+<tr class="odd">
+<td>IFT, AD on the kernels</td>
+<td>1 solve + ~1 sweep</td>
+<td style="text-align: right;"><strong>4.0</strong></td>
+<td style="text-align: right;"><strong>72×</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The 12× costs no new machinery at all: it is the box above, evaluated with the derivative the model already computes for other purposes. The remaining 6× comes from replacing the difference quotients with AD.</p>
+<p>And now the point about modes. Of that final 4.0 µs, <strong>3.6 is the one solve that carries no derivatives at all</strong> — you have to solve the model once per observation to know which operating point to differentiate at, and that is irreducible. The derivative work is the remaining 10%.</p>
+<p>Reverse-mode AD is asymptotically better at that 10%. Even if it were free, 4.0 would become 3.6.</p>
+</section>
+<section id="why-reverse-mode-looked-right-and-three-reasons-it-is-not" class="level2">
+<h2 class="anchored" data-anchor-id="why-reverse-mode-looked-right-and-three-reasons-it-is-not">Why reverse mode looked right, and three reasons it is not</h2>
+<p>The O(1)-in-parameters argument is correct as far as it goes. It just answers a question that stopped being the expensive one.</p>
+<p><strong>It optimises the wrong term.</strong> Amdahl’s law: after the implicit function theorem, differentiation is 10% of the cost. Forward mode is O(N) in the parameters where reverse is O(1), but O(N) applied to 10% of 4 µs is 0.4 µs, and we measured scalar and vector forward within noise of each other at N = 40.</p>
+<p><strong>Its advantage is conditional on taping through the solvers</strong>, which is exactly what the implicit function theorem exists to avoid. And taping a <em>bracketing</em> root-find does not give you the derivative of the root — it gives the derivative of whatever the solver returned, which is an affine combination of comparison-selected bracket endpoints. That is structurally the same defect as the golden-section staircase that <a href="https://github.com/traitecoevo/phylloptim/pull/36">#36</a> removed, just at a finer scale. If it proved too coarse, the fix would be to apply the implicit function theorem anyway — at which point the tape has bought nothing.</p>
+<p><strong>It costs a tape, and the tape costs the build.</strong> Forward-mode XAD is header-only; reverse mode is not. The <code>Tape</code> implementation is compiled once, in odelia, and downstream packages resolve against it by linking a shared library. The leaf model is deliberately header-only and R-free so it can be consumed from C++ and Python without R present — and those consumers cannot link an R package’s <code>.so</code>.</p>
+</section>
+<section id="the-sharp-edge-it-is-only-valid-at-an-interior-optimum" class="level2">
+<h2 class="anchored" data-anchor-id="the-sharp-edge-it-is-only-valid-at-an-interior-optimum">The sharp edge: it is only valid at an interior optimum</h2>
+<p>Stationarity is the premise of the whole derivation, and it fails whenever the optimum is pinned to a bound — a dry leaf held at the wettest collar potential that still moves water. There the constraint is active, <img src="https://latex.codecogs.com/png.latex?%5CPi'%20%5Cneq%200"> at the answer, and <img src="https://latex.codecogs.com/png.latex?%5Cmathrm%7Bd%7D%5Cpsi%5E%5C*/%5Cmathrm%7Bd%7D%5Ctheta"> is the <em>bound’s</em> derivative rather than the ratio above.</p>
+<p>The formula does not fail loudly. On our grid, 42 of 240 feasible operating points are pinned — all at the dry end — and at the worst of them the naive composite returns an O(1) gradient where the truth is around <img src="https://latex.codecogs.com/png.latex?10%5E%7B-8%7D">: wrong by seven orders of magnitude, silently, at exactly the operating points a calibration wandering into drought will visit.</p>
+<p>A finite difference on the solved output does not have this failure, because it differences the constrained answer and so respects the constraint by construction. That is the one thing the crude method does better, and it is why any implementation of the box above has to carry an explicit active-set test.</p>
+</section>
+<section id="what-generalises" class="level2">
+<h2 class="anchored" data-anchor-id="what-generalises">What generalises</h2>
+<p>Two things, neither specific to leaves.</p>
+<p><strong>Differentiate the equation, not the algorithm.</strong> An iterative solver is expensive and awkward to differentiate; the condition it converged to is usually closed form and cheap. Whenever a model’s inner loop is a root-find, a fixed point or an optimum, the implicit function theorem is likely to turn its derivative from a tape into an expression — here, from something needing the whole class templated and a tape linked, into 7% of a solve.</p>
+<p><strong>Profile before choosing an AD mode.</strong> Forward versus reverse is a question about the cost of differentiation, and it deserves an answer only once you know what fraction of the runtime differentiation is. We spent a while planning around a factor of 40 that applied to a tenth of the work, on top of a solve we had to do anyway.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>tf24</category>
+  <category>hydraulics</category>
+  <category>autodiff</category>
+  <category>numerics</category>
+  <guid>https://traitecoevo.github.io/overstorey/posts/2026-08-04-differentiate-the-equation/</guid>
+  <pubDate>Tue, 04 Aug 2026 00:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Moving cohort refining into C++</title>

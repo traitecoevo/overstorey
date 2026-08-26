@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2026-08-04">
+<meta name="description" content="Calibrating the TF24 leaf model needs derivatives with respect to traits, and the textbook answer — reverse-mode AD, because there are 40 parameters and one objective — turns out to be the wrong one. The implicit function theorem makes the derivative of a nested pair of root-finds a closed-form expression costing 7% of a solve, and once it does, the choice of AD mode stops mattering.">
 
-<title>Overstorey – Models</title>
+<title>Overstorey – Differentiate the equation, not the algorithm</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -35,8 +37,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../theory/models/ff16.html" rel="next">
-<link href="../../theory/size-structured-pde.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -77,11 +77,40 @@ ul.task-list li input[type="checkbox"] {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../assets/extras.css">
 </head>
 
-<body class="nav-sidebar floating nav-fixed fullcontent quarto-light">
+<body class="nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -107,7 +136,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Guides</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../../theory/index.html" aria-current="page"> 
+    <a class="nav-link" href="../../theory/index.html"> 
 <span class="menu-text">Theory</span></a>
   </li>  
   <li class="nav-item">
@@ -144,259 +173,56 @@ ul.task-list li input[type="checkbox"] {
 </div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../../theory/models/index.html">Models</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-    </div>
-  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Theory</span></a>
-  </div>
-</li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
- <span class="menu-text">1. Foundations</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The big picture</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The maths, gently</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The maths, worked through</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The size-structured PDE</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">2. Models and physiology</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/models/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Models</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/models/ff16.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">FF16</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Assimilation &amp; hydraulics</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/models/tf24.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">TF24</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Soil water &amp; root uptake</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/models/k93.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">K93</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">3. Adaptive dynamics</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Adaptive dynamics</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Adaptive-dynamics models in regnans</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics/DD99.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">DD99: competition and evolutionary branching</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics/GK98.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">GK98: adaptation across different habitats</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics/GM99.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">GM99: the evolution of seed size</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics/JJ12.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">JJ12: the evolution of migratory arrival time</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics/solving_attractors.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Finding evolutionary attractors</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics/assembly.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Community assembly with simple models</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics/assembly_fitmax.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Maximum-fitness community assembly</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/adaptive-dynamics/assembly_stochastic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Stochastic assembly</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
- <span class="menu-text">4. Implementation</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Implementation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/implementation/characteristic-method.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The characteristic method</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/implementation/ode-stepping.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ODE stepping &amp; control</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/implementation/node-spacing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The node-spacing algorithm</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/implementation/canopy-models.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Canopy &amp; light-environment models</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
- <span class="menu-text">5. Prediction and reproducibility</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../theory/models/scientific-versioning.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Scientific versioning of models</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-    </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-problem-has-solvers-nested-two-deep" id="toc-the-problem-has-solvers-nested-two-deep" class="nav-link active" data-scroll-target="#the-problem-has-solvers-nested-two-deep">The problem has solvers nested two deep</a></li>
+  <li><a href="#why-mathrmdpimathrmdpsi-is-cheap" id="toc-why-mathrmdpimathrmdpsi-is-cheap" class="nav-link" data-scroll-target="#why-mathrmdpimathrmdpsi-is-cheap">Why <span class="math inline">\(\mathrm{d}\Pi/\mathrm{d}\psi\)</span> is cheap</a></li>
+  <li><a href="#the-same-move-again-one-level-up" id="toc-the-same-move-again-one-level-up" class="nav-link" data-scroll-target="#the-same-move-again-one-level-up">The same move again, one level up</a></li>
+  <li><a href="#so-where-does-the-time-go" id="toc-so-where-does-the-time-go" class="nav-link" data-scroll-target="#so-where-does-the-time-go">So where does the time go?</a></li>
+  <li><a href="#why-reverse-mode-looked-right-and-three-reasons-it-is-not" id="toc-why-reverse-mode-looked-right-and-three-reasons-it-is-not" class="nav-link" data-scroll-target="#why-reverse-mode-looked-right-and-three-reasons-it-is-not">Why reverse mode looked right, and three reasons it is not</a></li>
+  <li><a href="#the-sharp-edge-it-is-only-valid-at-an-interior-optimum" id="toc-the-sharp-edge-it-is-only-valid-at-an-interior-optimum" class="nav-link" data-scroll-target="#the-sharp-edge-it-is-only-valid-at-an-interior-optimum">The sharp edge: it is only valid at an interior optimum</a></li>
+  <li><a href="#what-generalises" id="toc-what-generalises" class="nav-link" data-scroll-target="#what-generalises">What generalises</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-08-04-differentiate-the-equation/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../../theory/models/index.html">Models</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Models</h1>
-</div>
+<h1 class="title">Differentiate the equation, not the algorithm</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">tf24</div>
+    <div class="quarto-category">hydraulics</div>
+    <div class="quarto-category">autodiff</div>
+    <div class="quarto-category">numerics</div>
+  </div>
+  </div>
 
+<div>
+  <div class="description">
+    Calibrating the TF24 leaf model needs derivatives with respect to traits, and the textbook answer — reverse-mode AD, because there are 40 parameters and one objective — turns out to be the wrong one. The implicit function theorem makes the derivative of a nested pair of root-finds a closed-form expression costing 7% of a solve, and once it does, the choice of AD mode stops mattering.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 4, 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -406,23 +232,174 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div class="eyebrow">
-<p>theory · the physiological strategies</p>
+<p><span class="version-badge version-badge--dev">plant @develop a307198</span></p>
+<p>The TF24 leaf model finds its operating point by optimising. Given a soil water potential and light, it chooses the root-collar water potential <span class="math inline">\(\psi\)</span> that maximises carbon profit, and inside every candidate <span class="math inline">\(\psi\)</span> there is a further root-find for intercellular CO₂. Calibrating the model against measured gas exchange means asking for something the model has never provided: the derivative of its outputs with respect to its <em>traits</em>.</p>
+<p>The obvious way to get that is automatic differentiation, and the obvious mode is reverse. Our calibration problem has 40 parameters and one scalar log-posterior; forward-mode AD costs one sweep per input, reverse costs one per output, so reverse should win by a factor of 40. That is the textbook answer and it is what we assumed.</p>
+<p>It is wrong, and the reason is worth writing down, because the mistake is not about AD at all. It is about differentiating the <em>algorithm</em> when you should be differentiating the <em>equation the algorithm solved</em>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<p>A <em>strategy</em> tells <code>plant</code> how an individual tree behaves. Given the tree’s size and environment, the strategy calculates its current rates of growth, seed production, and mortality. The <a href="../../theory/size-structured-pde.html">size-structured PDE</a> then uses those rates to describe how the population changes through time.</p>
-<p>This separation is useful: the population-level machinery stays the same, while the biological assumptions can change. Choosing a different strategy therefore changes the biology without changing the population framework.</p>
-<p>Four strategies are documented here:</p>
-<ul>
-<li><strong><a href="../../theory/models/ff16.html">FF16</a></strong> — the default trait-based model (Falster <em>et al.</em> 2016). It calculates growth using leaf photosynthesis and a functional-balance allocation scheme. Four traits—leaf mass per area (LMA), wood density, seed mass, and maximum height—are commonly used to configure linked parts of the strategy.</li>
-<li><strong><a href="../../theory/models/k93.html">K93</a></strong> — Kohyama’s 1993 model, where growth, fecundity, and mortality depend directly on stem diameter and stand basal area. It is a compact example of a strategy that does not model the underlying plant physiology.</li>
-<li><strong><a href="../../theory/models/tf24.html">TF24</a></strong> — builds on FF16 by adding explicit plant hydraulics and stomatal optimisation. The model chooses stomatal conductance to maximise carbon gain after accounting for the hydraulic cost of transpiration.</li>
-<li><strong><a href="../../theory/models/tf24.html">TF24f</a></strong> — uses the same physiology as TF24, but allows the plant’s hydraulic operating point to adjust gradually when the environment changes. It is documented alongside TF24.</li>
-</ul>
-<p>If you are new to these models, start with FF16. It introduces the shared growth and allocation framework. TF24 then shows how explicit photosynthesis and hydraulics extend that framework, while K93 provides a useful contrast.</p>
-<p>When saving or comparing simulation results, also read <a href="../../theory/models/scientific-versioning.html">Scientific versioning of models</a>. It explains how to tell a change in the model’s science from a change only to the software.</p>
-<p>To implement your own, see <a href="../../contributing/implementing-a-strategy.html">implementing a new strategy</a>.</p>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Where the numbers come from
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Measurements are from <a href="https://github.com/traitecoevo/phylloptim"><code>phylloptim</code></a> at <code>d22907a</code> — the leaf model extracted from plant’s TF24 strategy — on macOS/arm64 at <code>-O2</code>. plant consumes the same code; the pin above is plant’s <code>develop</code>. The package was called <code>leaf_cpp</code> when that commit was made, and was renamed on 2026-08-05.</p>
+</div>
+</div>
+<section id="the-problem-has-solvers-nested-two-deep" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem-has-solvers-nested-two-deep">The problem has solvers nested two deep</h2>
+<p>Write the solve at a fixed collar potential <span class="math inline">\(\psi\)</span>. Transport to the stem is closed form: the soil-to-collar uptake <span class="math inline">\(E_{\text{up}}(\psi)\)</span> is analytic, and the vulnerability curve is pre-integrated into a pair of <span class="math inline">\(C^2\)</span> splines <span class="math inline">\(S\)</span> and its inverse <span class="math inline">\(P\)</span>, so</p>
+<p><span class="math display">\[
+\psi_{\text{stem}} = P\!\left( \frac{E_{\text{up}}(\psi)}{k_{\max}} + S(\psi) \right).
+\]</span></p>
+<p>Stomatal conductance follows from the transpiration those two potentials imply, <span class="math inline">\(g_c(\psi_{\text{stem}}, \psi)\)</span>. Intercellular CO₂ is then <em>not</em> closed form — it is the root of a demand-equals-supply residual,</p>
+<p><span class="math display">\[
+g(c;\, \psi_{\text{stem}}, \psi) \;=\; u\,A(c) \;-\; g_c(\psi_{\text{stem}}, \psi)\,\frac{c_a - c}{P_{\text{atm}}} \;=\; 0,
+\]</span></p>
+<p>solved by TOMS748. With <span class="math inline">\(c^\*\)</span> in hand, profit is assimilation minus hydraulic cost,</p>
+<p><span class="math display">\[
+\Pi(\psi) = A(c^\*) - C(\psi_{\text{stem}}).
+\]</span></p>
+<p>And the model maximises <span class="math inline">\(\Pi\)</span> over <span class="math inline">\(\psi\)</span> — which, since <a href="https://github.com/traitecoevo/phylloptim/pull/36">a recent change</a>, it does by solving the first-order condition <span class="math inline">\(\Pi'(\psi) = 0\)</span> rather than by searching.</p>
+<p>So there are two solvers stacked: a root-find for <span class="math inline">\(c\)</span> inside a root-find for <span class="math inline">\(\psi\)</span>. Differentiating <em>through</em> both is the thing that looks unavoidable.</p>
+</section>
+<section id="why-mathrmdpimathrmdpsi-is-cheap" class="level2">
+<h2 class="anchored" data-anchor-id="why-mathrmdpimathrmdpsi-is-cheap">Why <span class="math inline">\(\mathrm{d}\Pi/\mathrm{d}\psi\)</span> is cheap</h2>
+<p>It is not unavoidable, and the reason is the implicit function theorem. Take the chain rule on <span class="math inline">\(\Pi\)</span>:</p>
+<p><span class="math display">\[
+\frac{\mathrm{d}\Pi}{\mathrm{d}\psi}
+= A'(c)\,\frac{\mathrm{d}c}{\mathrm{d}\psi}
+- C'(\psi_{\text{stem}})\,\frac{\mathrm{d}\psi_{\text{stem}}}{\mathrm{d}\psi}.
+\]</span></p>
+<p>Two pieces look hard. Neither is.</p>
+<p><strong>The transport derivative is analytic</strong>, because <span class="math inline">\(S\)</span> and <span class="math inline">\(P\)</span> are splines that carry their own derivatives and <span class="math inline">\(E_{\text{up}}'\)</span> is a conductance we can write down:</p>
+<p><span class="math display">\[
+\frac{\mathrm{d}\psi_{\text{stem}}}{\mathrm{d}\psi}
+= P'(E_{\text{stem}}) \left[ \frac{E_{\text{up}}'(\psi)}{k_{\max}} + S'(\psi) \right].
+\]</span></p>
+<p><strong>The CO₂ derivative comes from the residual, not from the solver.</strong> We never re-run the root-find. At the converged <span class="math inline">\(c^\*\)</span> the residual vanishes identically, so differentiating <span class="math inline">\(g = 0\)</span> gives</p>
+<p><span class="math display">\[
+\frac{\partial c}{\partial p} = -\,\frac{\partial g/\partial p}{\partial g/\partial c},
+\qquad
+\frac{\partial g}{\partial c} = u\,A'(c) + \frac{g_c}{P_{\text{atm}}},
+\]</span></p>
+<p>for <span class="math inline">\(p\)</span> either <span class="math inline">\(\psi_{\text{stem}}\)</span> or <span class="math inline">\(\psi\)</span>. The collar enters both explicitly and through the stem, so</p>
+<p><span class="math display">\[
+\frac{\mathrm{d}c}{\mathrm{d}\psi}
+= \frac{\partial c}{\partial \psi_{\text{stem}}}\frac{\mathrm{d}\psi_{\text{stem}}}{\mathrm{d}\psi}
++ \left.\frac{\partial c}{\partial \psi}\right|_{\text{explicit}}.
+\]</span></p>
+<p>Look at what is left on the right-hand side of all of that: <span class="math inline">\(A'\)</span> and <span class="math inline">\(C'\)</span>, which are derivatives of small closed-form kernels; <span class="math inline">\(S'\)</span> and <span class="math inline">\(P'\)</span>, which the splines supply; and <span class="math inline">\(E_{\text{up}}'\)</span>, which is analytic. <strong>No iteration appears anywhere.</strong> The root-find’s job was to tell us <em>where</em> to evaluate — the point <span class="math inline">\((c^\*, \psi_{\text{stem}})\)</span> — and once we know that, the derivative is a single pass of arithmetic.</p>
+<p>That is the whole trick, and it shows up directly in the cost:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">µs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>one full solve (iterative)</td>
+<td style="text-align: right;"><strong>3.607</strong></td>
+</tr>
+<tr class="even">
+<td><code>dprofit_droot_collar_psi</code> (closed form)</td>
+<td style="text-align: right;"><strong>0.256</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The derivative of the solve costs <strong>7%</strong> of the solve.</p>
+</section>
+<section id="the-same-move-again-one-level-up" class="level2">
+<h2 class="anchored" data-anchor-id="the-same-move-again-one-level-up">The same move again, one level up</h2>
+<p>Now the trait derivative. The optimum <span class="math inline">\(\psi^\*\)</span> is defined implicitly by stationarity, and that condition holds identically in the traits <span class="math inline">\(\theta\)</span>:</p>
+<p><span class="math display">\[
+F(\psi^\*(\theta);\, \theta) \;\equiv\; \left.\frac{\partial \Pi}{\partial \psi}\right|_{\psi^\*} = 0.
+\]</span></p>
+<p>Differentiate the identity in <span class="math inline">\(\theta\)</span> and rearrange:</p>
+<p><span class="math display">\[
+\boxed{\;
+\frac{\mathrm{d}\psi^\*}{\mathrm{d}\theta}
+= -\,\frac{\partial^2 \Pi / \partial \psi\, \partial \theta}{\partial^2 \Pi / \partial \psi^2}
+\;}
+\]</span></p>
+<p>Both second derivatives are derivatives of <span class="math inline">\(\Pi'\)</span>, which we just established is closed form. The denominator is the curvature at the optimum — measured between <span class="math inline">\(-1.56\)</span> and <span class="math inline">\(-61.4\)</span> across our benchmark grid, so never near zero. The numerator is a mixed partial, and because <span class="math inline">\(\psi\)</span> is held fixed while <span class="math inline">\(\theta\)</span> moves, <em>no argmax is involved</em>: a plain difference quotient in <span class="math inline">\(\theta\)</span> is stable to seven significant figures across five decades of step size.</p>
+<p>The quantity a calibration actually wants then composes:</p>
+<p><span class="math display">\[
+\frac{\mathrm{d}A}{\mathrm{d}\theta}
+= \underbrace{\left.\frac{\partial A}{\partial \theta}\right|_{\psi}}_{\text{direct}}
++ \underbrace{\frac{\partial A}{\partial \psi}\,\frac{\mathrm{d}\psi^\*}{\mathrm{d}\theta}}_{\text{through the optimum}}.
+\]</span></p>
+<p>That second term is not a correction. For four of the eight traits we measured it is <strong>100%</strong> of the answer — the trait moves the operating point and nothing else — and for <code>vcmax_25</code> it is 52%. A finite difference taken on the solved output used to drop it silently, returning exactly zero, which is the bug that motivated all of this.</p>
+</section>
+<section id="so-where-does-the-time-go" class="level2">
+<h2 class="anchored" data-anchor-id="so-where-does-the-time-go">So where does the time go?</h2>
+<p>Per trait gradient at 40 parameters:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 28%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>route</th>
+<th>work</th>
+<th style="text-align: right;">µs</th>
+<th style="text-align: right;">speed-up</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>finite differences on the solve</td>
+<td><span class="math inline">\(2N\)</span> solves</td>
+<td style="text-align: right;">288.6</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr class="even">
+<td>IFT, differences on <span class="math inline">\(\Pi'\)</span></td>
+<td>1 solve + <span class="math inline">\(2N\)</span> closed-form</td>
+<td style="text-align: right;"><strong>24.1</strong></td>
+<td style="text-align: right;"><strong>12×</strong></td>
+</tr>
+<tr class="odd">
+<td>IFT, AD on the kernels</td>
+<td>1 solve + ~1 sweep</td>
+<td style="text-align: right;"><strong>4.0</strong></td>
+<td style="text-align: right;"><strong>72×</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The 12× costs no new machinery at all: it is the box above, evaluated with the derivative the model already computes for other purposes. The remaining 6× comes from replacing the difference quotients with AD.</p>
+<p>And now the point about modes. Of that final 4.0 µs, <strong>3.6 is the one solve that carries no derivatives at all</strong> — you have to solve the model once per observation to know which operating point to differentiate at, and that is irreducible. The derivative work is the remaining 10%.</p>
+<p>Reverse-mode AD is asymptotically better at that 10%. Even if it were free, 4.0 would become 3.6.</p>
+</section>
+<section id="why-reverse-mode-looked-right-and-three-reasons-it-is-not" class="level2">
+<h2 class="anchored" data-anchor-id="why-reverse-mode-looked-right-and-three-reasons-it-is-not">Why reverse mode looked right, and three reasons it is not</h2>
+<p>The O(1)-in-parameters argument is correct as far as it goes. It just answers a question that stopped being the expensive one.</p>
+<p><strong>It optimises the wrong term.</strong> Amdahl’s law: after the implicit function theorem, differentiation is 10% of the cost. Forward mode is O(N) in the parameters where reverse is O(1), but O(N) applied to 10% of 4 µs is 0.4 µs, and we measured scalar and vector forward within noise of each other at N = 40.</p>
+<p><strong>Its advantage is conditional on taping through the solvers</strong>, which is exactly what the implicit function theorem exists to avoid. And taping a <em>bracketing</em> root-find does not give you the derivative of the root — it gives the derivative of whatever the solver returned, which is an affine combination of comparison-selected bracket endpoints. That is structurally the same defect as the golden-section staircase that <a href="https://github.com/traitecoevo/phylloptim/pull/36">#36</a> removed, just at a finer scale. If it proved too coarse, the fix would be to apply the implicit function theorem anyway — at which point the tape has bought nothing.</p>
+<p><strong>It costs a tape, and the tape costs the build.</strong> Forward-mode XAD is header-only; reverse mode is not. The <code>Tape</code> implementation is compiled once, in odelia, and downstream packages resolve against it by linking a shared library. The leaf model is deliberately header-only and R-free so it can be consumed from C++ and Python without R present — and those consumers cannot link an R package’s <code>.so</code>.</p>
+</section>
+<section id="the-sharp-edge-it-is-only-valid-at-an-interior-optimum" class="level2">
+<h2 class="anchored" data-anchor-id="the-sharp-edge-it-is-only-valid-at-an-interior-optimum">The sharp edge: it is only valid at an interior optimum</h2>
+<p>Stationarity is the premise of the whole derivation, and it fails whenever the optimum is pinned to a bound — a dry leaf held at the wettest collar potential that still moves water. There the constraint is active, <span class="math inline">\(\Pi' \neq 0\)</span> at the answer, and <span class="math inline">\(\mathrm{d}\psi^\*/\mathrm{d}\theta\)</span> is the <em>bound’s</em> derivative rather than the ratio above.</p>
+<p>The formula does not fail loudly. On our grid, 42 of 240 feasible operating points are pinned — all at the dry end — and at the worst of them the naive composite returns an O(1) gradient where the truth is around <span class="math inline">\(10^{-8}\)</span>: wrong by seven orders of magnitude, silently, at exactly the operating points a calibration wandering into drought will visit.</p>
+<p>A finite difference on the solved output does not have this failure, because it differences the constrained answer and so respects the constraint by construction. That is the one thing the crude method does better, and it is why any implementation of the box above has to carry an explicit active-set test.</p>
+</section>
+<section id="what-generalises" class="level2">
+<h2 class="anchored" data-anchor-id="what-generalises">What generalises</h2>
+<p>Two things, neither specific to leaves.</p>
+<p><strong>Differentiate the equation, not the algorithm.</strong> An iterative solver is expensive and awkward to differentiate; the condition it converged to is usually closed form and cheap. Whenever a model’s inner loop is a root-find, a fixed point or an optimum, the implicit function theorem is likely to turn its derivative from a tape into an expression — here, from something needing the whole class templated and a tape linked, into 7% of a solve.</p>
+<p><strong>Profile before choosing an AD mode.</strong> Forward versus reverse is a question about the cost of differentiation, and it deserves an answer only once you know what fraction of the runtime differentiation is. We spent a while planning around a factor of 40 that applied to a tenth of the work, on top of a solve we had to do anyway.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -825,18 +802,6 @@ ul.task-list li input[type="checkbox"] {
     }
   });
   </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../../theory/size-structured-pde.html" class="pagination-link" aria-label="The size-structured PDE">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The size-structured PDE</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../../theory/models/ff16.html" class="pagination-link" aria-label="FF16">
-        <span class="nav-page-text">FF16</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -845,7 +810,7 @@ ul.task-list li input[type="checkbox"] {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/theory/models/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-08-04-differentiate-the-equation/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item">

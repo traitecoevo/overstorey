@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-06-10">
-<meta name="description" content="Timing the new plant hydraulics path against the FF16 baseline across a leaf-area-index sweep — an expensive run, pinned to its own environment.">
+<meta name="dcterms.date" content="2026-08-20">
+<meta name="description" content="The TF24 leaf model finds its operating point by maximising carbon profit, and how it does that looks like an implementation detail. It is not. Locating an argmax by comparing objective values is square-root conditioned, so it throws away half the precision of everything downstream — and in our case it returned trait derivatives that were smooth, plausible and the wrong sign.">
 
-<title>Overstorey – Hydraulics inner-loop benchmark</title>
+<title>Overstorey – A flat maximum costs you half your digits</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -27,41 +27,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -112,6 +77,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../assets/extras.css">
 </head>
@@ -189,28 +183,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#per-post-environment" id="toc-per-post-environment" class="nav-link active" data-scroll-target="#per-post-environment">Per-post environment</a></li>
-  <li><a href="#the-sweep" id="toc-the-sweep" class="nav-link" data-scroll-target="#the-sweep">The sweep</a></li>
-  <li><a href="#reproducibility-footer" id="toc-reproducibility-footer" class="nav-link" data-scroll-target="#reproducibility-footer">Reproducibility footer</a></li>
+  <li><a href="#three-solvers-and-bracketing-does-not-separate-them" id="toc-three-solvers-and-bracketing-does-not-separate-them" class="nav-link active" data-scroll-target="#three-solvers-and-bracketing-does-not-separate-them">Three solvers, and “bracketing” does not separate them</a></li>
+  <li><a href="#brent-beats-golden-section-and-it-is-the-smaller-story" id="toc-brent-beats-golden-section-and-it-is-the-smaller-story" class="nav-link" data-scroll-target="#brent-beats-golden-section-and-it-is-the-smaller-story">Brent beats golden section, and it is the smaller story</a></li>
+  <li><a href="#the-square-root" id="toc-the-square-root" class="nav-link" data-scroll-target="#the-square-root">The square root</a></li>
+  <li><a href="#ask-the-derivative-instead" id="toc-ask-the-derivative-instead" class="nav-link" data-scroll-target="#ask-the-derivative-instead">Ask the derivative instead</a></li>
+  <li><a href="#why-anyone-should-care-the-argmax-is-an-input" id="toc-why-anyone-should-care-the-argmax-is-an-input" class="nav-link" data-scroll-target="#why-anyone-should-care-the-argmax-is-an-input">Why anyone should care: the argmax is an input</a></li>
+  <li><a href="#what-the-root-find-costs" id="toc-what-the-root-find-costs" class="nav-link" data-scroll-target="#what-the-root-find-costs">What the root-find costs</a></li>
+  <li><a href="#a-note-on-checking-a-change-like-this" id="toc-a-note-on-checking-a-change-like-this" class="nav-link" data-scroll-target="#a-note-on-checking-a-change-like-this">A note on checking a change like this</a></li>
+  <li><a href="#what-generalises" id="toc-what-generalises" class="nav-link" data-scroll-target="#what-generalises">What generalises</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-06-10-hydraulics-benchmark/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-08-20-flat-maximum-half-your-digits/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Hydraulics inner-loop benchmark</h1>
+<h1 class="title">A flat maximum costs you half your digits</h1>
   <div class="quarto-categories">
+    <div class="quarto-category">tf24</div>
     <div class="quarto-category">hydraulics</div>
+    <div class="quarto-category">numerics</div>
     <div class="quarto-category">performance</div>
-    <div class="quarto-category">develop</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    Timing the new plant hydraulics path against the FF16 baseline across a leaf-area-index sweep — an expensive run, pinned to its own environment.
+    The TF24 leaf model finds its operating point by maximising carbon profit, and how it does that looks like an implementation detail. It is not. Locating an argmax by comparing objective values is square-root conditioned, so it throws away half the precision of everything downstream — and in our case it returned trait derivatives that were smooth, plausible and the wrong sign.
   </div>
 </div>
 
@@ -221,7 +221,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 10, 2026</p>
+      <p class="date">August 20, 2026</p>
     </div>
   </div>
   
@@ -233,53 +233,200 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p><span class="version-badge version-badge--dev">plant @develop a1b2c3d</span></p>
-<p>This post is built against an <strong>unreleased</strong> commit on <code>develop</code>, so the badge pins to a SHA rather than a version. The simulation below is slow, so it’s pinned to its own <code>renv</code> snapshot as well — a later project-wide package upgrade can’t change this result even on a forced re-run.</p>
-<section id="per-post-environment" class="level2">
-<h2 class="anchored" data-anchor-id="per-post-environment">Per-post environment</h2>
-<p>This directory carries its own lockfile, captured once when the post was written:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run from this post's directory, once:</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">snapshot</span>(<span class="at">lockfile =</span> <span class="st">"renv.lock.dev"</span>, <span class="at">prompt =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><code>plant_session_info()</code> (footer) reports <code>renv.lock.dev</code> when present, so the page records exactly which environment produced the figures. To reproduce: check out <code>plant</code> at the SHA above, <code>renv::restore(lockfile = "renv.lock.dev")</code>, delete this post’s <code>_freeze/</code> entry, re-render.</p>
-</section>
-<section id="the-sweep" class="level2">
-<h2 class="anchored" data-anchor-id="the-sweep">The sweep</h2>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bench)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>lai_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">8</span>, <span class="at">by =</span> <span class="fl">0.5</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(lai_grid, <span class="cf">function</span>(L) {</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  bench<span class="sc">::</span><span class="fu">mark</span>(</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline  =</span> <span class="fu">run_inner_ff16</span>(<span class="at">lai =</span> L),</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">hydraulic =</span> <span class="fu">run_inner_hydraulics</span>(<span class="at">lai =</span> L),</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">iterations =</span> <span class="dv">20</span>, <span class="at">check =</span> <span class="cn">FALSE</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ... ggplot of median time by method across lai_grid ...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
+<p><span class="version-badge version-badge--dev">plant @develop 39c0c65</span></p>
+<p>The TF24 leaf chooses its operating point by optimising. Given soil water and light, it picks the root-collar water potential <span class="math inline">\(\psi\)</span> that maximises carbon profit <span class="math inline">\(\Pi\)</span> — assimilation minus the hydraulic cost of the water that bought it. Which one-dimensional optimiser does that job reads like the most boring possible implementation detail. Bracket the maximum, shrink the bracket, return the middle.</p>
+<p>It ran on golden-section search for years, and the decision was defended each time it came up, on a reason that sounded exactly right: the argmax feeds a gradient, so it has to vary <em>smoothly</em> with the model’s inputs, and golden section takes a fixed number of comparison steps where an interpolating method takes a data-dependent number. Fixed beats adaptive when you need smoothness.</p>
+<p>That reasoning is wrong, and it was wrong in an expensive direction. Golden section was resolving the operating point to about three digits while reporting seventeen, and the trait derivatives built on top of it came back either exactly zero or, for traits in the hydraulic path, <strong>smooth, plausible and sign-inverted</strong>. Replacing it with a root-find on the first-order condition improved the residual by eleven orders of magnitude and was 24.5% faster as a side effect.</p>
+<p>The lesson underneath is not about golden section. It is about which <em>question</em> you ask a solver.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>Where the numbers come from
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Numbers here are frozen to commit <code>a1b2c3d</code>. When this work lands on <code>master</code>, supersede this post with a release-pinned version rather than editing it — keeping the develop snapshot as the historical record.</p>
+<p>Measurements are as recorded in <a href="https://github.com/traitecoevo/phylloptim"><code>phylloptim</code></a> — the leaf model extracted from plant’s TF24 strategy — on macOS/arm64 at <code>-O2</code>, against its 288-point operating-point grid. plant consumes the same headers; the pin above is plant’s <code>develop</code>. Timings are min-of-N with the two binaries interleaved, which on this benchmark is the difference between measuring an effect and inventing one.</p>
 </div>
 </div>
+<section id="three-solvers-and-bracketing-does-not-separate-them" class="level2">
+<h2 class="anchored" data-anchor-id="three-solvers-and-bracketing-does-not-separate-them">Three solvers, and “bracketing” does not separate them</h2>
+<p>It is worth being precise about the alternatives first, because the word <em>bracketing</em> gets used for all of them and so distinguishes none of them. All three below maintain an interval containing the answer and never leave it. They differ in <strong>what they evaluate</strong> and <strong>how they choose the next point</strong>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>evaluates</th>
+<th>step rule</th>
+<th>convergence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>golden section</td>
+<td><span class="math inline">\(\Pi\)</span></td>
+<td>fixed ratio 0.618, comparisons only</td>
+<td>linear</td>
+</tr>
+<tr class="even">
+<td>Brent’s <code>fmin</code></td>
+<td><span class="math inline">\(\Pi\)</span></td>
+<td>parabola through the 3 best points, golden fallback</td>
+<td>superlinear</td>
+</tr>
+<tr class="odd">
+<td>TOMS748</td>
+<td><span class="math inline">\(\Pi'\)</span></td>
+<td>inverse cubic interpolation, bisection safeguard</td>
+<td>superlinear (~2.7)</td>
+</tr>
+</tbody>
+</table>
+<p>The first two answer <em>where is the largest value</em>. The third answers <em>where does the derivative change sign</em>. Those are the same point on a smooth interior maximum and they are not the same question, which is the whole of this post.</p>
 </section>
-<section id="reproducibility-footer" class="level2">
-<h2 class="anchored" data-anchor-id="reproducibility-footer">Reproducibility footer</h2>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plant_session_info</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="brent-beats-golden-section-and-it-is-the-smaller-story" class="level2">
+<h2 class="anchored" data-anchor-id="brent-beats-golden-section-and-it-is-the-smaller-story">Brent beats golden section, and it is the smaller story</h2>
+<p>Take the first two against each other, since that is the comparison people usually have in mind.</p>
+<p>Golden section is <strong>comparison-based</strong>. It evaluates <span class="math inline">\(\Pi\)</span> at two interior points and learns exactly one thing: which is higher. That single bit lets it discard a fixed fraction of the bracket, and no more — the bracket shrinks by <span class="math inline">\(0.618\)</span> per evaluation whatever the function is doing, because the algorithm has thrown away the values and kept only their order.</p>
+<p>Brent’s <code>fmin</code> keeps the values. It fits a parabola through the three best points and jumps to its vertex, which is <em>exact</em> for a quadratic — and every smooth maximum is locally quadratic, so the fit gets better as it converges. When the parabolic step looks unsafe (not comfortably inside the bracket, or not shrinking it) it takes a golden step instead, so it never loses the bracketing guarantee it started with.</p>
+<p>Fewer evaluations for the same final bracket width. In this package that was measured at <strong>2.3–2.6×</strong> on the single-layer optimisers, and it is a real, worthwhile, constant-factor win.</p>
+<p>It also does not touch the problem.</p>
+</section>
+<section id="the-square-root" class="level2">
+<h2 class="anchored" data-anchor-id="the-square-root">The square root</h2>
+<p>Here is what neither of them can fix. Near its maximum the objective is flat — that is what being a maximum means:</p>
+<p><span class="math display">\[
+\Pi(\psi) \;\approx\; \Pi^\* - k\,(\psi - \psi^\*)^2 ,
+\]</span></p>
+<p>with curvature <span class="math inline">\(k \approx 1.0\)</span> measured directly at the worst points on our grid. Invert it. If your method can only distinguish profit <em>values</em> down to <span class="math inline">\(\delta\)</span>, the best it can possibly say about the <em>location</em> is</p>
+<p><span class="math display">\[
+|\psi - \psi^\*| \;\approx\; \sqrt{\delta / k}.
+\]</span></p>
+<p>The error in the answer is the square root of the error in the objective. In digits: <strong>you get half of them.</strong> Profit at our defaults is around 2.5, so double precision gives <span class="math inline">\(\delta \approx 5\times10^{-16}\)</span> and the ceiling on any value-comparison method is <span class="math inline">\(\psi^\*\)</span> to about <span class="math inline">\(2\times10^{-8}\)</span> — eight digits, from an objective known to sixteen. Brent’s parabola gets you to that ceiling in fewer evaluations than golden section. It does not raise it, because the ceiling belongs to the question, not to the algorithm.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>The square root is visible in the golden file
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is not a blackboard argument. <code>phylloptim</code> compares 576 solved operating points bit-exactly on the platform that generated them, and with a tolerance elsewhere, which gives a free measurement of how far the nine reported fields move between Apple’s libm and glibc:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>field</th>
+<th style="text-align: right;">worst cross-platform difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>profit</code> — the maximum <em>value</em></td>
+<td style="text-align: right;"><strong>2.14e-09</strong></td>
+</tr>
+<tr class="even">
+<td>the other eight — evaluated <em>at the argmax</em></td>
+<td style="text-align: right;"><strong>1.4e-04</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Five orders of magnitude, from one perturbation, split exactly along value-versus-location. It is a mechanism rather than an identity — <span class="math inline">\(\sqrt{2.14\times10^{-9}} = 4.6\times10^{-5}\)</span> against the <span class="math inline">\(1.4\times10^{-4}\)</span> observed, because the two column maxima fall at different operating points — but the class is unmistakable. If you need a portable check of this solve, check <code>profit</code>. It is the only reported field that is well-conditioned.</p>
+</div>
+</div>
+<p>And golden section was nowhere near even that ceiling, for a second reason. It terminates on <strong>bracket width</strong>, and the width it was given was <code>GSS_tol_abs</code> <span class="math inline">\(= 10^{-3}\)</span>. So the operating point was printed to seventeen significant figures and determined to about three.</p>
+</section>
+<section id="ask-the-derivative-instead" class="level2">
+<h2 class="anchored" data-anchor-id="ask-the-derivative-instead">Ask the derivative instead</h2>
+<p><span class="math inline">\(\Pi'\)</span> has none of this. At an interior optimum it crosses zero <em>transversally</em>, with slope <span class="math inline">\(-2k\)</span>:</p>
+<p><span class="math display">\[
+\Pi'(\psi) \;\approx\; -2k\,(\psi - \psi^\*).
+\]</span></p>
+<p>A residual <span class="math inline">\(r\)</span> therefore displaces the located root by <span class="math inline">\(r/2k\)</span> — <strong>linear</strong>, not square-rooted. Full double precision is reachable, and the safeguarded bracket is still there: TOMS748 keeps opposite signs at the endpoints throughout, so a kinked or non-monotone case degrades toward bisection instead of diverging the way Newton would.</p>
+<p>What that bought, on the 240 feasible grid rows:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>golden section on <span class="math inline">\(\Pi\)</span></th>
+<th>TOMS748 on <span class="math inline">\(\Pi'\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\lvert\Pi'\rvert\)</span> at the returned collar (198 interior rows)</td>
+<td>median 7.8e-04</td>
+<td><strong>median 5.6e-15</strong></td>
+</tr>
+<tr class="even">
+<td>distinct argmax values over 11 trait steps</td>
+<td>6 / 11</td>
+<td><strong>11 / 11</strong></td>
+</tr>
+<tr class="odd">
+<td>argmax second differences in a trait</td>
+<td>3.9e-04 (= the step size: noise)</td>
+<td><strong>3.4e-07</strong></td>
+</tr>
+<tr class="even">
+<td>µs/solve, interleaved at reps=2000</td>
+<td>3.51</td>
+<td><strong>2.65</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Eleven orders of magnitude on the residual, improved on <strong>240 of 240</strong> rows with none worse. The 24.5% on the clock is the least interesting row in that table.</p>
+<p>This is only affordable because <span class="math inline">\(\Pi'\)</span> is cheap: the implicit function theorem turns the derivative of the nested solve into a closed-form expression costing 7% of a solve, which is <a href="../../posts/2026-08-04-differentiate-the-equation/">the previous post</a>. Without that, root-finding the first-order condition would mean differentiating an iterative solver, and the trade would look very different.</p>
+</section>
+<section id="why-anyone-should-care-the-argmax-is-an-input" class="level2">
+<h2 class="anchored" data-anchor-id="why-anyone-should-care-the-argmax-is-an-input">Why anyone should care: the argmax is an input</h2>
+<p>An operating point good to three digits sounds fine for a leaf. It is not fine, because the argmax is not the output — it is an input to a derivative.</p>
+<p>Golden section’s leftover offset inside its <span class="math inline">\(10^{-3}\)</span> bracket is not a small random error. It wanders <strong>discontinuously</strong> as the comparison sequence flips: the same sequence of comparisons returns the same offset, and the sequence changes in jumps. So <span class="math inline">\(\psi^\*(\theta)\)</span> was a <em>staircase</em> in trait space, tread width <span class="math inline">\(\approx\)</span> <code>GSS_tol_abs</code>. Six distinct values across eleven trait steps, as the table shows.</p>
+<p>Difference a staircase and you get one of two answers, both wrong:</p>
+<ul>
+<li><strong>Exactly zero</strong>, whenever the step lands inside a tread. A finite difference in a photosynthetic trait returned identically zero for any relative step below <span class="math inline">\(10^{-4}\)</span>, silently dropping a whole term of <span class="math inline">\(\mathrm{d}A/\mathrm{d}\theta\)</span>.</li>
+<li><strong>A plausible number with the wrong sign</strong>, whenever the step happens to straddle risers unevenly. For <code>root_b</code> the composite gradient came back at <span class="math inline">\(-2.6\times10^{-3}\)</span> where the truth is <span class="math inline">\(+2.6\times10^{-4}\)</span>: smooth, stable, believable, and pointing the wrong way.</li>
+</ul>
+<p>The second is the one that should worry you. A gradient-based calibration handed that number walks the trait <em>away</em> from the data, converges to something, and reports it with a straight face. Nothing in the output looks wrong. After the change, finite differences agree to ~4 digits at any relative step from <span class="math inline">\(10^{-8}\)</span> to <span class="math inline">\(10^{-2}\)</span>.</p>
+<p><strong>A fixed iteration count is not smoothness.</strong> That was the error in the original defence of golden section — the requirement it named was real, and the algorithm it chose to meet it was the one that failed it worst.</p>
+</section>
+<section id="what-the-root-find-costs" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-root-find-costs">What the root-find costs</h2>
+<p>Three things, and they are not free.</p>
+<p><strong>It needs a derivative you trust.</strong> An analytic <span class="math inline">\(\Pi'\)</span> that provably agrees with the <span class="math inline">\(\Pi\)</span> everything else reports. A value search needs no such thing.</p>
+<p><strong>A stationary point is not a maximum.</strong> The first-order condition is satisfied at minima too, so the solver has to be told which it found. When profit falls away from <em>both</em> ends into the interval, the interior stationary point is a minimum and the answer is at one of the bounds — reporting whichever bound the ordering of the tests happened to reach first would be a plausible, finite, wrong answer, so that case is tagged and refused rather than guessed.</p>
+<p><strong>Not every maximum is stationary.</strong> The first-order condition is blind to an optimum pinned to a constraint, and those are not exotic here: <strong>42 of the 240 feasible grid rows</strong> are pinned, 24 at the wet end and 18 at the dry, all at soil potentials of 3–4 MPa where profit is negative and the best the leaf can do is barely transpire. Handling them is explicit code, not a fallthrough.</p>
+<p>Value searches have the mirror defect, and it is worse because nothing announces it. <code>brent_fmin</code> steps in from the bounds by construction, so it can return neither an endpoint nor the global maximum. Both happen in this model. At an air temperature of 50 °C with the thermal cost on, ProfitMax profit is highest at <strong>full stomatal closure</strong> — <span class="math inline">\(-1.5314\)</span> at <span class="math inline">\(\psi_{\text{soil}}\)</span>, against <span class="math inline">\(-1.5510\)</span> and <span class="math inline">\(-1.5459\)</span> at two interior points — and the solver returned <span class="math inline">\(\psi = 1.643\)</span>, reporting an open stoma where the objective says shut.</p>
+<p>The general form is worth keeping:</p>
+<blockquote class="blockquote">
+<p>A bracketing optimiser answers <em>where is the interior maximum</em>. That is not the same question as <em>where is the maximum</em>.</p>
+</blockquote>
+</section>
+<section id="a-note-on-checking-a-change-like-this" class="level2">
+<h2 class="anchored" data-anchor-id="a-note-on-checking-a-change-like-this">A note on checking a change like this</h2>
+<p>One methodological trap, because it cost real time here. When you swap the collar solver, the obvious thing to check is whether profit went up. Don’t.</p>
+<p>Profit is the maximum, so it is flat, so it is exactly the quantity that cannot resolve a change in the argmax — and its own floor is set by the nested CO₂ root-find. When this change landed, two of 288 rows came out ~<span class="math inline">\(6\times10^{-7}\)</span> <em>lower</em> in profit while their first-order residual improved by ten orders of magnitude. Read as a profit comparison, the change looks like a marginal regression on those rows. Read as a residual, it is 240 of 240 improved with none worse.</p>
+<p><strong>Check the condition you claim to be solving, not the objective you claim to be maximising.</strong> The residual has teeth precisely where the objective has none.</p>
+</section>
+<section id="what-generalises" class="level2">
+<h2 class="anchored" data-anchor-id="what-generalises">What generalises</h2>
+<p><strong>The conditioning belongs to the question, not the algorithm.</strong> Golden section and Brent’s <code>fmin</code> both ask “which <span class="math inline">\(\psi\)</span> gives the biggest <span class="math inline">\(\Pi\)</span>”, and both inherit the square root that comes with asking it. Switching between them is a constant factor. Switching to “where does <span class="math inline">\(\Pi'\)</span> change sign” is a change of exponent — same bracketing safety, different conditioning, eleven orders on the residual.</p>
+<p><strong>If an argmax feeds anything downstream, it has half the precision you think it does.</strong> Whatever tolerance your optimiser reports is a tolerance on the objective; the location carries the square root of it. That is fine when the argmax is the answer a human reads and fatal when it is the point a derivative is evaluated at.</p>
+<p><strong>Smoothness is about the termination criterion, not the iteration count.</strong> A method that stops on bracket <em>width</em> leaves an offset inside that width, and if the offset is chosen by comparisons it is a staircase rather than a smooth error. A method that stops on a <em>residual</em> leaves an error proportional to that residual. Only the second one differentiates.</p>
 
 
 </section>
@@ -693,7 +840,7 @@ Note
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-06-10-hydraulics-benchmark/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/main/posts/2026-08-20-flat-maximum-half-your-digits/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item">
