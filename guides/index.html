@@ -262,12 +262,29 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
- <span class="menu-text">TF24 in depth</span></a>
+ <span class="menu-text">Scaling up</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/running-in-parallel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Running sweeps in parallel</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">TF24 in depth</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/tf24-hydraulics-and-acclimation.html" class="sidebar-item-text sidebar-link">
@@ -337,6 +354,12 @@ ul.task-list li input[type="checkbox"] {
 <li><a href="../guides/example-analysis.html">Example analysis</a> — the full pipeline, setup to results.</li>
 <li><a href="../guides/self-thinning.html">Self-thinning</a> — recover the classic size–density line.</li>
 <li><a href="../guides/emergent-properties.html">Emergent properties</a> — integrate patch outputs up to the metapopulation.</li>
+</ul>
+</section>
+<section id="scaling-up" class="level2">
+<h2 class="anchored" data-anchor-id="scaling-up">Scaling up</h2>
+<ul>
+<li><a href="../guides/running-in-parallel.html">Running sweeps in parallel</a> — run a parameter grid across cores with <code>mclapply()</code>, then with a <code>targets</code> pipeline that knows which results are still current.</li>
 </ul>
 </section>
 <section id="tf24-in-depth" class="level2">
