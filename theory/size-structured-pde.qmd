@@ -40,9 +40,8 @@ coordinate to another.
 
 ::: {.callout-note}
 ## How to read size and environment on this page
-The notation follows the FF16 and TF24 strategies: $H$ is plant height and
-$E_a$ includes the canopy light profile. The demographic transport equation is
-more general than that notation. K93 uses stem diameter as its biological size
+The notation on this page follows the FF16 and TF24 strategies: $H$ is plant height and
+$E_a$ includes the canopy light profile. K93 uses stem diameter instead as its biological size
 coordinate and cumulative basal area as its competitive environment, while
 TF24 additionally couples physiological rates to soil water. In each case the
 strategy supplies the appropriate rates to the same demographic bookkeeping.
@@ -63,8 +62,10 @@ library(plant)
 #| echo: false
 #| output: asis
 #| tbl-cap: "Variable names and definitions in the demographic model of the `plant` package."
-system.file("docs", "demography-vars.csv", package = "plant") %>% read.csv() %>% dplyr::as_tibble() %>%
-knitr::kable(align = "l")
+system.file("docs", "demography-vars.csv", package = "plant") %>%
+  read.csv() %>%
+  dplyr::as_tibble() %>%
+  knitr::kable(align = "l")
 ```
 
 ## Metacommunity dynamics {#sec-system-dynamics}
@@ -207,7 +208,7 @@ the instantaneous disturbance rate, or hazard, for a patch of age $a$.
 We first focus on an equilibrium patch-age distribution. See
 @sec-derivation-age-structured for the time-dependent derivation. At
 equilibrium, patches flow steadily toward older ages and leave each age class
-when disturbed [@Mckendrick-1926; @Vonfoerster-1959]:
+when disturbed [@Mckendrick-1926; @Vonfoerster-1959]: <!-- SY: What does a non-equilibrium patch-age distribution look like in contrast? -->
 $$
 \frac{{\rm d}}{{\rm d} a} P(a) = - d_{\rm P}(a) \, P(a) ,
 $$ {#eq-agepde}
@@ -280,7 +281,7 @@ density. The outer integral averages that patch output across patch ages,
 weighted by how common each age is. $S_{\rm D}$ retains only seeds that survive
 dispersal.
 
-At metacommunity equilibrium, the seed-arrival rate $Y_x$ is constant. If every
+At metacommunity equilibrium, the seed-arrival rate $Y_x$ is constant. If every <!-- SY: What does metacommunity equilibrium mean exactly? -->
 disturbance also leaves the same empty initial state, all patches then follow
 the same developmental trajectory. Their only difference is how long ago they
 were disturbed. This is why one patch trajectory, combined with the patch-age
@@ -297,7 +298,7 @@ metacommunity.
 
 Once $N(H | x, a)$ and $P(a)$ are known, stand- and landscape-level outputs are
 weighted integrals. A hat denotes an average over the entire metacommunity,
-while a bar below denotes an average across patch ages at a specified plant
+while a bar denotes an average across patch ages at a specified plant
 height.
 
 The average density of individuals with traits $x$ per unit ground area across

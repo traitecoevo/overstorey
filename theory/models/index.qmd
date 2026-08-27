@@ -22,7 +22,7 @@ Four strategies are documented here:
   It calculates growth using leaf photosynthesis and a functional-balance
   allocation scheme. Four traits—leaf mass per area (LMA), wood density, seed
   mass, and maximum height—are commonly used to configure linked parts of the
-  strategy.
+  strategy. <!-- SY: What is a functional-balance allocation scheme? -->
 - **[K93](k93.qmd)** — Kohyama's 1993 model, where growth, fecundity, and
   mortality depend directly on stem diameter and stand basal area. It is a
   compact example of a strategy that does not model the underlying plant
