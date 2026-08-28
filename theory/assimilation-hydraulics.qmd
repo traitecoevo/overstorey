@@ -155,7 +155,7 @@ The biochemical side uses the photosynthesis model of Farquhar et al. (1980).
 It calculates a Rubisco-limited rate,
 $A_c~(umol~m^{-2}~s^{-1})$, and an electron-transport-limited rate,
 $A_j~(umol~m^{-2}~s^{-1})$. Net assimilation follows the more limiting process,
-with a smooth transition between them.
+with a smooth transition between them. <!-- SY: What is meant by a smooth transition between them? -->
 
 The electron-transport-limited rate depends on both light availability and
 $C_i$:
@@ -206,7 +206,9 @@ population.
 The following executable example uses the `Leaf()` interface in `plant`
 2.0.0.9002. The constructor now makes the root-hydraulics and numerical-control
 inputs explicit; `hk_s` is not a `Leaf()` argument in this API.
+<!-- SY: This second sentence is confusing, does it need to be here? -->
 
+<!-- SY: Some question marks in the code below -->
 ```{r}
 sw <- list(
   vcmax_25 = 96,                 #  umol m^-2 s^-1

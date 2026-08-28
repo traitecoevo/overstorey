@@ -63,6 +63,7 @@ do that, it helps to see where those rates come from. In the default
 [FF16](models/ff16.qmd) model, growth and fecundity are tied directly to the
 **net biomass** a plant produces per unit time. Net biomass also affects one
 component of mortality.
+<!-- SY: 'Demographic core' is a bit vague for a reader who doesn't know what it is -->
 
 $$
 \underbrace{\frac{{\rm d}B}{{\rm d}t}}_{\text{net biomass}}
@@ -236,8 +237,10 @@ Here $z$ is a height in the canopy, $E_a(z)$ is the fraction of open-sky light
 reaching it, and $k_{\rm I}$ is the extinction coefficient (how strongly leaves
 block light). The "leaf area above $z$" is itself found by adding up the leaf area
 of every cohort taller than $z$ — that is, by integrating over the size
-distribution $N$.
-<!-- SY: Why z and not H? -->
+distribution $N$. 
+<!-- SY: Why z and not H? Oh is it because the crown of a plant covers multiple heights and H signifies the height of the plant? Probably should add this to the table at the beginning. I see in FF16 model that the distribution of leaf area q(z, H) is used to calculate leaf photosynthesis. Maybe worth having a sentence here about that (suggested below)? -->
+Average light competition experienced by a plant is calculated using the vertical distribution of its leaf area, i.e. its crown. 
+
 We can now close the feedback loop from [the big picture](overview.qmd). The
 distribution $N$ determines leaf area; leaf area determines the light $E_a$; and
 light changes the growth and death rates that reshape $N$. Taller plants

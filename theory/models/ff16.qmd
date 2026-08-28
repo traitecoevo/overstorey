@@ -37,8 +37,7 @@ also has more living tissue to maintain.
 
 The rest of this page develops that idea mathematically. The model was
 developed elsewhere, particularly in @Falster-2011. The equations are collected
-here so that users can see the complete FF16 system implemented in `plant`, not
-as a claim that the model originated in this documentation.
+here so that users can see the complete FF16 system implemented in `plant`.
 
 ```{r}
 #| echo: false
@@ -83,6 +82,8 @@ $$ {#eq-photosynthesis}
 Here, $\alpha_{{\rm p1}}$ is the maximum annual photosynthetic rate, and
 $\alpha_{{\rm p2}}$ is the light level at which the leaf reaches half that
 maximum. Both parameters are derived from a more detailed leaf-level model.
+
+<!-- SY: Could be nice to add graphs of the curves in the equations -->
 
 Leaves at different heights receive different amounts of light. To obtain a
 whole-plant average, the model weights the photosynthetic rate at each height
@@ -188,6 +189,8 @@ $$
 \frac{{\rm d}A_{\rm st}}{{\rm d}t} = \left(\frac{{\rm d}A_{\rm s}}{{\rm d}A_{\rm l}} + \frac{{\rm d}A_{\rm b}}{{\rm d}A_{\rm l}}\right) \times
 \frac{{\rm d}A_{\rm l}}{{\rm d}M_{\rm a}} \times \frac{{\rm d}M_{\rm a}}{{\rm d}B} \times \frac{{\rm d}B}{{\rm d}t} + \frac{{\rm d}A_{\rm h}}{{\rm d}t} .
 $$ {#eq-dast}
+<!-- SY: Where is the conversion of sapwood to heartwood? -->
+
 Finally, the geometric relationship between stem area and diameter converts
 basal-area growth into diameter growth:
 $$
@@ -201,6 +204,7 @@ model tracks only plant height. FF16 connects these quantities through an
 allometric **functional-balance model**. Given a plant's height, the model
 infers how much leaf, sapwood, bark, and fine-root tissue it needs to maintain
 a workable plant architecture.
+<!-- SY: What does 'functional-balance' mean? -->
 
 This approach keeps the population model one-dimensional while still charging
 the plant for all the tissue needed to support new leaves. It also allows the
@@ -236,11 +240,12 @@ $$ {#eq-crown1}
 The **pipe model** assumes that each unit of leaf area is supported by a fixed
 area, $\theta$, of sapwood [@Shinozaki-1964]. Basal sapwood area is therefore
 proportional to total leaf area:
+<!-- SY: Is there a good figure of the pipe model? -->
 $$
 A_{\rm s} = \theta \, A_{\rm l}.
 $$ {#eq-crown2}
 FF16 applies this relationship both within an individual and across plants of
-different sizes. As a result, the fraction of a plant's leaves above height
+different sizes. <!-- SY: What does this mean? --> As a result, the fraction of a plant's leaves above height
 $z$, denoted $Q(z,H)$, is
 
 $$
@@ -252,6 +257,7 @@ describes how leaf area is distributed with height:
 $$
 q(z, H) = 2\frac{\eta}{H}\left(1-\left(\frac{z}{H}\right)^{\eta}\right) \left(\frac{z}{H}\right)^{\eta-1}.
 $$ {#eq-crown3}
+<!-- SY: Again, would be cool to have graphs of these equations throughout! -->
 
 ### Sapwood mass {#mass-of-sapwood}
 
@@ -321,7 +327,7 @@ to their leaf area therefore face a higher mortality hazard. The parameters
 $\alpha_{{\rm dG1}}$ and $\alpha_{{\rm dG2}}$ allow the level and sensitivity of
 this response to differ among species.
 
-Germination and establishment require a separate survival function,
+Germination and establishment require a separate survival function, <!-- SY: Why the use of x' (prime)? -->
 $S_{\rm G}(x^\prime,H_0,E_{{\rm a}0})$, evaluated for a new plant of initial
 height $H_0$ in its initial environment $E_{{\rm a}0}$. For the demographic
 model to remain well behaved, the ratio
@@ -398,7 +404,7 @@ this mean keeps the relationships anchored while their other parameters vary.
 By default, $\beta_{{\rm dI2}}$ and $\beta_{{\rm ks2}}$ are zero, so wood density
 does not affect these two rates unless the corresponding exponents are changed.
 
-FF16 assumes that sapwood respiration is constant per unit volume. A unit of
+FF16 assumes that sapwood respiration is constant per unit volume. A unit of <!-- SY: I was wondering why sapwood respiration would decrease with increasing wood density. I found a paper by Westerband et al. (2022) called "nitrogen concentration and physical properties are key drivers of woody tissue respiration" which seems like a great reference for this section. -->
 mass occupies less volume when wood is denser, so respiration per unit mass is
 $$
 r_{\rm s}  = \frac{\beta_{{\rm rs1}}}{\rho},
@@ -457,6 +463,8 @@ $\alpha_{{\rm p1}}$ and $\alpha_{{\rm p2}}$ into functions of leaf nitrogen.
 The rest of FF16 can then use the compact photosynthesis equation while
 retaining the effect of $\nu$ derived from the detailed annual calculation.
 
+<!-- SY: Need a link to the assimilation and hydraulics page? Or a what next to read? -->
+
 ## Tables {#tables}
 
 The following tables collect the notation, allometric relationships, and
@@ -466,10 +474,8 @@ parameter values used above. They are generated directly from the installed
 ```{r}
 #| label: functions
 #| echo: false
-extract_strategy_parameter_values <- function(vars){
-
-  s <- c(FF16_Strategy(),
-         lapply(as.list(args(make_FF16_hyperpar)), eval))
+extract_strategy_parameter_values <- function(vars) {
+  s <- c(FF16_Strategy(), lapply(as.list(args(make_FF16_hyperpar)), eval))
 
   out <- rep(NA_character_, length(vars))
 
@@ -480,10 +486,10 @@ extract_strategy_parameter_values <- function(vars){
   val <- s[code]
   err <- sapply(val, is.null)
   if (any(err)) {
-    message("Missing parameters: ", paste(code[err], collapse=", "))
+    message("Missing parameters: ", paste(code[err], collapse = ", "))
   }
 
-  oo <- options(scipen=999)
+  oo <- options(scipen = 999)
   on.exit(options(oo))
   out[to_code] <- unlist(lapply(val, prettyNum))
   out[is.na(out)] <- ""
@@ -497,10 +503,11 @@ extract_strategy_parameter_values <- function(vars){
 #| echo: false
 #| tbl-cap: 'Key variables of the `FF16` physiological model. For mass ($M$), respiration ($r$), and turnover ($k$) variables, subscripts refer to any of the following tissues: ${\rm l}$ = leaves, ${\rm b}$ = bark, ${\rm s}$ = sapwood,${\rm r}$ = roots, ${\rm a}$ = all living tissue. For area $A$ variables, subscripts refer to any of the following: ${\rm l}$ = leaves, ${\rm st}$ = total stem cross-section, ${\rm s}$ = sapwood cross-section, ${\rm b}$ = bark cross-section, ${\rm h}$ = heartwood cross-section'
 system.file("docs", "demography-vars.csv", package = "plant") %>%
-read.csv() %>% dplyr::as_tibble() %>%
-# TODO(#481): can we get groups as headers spanning multiple columns?
-knitr::kable(align = "l")
+  read.csv() %>%
+  dplyr::as_tibble() %>%
+  knitr::kable(align = "l")
 ```
+<!-- SY: I believe this table contains more than just key variables of the FF16 physiological model, such as the metacommunity / patch state variables -->
 
 ```{r}
 #| label: tbl-allometry
@@ -522,6 +529,7 @@ x$Value <- extract_strategy_parameter_values(x$Symbol)
 knitr::kable(x,  align = "l")
 ```
 
+<!-- SY: value column is empty, so should fill or remove -->
 
 ```{r}
 #| label: tbl-params-hyper
