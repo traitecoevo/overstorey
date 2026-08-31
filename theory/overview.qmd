@@ -101,6 +101,8 @@ several parts of the model at once.
 
 : The four main traits used by the FF16 hyper-parameterisation.
 
+<!-- SY: I would love if there was somewhere in these docs where I could find a comprehensive list of traits / hyperparameterisations the user can input in a model -->
+
 Changing one of these traits can change several physiological parameters. For
 example, LMA affects leaf construction cost, turnover, and respiration. Leaf
 nitrogen per area, which can also be supplied to the hyper-parameterisation,

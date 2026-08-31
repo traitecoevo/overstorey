@@ -44,3 +44,5 @@ to tell a change in the model's science from a change only to the software.
 
 To implement your own, see
 [implementing a new strategy](../../contributing/implementing-a-strategy.qmd).
+
+<!-- SY: Potentially missing from these docs: leaf thermal model, non-structural carbohydrates, variable allometry -->
