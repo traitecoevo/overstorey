@@ -35,6 +35,7 @@ Imagine the soil beneath a patch as a stack of buckets. Rain enters the top
 bucket. As that bucket approaches saturation, more water drains into the layer
 below. The same process continues down the column, with water leaving the
 bottom as deep drainage.
+<!-- SY: When I think of the bucket metaphor I think that the water in a given layer doesn't drain until the layer above it is full / saturated. Is this how the model works? -->
 
 Plants draw water from the layers reached by their roots. Uptake depends on how
 wet each layer is and on how much resistance the roots present, including the
@@ -69,6 +70,7 @@ layers have the same thickness by default: `depth` $/ N$), a lower-boundary
 depth $z_i$, and a midpoint depth $\bar z_i$ (`z_mid`). The root-uptake model
 in @sec-plant-coupling treats this midpoint as the depth from which the layer's
 water is drawn.
+<!-- SY: These display as section numbers, but the numbers aren't visible in the actual section headings. You could either set number-sections: true in the yaml or use a plain Markdown link e.g. [Infiltration and runoff](#sec-infiltration) and [Drainage](#sec-drainage) define ... -->
 
 Each layer carries one state variable, its volumetric soil moisture
 $\theta_i$ (m$^3$ water m$^{-3}$ soil). The saturated moisture content
@@ -112,6 +114,9 @@ Water leaves the base of each layer at a rate set by its unsaturated hydraulic
 conductivity. Conductivity rises steeply with moisture content, following the
 Clapp & Hornberger (1978) form as parameterised by Zeng & Decker (2009, their
 Eq. 5):
+
+<!-- SY: Horton's equation shows that infiltration rate decreases with time, i.e. is fastest at the beginning when soils are drier. Meanwhile this suggests that water flows down faster as the soil becomes wetter. Are the two consolidated in @sec-infiltration as there's more runoff as the soil becomes wetter? -->
+<!-- SY: I think there's two forces that drive infiltration, one is gravity and one is water potential gradient. The water potential gradient is the stronger force. If the soil is really dry (water potential very negative) then that will pull water down really fast. As the soil becomes wetter the water potential gradient lessens and so infiltration slows down. But at the same time conductivity increases (according to the below equation) and so the effectiveness of gravity increases, but the magnitude of this is not significant compared to the lessening of the water potential gradient. I'm wondering if this is accounted for in the current model -->
 
 $$
 q_{{\rm out},i} = K(\theta_i) = K_{\rm sat}\left(\frac{\theta_i}{\theta_{\rm sat}}\right)^{2n_\psi + 3},
@@ -161,6 +166,7 @@ This is an API asymmetry, not a physical distinction. The theory and the leaf
 model use MPa, so a future `plant` change to make the inverse accept MPa would
 be easier to use; until then, callers need to make the conversion explicitly.
 :::
+<!-- SY: Can this be fixed easily? -->
 
 ::: {.callout-note}
 ## Residual-moisture floor
@@ -205,6 +211,7 @@ curve has the same exponential form as the stem vulnerability curve on the
 root parameters (`root_c`, `root_b`, `root_psi_crit`). As roots lose conductance
 under water stress, they become proportionately harder for water to pass
 through.
+<!-- SY: I think it would be good to include the vulnerability curve here too -->
 
 For a candidate signed root-collar potential $P_{x,r}$ and signed layer
 potential $\Psi_{{\rm soil},i}$, the water drawn from layer $i$ (per unit plant leaf
@@ -219,14 +226,16 @@ resistance. The term $g\,\bar z_i$ is the gravitational head that must be
 overcome to lift water from the layer midpoint $\bar z_i$ to the collar, with
 $g$ = `gravity_head` = $9.8\times10^{-3}$ MPa m$^{-1}$. Two special cases are
 handled exactly rather than with this general form: when
-$P_{x,r} = \Psi_{{\rm soil},i}$, the layer is driven only by gravity; when the
+$P_{x,r} = \Psi_{{\rm soil},i}$, the layer is driven only by gravity; and when the
 potential gradient exactly balances the gravitational head, $E_i = 0$.
+<!-- SY: Since gravity is moving water down (thus is negative), E supply must also be negative right? -->
 
 The root vulnerability curve is non-linear in $\psi$. For that reason, the
 horizontal resistance in @eq-layer-uptake is averaged over the potential
 interval between the soil and the collar rather than evaluated at a single
 point. Specifically, $r_{{\rm R},H,i}$ scales with the interval's span divided
 by the integral of the vulnerability curve across it.
+<!-- SY: after adding the vulnerability curve above can add another figure here showing the integral -->
 
 Summing $E_i$ across layers gives the total water the root system can supply at
 a given $P_{x,r}$. The model then solves for the root-collar potential and the
@@ -237,7 +246,7 @@ The solution must reconcile soil-side supply with the demand implied by the
 optimal stomatal conductance. Water arriving at the collar from the soil must
 equal the water carried onward through the root-to-leaf hydraulic path. In
 this way, the layer potentials from this page, together with gravity and root
-vulnerability, provide the "downstream water potential" required by the leaf
+vulnerability, provide the "downstream water potential" required by the leaf <!-- SY: Why is it called "downstream" water potential -->
 model's cost function. Solving for $P_{x,r}$ links the soil water balance to
 leaf-level profit maximisation.
 

@@ -160,6 +160,7 @@ $$
 \frac{\partial}{\partial a} N(H | x, a) = - d(x, H, E_a) \, N(H | x, a) - \frac{\partial}{\partial H} \left[g(x, H, E_a) \, N(H | x, a)\right].
 $$ {#eq-pde}
 See @sec-derivation-size-structured for the derivation of this PDE.
+<!-- SY: These display as section numbers, bu the numbers aren't visible in the actual section headings. You could either set number-sections: true in the yaml or use a plain Markdown link e.g. [Infiltration and runoff](#sec-infiltration) and [Drainage](#sec-drainage) define ... -->
 
 The two terms on the right-hand side are a population ledger. The first removes
 plants through mortality. The second describes the flow of plants along the

@@ -12,6 +12,7 @@ its local optimum. Density regulation is **soft**: every habitat contributes a
 fixed share of the next generation, regardless of how many individuals survive
 there. This prevents the most productive habitat from dominating the whole
 population.
+<!-- SY: I don't really understand soft selection -->
 
 When habitat optima are close together, evolution settles on one compromise
 strategy. When they are far enough apart, the same compromise attracts gradual
@@ -24,7 +25,7 @@ and the adaptive growth and branching of the evolutionary tree* [@Geritz-1998].
 ## Fitness equations
 
 There are three habitats ($m=3$), with optima $\mu = (-d, 0, d)$. Habitat $j$
-has capacity $K_j$ and therefore contributes the fraction
+has carrying capacity $K_j$ and therefore contributes the fraction <!-- SY: Add carrying capacity to a glossary? -->
 $c_j = K_j/\sum_h K_h$ of the next generation. Survival within each habitat is
 a Gaussian curve with width $\sigma$:
 
@@ -33,7 +34,7 @@ f_j(x) = \exp\!\left(-\frac{(x-\mu_j)^2}{2\sigma^2}\right).
 $$
 
 For a single resident `x`, the invasion fitness of a mutant `y` (a log per-capita
-growth, zero at the resident) is
+growth, which is zero at the resident) is
 
 $$
 s_x(y) = \log \sum_{j} c_j \, \frac{f_j(y)}{f_j(x)}.
@@ -42,7 +43,7 @@ $$
 The singular strategy is the capacity-weighted mean optimum,
 $x^\* = \sum_j c_j \mu_j$. It equals zero when the three habitats have equal
 capacities. Evolution always moves towards this strategy, but what happens on
-arrival depends on the separation of habitat optima:
+arrival depends on the separation of habitat optima: <!-- SY: On arrival of a mutant? -->
 
 - if $d/\sigma > \sqrt{3/2} \approx 1.2247$, it is a branching point;
 - below that threshold, it is a continuously stable strategy (CSS): evolution

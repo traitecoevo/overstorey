@@ -68,6 +68,8 @@ tidy_assembly(obj) |>
   theme_classic()
 ```
 
+<!-- SY: Explain this figure more? -->
+
 ## Fitness landscape
 
 Stochastic runs do not calculate a complete fitness landscape by default. We can
@@ -87,6 +89,8 @@ ggplot(fp, aes(lma, fitness)) +
   scale_x_log10() +
   theme_classic()
 ```
+
+<!-- SY: Explain this figure more? -->
 
 # Leaf mass per area and height at maturation
 

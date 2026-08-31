@@ -179,7 +179,7 @@ identifier with the archive rather than silently relabelling it as current.
 
 ## For developers
 
-See `plant`'s `agents.md` (§7) for the maintenance rules. Family-wide
+See [`plant`'s `agents.md`](https://github.com/traitecoevo/plant/blob/develop/agents.md) for the maintenance rules. Family-wide
 conventions live in
 [`plant-meta`](https://github.com/traitecoevo/plant-meta).
 

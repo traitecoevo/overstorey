@@ -5,8 +5,8 @@ title: "Adaptive-dynamics models in regnans"
 theory
 :::
 
-`regnans` includes four small adaptive-dynamics models with explicit invasion-
-fitness equations and demographic equilibria. They run quickly and have known
+`regnans` includes four small adaptive-dynamics models with explicit invasion-fitness 
+equations and demographic equilibria. They run quickly and have known
 solutions, which makes them useful for learning the workflow and checking the
 community-assembly and attractor algorithms. The same calculations are much
 more demanding in the full, size-structured `plant` model.
@@ -37,5 +37,5 @@ plots and run the full [community-assembly algorithm](assembly.qmd). The example
 show how branching and limiting similarity build a multi-strategy community,
 including a two-trait version of DD99.
 
-> Rendering these pages requires `regnans` (and its dependency `plant`) to be
+> Rendering these pages requires [`regnans`](https://github.com/traitecoevo/regnans)  (and its dependency [`plant`](https://github.com/traitecoevo/plant)) to be
 > installed, not just loaded from source.

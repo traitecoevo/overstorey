@@ -38,8 +38,8 @@ Set the scale with `community_start(trait_scale = ...)`. The default is `"log"`.
 
 ## DD99 — limiting similarity in one dimension
 
-When competition covers a narrower trait range than the resource distribution
-(`sigma_C < sigma_K`), the resource optimum is a branching point. Repeated
+When competition covers a narrower trait range than the resource distribution 
+(`sigma_C < sigma_K`), the resource optimum is a branching point. Repeated 
 branching fills trait space with coexisting strategies. Strategies that are too
 similar compete too strongly to coexist, so the survivors are spaced apart.
 This spacing is called **limiting similarity**.
@@ -59,6 +59,8 @@ plot(xs, rep(1, length(xs)), pch = 19, col = "forestgreen", yaxt = "n",
      ylab = "", xlab = "trait x", xlim = c(-3, 3),
      main = sprintf("DD99 assembly: %d species (limiting similarity)", length(xs)))
 ```
+
+<!-- SY: Explain this figure more? -->
 
 ## GK98 — branching to a protected dimorphism
 

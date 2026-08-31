@@ -57,6 +57,7 @@ unnecessarily expensive. An ordinary run uses the supplied introduction
 schedule. When greater numerical accuracy is needed, users can opt in to a
 refinement step that adds nodes only where removing a node would make an
 important population integral too inaccurate.
+<!-- SY: 'adds nodes only where removing a node would ...': Does this make sense? Surely you add nodes when having the default introduction schedule is insufficient, not when removing the node would make it too inaccurate? -->
 
 Read [The node-spacing algorithm](node-spacing.qmd) for the refinement test and
 worked diagnostics.
@@ -70,7 +71,8 @@ or eco-evolutionary analysis.
 
 Read [Canopy models](canopy-models.qmd) for the available shading models, their
 computational cost, and the reason PPA requires a smoothed light profile under
-adaptive ODE stepping.
+adaptive ODE stepping. <!-- SY: What is PPA? -->
+<!-- SY: I didn't know there were multiple shading models available when learning about how shade was represented in the FF16 and TF24 canopy light models -->
 
 ## Numerical tools inside the solver
 

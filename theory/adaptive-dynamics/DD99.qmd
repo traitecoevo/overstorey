@@ -31,8 +31,10 @@ K(x) = K_0 \exp\!\left(-\frac{(x-x_0)^2}{2\sigma_K^2}\right),
 C(d) = \exp\!\left(-\frac{d^2}{2\sigma_C^2}\right).
 $$
 
+<!-- SY: What do these equations represent? -->
+
 For a rare mutant `y` in a resident community $\{x_i, N_i\}$ at demographic
-equilibrium, the invasion fitness (a per-capita growth **rate**, zero at the
+equilibrium, the invasion fitness (a per-capita growth **rate**, which is zero for the
 resident) is
 
 $$
@@ -90,7 +92,7 @@ curv(resident_at(harness_dd99(sigma_C = 1.5), 0), 0)        # < 0  → ESS
 
 A pairwise invasibility plot shows the sign of $s(y)$ for each resident `x` and
 mutant `y`. Green marks combinations for which the mutant can invade. The two
-green wedges on either side of `x0 = 0` show that nearby mutants can invade the
+green wedges on either side of `x0 = 0` show that nearby mutants can invade the <!-- SY: Which green wedges? -->
 singular resident, which is the signature of branching.
 
 ```{r pip}

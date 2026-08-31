@@ -70,7 +70,7 @@ community_eq$resident_fitness
 community_eq$selection_gradient
 ```
 
-The resident fitness is close to zero because its population has been brought to
+The resident fitness is close to zero because its population has been brought to <!-- SY: Why is it not exactly zero? -->
 demographic equilibrium. The positive selection gradient means that a mutant
 with slightly larger `lma` would have an advantage.
 
@@ -246,3 +246,5 @@ arrows converge near the joint attractor, where both components approach zero.
 `regnans` does not yet provide a two-dimensional equivalent of
 `community_solve_singularity_1D()`, so this example locates the attractor
 approximately from the vector field.
+<!-- SY: Are all arrows supposed to face the right? Is that what is meant by there's only a 1D solver? -->
+
