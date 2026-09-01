@@ -134,7 +134,7 @@ A~(C_i) = \frac{g_c(\psi_{l})(C_a - C_i)}{P_{atm}}.
 $$ {#eq-assim-ci}
 
 Here, $P_{atm}~(kPa)$ is atmospheric pressure and $g_c$ is stomatal
-conductance to $CO_2$. Water vapour and carbon dioxide diffuse at different
+conductance to $CO_2$. Water vapour and carbon dioxide diffuse at different <!--SY: Is the same as g_s which is used later in calculating E_demand?-->
 rates, so conductance to $CO_2$ is calculated from conductance to water,
 $g_w$, as
 
@@ -320,6 +320,8 @@ tibble(C_i = C_i) %>%
   theme_classic()
 ```
 
+<!-- SY: I'm confused how this links back to how "The model must find a value of 𝐶𝑖 at which the diffusive supply of carbon dioxide and its biochemical use agree." -->
+
 The `A_net` calculation also subtracts dark respiration. Adding that respiration
 term back helps show how the co-limited curve relates to $A_c$ and $A_j$ before
 the respiratory deduction.
@@ -438,8 +440,7 @@ Atmospheric demand is
 
 $$
 E_{demand} = \frac{g_sD}{P_{atm}},
-$$ 
-{#eq-e-demand}
+$$ {#eq-e-demand}
 
 where $D~(kPa)$ is atmospheric vapour pressure deficit and $g_s$ is stomatal
 conductance. The model uses atmospheric VPD rather than leaf-to-atmosphere VPD;
