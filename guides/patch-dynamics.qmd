@@ -16,6 +16,7 @@ the characteristics of the model's partial differential equation. See the
 [size-structured PDE](../theory/size-structured-pde.qmd) being solved and the
 [characteristic method](../theory/implementation/characteristic-method.qmd)
 used to solve it.
+<!-- SY: I think there might need to be more explanation of nodes and cohorts here for people who haven't read the theory yet. Something like what's found in the Patch section of Overview / The big picture? -->
 
 ## Set up the patch
 
@@ -31,6 +32,8 @@ library(plant)
 
 params <- scm_base_parameters("FF16")
 ```
+
+<!-- SY: What does scm stand for? -->
 
 ```{r}
 #| include: false
@@ -104,6 +107,8 @@ t <- result$steps$time
 h <- t(sdd_matrix(dplyr::filter(result$species, species == "1"), "height"))
 ```
 
+<!-- SY: sdd_matrix() is defined in the setup chunk but never defined to the reader. Could change it to #| echo: true or #| code-fold: true? -->
+
 here `h` is the height of every node, arranged so that each row is a *time* and
 each column is a *node*:
 
@@ -160,6 +165,7 @@ introduction, with the last two steps having the same number of nodes. With
 multiple species there can be more time steps than node introductions, as we'll
 record data at every node introduction for *either* species when their schedules
 differ.
+<!-- SY: I think this might need more explanation or demonstration with the data frame? At this point I don't think the reader understands time steps and node introductions that well. -->
 
 FF16 individuals grow taller through time, but their growth rate depends on
 both their size and the light reaching their canopy. Competition therefore
@@ -174,6 +180,8 @@ We can plot the trajectories of nodes developing within a patch over time:
 matplot(t, h, lty=1, col=util_colour_set_opacity("black", 0.25), type="l",
         las=1, xlab="Time (years)", ylab="Height (m)")
 ```
+
+<!-- SY: Still trying to wrap my head around nodes and cohorts. Nodes are a numerical implementation thing but also does it have a biological meaning, like this is what the size distribution looks like given continuous recruitment through time? Are nodes removed below a certain density? -->
 
 The light environment — canopy openness as a function of height — is stored over
 each time step; see [Canopy & light-environment models](../theory/implementation/canopy-models.qmd)
@@ -235,10 +243,12 @@ The repeated waves reflect recruitment followed by self-thinning. Mortality is
 not instantaneous, so a one-species patch can briefly recruit more plants than
 the closed canopy can support.
 
+<!-- SY: What does this second sentence mean? -->
+
 ## Leaf area index in one patch
 
 Leaf area index (LAI) is total leaf area per unit ground area. The collected
-output records individual leaf area as `competition_effect`; weighting it by
+output records individual leaf area as `competition_effect`; weighting it by <!-- SY: I thought that we don't model individual leaf area? -->
 node density and integrating over height gives patch-level LAI. FF16 multiplies
 LAI by the light extinction coefficient `k_I` to obtain the ground-level
 optical depth used by its canopy model:
@@ -312,6 +322,8 @@ or eliminated.
 The dynamics are easier to see when node trajectories are weighted by node
 density (some of the lines here represent nodes at close to zero density). Log
 density is available as a characteristic variable of all `plant` strategies:
+
+<!-- SY: I feel like the node density-weighted plots could be the default visualisation. -->
 
 ```{r}
 #| label: plot-density-weighted
@@ -427,4 +439,12 @@ patch <- function(result, threshold = 1e-3) {
          alpha = "Density") +
     theme_bw()
 }
+```
+
+<!-- SY: Add an example here? -->
+<!-- SY: Also, this only plots species 1? -->
+
+```{r}
+library(ggplot2)
+patch(result_2sp)
 ```
