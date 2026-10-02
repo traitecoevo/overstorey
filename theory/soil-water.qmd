@@ -20,8 +20,8 @@ Only the hydraulically explicit strategies — `TF24` and `TF24f` — carry a so
 water balance. `FF16` and `K93` have no below-ground state: FF16's environment
 tracks canopy openness, while K93's tracks the cumulative basal area of larger
 neighbours. Throughout this page, "the environment" means
-`TF24_Environment`, not the shared base class.
-:::
+`TF24_Environment`, not the shared base class. <!-- SY: What is the shared base class? -->
+::: 
 
 ## The idea first
 

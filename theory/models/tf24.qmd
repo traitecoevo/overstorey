@@ -30,8 +30,10 @@ carbon-equivalent hydraulic cost**.
 The cost is expressed in carbon units so it can be subtracted from
 photosynthetic gain. In the original formulation, it represents the carbon
 needed to restore xylem conductivity lost through cavitation.
+<!-- SY: Which original formulation? -->
+<!-- SY: The carbon needed to restore xylem conductivity through what mechanism? Rebuilding xylem? -->
 
-This operating point is not prescribed by an empirical stomatal-response
+This operating point is not prescribed by an empirical stomatal-response <!-- SY: What's an operating point? -->
 curve. It emerges from the interaction among leaf biochemistry, atmospheric
 demand, soil water, plant size, and hydraulic traits. The calculation combines:
 
@@ -54,6 +56,8 @@ why it was added to the model and how it connects to whole-plant growth.
 | Water | implicit | explicit supply–demand hydraulics with a vulnerability curve |
 | Stomata | — | conductance set by profit maximisation |
 | Allocation / growth | functional balance (shared) | functional balance (shared) |
+<!-- SY: Could say none or not modelled instead '—' maybe? -->
+<!-- SY: Still not sure what functional balance means -->
 
 TF24 changes how the plant calculates carbon income at the leaf. The
 subsequent steps are inherited from FF16: assimilated carbon is allocated to
@@ -64,7 +68,7 @@ the [size-structured PDE](../size-structured-pde.qmd).
 
 Earlier versions of the `plant` framework could explain how traits affect
 growth through tissue construction, allocation, respiration, and turnover, but
-water availability entered that framework only indirectly. Towers et al.
+water availability entered that framework only indirectly. @Towers-2024
 connected those whole-plant growth rules to an explicit stomatal and hydraulic
 model. This made it possible to follow a continuous chain from the environment
 to plant performance:
@@ -139,7 +143,7 @@ alone [@Towers-2024].
 
 ## Traits that connect hydraulics to growth
 
-Towers et al. focused on four measurable traits that connect water transport to
+@Towers-2024 focused on four measurable traits that connect water transport to
 the wider carbon budget. In TF24, each trait can help one part of the plant's
 carbon-water economy while imposing a cost elsewhere.
 
@@ -172,21 +176,22 @@ and atmospheric conditions [@Towers-2024].
 
 ## How the paper relates to current TF24
 
-Towers et al. introduced the physiological module and used it in an outer
+@Towers-2024 introduced the physiological module and used it in an outer
 trait-optimisation analysis. That analysis is best read as a worked application
 of TF24: it shows how the model can be used to investigate trait-environment
 trade-offs, but its predicted trait responses are not rules built into the
 strategy. A normal TF24 simulation uses fixed strategy traits unless the user
 places it inside a separate evolutionary or optimisation analysis
 [@Towers-2024].
+<!-- SY: Talk about the adaptive dynamics regnans framework? -->
 
-The distinction between the published experiment and the current `plant`
-implementation is also important. Towers et al. supplied a fixed soil water
+There is another distinction between the published experiment and the current `plant`
+implementation. @Towers-2024 supplied a fixed soil water
 potential and did not simulate competition, reproduction, mortality, or a
 changing soil water balance. The current TF24 strategy can instead receive
 water from the dynamic, multi-layer soil-water and root-uptake model described
 below. The paper is therefore the source for TF24's physiological logic and
-original tests, while the linked theory pages describe the broader model in
+original tests, while the linked theory pages below describe the broader model in
 which that physiology now operates.
 
 ## Soil water and root uptake
@@ -194,7 +199,7 @@ which that physiology now operates.
 The leaf model needs to know how much water the roots can supply. In TF24, the
 plant's hydraulic calculation extends down to the root collar. A separate soil
 water model tracks the water balance and calculates uptake from multiple soil
-layers, providing the water supply at that boundary. These calculations are
+layers, providing the water supply at the root collar boundary. These calculations are
 described on their own core theory page:
 
 - **[Soil water & root uptake](../soil-water.qmd)** — the multi-layer bucket
@@ -214,6 +219,7 @@ connects leaf hydraulics to the FF16 growth framework. It is not a parameter
 reference. The exact current parameter set and its links to the whole-plant
 implementation still need a separate, version-specific account.
 :::
+<!-- SY: Is this callout note necessary? I feel like it's implicit based on being in the theory section. Maybe a link to the current parameter set could be added here? -->
 
 ## TF24f: acclimation lag instead of instantaneous re-optimisation
 
@@ -223,13 +229,15 @@ again and places the plant directly at the new optimum. This quasi-steady-state
 assumption is useful, but it cannot represent a plant that is still adjusting
 to a change in its environment.
 
-TF24f introduces that adjustment time. It uses the same physiology as TF24:
+<!-- SY: If you're reading these theory docs in order, the implementation section comes after and so this part doesn't make much sense -->
+
+TF24f introduces that adjustment time. It uses the same physiology as TF24: <!-- SY: expand on what it means by adjustment time? -->
 the same leaf model, xylem vulnerability curve, and soil-water coupling. The
-implementation subclasses `TF24_Strategy`, so the carbon-income and
+implementation subclasses `TF24_Strategy`, so the carbon-income and <!-- SY: what does it mean to 'subclass'? -->
 water-transport calculations described on
 [Assimilation & hydraulics](../assimilation-hydraulics.qmd) are inherited
 unchanged. The only difference is *how the plant moves towards the most
-profitable hydraulic operating point*.
+profitable hydraulic operating point*. 
 
 In TF24, a golden-section search over root-collar water potential is used at
 every step to find the $\psi$ that maximises the profit $P(\psi_l)$ defined on
@@ -238,6 +246,8 @@ TF24f instead adds a sixth ODE state, `opt_root_psi_state`, which records the
 plant's current root-collar water potential. Gradient ascent then moves this
 state towards the profit-maximising value rather than allowing it to jump
 there immediately:
+
+<!-- SY: This is all quite technical, but maybe that's okay -->
 
 $$
 \frac{d\psi}{dt} = k_{\text{acclim}} \cdot \frac{dP}{d\psi}
@@ -297,3 +307,5 @@ want to introduce an extra state or choose an acclimation-rate parameter. TF24
 is also the right choice when results must match TF24 exactly: TF24f approaches
 its behaviour as $k_{\text{acclim}} \to \infty$, but does not reproduce it
 bit for bit.
+
+<!-- SY: Is the last sentence not obvious? Is this Claude being verbose? -->

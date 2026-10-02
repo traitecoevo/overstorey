@@ -10,7 +10,8 @@ theory · start here
 patches. Rather than simulating every tree as an independent object, its main
 solver describes a population by the distribution of plant sizes and follows
 how that distribution changes through growth, mortality, and recruitment.
-<!-- SY: What is its 'main solver'? Should this be assumed knowledge? -->
+<!-- SY: What is its 'main solver'? Add to the glossary! -->
+<!-- SY: Add even broader overview of why we use `plant` -->
 
 The biological details are supplied by a **strategy**. A strategy determines
 how an individual plant responds to its size and surroundings: how quickly it
@@ -52,9 +53,8 @@ These inputs are specified by the user. What is not specified directly is the
 resulting stand structure. Plant sizes, population densities, canopy structure,
 self-thinning, and changes in community composition arise from the simulated
 growth, death, recruitment, and competition.
-<!-- SY: Would it be worth mentioning here that seed input can be defined by the
-eco-evolutionary dynamics in the regnans package? -->
-<!-- SY: It's not clear to me how disturbance regime is linked to 'the duration and age weighting of patches' and 'how a patch trajectory is scaled up to a landscape' -->
+<!-- SY: Can seed input be defined by the eco-evolutionary dynamics in the regnans package? Is it always initially defined by the user? I thought seed input is defined by fecundity when the metacommunity is at equilibrium? -->
+<!-- SY: It's not clear to me yet how disturbance regime is linked to 'the duration and age weighting of patches' and 'how a patch trajectory is scaled up to a landscape' -->
 
 ## Biology and population dynamics
 
@@ -159,6 +159,7 @@ The ecological model is organised at three scales: individuals, patches, and
 the metacommunity. **Nodes are not a fourth ecological scale;** they are the
 numerical objects that the solver uses to represent groups of similar plants
 within a patch.
+<!-- SY: I think the concept of nodes in this context is confusing even as someone who has a bit of modelling experience. -->
 
 ```{mermaid}
 flowchart LR
@@ -187,7 +188,7 @@ an early node might represent a small number of large survivors, while a recent
 node might represent many small recruits. Together, all the nodes describe the
 current population in that one patch.
 <!-- SY: Is it accurate to call them early and recent nodes? Is a node based on size or recruitment time? -->
-<!-- SY: Why 'for each strategy'? -->
+<!-- SY: Why 'for each strategy'? I think here strategy is used to mean the trait combination / species, instead of the model -->
 
 Now zoom out to the landscape. Some patches were disturbed recently and are
 young; others have developed for decades. The metacommunity combines the

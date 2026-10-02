@@ -155,7 +155,7 @@ The biochemical side uses the photosynthesis model of Farquhar et al. (1980).
 It calculates a Rubisco-limited rate,
 $A_c~(umol~m^{-2}~s^{-1})$, and an electron-transport-limited rate,
 $A_j~(umol~m^{-2}~s^{-1})$. Net assimilation follows the more limiting process,
-with a smooth transition between them. <!-- SY: What is meant by a smooth transition between them? -->
+with a smooth transition between them. <!-- SY: What is meant by a smooth transition between them? Oh I see with the graphs down below, maybe could explain better here, or omit. -->
 
 The electron-transport-limited rate depends on both light availability and
 $C_i$:
@@ -334,9 +334,9 @@ more negative physical water potential than the soil. In the positive-magnitude
 notation used here, this means that $\psi_l$ must be larger than $\psi_s$.
 
 Making that gradient steeper can supply more water, but it also reduces the
-conductance of the xylem pathway as embolism risk increases. The formulation
+conductance of the xylem pathway as embolism risk increases. The formulation <!-- SY: Add embolism to the glossary or expand here -->
 developed on this page represents the hydraulic pathway with the following
-vulnerability curve:
+vulnerability curve: <!-- SY: I don't think k_l has been defined anywhere -->
 
 $$
 k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
@@ -358,6 +358,7 @@ data %>%
   theme_classic()
 ```
 
+<!-- SY: Why is it psi_stem here not psi_leaf? I think I'm confused on what this figure means. I thought it was meant to demonstrate, for a given soil potential, that increasing leaf water potential should decrease conductance because of embolism risk. But then the graph below about E_supply is integrating the curve between soil and leaf psi to get water supply, which conflicts with my understanding. Ah and then later there's a figure holding soil psi fixed. I think there could be clearer explanations. -->
 
 $b~(MPa)$ controls the sensitivity of the curve and $c$ controls its shape. The
 value of $b$ is calculated as
@@ -367,6 +368,8 @@ $$b = \frac{p_{50}}{-log(1-\frac{50}{100}^{\frac{1}{c}})},$$
 where $p_{50}$ is the $\psi_l$ at which 50% of hydraulic conductance is lost.
 If two points on a hydraulic vulnerability curve are known, they can be used to
 calculate $c$. Here, an empirical value for $c$ is obtained from AusTraits.
+
+<!-- SY: Would it be worth showing what different b and c parameters look like on the plot? -->
 
 $p_{50}$ is in turn calculated from an empirical relationship with the
 hydraulic conductivity of the xylem pathway. In this relationship, more
@@ -415,7 +418,7 @@ Holding $\psi_s$ fixed, the next plot shows how $E_{supply}$ changes as
 $\psi_l$ becomes more negative. Supply initially rises as the potential
 gradient increases, but the rise tapers because conductance is simultaneously
 being lost along the vulnerability curve. Increasing hydraulic strain therefore
-produces progressively smaller gains in water supply.
+produces progressively smaller gains in water supply. <!-- SY: This graph says psi_stem not psi_leaf -->
 
 ```{r}
 data %>%
@@ -429,6 +432,7 @@ data %>%
 The feasible range ends at a critical value, $\psi_{crit}$, beyond which the
 xylem is assumed to fail catastrophically. Here, $\psi_{crit}$ is the
 $\psi_l$ at which 95% of conductance has been lost.
+<!-- SY: psi crit is not on any of the figures, and this follows the Esupply figure not the conductance figure -->
 
 The revenue calculation requires stomatal conductance, while the hydraulic
 calculation gives water supply. The two are joined by requiring water supplied
@@ -444,7 +448,8 @@ $$ {#eq-e-demand}
 
 where $D~(kPa)$ is atmospheric vapour pressure deficit and $g_s$ is stomatal
 conductance. The model uses atmospheric VPD rather than leaf-to-atmosphere VPD;
-the latter would also depend on differences between leaf and air temperature.
+the latter would also depend on differences between leaf and air temperature. 
+<!-- SY: Not sure sure what the last bit means about differences between leaf and air temperature -->
 
 For a fixed $D$, increasing $g_s$ increases $E_{demand}$. Meeting that demand
 requires a more negative leaf water potential, which causes further loss of
@@ -462,6 +467,8 @@ $b_1(\mu mol~m^{-2}~s^{-1})$ converts conductivity loss to a carbon cost, and
 $b_2~(unitless)$ controls the shape of the cost curve. The term in parentheses
 is the proportion of conductivity lost at $\psi_l$, so $H=0$ when
 $\psi_l = 0$ and increases as conductivity is lost.
+<!-- SY: There are multiple parentheses -->
+<!-- SY: How is conductivity loss translated to a carbon cost? Is it the cost of replacing the embolised sapwood? -->
 
 $z$ depends on plant size and the Huber value, and represents the volume of
 sapwood supplying each unit of leaf area:
@@ -503,6 +510,8 @@ data %>%
   geom_vline(xintercept = 2.05, linetype = "dashed")
 ```
 
+<!-- SY: psi_stem on the x axis again -->
+
 The explicit calculation is useful for seeing where the three curves come from.
 In normal use, TF24 performs the same sequence through its built-in
 `profit_psi_stem_TF` function.
@@ -527,11 +536,11 @@ data  %>%
 
 ## Optimising profit
 
-The leaf submodel ultimately needs two outputs under the current environmental
+The leaf submodel ultimately needs two outputs under the current environmental <!-- SY: creates or needs outputs? -->
 conditions and plant state: carbon assimilation and water use per unit leaf
 area. Obtaining them requires finding the $\psi_l$ that maximises $P$ in
 @eq-profit. Once that operating point is known, the corresponding transpiration
-$E$ can also be passed to the soil-water calculation.
+$E$ can also be passed to the soil-water calculation. <!-- SY: Transpiration and soil-water calculation hasn't been explained yet, so this sounds vague -->
 
 TF24 uses a golden-section search. The search starts with a lower and upper
 bound and repeatedly narrows the interval containing the maximum until that
@@ -611,3 +620,9 @@ TF24 repeats this calculation as plant size and environmental conditions change.
 The resulting assimilation contributes to the whole-plant carbon balance, while
 transpiration feeds back on the soil-water state described in
 [Soil water & root uptake](soil-water.qmd).
+
+<!-- SY: Link to TF24 page? -->
+
+<!-- SY: Add references -->
+
+## References
