@@ -595,7 +595,8 @@ while (abs(bound_b - bound_a) > delta_crit) {
 (transpiration = leaf$transpiration_)
 ```
 
-### Validation against the compiled implementation
+### Validation against the compiled implementation 
+<!-- SY: Could make this section more layperson-friendly -->
 
 The final chunk calls the corresponding built-in TF24 `Leaf` optimisation. Its
 purpose is to check that the compiled implementation returns the same optimum,
