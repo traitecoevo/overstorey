@@ -103,21 +103,14 @@ comm$resident_fitness          # ≈ 0
 
 The green regions show which mutant seed sizes can invade each resident seed
 size. The pattern around the singular strategy shows that mutants on either side
-can invade, as expected at a branching point.
+can invade, as expected at a branching point. Seed size is a strictly positive
+trait, so the community uses the log trait scale and the axes follow it.
 
 ```{r pip}
 #| fig-width: 5
 #| fig-height: 5
-h  <- harness_gm99(alpha = 7, beta = 15)
-xs <- seq(0.06, 0.95, length.out = 81)
-S <- sapply(xs, function(res) {
-  community_start(bounds(x = range(xs)), harness = h) |>
-    community_add(trait_matrix(res, "x")) |>
-    community_demography() |>
-    (\(comm) comm$fitness_function(xs))()
-})
-image(xs, xs, t(sign(S)), col = c("white", "grey85", "forestgreen"),
-      xlab = "resident seed size", ylab = "mutant seed size",
-      main = "GM99 PIP (alpha*R = 7, beta*R = 15)")
-abline(0, 1, lty = 2)
+pip <- community_start(bounds(x = c(0.06, 0.95)), trait_scale = "log",
+                       harness = harness_gm99(alpha = 7, beta = 15)) |>
+  community_pip()
+plot(pip) + ggplot2::ggtitle("GM99 (alpha R = 7, beta R = 15)")
 ```

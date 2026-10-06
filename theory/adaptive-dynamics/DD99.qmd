@@ -93,16 +93,15 @@ mutant `y`. Green marks combinations for which the mutant can invade. The two
 green wedges on either side of `x0 = 0` show that nearby mutants can invade the
 singular resident, which is the signature of branching.
 
+`community_pip()` solves each resident of a grid to equilibrium and evaluates
+every mutant against it, then locates the zero contours exactly and draws the
+regions they bound; the lines are the contours $s(y; x) = 0$, one of which is
+always the diagonal.
+
 ```{r pip}
 #| fig-width: 5
 #| fig-height: 5
-xs <- seq(-2, 2, length.out = 81)
-S <- sapply(xs, function(res) {
-  resident_at(h, res)$fitness_function(xs)   # vector over all mutants
-})                                            # S[mutant, resident]
-
-image(xs, xs, t(sign(S)), col = c("white", "grey85", "forestgreen"),
-      xlab = "resident trait x", ylab = "mutant trait y",
-      main = "DD99 PIP (sigma_C = 0.4 < sigma_K = 1)")
-abline(0, 1, lty = 2)
+pip <- community_start(bounds(x = c(-2, 2)), trait_scale = "linear", harness = h) |>
+  community_pip()
+plot(pip) + ggplot2::ggtitle("DD99 (sigma_C = 0.4 < sigma_K = 1)")
 ```
