@@ -34,7 +34,8 @@ rainfall driver with value `1`:
 env <- Environment("TF24")
 ```
 
-Replace it with a different constant when rainfall is fixed:
+<!-- SY: How do you see what the current value is? -->
+You can replace it with a different constant when rainfall is fixed:
 
 ```{r}
 env <- Environment("TF24")
@@ -126,12 +127,14 @@ drought_y <- ifelse(x_pts >= 80 & x_pts <= 120, 0.1, 1)
 env <- Environment("TF24")
 env$extrinsic_drivers_set_variable("rainfall", x_pts, drought_y)
 ```
+<!-- SY: Could we have a plot here showing what the spline might look like for the drought pulse? I'm not sure what kind of spline is fit. -->
 
+<!-- SY: Would be great to see the outcomes of the different rainfall regimes with some plots. -->
 Only the TF24 and TF24f strategies read these atmospheric and leaf drivers
 (`atm_vpd`, `ca`, `leaf_temp`, `atm_o2_kpa`, `atm_kpa`) and couple them into
 the leaf-level water economy described in
 [Assimilation & hydraulics](../theory/assimilation-hydraulics.qmd). FF16 and
-K93 instead use their canopy light profile; they do not read these TF24 climate
+K93 instead use their canopy light profile; they do not read these TF24 climate <!-- SY: Could be more explicit here: FF16 and K93 instead use their canopy light profile for what? -->
 drivers. All strategies can receive the separate, per-species `birth_rate`
 driver described below.
 
@@ -140,6 +143,8 @@ driver described below.
 A species' birth rate describes the seed rain entering each patch. In the
 [size-structured PDE](../theory/size-structured-pde.qmd), it is the boundary
 condition that introduces new plants.
+
+<!-- SY: How do birth rates relate to the node introduction schedule? If a node gets introduced at time x, does the birth rate define the density of recruits at that time x? -->
 
 Pass birth rates to `add_strategies()`. Each species needs one entry: either a
 constant number or a list of `x` and `y` control points.
@@ -178,3 +183,5 @@ received the intended recruitment schedule:
 ```{r}
 out$patch$species[[1]]$extrinsic_drivers$evaluate("birth_rate", 7)
 ```
+
+<!-- SY: Would be cool to see the outcome of changing the birth rates here with a plot. -->

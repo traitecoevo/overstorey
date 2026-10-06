@@ -17,6 +17,10 @@ multi-layer soil-water balance. `Environment("TF24")` already provides five soil
 layers, an initial moisture state, and constant rainfall. The helper below shows
 how to replace those defaults with 15 layers and seasonal rainfall.
 
+<!-- SY: I think a lot of the Guides sections uses jargon-y language and style characteristic of `plant` and modelling, which might be daunting or unhelpful to non-modellers and beginners. Perhaps there could be more explicit discernment between the biology and the model. Maybe the Guides are also a bit hard to grasp unless someone has read the Theory section. It would help if Overstorey had an even broader overview page about why and what we use `plant` for, accessible to modellers and non-modellers alike. 
+
+I think a lot of underlying concepts might get missed by the non-modeller. For example, the simple sentence "The TF24 model couples plant growth to a multi-layer soil-water balance." can be easily understood by a plant modeller, but to a non-modeller, I wonder if they would benefit from something more explicit, even if it's wordier. "Couples" and "balance" feel a bit jargon-y to me. I like something closer to this: "The TF24 model tracks soil water at several depths. Plants draw on that water to grow, and as they use it, the soil dries out, which then limits further growth." -->
+
 TF24's hydraulic calculations make long runs expensive, so this example stops
 at a patch age of 25 years. Choose a lifetime appropriate to your scientific
 question for a production analysis.
@@ -67,6 +71,7 @@ make_tf24_env <- function(max_patch_lifetime, n_layers = 15, theta0 = 0.2) {
 A minimal run needs base parameters, at least one strategy, and an environment.
 The first call refines the node-introduction schedule; the second runs the patch
 and collects its state:
+<!-- SY: Maybe should explain more why two runs are needed? Are they always necessary? If we're interested in two strategies why are we doing a minimal run and refining the node-introduction schedule with one strategy? I thought there was an argument to refine the schedule in `run_scm`? -->
 
 ```{r}
 #| label: minimal-run
@@ -83,7 +88,7 @@ results <- run_scm(p1, env = env, refine_schedule = TRUE)$parameters
 results <- run_scm(results, env = env, collect = TRUE)
 ```
 
-For repeated analyses, helper functions keep assumptions in one place. The
+For repeated analyses, helper functions keep assumptions in one place. The <!-- SY: What assumptions? -->
 first helper starts from TF24 defaults and changes four strategy parameters:
 
 ```{r}
@@ -104,7 +109,7 @@ base_parameters <- function() {
 The run helper below combines three kinds of input:
 
 - biological choices: traits, birth rates, and `B_lf1`;
-- location: latitude, used by the TF24 hyperparameterisation;
+- location: latitude, used by the TF24 hyperparameterisation; <!-- SY: What does latitude have to do with the model? -->
 - a numerical choice: whether to refine the node-introduction schedule.
 
 ```{r}
@@ -159,6 +164,8 @@ results_tidy <- results
 results_tidy
 ```
 
+<!-- SY: I think this output is way too long. -->
+
 Each line in the size-distribution plot follows one node through time. New nodes
 enter at times chosen by the node schedule, so a recorded step is not the same
 as one year. Line transparency represents node density: darker trajectories
@@ -171,6 +178,7 @@ results_tidy$species %>%
   plot_size_distribution()
 ```
 
+<!-- SY: Maybe add some interpretation here about what the plot shows, e.g. it stabilises to an overstorey created by species 1 and an understorey around 2 m of species 2. -->
 
 ## Calculate patch totals for each strategy
 
@@ -187,6 +195,7 @@ data_species_tot
 ```
 
 Plotting that total shows how stem density changes as the patch develops:
+<!-- SY: Why stem density, not individual density? -->
 
 ```{r}
 #| label: plot-total-density
@@ -194,6 +203,8 @@ data_species_tot %>%
   ggplot(aes(time, density, colour=species)) +
   geom_line()
 ```
+
+<!-- SY: Maybe better to label species 1 and 2 with their LMA values? -->
 
 `expand_state()` derives additional quantities, including leaf area and tissue
 mass, from the states returned by the solver:
@@ -204,6 +215,8 @@ results_tidy_expand <- results_tidy %>% expand_state()
 
 results_tidy_expand$species
 ```
+
+<!-- SY: Difference between patch_density and density? -->
 
 To obtain total leaf area, the helper weights individual leaf area by node
 density and integrates over height at each time:
@@ -222,6 +235,7 @@ data_species_tot %>%
 
 In this run, the thin-leaved strategy initially deploys more total leaf area but
 is later overtaken by the thicker-leaved strategy.
+<!-- SY: I don't see this being the case? Species 2 always has lower leaf area. -->
 
 The expanded totals also show how above-ground biomass is divided among leaf,
 bark, sapwood, and heartwood through time:
@@ -246,10 +260,11 @@ data_long %>%
   geom_area() +
   labs(x = "Patch age (yr)", y = "Above ground mass (kg/m2)") +
   theme_classic() +
-  xlim(c(0,100)) +
+  xlim(c(0, 25)) +
   facet_wrap(~species_name)
 ```
 
+<!-- SY: Maybe explain here that Species 2 has values too small to be plotted? -->
 
 ## Interpolate to specific times
 
@@ -258,8 +273,7 @@ The node-introduction schedule sets the times at which new
 simulation. It can optionally be refined by the
 [node-spacing algorithm](../theory/implementation/node-spacing.qmd). The
 recorded steps therefore may not fall at the exact times we want to query.
-`interpolate_to_times()` estimates the node states at 1, 5, and 10 years from
-the existing run:
+`interpolate_to_times()` estimates the node states at times we are interested in, e.g., 1, 5, and 10 years from an existing run:
 
 ```{r}
 #| label: interpolate-times
