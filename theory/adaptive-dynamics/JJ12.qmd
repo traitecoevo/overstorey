@@ -62,8 +62,8 @@ library(regnans)
 a <- 0.125; x_opt <- 0; sigma <- 10
 h <- harness_jj12(a = a, x_opt = x_opt, sigma = sigma, R0 = 1, K = 5, p = 0.5)
 
-out <- community_start(bounds(x = c(-40, 40)), harness = h) |>
-  community_solve_singularity_1D()
+out <- community_start(bounds(x = c(-40, 40)), harness = h, trait_scale = "linear") |>
+  community_solve_singularity()
 
 c(numeric = as.numeric(out$traits),
   analytic = x_opt - a * sigma^2)     # should match: -12.5
@@ -85,7 +85,7 @@ times above it. Small evolutionary steps therefore move the population towards
 #| fig-height: 4
 xs <- seq(-30, 10, length.out = 60)
 grad <- sapply(xs, function(x) {
-  community_start(bounds(x = c(-40, 40)), harness = h) |>
+  community_start(bounds(x = c(-40, 40)), harness = h, trait_scale = "linear") |>
     community_add(trait_matrix(x, "x")) |>
     community_demography() |>
     community_selection_gradient() |>
@@ -107,8 +107,8 @@ evolved arrival date therefore moves farther ahead of the seasonal optimum:
 ```{r mismatch}
 sapply(c(0, 0.04, 0.125), function(a) {
   h <- harness_jj12(a = a, x_opt = 0, sigma = 10)
-  as.numeric(community_start(bounds(x = c(-40, 40)), harness = h) |>
-               community_solve_singularity_1D() |>
+  as.numeric(community_start(bounds(x = c(-40, 40)), harness = h, trait_scale = "linear") |>
+               community_solve_singularity() |>
                (\(comm) comm$traits)())
 })   # 0, -4, -12.5  — earlier arrival as competition for territories intensifies
 ```

@@ -134,13 +134,16 @@ plot_sg
 ## Using a root solver to find the 1D attractor
 
 The sign-change plot helps us see the attractor, but a root finder gives a more
-precise estimate. `community_solve_singularity_1D()` wraps the demographic and
+precise estimate. `community_solve_singularity()` wraps the demographic and
 selection-gradient calculations and searches for the trait value where the
-gradient equals zero:
+gradient equals zero. With one trait it can bracket the root between two
+bounds, which is what we want here, having just seen the sign change between
+them:
 
 ```{r}
 community_attractor <- community0 %>%
- community_solve_singularity_1D(bounds = c(0.05, 0.15), tol = 1e-4)
+ community_solve_singularity(bounds = c(0.03, 0.06), solver = "bracket",
+                             tol = 1e-4)
 
 community_attractor$traits
 ```
@@ -244,7 +247,7 @@ plot_sg
 Each arrow shows the locally favoured direction of evolutionary change. The
 arrows converge near the joint attractor, where both components approach zero.
 To solve for that point directly rather than reading it off the vector field,
-use `community_solve_singularity()`, the multi-trait counterpart of
-`community_solve_singularity_1D()`; `community_classify_singularity()` then
+use `community_solve_singularity()` again, now with two traits (and its
+default Newton solver); `community_classify_singularity()` then
 reports whether it is a CSS, a branching point, a repeller or a Garden of Eden,
 and the direction along which branching would occur.

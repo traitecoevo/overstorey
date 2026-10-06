@@ -58,8 +58,8 @@ library(regnans)
 ```{r singular}
 h <- harness_gk98(d = 1.5, sigma = 1)   # d/sigma = 1.5 > sqrt(1.5) → branching
 
-out <- community_start(bounds(x = c(-4, 4)), harness = h) |>
-  community_solve_singularity_1D()
+out <- community_start(bounds(x = c(-4, 4)), harness = h, trait_scale = "linear") |>
+  community_solve_singularity()
 
 as.numeric(out$traits)   # x* — expected 0 (symmetric three-patch)
 ```

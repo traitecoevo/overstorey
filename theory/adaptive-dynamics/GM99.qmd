@@ -67,7 +67,7 @@ Hold pre-competitive survival at $\beta R = 15$. Weak competitive asymmetry
 solve_x <- function(alpha, beta = 15, bounds_x = c(0.06, 0.95)) {
   community_start(bounds(x = bounds_x),
                   harness = harness_gm99(alpha = alpha, beta = beta)) |>
-    community_solve_singularity_1D()
+    community_solve_singularity()
 }
 
 css    <- solve_x(4.5)   # CSS

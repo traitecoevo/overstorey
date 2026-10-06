@@ -27,8 +27,9 @@ All single-model pages use the same pipeline:
 ```r
 library(regnans)
 h <- harness_dd99()                                   # or _gk98 / _gm99 / _jj12
-community_start(bounds(x = c(-2, 2)), harness = h) |>
-  community_solve_singularity_1D()                    # -> evolutionary attractor
+community_start(bounds(x = c(-2, 2)), harness = h,
+                trait_scale = "linear") |>
+  community_solve_singularity()                       # -> evolutionary attractor
 ```
 
 The DD99, GK98, and GM99 models also support resident communities containing

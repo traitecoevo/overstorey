@@ -60,8 +60,8 @@ then solve for the singular strategy:
 ```{r singular}
 h <- harness_dd99(r = 1, K0 = 500, x0 = 0, sigma_K = 1, sigma_C = 0.4)
 
-out <- community_start(bounds(x = c(-2, 2)), harness = h) |>
-  community_solve_singularity_1D()
+out <- community_start(bounds(x = c(-2, 2)), harness = h, trait_scale = "linear") |>
+  community_solve_singularity()
 
 as.numeric(out$traits)        # x* — expected 0 (= x0)
 ```
@@ -73,7 +73,7 @@ branching can occur:
 
 ```{r curvature}
 resident_at <- function(h, x) {
-  community_start(bounds(x = c(-2, 2)), harness = h) |>
+  community_start(bounds(x = c(-2, 2)), harness = h, trait_scale = "linear") |>
     community_add(trait_matrix(x, "x")) |>
     community_demography()
 }
