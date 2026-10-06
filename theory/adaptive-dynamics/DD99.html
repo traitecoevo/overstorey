@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-7046d0b62750613b1166f62bdcaf074f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-e30b0f8ea5685d2ef6f683bb78d13b16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -549,16 +549,11 @@ s(y) = r\left(1 - \frac{\sum_i N_i\, C(y - x_i)}{K(y)}\right).
 <section id="pairwise-invasibility-plot" class="level3">
 <h3 class="anchored" data-anchor-id="pairwise-invasibility-plot">Pairwise invasibility plot</h3>
 <p>A pairwise invasibility plot shows the sign of <span class="math inline">\(s(y)\)</span> for each resident <code>x</code> and mutant <code>y</code>. Green marks combinations for which the mutant can invade. The two green wedges on either side of <code>x0 = 0</code> show that nearby mutants can invade the singular resident, which is the signature of branching.</p>
+<p><code>community_pip()</code> solves each resident of a grid to equilibrium and evaluates every mutant against it, then locates the zero contours exactly and draws the regions they bound; the lines are the contours <span class="math inline">\(s(y; x) = 0\)</span>, one of which is always the diagonal.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>xs <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="at">length.out =</span> <span class="dv">81</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>S <span class="ot">&lt;-</span> <span class="fu">sapply</span>(xs, <span class="cf">function</span>(res) {</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">resident_at</span>(h, res)<span class="sc">$</span><span class="fu">fitness_function</span>(xs)   <span class="co"># vector over all mutants</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>})                                            <span class="co"># S[mutant, resident]</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(xs, xs, <span class="fu">t</span>(<span class="fu">sign</span>(S)), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"grey85"</span>, <span class="st">"forestgreen"</span>),</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"resident trait x"</span>, <span class="at">ylab =</span> <span class="st">"mutant trait y"</span>,</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">main =</span> <span class="st">"DD99 PIP (sigma_C = 0.4 &lt; sigma_K = 1)"</span>)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pip <span class="ot">&lt;-</span> <span class="fu">community_start</span>(<span class="fu">bounds</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>)), <span class="at">trait_scale =</span> <span class="st">"linear"</span>, <span class="at">harness =</span> h) <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">community_pip</span>()</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pip) <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">ggtitle</span>(<span class="st">"DD99 (sigma_C = 0.4 &lt; sigma_K = 1)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
