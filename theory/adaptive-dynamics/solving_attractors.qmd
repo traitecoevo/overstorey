@@ -243,6 +243,8 @@ plot_sg
 
 Each arrow shows the locally favoured direction of evolutionary change. The
 arrows converge near the joint attractor, where both components approach zero.
-`regnans` does not yet provide a two-dimensional equivalent of
-`community_solve_singularity_1D()`, so this example locates the attractor
-approximately from the vector field.
+To solve for that point directly rather than reading it off the vector field,
+use `community_solve_singularity()`, the multi-trait counterpart of
+`community_solve_singularity_1D()`; `community_classify_singularity()` then
+reports whether it is a CSS, a branching point, a repeller or a Garden of Eden,
+and the direction along which branching would occur.
