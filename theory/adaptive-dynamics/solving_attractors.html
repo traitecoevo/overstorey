@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -571,14 +571,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="using-a-root-solver-to-find-the-1d-attractor" class="level2">
 <h2 class="anchored" data-anchor-id="using-a-root-solver-to-find-the-1d-attractor">Using a root solver to find the 1D attractor</h2>
-<p>The sign-change plot helps us see the attractor, but a root finder gives a more precise estimate. <code>community_solve_singularity_1D()</code> wraps the demographic and selection-gradient calculations and searches for the trait value where the gradient equals zero:</p>
+<p>The sign-change plot helps us see the attractor, but a root finder gives a more precise estimate. <code>community_solve_singularity()</code> wraps the demographic and selection-gradient calculations and searches for the trait value where the gradient equals zero. With one trait it can bracket the root between two bounds, which is what we want here, having just seen the sign change between them:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>community_attractor <span class="ot">&lt;-</span> community0 <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">community_solve_singularity_1D</span>(<span class="at">bounds =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.15</span>), <span class="at">tol =</span> <span class="fl">1e-4</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>community_attractor<span class="sc">$</span>traits</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       lma</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 0.05</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">community_solve_singularity</span>(<span class="at">bounds =</span> <span class="fu">c</span>(<span class="fl">0.03</span>, <span class="fl">0.06</span>), <span class="at">solver =</span> <span class="st">"bracket"</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">tol =</span> <span class="fl">1e-4</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>community_attractor<span class="sc">$</span>traits</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             lma</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 0.04064079</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Add the root finder’s solution to the selection-gradient plot:</p>
 <div class="cell">
@@ -680,7 +681,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Each arrow shows the locally favoured direction of evolutionary change. The arrows converge near the joint attractor, where both components approach zero. To solve for that point directly rather than reading it off the vector field, use <code>community_solve_singularity()</code>, the multi-trait counterpart of <code>community_solve_singularity_1D()</code>; <code>community_classify_singularity()</code> then reports whether it is a CSS, a branching point, a repeller or a Garden of Eden, and the direction along which branching would occur.</p>
+<p>Each arrow shows the locally favoured direction of evolutionary change. The arrows converge near the joint attractor, where both components approach zero. To solve for that point directly rather than reading it off the vector field, use <code>community_solve_singularity()</code> again, now with two traits (and its default Newton solver); <code>community_classify_singularity()</code> then reports whether it is a CSS, a branching point, a repeller or a Garden of Eden, and the direction along which branching would occur.</p>
 
 
 </section>

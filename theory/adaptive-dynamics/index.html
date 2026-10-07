@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -482,8 +482,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>All single-model pages use the same pipeline:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(regnans)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>h <span class="ot">&lt;-</span> <span class="fu">harness_dd99</span>()                                   <span class="co"># or _gk98 / _gm99 / _jj12</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">community_start</span>(<span class="fu">bounds</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>)), <span class="at">harness =</span> h) <span class="sc">|&gt;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">community_solve_singularity_1D</span>()                    <span class="co"># -&gt; evolutionary attractor</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">community_start</span>(<span class="fu">bounds</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>)), <span class="at">harness =</span> h,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">trait_scale =</span> <span class="st">"linear"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">community_solve_singularity</span>()                       <span class="co"># -&gt; evolutionary attractor</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The DD99, GK98, and GM99 models also support resident communities containing more than one strategy. You can therefore move beyond pairwise invasibility plots and run the full <a href="../../theory/adaptive-dynamics/assembly.html">community-assembly algorithm</a>. The examples show how branching and limiting similarity build a multi-strategy community, including a two-trait version of DD99.</p>
 <blockquote class="blockquote">
 <p>Rendering these pages requires <code>regnans</code> (and its dependency <code>plant</code>) to be installed, not just loaded from source.</p>

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -518,7 +518,7 @@ W(x') = \frac{R}{x'}\, s(x')\, g .
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>solve_x <span class="ot">&lt;-</span> <span class="cf">function</span>(alpha, <span class="at">beta =</span> <span class="dv">15</span>, <span class="at">bounds_x =</span> <span class="fu">c</span>(<span class="fl">0.06</span>, <span class="fl">0.95</span>)) {</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">community_start</span>(<span class="fu">bounds</span>(<span class="at">x =</span> bounds_x),</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">harness =</span> <span class="fu">harness_gm99</span>(<span class="at">alpha =</span> alpha, <span class="at">beta =</span> beta)) <span class="sc">|&gt;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">community_solve_singularity_1D</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">community_solve_singularity</span>()</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>css    <span class="ot">&lt;-</span> <span class="fu">solve_x</span>(<span class="fl">4.5</span>)   <span class="co"># CSS</span></span>
@@ -526,7 +526,7 @@ W(x') = \frac{R}{x'}\, s(x')\, g .
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">css =</span> <span class="fu">as.numeric</span>(css<span class="sc">$</span>traits), <span class="at">branch =</span> <span class="fu">as.numeric</span>(branch<span class="sc">$</span>traits))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      css    branch 
-0.1836583 0.6481792 </code></pre>
+0.1836378 0.6481794 </code></pre>
 </div>
 </div>
 <p>We classify each solution using the curvature of invasion fitness at the singular strategy. Negative curvature indicates a fitness maximum and a stable strategy; positive curvature indicates a fitness minimum and branching:</p>
@@ -539,7 +539,7 @@ W(x') = \frac{R}{x'}\, s(x')\, g .
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">branch =</span> <span class="fu">curv</span>(branch, <span class="fu">as.numeric</span>(branch<span class="sc">$</span>traits)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       css     branch 
--10.556158   1.439901 </code></pre>
+-10.564513   1.439901 </code></pre>
 </div>
 </div>
 <p>As a check, a resident at its own demographic equilibrium must have a lifetime reproductive ratio of exactly 1, or a log fitness of 0:</p>
