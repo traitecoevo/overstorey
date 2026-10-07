@@ -112,3 +112,45 @@ sapply(c(0, 0.04, 0.125), function(a) {
                (\(comm) comm$traits)())
 })   # 0, -4, -12.5  — earlier arrival as competition for territories intensifies
 ```
+
+### Following x* as a parameter changes
+
+The calculation above re-solves the model at each value of `a`. `regnans` can instead follow the singular strategy along a parameter: `community_continue_singularity()` steps through a series of values, predicts where $x^\*$ will be at each from its sensitivity $dx^\*/dp$, solves from that prediction, and classifies the result. The method is described on the [DD99 page](DD99.qmd#how-the-singular-strategy-moves-with-a-parameter).
+
+The parameter enters through a function that takes a value and returns a community built at it. `community_parameter_map()` writes one for any argument of the model, but you can write your own, and then the parameter can be anything you can build a community from. Here it is the variance $\sigma^2$ of the reproduction curve, which is not itself an argument of `harness_jj12()`:
+
+```{r by-sigma2}
+by_sigma2 <- function(s2) {
+  community_start(bounds(x = c(-40, 40)), trait_scale = "linear",
+                  harness = harness_jj12(a = a, x_opt = x_opt, sigma = sqrt(s2)))
+}
+
+sigma2 <- seq(25, 200, by = 25)
+path <- community_continue_singularity(community_solve_singularity(by_sigma2(sigma2[1])),
+                                       by_sigma2, sigma2)
+path
+
+round(cbind(sigma2 = path$p, x = path$traits[, 1], exact = x_opt - a * path$p,
+            dx_dsigma2 = path$sensitivity[, 1]), 4)
+```
+
+Since $x^\* = x_{\mathrm{opt}} - a\sigma^2$ is a straight line in $\sigma^2$, its slope is $dx^\*/d\sigma^2 = -a$ = `r -a` at every point. The prediction from each point's slope therefore lands on the next singular strategy, and the solver has nothing left to correct. The strategy is a CSS all along the path:
+
+```{r by-sigma2-plot}
+#| fig-width: 5.5
+#| fig-height: 4
+plot(path$p, path$traits[, 1], type = "n",
+     xlab = expression("variance of the reproduction curve, " * sigma^2),
+     ylab = "evolved arrival time x*")
+abline(a = x_opt, b = -a, lty = 2, col = "grey40")
+points(path$p, path$traits[, 1], pch = 16, col = "#2a78d6")
+legend("topright", legend = c("CSS, followed by regnans", expression(x^"*" == x[opt] - a * sigma^2)),
+       pch = c(16, NA), lty = c(NA, 2), col = c("#2a78d6", "grey40"), bty = "n")
+```
+
+A map from `community_parameter_map()` can vary several arguments at once. `community_parameter_sensitivity()` then gives the sensitivity of $x^\*$ to each, here at the singular strategy solved at the top of this page. Differentiating $x^\* = x_{\mathrm{opt}} - a\sigma^2$ gives $-\sigma^2$, $1$ and $-2a\sigma$:
+
+```{r sensitivity}
+S <- community_parameter_sensitivity(out, community_parameter_map(out, c("a", "x_opt", "sigma")))
+rbind(numeric = S[1, ], analytic = c(-sigma^2, 1, -2 * a * sigma))
+```

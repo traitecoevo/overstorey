@@ -114,3 +114,78 @@ pip <- community_start(bounds(x = c(0.06, 0.95)), trait_scale = "log",
   community_pip()
 plot(pip) + ggplot2::ggtitle("GM99 (alpha R = 7, beta R = 15)")
 ```
+
+## A second branching as competition becomes more asymmetric
+
+At $\alpha R = 7$ the single seed-size strategy is a branching point. After branching, the community settles at a pair: a small-seeded strategy that makes many seeds, and a large-seeded one that wins the sites it reaches. That pair is the next singular point, and it too can be stable or a branching point.
+
+Here we follow the pair as competitive asymmetry $\alpha R$ grows. `community_continue_singularity()` steps through values of $\alpha R$, predicting where the pair will be from its sensitivity, solving for it from there, and classifying it at each step (the method is described on the [DD99 page](DD99.qmd#how-the-singular-strategy-moves-with-a-parameter)). `community_parameter_map()` builds the model as a function of $\alpha$ (with $R = 1$). There is no closed form for this pair, so what to look for is the curvature of invasion fitness at each resident.
+
+```{r path-helpers}
+#| code-fold: true
+#| code-summary: "Plotting helpers: plot_path(), add_path() and legend_path()"
+class_col <- c("CSS" = "#2a78d6", "branching point" = "#eb6834", "degenerate" = "grey45")
+class_pch <- c("CSS" = 16, "branching point" = 17, "degenerate" = 1)
+
+# One line per resident, each point marked by its classification, and a grey
+# band where the classification changes between two parameter values.
+add_path <- function(path) {
+  ch <- path$changes
+  if (nrow(ch) > 0)
+    rect(ch$p_before, par("usr")[3], ch$p_after, par("usr")[4],
+         col = "grey92", border = NA)
+  cls <- path$classification
+  for (j in seq_len(ncol(path$traits))) {
+    lines(path$p, path$traits[, j], col = "grey40")
+    points(path$p, path$traits[, j], pch = class_pch[cls], col = class_col[cls])
+  }
+}
+plot_path <- function(path, xlab, ylab, ylim = range(path$traits), ...) {
+  plot(range(path$p), ylim, type = "n", xlab = xlab, ylab = ylab, ...)
+  add_path(path)
+}
+# A legend for the classifications on a plot, and optionally one reference line.
+legend_path <- function(where, cls, line = NULL, lty = 2) {
+  n <- length(line)
+  legend(where, legend = c(cls, line), bty = "n",
+         pch = c(class_pch[cls], rep(NA, n)), col = c(class_col[cls], rep("grey40", n)),
+         lty = c(rep(0, length(cls)), rep(lty, n)))
+}
+```
+
+Solve for the pair from two starting residents, then follow it from $\alpha R = 7$ to $7.75$:
+
+```{r pair-alpha}
+pair <- community_solve_singularity(branch, x0 = trait_matrix(c(0.2, 0.7), "x"))
+pair$traits
+
+path_alpha <- community_continue_singularity(pair, community_parameter_map(pair, "alpha"),
+                                             seq(7, 7.75, by = 0.125))
+path_alpha
+path_alpha$changes
+```
+
+At $\alpha R = 7$ the pair is a CSS: both residents sit at fitness maxima, so once the population has branched, evolution stops there. As $\alpha R$ grows, both seed sizes increase, and between $\alpha R = 7.5$ and $7.625$ the pair becomes a branching point. The curvature of invasion fitness at each resident shows why. The large-seeded resident stays at a fitness maximum, but the small-seeded resident's curvature changes sign, so it becomes a fitness minimum and branches again:
+
+```{r pair-alpha-plot}
+#| fig-width: 9
+#| fig-height: 4
+curvature <- t(vapply(path_alpha$classifications,
+                      function(cl) vapply(cl$hessian, as.numeric, 0), numeric(2)))
+
+par(mfrow = c(1, 2))
+plot_path(path_alpha, xlab = expression(alpha * R), ylab = "seed size of each resident",
+          ylim = c(0.15, 0.8))
+legend_path("right", unique(path_alpha$classification))
+
+matplot(path_alpha$p, curvature, type = "n",
+        xlab = expression(alpha * R), ylab = "curvature of invasion fitness")
+ch <- path_alpha$changes
+rect(ch$p_before, par("usr")[3], ch$p_after, par("usr")[4], col = "grey92", border = NA)
+abline(h = 0, lty = 3)
+matlines(path_alpha$p, curvature, lty = c(1, 2), col = "grey40")
+legend("topleft", legend = c("small-seeded resident", "large-seeded resident"),
+       lty = c(1, 2), col = "grey40", bty = "n")
+```
+
+The small-seeded resident's curvature changes sign from `r round(curvature[5, 1], 2)` at $\alpha R = 7.5$ to `r round(curvature[6, 1], 2)` at $7.625$, while the large-seeded resident's stays near `r round(curvature[6, 2], 1)`. Once competition is asymmetric enough, the small-seeded strategy splits in two and the pair gives way to a community of three.
