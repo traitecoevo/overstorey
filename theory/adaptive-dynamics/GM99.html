@@ -458,6 +458,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#pairwise-invasibility-plot" id="toc-pairwise-invasibility-plot" class="nav-link" data-scroll-target="#pairwise-invasibility-plot">Pairwise invasibility plot</a></li>
   </ul></li>
+  <li><a href="#a-second-branching-as-competition-becomes-more-asymmetric" id="toc-a-second-branching-as-competition-becomes-more-asymmetric" class="nav-link" data-scroll-target="#a-second-branching-as-competition-becomes-more-asymmetric">A second branching as competition becomes more asymmetric</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/theory/adaptive-dynamics/GM99.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -569,9 +570,96 @@ W(x') = \frac{R}{x'}\, s(x')\, g .
 </div>
 </div>
 </div>
-
-
 </section>
+</section>
+<section id="a-second-branching-as-competition-becomes-more-asymmetric" class="level2">
+<h2 class="anchored" data-anchor-id="a-second-branching-as-competition-becomes-more-asymmetric">A second branching as competition becomes more asymmetric</h2>
+<p>At <span class="math inline">\(\alpha R = 7\)</span> the single seed-size strategy is a branching point. After branching, the community settles at a pair: a small-seeded strategy that makes many seeds, and a large-seeded one that wins the sites it reaches. That pair is the next singular point, and it too can be stable or a branching point.</p>
+<p>Here we follow the pair as competitive asymmetry <span class="math inline">\(\alpha R\)</span> grows. <code>community_continue_singularity()</code> steps through values of <span class="math inline">\(\alpha R\)</span>, predicting where the pair will be from its sensitivity, solving for it from there, and classifying it at each step (the method is described on the <a href="../../theory/adaptive-dynamics/DD99.html#how-the-singular-strategy-moves-with-a-parameter">DD99 page</a>). <code>community_parameter_map()</code> builds the model as a function of <span class="math inline">\(\alpha\)</span> (with <span class="math inline">\(R = 1\)</span>). There is no closed form for this pair, so what to look for is the curvature of invasion fitness at each resident.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Plotting helpers: plot_path(), add_path() and legend_path()</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>class_col <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CSS"</span> <span class="ot">=</span> <span class="st">"#2a78d6"</span>, <span class="st">"branching point"</span> <span class="ot">=</span> <span class="st">"#eb6834"</span>, <span class="st">"degenerate"</span> <span class="ot">=</span> <span class="st">"grey45"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>class_pch <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CSS"</span> <span class="ot">=</span> <span class="dv">16</span>, <span class="st">"branching point"</span> <span class="ot">=</span> <span class="dv">17</span>, <span class="st">"degenerate"</span> <span class="ot">=</span> <span class="dv">1</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># One line per resident, each point marked by its classification, and a grey</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># band where the classification changes between two parameter values.</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>add_path <span class="ot">&lt;-</span> <span class="cf">function</span>(path) {</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  ch <span class="ot">&lt;-</span> path<span class="sc">$</span>changes</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(ch) <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rect</span>(ch<span class="sc">$</span>p_before, <span class="fu">par</span>(<span class="st">"usr"</span>)[<span class="dv">3</span>], ch<span class="sc">$</span>p_after, <span class="fu">par</span>(<span class="st">"usr"</span>)[<span class="dv">4</span>],</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="st">"grey92"</span>, <span class="at">border =</span> <span class="cn">NA</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  cls <span class="ot">&lt;-</span> path<span class="sc">$</span>classification</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">ncol</span>(path<span class="sc">$</span>traits))) {</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines</span>(path<span class="sc">$</span>p, path<span class="sc">$</span>traits[, j], <span class="at">col =</span> <span class="st">"grey40"</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">points</span>(path<span class="sc">$</span>p, path<span class="sc">$</span>traits[, j], <span class="at">pch =</span> class_pch[cls], <span class="at">col =</span> class_col[cls])</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>plot_path <span class="ot">&lt;-</span> <span class="cf">function</span>(path, xlab, ylab, <span class="at">ylim =</span> <span class="fu">range</span>(path<span class="sc">$</span>traits), ...) {</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="fu">range</span>(path<span class="sc">$</span>p), ylim, <span class="at">type =</span> <span class="st">"n"</span>, <span class="at">xlab =</span> xlab, <span class="at">ylab =</span> ylab, ...)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_path</span>(path)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co"># A legend for the classifications on a plot, and optionally one reference line.</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>legend_path <span class="ot">&lt;-</span> <span class="cf">function</span>(where, cls, <span class="at">line =</span> <span class="cn">NULL</span>, <span class="at">lty =</span> <span class="dv">2</span>) {</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(line)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(where, <span class="at">legend =</span> <span class="fu">c</span>(cls, line), <span class="at">bty =</span> <span class="st">"n"</span>,</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">pch =</span> <span class="fu">c</span>(class_pch[cls], <span class="fu">rep</span>(<span class="cn">NA</span>, n)), <span class="at">col =</span> <span class="fu">c</span>(class_col[cls], <span class="fu">rep</span>(<span class="st">"grey40"</span>, n)),</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">lty =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">0</span>, <span class="fu">length</span>(cls)), <span class="fu">rep</span>(lty, n)))</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Solve for the pair from two starting residents, then follow it from <span class="math inline">\(\alpha R = 7\)</span> to <span class="math inline">\(7.75\)</span>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pair <span class="ot">&lt;-</span> <span class="fu">community_solve_singularity</span>(branch, <span class="at">x0 =</span> <span class="fu">trait_matrix</span>(<span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.7</span>), <span class="st">"x"</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>pair<span class="sc">$</span>traits</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             x
+[1,] 0.2061229
+[2,] 0.6998292</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>path_alpha <span class="ot">&lt;-</span> <span class="fu">community_continue_singularity</span>(pair, <span class="fu">community_parameter_map</span>(pair, <span class="st">"alpha"</span>),</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                                             <span class="fu">seq</span>(<span class="dv">7</span>, <span class="fl">7.75</span>, <span class="at">by =</span> <span class="fl">0.125</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>path_alpha</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;singularity_path: 7 points, p from 7 to 7.75 (coalition of 2)&gt;
+  classification: CSS (p 7 to 7.5), branching point (p 7.625 to 7.75) 
+  equilibrium solves: 75</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>path_alpha<span class="sc">$</span>changes</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  p_before p_after from              to
+1      7.5   7.625  CSS branching point</code></pre>
+</div>
+</div>
+<p>At <span class="math inline">\(\alpha R = 7\)</span> the pair is a CSS: both residents sit at fitness maxima, so once the population has branched, evolution stops there. As <span class="math inline">\(\alpha R\)</span> grows, both seed sizes increase, and between <span class="math inline">\(\alpha R = 7.5\)</span> and <span class="math inline">\(7.625\)</span> the pair becomes a branching point. The curvature of invasion fitness at each resident shows why. The large-seeded resident stays at a fitness maximum, but the small-seeded resident’s curvature changes sign, so it becomes a fitness minimum and branches again:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>curvature <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">vapply</span>(path_alpha<span class="sc">$</span>classifications,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                      <span class="cf">function</span>(cl) <span class="fu">vapply</span>(cl<span class="sc">$</span>hessian, as.numeric, <span class="dv">0</span>), <span class="fu">numeric</span>(<span class="dv">2</span>)))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_path</span>(path_alpha, <span class="at">xlab =</span> <span class="fu">expression</span>(alpha <span class="sc">*</span> R), <span class="at">ylab =</span> <span class="st">"seed size of each resident"</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.15</span>, <span class="fl">0.8</span>))</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">legend_path</span>(<span class="st">"right"</span>, <span class="fu">unique</span>(path_alpha<span class="sc">$</span>classification))</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(path_alpha<span class="sc">$</span>p, curvature, <span class="at">type =</span> <span class="st">"n"</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="fu">expression</span>(alpha <span class="sc">*</span> R), <span class="at">ylab =</span> <span class="st">"curvature of invasion fitness"</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>ch <span class="ot">&lt;-</span> path_alpha<span class="sc">$</span>changes</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="fu">rect</span>(ch<span class="sc">$</span>p_before, <span class="fu">par</span>(<span class="st">"usr"</span>)[<span class="dv">3</span>], ch<span class="sc">$</span>p_after, <span class="fu">par</span>(<span class="st">"usr"</span>)[<span class="dv">4</span>], <span class="at">col =</span> <span class="st">"grey92"</span>, <span class="at">border =</span> <span class="cn">NA</span>)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="fu">matlines</span>(path_alpha<span class="sc">$</span>p, curvature, <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">col =</span> <span class="st">"grey40"</span>)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"small-seeded resident"</span>, <span class="st">"large-seeded resident"</span>),</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">col =</span> <span class="st">"grey40"</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="GM99_files/figure-html/pair-alpha-plot-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The small-seeded resident’s curvature changes sign from -0.44 at <span class="math inline">\(\alpha R = 7.5\)</span> to 0.34 at <span class="math inline">\(7.625\)</span>, while the large-seeded resident’s stays near -0.7. Once competition is asymmetric enough, the small-seeded strategy splits in two and the pair gives way to a community of three.</p>
+
+
 </section>
 
 </main> <!-- /main -->

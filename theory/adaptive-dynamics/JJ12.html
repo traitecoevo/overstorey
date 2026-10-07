@@ -478,6 +478,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#selection-gradient-and-convergence" id="toc-selection-gradient-and-convergence" class="nav-link" data-scroll-target="#selection-gradient-and-convergence">Selection gradient and convergence</a></li>
   <li><a href="#mismatch-grows-with-the-competitive-advantage-a" id="toc-mismatch-grows-with-the-competitive-advantage-a" class="nav-link" data-scroll-target="#mismatch-grows-with-the-competitive-advantage-a">Mismatch grows with the competitive advantage <code>a</code></a></li>
+  <li><a href="#following-x-as-a-parameter-changes" id="toc-following-x-as-a-parameter-changes" class="nav-link" data-scroll-target="#following-x-as-a-parameter-changes">Following x* as a parameter changes</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/theory/adaptive-dynamics/JJ12.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -588,6 +589,67 @@ x^\* = x_{\mathrm{opt}} - a\,\sigma^2 ,
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>})   <span class="co"># 0, -4, -12.5  — earlier arrival as competition for territories intensifies</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]   0.0  -4.0 -12.5</code></pre>
+</div>
+</div>
+</section>
+<section id="following-x-as-a-parameter-changes" class="level3">
+<h3 class="anchored" data-anchor-id="following-x-as-a-parameter-changes">Following x* as a parameter changes</h3>
+<p>The calculation above re-solves the model at each value of <code>a</code>. <code>regnans</code> can instead follow the singular strategy along a parameter: <code>community_continue_singularity()</code> steps through a series of values, predicts where <span class="math inline">\(x^\*\)</span> will be at each from its sensitivity <span class="math inline">\(dx^\*/dp\)</span>, solves from that prediction, and classifies the result. The method is described on the <a href="../../theory/adaptive-dynamics/DD99.html#how-the-singular-strategy-moves-with-a-parameter">DD99 page</a>.</p>
+<p>The parameter enters through a function that takes a value and returns a community built at it. <code>community_parameter_map()</code> writes one for any argument of the model, but you can write your own, and then the parameter can be anything you can build a community from. Here it is the variance <span class="math inline">\(\sigma^2\)</span> of the reproduction curve, which is not itself an argument of <code>harness_jj12()</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>by_sigma2 <span class="ot">&lt;-</span> <span class="cf">function</span>(s2) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">community_start</span>(<span class="fu">bounds</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">40</span>, <span class="dv">40</span>)), <span class="at">trait_scale =</span> <span class="st">"linear"</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">harness =</span> <span class="fu">harness_jj12</span>(<span class="at">a =</span> a, <span class="at">x_opt =</span> x_opt, <span class="at">sigma =</span> <span class="fu">sqrt</span>(s2)))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">25</span>, <span class="dv">200</span>, <span class="at">by =</span> <span class="dv">25</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">community_continue_singularity</span>(<span class="fu">community_solve_singularity</span>(<span class="fu">by_sigma2</span>(sigma2[<span class="dv">1</span>])),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                                       by_sigma2, sigma2)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>path</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;singularity_path: 8 points, p from 25 to 200&gt;
+  classification: CSS (p 25 to 200) 
+  equilibrium solves: 40</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">cbind</span>(<span class="at">sigma2 =</span> path<span class="sc">$</span>p, <span class="at">x =</span> path<span class="sc">$</span>traits[, <span class="dv">1</span>], <span class="at">exact =</span> x_opt <span class="sc">-</span> a <span class="sc">*</span> path<span class="sc">$</span>p,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">dx_dsigma2 =</span> path<span class="sc">$</span>sensitivity[, <span class="dv">1</span>]), <span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     sigma2       x   exact dx_dsigma2
+[1,]     25  -3.125  -3.125     -0.125
+[2,]     50  -6.250  -6.250     -0.125
+[3,]     75  -9.375  -9.375     -0.125
+[4,]    100 -12.500 -12.500     -0.125
+[5,]    125 -15.625 -15.625     -0.125
+[6,]    150 -18.750 -18.750     -0.125
+[7,]    175 -21.875 -21.875     -0.125
+[8,]    200 -25.000 -25.000     -0.125</code></pre>
+</div>
+</div>
+<p>Since <span class="math inline">\(x^\* = x_{\mathrm{opt}} - a\sigma^2\)</span> is a straight line in <span class="math inline">\(\sigma^2\)</span>, its slope is <span class="math inline">\(dx^\*/d\sigma^2 = -a\)</span> = -0.125 at every point. The prediction from each point’s slope therefore lands on the next singular strategy, and the solver has nothing left to correct. The strategy is a CSS all along the path:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(path<span class="sc">$</span>p, path<span class="sc">$</span>traits[, <span class="dv">1</span>], <span class="at">type =</span> <span class="st">"n"</span>,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="fu">expression</span>(<span class="st">"variance of the reproduction curve, "</span> <span class="sc">*</span> sigma<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"evolved arrival time x*"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">a =</span> x_opt, <span class="at">b =</span> <span class="sc">-</span>a, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"grey40"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(path<span class="sc">$</span>p, path<span class="sc">$</span>traits[, <span class="dv">1</span>], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">col =</span> <span class="st">"#2a78d6"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"CSS, followed by regnans"</span>, <span class="fu">expression</span>(x<span class="sc">^</span><span class="st">"*"</span> <span class="sc">==</span> x[opt] <span class="sc">-</span> a <span class="sc">*</span> sigma<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">16</span>, <span class="cn">NA</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">2</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2a78d6"</span>, <span class="st">"grey40"</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="JJ12_files/figure-html/by-sigma2-plot-1.png" class="img-fluid figure-img" width="528"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>A map from <code>community_parameter_map()</code> can vary several arguments at once. <code>community_parameter_sensitivity()</code> then gives the sensitivity of <span class="math inline">\(x^\*\)</span> to each, here at the singular strategy solved at the top of this page. Differentiating <span class="math inline">\(x^\* = x_{\mathrm{opt}} - a\sigma^2\)</span> gives <span class="math inline">\(-\sigma^2\)</span>, <span class="math inline">\(1\)</span> and <span class="math inline">\(-2a\sigma\)</span>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>S <span class="ot">&lt;-</span> <span class="fu">community_parameter_sensitivity</span>(out, <span class="fu">community_parameter_map</span>(out, <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"x_opt"</span>, <span class="st">"sigma"</span>)))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="at">numeric =</span> S[<span class="dv">1</span>, ], <span class="at">analytic =</span> <span class="fu">c</span>(<span class="sc">-</span>sigma<span class="sc">^</span><span class="dv">2</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span> <span class="sc">*</span> a <span class="sc">*</span> sigma))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            a x_opt     sigma
+numeric  -100     1 -2.500005
+analytic -100     1 -2.500000</code></pre>
 </div>
 </div>
 
