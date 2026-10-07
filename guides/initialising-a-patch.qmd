@@ -78,13 +78,13 @@ a fresh session.
 ## Seeding an arbitrary size distribution
 
 Seeding a size distribution supplies the plants present at patch age zero; it
-does not replace recruitment later in the run. Build the initial state from node
+does not replace recruitment later in the run. Build the initial state from node <!-- SY: I feel like adding this part 'it does not replace recruitment later in the run' makes it a bit more confusing. -->
 heights and densities with `make_initial_state()`. Mortality, fecundity,
 accumulated reproduction, and heartwood start at zero. Recruitment then
 continues normally for $t > 0$.
 
 As an example, take a log-normal distribution of heights, normalised to a target
-total density — the same shape PR #304 used to motivate this feature:
+total density:
 
 ```{r}
 #| label: lognormal-distribution
