@@ -16,7 +16,7 @@ known as the self-thinning line. Its universality across species, environments,
 and stand types remains debated.
 
 Here we ask whether this pattern emerges from an
-[FF16](../theory/models/ff16.qmd) simulation. It is not imposed on the model:
+[FF16](../theory/models/ff16.qmd) simulation. Self-thinning is not imposed on the model:
 we calculate it from the growth and mortality represented by the
 [size-structured PDE](../theory/size-structured-pde.qmd).
 
@@ -78,6 +78,7 @@ patch_total <-
       across(c(diameter_stem, area_stem, area_leaf, height, mass_above_ground), ~.x/density,
              .names = "{.col}_av"))
 # one row per time, containing patch totals and mean individual sizes
+patch_total
 ```
 
 The self-thinning plot places mean stem diameter on the horizontal axis and
@@ -96,6 +97,8 @@ patch_total %>%
              ggtitle("Self-thinning plot") +
              theme_classic(base_size = 18)
 ```
+
+<!-- SY: I think for someone who doesn't know the self-thinning line, you could be more specific about which part of the graph it is. Or highlight it on the figure or add a different figure showing the self-thinning line? -->
 
 Leaf area and above-ground biomass provide complementary views of stand
 development:

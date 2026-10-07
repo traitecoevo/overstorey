@@ -47,13 +47,13 @@ pl$strategy$pars$lma
 ```
 
 This direct edit changes only `lma`. That is useful when deliberately varying
-one model parameter, but biological traits are often linked. In FF16, LMA
+one model parameter, but biological traits are often linked. In the FF16 model, LMA
 affects leaf mass and seedling allometry directly and is also associated with
 leaf turnover and respiration.
 
 ## Create strategies from traits
 
-`plant` represents these links with a **hyperparameterisation**: an R function
+`plant` represents links between traits with a **hyperparameterisation**: an R function
 that translates a small set of input traits into a consistent set of model
 parameters. FF16 uses `FF16_hyperpar()`:
 
@@ -145,7 +145,7 @@ sapply(ss, function(x) x$pars$r_l)
 ```
 
 ## Choose numerical accuracy
-
+<!-- SY: Perhaps this section should be on its own page? It doesn't really come under 'strategies & traits'. -->
 Strategies describe plants; `Control` settings describe how the numerical
 solver runs. The controls include time-step, error-tolerance, and node-schedule
 settings, and may be numeric or logical:
@@ -165,3 +165,5 @@ trade-offs. The following comparison shows which defaults change:
 ctrl_accurate <- control_accurate()
 ctrl_accurate[unlist(control()) != unlist(ctrl_accurate)]
 ```
+
+<!-- SY: There's no example here of how you use the Control() functions? Does it just work when you call the function, as in it'll apply to runs after the call? Or do you have to assign it to the parameterisation? -->

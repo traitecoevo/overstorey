@@ -11,7 +11,7 @@ changing, and grow it through time. You will then compare plants with different
 traits under different light conditions.
 
 We use the [`FF16`](../theory/models/ff16.qmd) model throughout. Its **strategy**
-stores the biological parameters for a type of plant; an **individual** is one
+stores the biological parameters for a type of plant; an **individual** is one <!-- SY: Do you call a type of plant a 'species'? We should define 'species' somewhere. --> 
 plant governed by that strategy. Patch simulations later group individuals of
 similar age into nodes and allow them to compete, but those extra layers are not
 needed yet.
