@@ -1541,6 +1541,11 @@
       "Maintainer": "Thomas Lin Pedersen <thomas.pedersen@posit.co>",
       "Repository": "CRAN"
     },
+    "ggquiver": {
+      "Package": "ggquiver",
+      "Version": "0.5.0",
+      "Source": "Repository"
+    },
     "glue": {
       "Package": "glue",
       "Version": "1.8.1",

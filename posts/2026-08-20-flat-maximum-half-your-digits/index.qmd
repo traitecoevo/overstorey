@@ -1,0 +1,268 @@
+---
+title: "A flat maximum costs you half your digits"
+description: "The TF24 leaf model finds its operating point by maximising carbon profit, and how it does that looks like an implementation detail. It is not. Locating an argmax by comparing objective values is square-root conditioned, so it throws away half the precision of everything downstream — and in our case it returned trait derivatives that were smooth, plausible and the wrong sign."
+date: 2026-08-20
+plant-ref: "develop"
+plant-sha: "39c0c6571151cf1ce14bc56f3cd54c195fc78c35"
+categories: [tf24, hydraulics, numerics, performance]
+reading-time: true
+---
+
+```{r setup, include=FALSE}
+source(here::here("R/version-badge.R"))
+```
+
+`r plant_version_badge()`
+
+The TF24 leaf chooses its operating point by optimising. Given soil water and
+light, it picks the root-collar water potential $\psi$ that maximises carbon
+profit $\Pi$ — assimilation minus the hydraulic cost of the water that bought it.
+Which one-dimensional optimiser does that job reads like the most boring possible
+implementation detail. Bracket the maximum, shrink the bracket, return the middle.
+
+It ran on golden-section search for years, and the decision was defended each time
+it came up, on a reason that sounded exactly right: the argmax feeds a gradient, so
+it has to vary *smoothly* with the model's inputs, and golden section takes a fixed
+number of comparison steps where an interpolating method takes a data-dependent
+number. Fixed beats adaptive when you need smoothness.
+
+That reasoning is wrong, and it was wrong in an expensive direction. Golden section
+was resolving the operating point to about three digits while reporting seventeen,
+and the trait derivatives built on top of it came back either exactly zero or, for
+traits in the hydraulic path, **smooth, plausible and sign-inverted**. Replacing it
+with a root-find on the first-order condition improved the residual by eleven orders
+of magnitude and was 24.5% faster as a side effect.
+
+The lesson underneath is not about golden section. It is about which *question* you
+ask a solver.
+
+::: {.callout-note}
+## Where the numbers come from
+Measurements are as recorded in
+[`phylloptim`](https://github.com/traitecoevo/phylloptim) — the leaf model extracted
+from plant's TF24 strategy — on macOS/arm64 at `-O2`, against its 288-point
+operating-point grid. plant consumes the same headers; the pin above is plant's
+`develop`. Timings are min-of-N with the two binaries interleaved, which on this
+benchmark is the difference between measuring an effect and inventing one.
+:::
+
+## Three solvers, and "bracketing" does not separate them
+
+It is worth being precise about the alternatives first, because the word
+*bracketing* gets used for all of them and so distinguishes none of them. All three
+below maintain an interval containing the answer and never leave it. They differ in
+**what they evaluate** and **how they choose the next point**.
+
+| | evaluates | step rule | convergence |
+|---|---|---|---|
+| golden section | $\Pi$ | fixed ratio 0.618, comparisons only | linear |
+| Brent's `fmin` | $\Pi$ | parabola through the 3 best points, golden fallback | superlinear |
+| TOMS748 | $\Pi'$ | inverse cubic interpolation, bisection safeguard | superlinear (~2.7) |
+
+The first two answer *where is the largest value*. The third answers *where does the
+derivative change sign*. Those are the same point on a smooth interior maximum and
+they are not the same question, which is the whole of this post.
+
+## Brent beats golden section, and it is the smaller story
+
+Take the first two against each other, since that is the comparison people usually
+have in mind.
+
+Golden section is **comparison-based**. It evaluates $\Pi$ at two interior points
+and learns exactly one thing: which is higher. That single bit lets it discard a
+fixed fraction of the bracket, and no more — the bracket shrinks by $0.618$ per
+evaluation whatever the function is doing, because the algorithm has thrown away the
+values and kept only their order.
+
+Brent's `fmin` keeps the values. It fits a parabola through the three best points
+and jumps to its vertex, which is *exact* for a quadratic — and every smooth maximum
+is locally quadratic, so the fit gets better as it converges. When the parabolic step
+looks unsafe (not comfortably inside the bracket, or not shrinking it) it takes a
+golden step instead, so it never loses the bracketing guarantee it started with.
+
+Fewer evaluations for the same final bracket width. In this package that was measured
+at **2.3–2.6×** on the single-layer optimisers, and it is a real, worthwhile,
+constant-factor win.
+
+It also does not touch the problem.
+
+## The square root
+
+Here is what neither of them can fix. Near its maximum the objective is flat — that
+is what being a maximum means:
+
+$$
+\Pi(\psi) \;\approx\; \Pi^\* - k\,(\psi - \psi^\*)^2 ,
+$$
+
+with curvature $k \approx 1.0$ measured directly at the worst points on our grid.
+Invert it. If your method can only distinguish profit *values* down to $\delta$, the
+best it can possibly say about the *location* is
+
+$$
+|\psi - \psi^\*| \;\approx\; \sqrt{\delta / k}.
+$$
+
+The error in the answer is the square root of the error in the objective. In digits:
+**you get half of them.** Profit at our defaults is around 2.5, so double precision
+gives $\delta \approx 5\times10^{-16}$ and the ceiling on any value-comparison
+method is $\psi^\*$ to about $2\times10^{-8}$ — eight digits, from an objective known
+to sixteen. Brent's parabola gets you to that ceiling in fewer evaluations than
+golden section. It does not raise it, because the ceiling belongs to the question,
+not to the algorithm.
+
+::: {.callout-tip}
+## The square root is visible in the golden file
+This is not a blackboard argument. `phylloptim` compares 576 solved operating points
+bit-exactly on the platform that generated them, and with a tolerance elsewhere,
+which gives a free measurement of how far the nine reported fields move between
+Apple's libm and glibc:
+
+| field | worst cross-platform difference |
+|---|---:|
+| `profit` — the maximum *value* | **2.14e-09** |
+| the other eight — evaluated *at the argmax* | **1.4e-04** |
+
+Five orders of magnitude, from one perturbation, split exactly along
+value-versus-location. It is a mechanism rather than an identity —
+$\sqrt{2.14\times10^{-9}} = 4.6\times10^{-5}$ against the $1.4\times10^{-4}$
+observed, because the two column maxima fall at different operating points — but the
+class is unmistakable. If you need a portable check of this solve, check `profit`.
+It is the only reported field that is well-conditioned.
+:::
+
+And golden section was nowhere near even that ceiling, for a second reason. It
+terminates on **bracket width**, and the width it was given was `GSS_tol_abs`
+$= 10^{-3}$. So the operating point was printed to seventeen significant figures and
+determined to about three.
+
+## Ask the derivative instead
+
+$\Pi'$ has none of this. At an interior optimum it crosses zero *transversally*,
+with slope $-2k$:
+
+$$
+\Pi'(\psi) \;\approx\; -2k\,(\psi - \psi^\*).
+$$
+
+A residual $r$ therefore displaces the located root by $r/2k$ — **linear**, not
+square-rooted. Full double precision is reachable, and the safeguarded bracket is
+still there: TOMS748 keeps opposite signs at the endpoints throughout, so a kinked
+or non-monotone case degrades toward bisection instead of diverging the way Newton
+would.
+
+What that bought, on the 240 feasible grid rows:
+
+| | golden section on $\Pi$ | TOMS748 on $\Pi'$ |
+|---|---|---|
+| $\lvert\Pi'\rvert$ at the returned collar (198 interior rows) | median 7.8e-04 | **median 5.6e-15** |
+| distinct argmax values over 11 trait steps | 6 / 11 | **11 / 11** |
+| argmax second differences in a trait | 3.9e-04 (= the step size: noise) | **3.4e-07** |
+| µs/solve, interleaved at reps=2000 | 3.51 | **2.65** |
+
+Eleven orders of magnitude on the residual, improved on **240 of 240** rows with
+none worse. The 24.5% on the clock is the least interesting row in that table.
+
+This is only affordable because $\Pi'$ is cheap: the implicit function theorem turns
+the derivative of the nested solve into a closed-form expression costing 7% of a
+solve, which is [the previous
+post](/posts/2026-08-04-differentiate-the-equation/). Without that, root-finding the
+first-order condition would mean differentiating an iterative solver, and the trade
+would look very different.
+
+## Why anyone should care: the argmax is an input
+
+An operating point good to three digits sounds fine for a leaf. It is not fine,
+because the argmax is not the output — it is an input to a derivative.
+
+Golden section's leftover offset inside its $10^{-3}$ bracket is not a small random
+error. It wanders **discontinuously** as the comparison sequence flips: the same
+sequence of comparisons returns the same offset, and the sequence changes in jumps.
+So $\psi^\*(\theta)$ was a *staircase* in trait space, tread width $\approx$
+`GSS_tol_abs`. Six distinct values across eleven trait steps, as the table shows.
+
+Difference a staircase and you get one of two answers, both wrong:
+
+- **Exactly zero**, whenever the step lands inside a tread. A finite difference in a
+  photosynthetic trait returned identically zero for any relative step below
+  $10^{-4}$, silently dropping a whole term of $\mathrm{d}A/\mathrm{d}\theta$.
+- **A plausible number with the wrong sign**, whenever the step happens to straddle
+  risers unevenly. For `root_b` the composite gradient came back at
+  $-2.6\times10^{-3}$ where the truth is $+2.6\times10^{-4}$: smooth, stable,
+  believable, and pointing the wrong way.
+
+The second is the one that should worry you. A gradient-based calibration handed that
+number walks the trait *away* from the data, converges to something, and reports it
+with a straight face. Nothing in the output looks wrong. After the change, finite
+differences agree to ~4 digits at any relative step from $10^{-8}$ to $10^{-2}$.
+
+**A fixed iteration count is not smoothness.** That was the error in the original
+defence of golden section — the requirement it named was real, and the algorithm it
+chose to meet it was the one that failed it worst.
+
+## What the root-find costs
+
+Three things, and they are not free.
+
+**It needs a derivative you trust.** An analytic $\Pi'$ that provably agrees with
+the $\Pi$ everything else reports. A value search needs no such thing.
+
+**A stationary point is not a maximum.** The first-order condition is satisfied at
+minima too, so the solver has to be told which it found. When profit falls away from
+*both* ends into the interval, the interior stationary point is a minimum and the
+answer is at one of the bounds — reporting whichever bound the ordering of the tests
+happened to reach first would be a plausible, finite, wrong answer, so that case is
+tagged and refused rather than guessed.
+
+**Not every maximum is stationary.** The first-order condition is blind to an
+optimum pinned to a constraint, and those are not exotic here: **42 of the 240
+feasible grid rows** are pinned, 24 at the wet end and 18 at the dry, all at soil
+potentials of 3–4 MPa where profit is negative and the best the leaf can do is barely
+transpire. Handling them is explicit code, not a fallthrough.
+
+Value searches have the mirror defect, and it is worse because nothing announces it.
+`brent_fmin` steps in from the bounds by construction, so it can return neither an
+endpoint nor the global maximum. Both happen in this model. At an air temperature of
+50 °C with the thermal cost on, ProfitMax profit is highest at **full stomatal
+closure** — $-1.5314$ at $\psi_{\text{soil}}$, against $-1.5510$ and $-1.5459$ at two
+interior points — and the solver returned $\psi = 1.643$, reporting an open stoma
+where the objective says shut.
+
+The general form is worth keeping:
+
+> A bracketing optimiser answers *where is the interior maximum*. That is not the
+> same question as *where is the maximum*.
+
+## A note on checking a change like this
+
+One methodological trap, because it cost real time here. When you swap the collar
+solver, the obvious thing to check is whether profit went up. Don't.
+
+Profit is the maximum, so it is flat, so it is exactly the quantity that cannot
+resolve a change in the argmax — and its own floor is set by the nested CO₂
+root-find. When this change landed, two of 288 rows came out ~$6\times10^{-7}$
+*lower* in profit while their first-order residual improved by ten orders of
+magnitude. Read as a profit comparison, the change looks like a marginal regression
+on those rows. Read as a residual, it is 240 of 240 improved with none worse.
+
+**Check the condition you claim to be solving, not the objective you claim to be
+maximising.** The residual has teeth precisely where the objective has none.
+
+## What generalises
+
+**The conditioning belongs to the question, not the algorithm.** Golden section and
+Brent's `fmin` both ask "which $\psi$ gives the biggest $\Pi$", and both inherit the
+square root that comes with asking it. Switching between them is a constant factor.
+Switching to "where does $\Pi'$ change sign" is a change of exponent — same bracketing
+safety, different conditioning, eleven orders on the residual.
+
+**If an argmax feeds anything downstream, it has half the precision you think it
+does.** Whatever tolerance your optimiser reports is a tolerance on the objective;
+the location carries the square root of it. That is fine when the argmax is the
+answer a human reads and fatal when it is the point a derivative is evaluated at.
+
+**Smoothness is about the termination criterion, not the iteration count.** A method
+that stops on bracket *width* leaves an offset inside that width, and if the offset
+is chosen by comparisons it is a staircase rather than a smooth error. A method that
+stops on a *residual* leaves an error proportional to that residual. Only the second
+one differentiates.

@@ -35,6 +35,13 @@ generally used for R packages including C++ source.
 └── vignettes   		# Vignettes
 ```
 
+::: {.callout-note}
+The workflow itself — issues and the board, feature branches, what the automated
+checks do and don't prove, squash merges, and what a reviewer is looking for — is
+set out in [How we work](how-we-work.qmd). This section covers only the parts
+specific to building this package.
+:::
+
 ### Issues
 
 We use

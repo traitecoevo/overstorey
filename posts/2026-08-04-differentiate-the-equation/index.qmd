@@ -1,0 +1,255 @@
+---
+title: "Differentiate the equation, not the algorithm"
+description: "Calibrating the TF24 leaf model needs derivatives with respect to traits, and the textbook answer — reverse-mode AD, because there are 40 parameters and one objective — turns out to be the wrong one. The implicit function theorem makes the derivative of a nested pair of root-finds a closed-form expression costing 7% of a solve, and once it does, the choice of AD mode stops mattering."
+date: 2026-08-04
+plant-ref: "develop"
+plant-sha: "a307198da9e473a0268c88ab526e3ca57fe7c082"
+categories: [tf24, hydraulics, autodiff, numerics]
+reading-time: true
+---
+
+```{r setup, include=FALSE}
+source(here::here("R/version-badge.R"))
+```
+
+`r plant_version_badge()`
+
+The TF24 leaf model finds its operating point by optimising. Given a soil water
+potential and light, it chooses the root-collar water potential $\psi$ that
+maximises carbon profit, and inside every candidate $\psi$ there is a further
+root-find for intercellular CO₂. Calibrating the model against measured gas
+exchange means asking for something the model has never provided: the derivative
+of its outputs with respect to its *traits*.
+
+The obvious way to get that is automatic differentiation, and the obvious mode is
+reverse. Our calibration problem has 40 parameters and one scalar log-posterior;
+forward-mode AD costs one sweep per input, reverse costs one per output, so
+reverse should win by a factor of 40. That is the textbook answer and it is what
+we assumed.
+
+It is wrong, and the reason is worth writing down, because the mistake is not
+about AD at all. It is about differentiating the *algorithm* when you should be
+differentiating the *equation the algorithm solved*.
+
+::: {.callout-note}
+## Where the numbers come from
+Measurements are from [`phylloptim`](https://github.com/traitecoevo/phylloptim)
+at `d22907a` — the leaf model extracted from plant's TF24 strategy — on
+macOS/arm64 at `-O2`. plant consumes the same code; the pin above is plant's
+`develop`. The package was called `leaf_cpp` when that commit was made, and was
+renamed on 2026-08-05.
+:::
+
+## The problem has solvers nested two deep
+
+Write the solve at a fixed collar potential $\psi$. Transport to the stem is
+closed form: the soil-to-collar uptake $E_{\text{up}}(\psi)$ is analytic, and the
+vulnerability curve is pre-integrated into a pair of $C^2$ splines $S$ and its
+inverse $P$, so
+
+$$
+\psi_{\text{stem}} = P\!\left( \frac{E_{\text{up}}(\psi)}{k_{\max}} + S(\psi) \right).
+$$
+
+Stomatal conductance follows from the transpiration those two potentials imply,
+$g_c(\psi_{\text{stem}}, \psi)$. Intercellular CO₂ is then *not* closed form — it
+is the root of a demand-equals-supply residual,
+
+$$
+g(c;\, \psi_{\text{stem}}, \psi) \;=\; u\,A(c) \;-\; g_c(\psi_{\text{stem}}, \psi)\,\frac{c_a - c}{P_{\text{atm}}} \;=\; 0,
+$$
+
+solved by TOMS748. With $c^\*$ in hand, profit is assimilation minus hydraulic
+cost,
+
+$$
+\Pi(\psi) = A(c^\*) - C(\psi_{\text{stem}}).
+$$
+
+And the model maximises $\Pi$ over $\psi$ — which, since [a recent
+change](https://github.com/traitecoevo/phylloptim/pull/36), it does by solving the
+first-order condition $\Pi'(\psi) = 0$ rather than by searching.
+
+So there are two solvers stacked: a root-find for $c$ inside a root-find for
+$\psi$. Differentiating *through* both is the thing that looks unavoidable.
+
+## Why $\mathrm{d}\Pi/\mathrm{d}\psi$ is cheap
+
+It is not unavoidable, and the reason is the implicit function theorem. Take the
+chain rule on $\Pi$:
+
+$$
+\frac{\mathrm{d}\Pi}{\mathrm{d}\psi}
+= A'(c)\,\frac{\mathrm{d}c}{\mathrm{d}\psi}
+- C'(\psi_{\text{stem}})\,\frac{\mathrm{d}\psi_{\text{stem}}}{\mathrm{d}\psi}.
+$$
+
+Two pieces look hard. Neither is.
+
+**The transport derivative is analytic**, because $S$ and $P$ are splines that
+carry their own derivatives and $E_{\text{up}}'$ is a conductance we can write
+down:
+
+$$
+\frac{\mathrm{d}\psi_{\text{stem}}}{\mathrm{d}\psi}
+= P'(E_{\text{stem}}) \left[ \frac{E_{\text{up}}'(\psi)}{k_{\max}} + S'(\psi) \right].
+$$
+
+**The CO₂ derivative comes from the residual, not from the solver.** We never
+re-run the root-find. At the converged $c^\*$ the residual vanishes identically,
+so differentiating $g = 0$ gives
+
+$$
+\frac{\partial c}{\partial p} = -\,\frac{\partial g/\partial p}{\partial g/\partial c},
+\qquad
+\frac{\partial g}{\partial c} = u\,A'(c) + \frac{g_c}{P_{\text{atm}}},
+$$
+
+for $p$ either $\psi_{\text{stem}}$ or $\psi$. The collar enters both explicitly
+and through the stem, so
+
+$$
+\frac{\mathrm{d}c}{\mathrm{d}\psi}
+= \frac{\partial c}{\partial \psi_{\text{stem}}}\frac{\mathrm{d}\psi_{\text{stem}}}{\mathrm{d}\psi}
++ \left.\frac{\partial c}{\partial \psi}\right|_{\text{explicit}}.
+$$
+
+Look at what is left on the right-hand side of all of that: $A'$ and $C'$, which
+are derivatives of small closed-form kernels; $S'$ and $P'$, which the splines
+supply; and $E_{\text{up}}'$, which is analytic. **No iteration appears
+anywhere.** The root-find's job was to tell us *where* to evaluate — the point
+$(c^\*, \psi_{\text{stem}})$ — and once we know that, the derivative is a single
+pass of arithmetic.
+
+That is the whole trick, and it shows up directly in the cost:
+
+| | µs |
+|---|---:|
+| one full solve (iterative) | **3.607** |
+| `dprofit_droot_collar_psi` (closed form) | **0.256** |
+
+The derivative of the solve costs **7%** of the solve.
+
+## The same move again, one level up
+
+Now the trait derivative. The optimum $\psi^\*$ is defined implicitly by
+stationarity, and that condition holds identically in the traits $\theta$:
+
+$$
+F(\psi^\*(\theta);\, \theta) \;\equiv\; \left.\frac{\partial \Pi}{\partial \psi}\right|_{\psi^\*} = 0.
+$$
+
+Differentiate the identity in $\theta$ and rearrange:
+
+$$
+\boxed{\;
+\frac{\mathrm{d}\psi^\*}{\mathrm{d}\theta}
+= -\,\frac{\partial^2 \Pi / \partial \psi\, \partial \theta}{\partial^2 \Pi / \partial \psi^2}
+\;}
+$$
+
+Both second derivatives are derivatives of $\Pi'$, which we just established is
+closed form. The denominator is the curvature at the optimum — measured between
+$-1.56$ and $-61.4$ across our benchmark grid, so never near zero. The numerator
+is a mixed partial, and because $\psi$ is held fixed while $\theta$ moves, *no
+argmax is involved*: a plain difference quotient in $\theta$ is stable to seven
+significant figures across five decades of step size.
+
+The quantity a calibration actually wants then composes:
+
+$$
+\frac{\mathrm{d}A}{\mathrm{d}\theta}
+= \underbrace{\left.\frac{\partial A}{\partial \theta}\right|_{\psi}}_{\text{direct}}
++ \underbrace{\frac{\partial A}{\partial \psi}\,\frac{\mathrm{d}\psi^\*}{\mathrm{d}\theta}}_{\text{through the optimum}}.
+$$
+
+That second term is not a correction. For four of the eight traits we measured it
+is **100%** of the answer — the trait moves the operating point and nothing else —
+and for `vcmax_25` it is 52%. A finite difference taken on the solved output used
+to drop it silently, returning exactly zero, which is the bug that motivated all
+of this.
+
+## So where does the time go?
+
+Per trait gradient at 40 parameters:
+
+| route | work | µs | speed-up |
+|---|---|---:|---:|
+| finite differences on the solve | $2N$ solves | 288.6 | — |
+| IFT, differences on $\Pi'$ | 1 solve + $2N$ closed-form | **24.1** | **12×** |
+| IFT, AD on the kernels | 1 solve + ~1 sweep | **4.0** | **72×** |
+
+The 12× costs no new machinery at all: it is the box above, evaluated with the
+derivative the model already computes for other purposes. The remaining 6× comes
+from replacing the difference quotients with AD.
+
+And now the point about modes. Of that final 4.0 µs, **3.6 is the one solve that
+carries no derivatives at all** — you have to solve the model once per observation
+to know which operating point to differentiate at, and that is irreducible. The
+derivative work is the remaining 10%.
+
+Reverse-mode AD is asymptotically better at that 10%. Even if it were free, 4.0
+would become 3.6.
+
+## Why reverse mode looked right, and three reasons it is not
+
+The O(1)-in-parameters argument is correct as far as it goes. It just answers a
+question that stopped being the expensive one.
+
+**It optimises the wrong term.** Amdahl's law: after the implicit function
+theorem, differentiation is 10% of the cost. Forward mode is O(N) in the
+parameters where reverse is O(1), but O(N) applied to 10% of 4 µs is 0.4 µs, and
+we measured scalar and vector forward within noise of each other at N = 40.
+
+**Its advantage is conditional on taping through the solvers**, which is exactly
+what the implicit function theorem exists to avoid. And taping a *bracketing*
+root-find does not give you the derivative of the root — it gives the derivative
+of whatever the solver returned, which is an affine combination of
+comparison-selected bracket endpoints. That is structurally the same defect as the
+golden-section staircase that
+[#36](https://github.com/traitecoevo/phylloptim/pull/36) removed, just at a finer
+scale. If it proved too coarse, the fix would be to apply the implicit function
+theorem anyway — at which point the tape has bought nothing.
+
+**It costs a tape, and the tape costs the build.** Forward-mode XAD is
+header-only; reverse mode is not. The `Tape` implementation is compiled once, in
+odelia, and downstream packages resolve against it by linking a shared library.
+The leaf model is deliberately header-only and R-free so it can be consumed from
+C++ and Python without R present — and those consumers cannot link an R package's
+`.so`.
+
+## The sharp edge: it is only valid at an interior optimum
+
+Stationarity is the premise of the whole derivation, and it fails whenever the
+optimum is pinned to a bound — a dry leaf held at the wettest collar potential
+that still moves water. There the constraint is active, $\Pi' \neq 0$ at the
+answer, and $\mathrm{d}\psi^\*/\mathrm{d}\theta$ is the *bound's* derivative
+rather than the ratio above.
+
+The formula does not fail loudly. On our grid, 42 of 240 feasible operating points
+are pinned — all at the dry end — and at the worst of them the naive composite
+returns an O(1) gradient where the truth is around $10^{-8}$: wrong by seven
+orders of magnitude, silently, at exactly the operating points a calibration
+wandering into drought will visit.
+
+A finite difference on the solved output does not have this failure, because it
+differences the constrained answer and so respects the constraint by
+construction. That is the one thing the crude method does better, and it is why
+any implementation of the box above has to carry an explicit active-set test.
+
+## What generalises
+
+Two things, neither specific to leaves.
+
+**Differentiate the equation, not the algorithm.** An iterative solver is
+expensive and awkward to differentiate; the condition it converged to is usually
+closed form and cheap. Whenever a model's inner loop is a root-find, a fixed
+point or an optimum, the implicit function theorem is likely to turn its
+derivative from a tape into an expression — here, from something needing the whole
+class templated and a tape linked, into 7% of a solve.
+
+**Profile before choosing an AD mode.** Forward versus reverse is a question
+about the cost of differentiation, and it deserves an answer only once you know
+what fraction of the runtime differentiation is. We spent a while planning around
+a factor of 40 that applied to a tenth of the work, on top of a solve we had to
+do anyway.

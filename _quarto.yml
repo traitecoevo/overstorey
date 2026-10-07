@@ -27,6 +27,9 @@ website:
   description: "a field guide to the plant model"
   site-url: "https://traitecoevo.github.io/overstorey"
   repo-url: "https://github.com/traitecoevo/overstorey"
+  # Must be set: Quarto defaults repo-branch to `main`, and this repo's default
+  # branch is `master`, so without it every "Edit this page" link 404s.
+  repo-branch: master
   repo-actions: [edit, issue]
   reader-mode: true
   page-navigation: true
@@ -53,8 +56,12 @@ website:
     right:
       - text: "Pipeline"
         file: develop.qmd
-      - icon: github
-        href: "https://github.com/traitecoevo/overstorey"
+      # Labelled deliberately: this points at the *model* source, not at this
+      # site's repo, which a bare GitHub icon in a navbar is usually read as.
+      # overstorey itself is reachable from the repo-actions links on every page.
+      - text: "plant source"
+        icon: github
+        href: "https://github.com/traitecoevo/plant"
         target: _blank
         aria-label: overstorey source on GitHub
 
@@ -79,6 +86,9 @@ website:
             - guides/example-analysis.qmd
             - guides/self-thinning.qmd
             - guides/emergent-properties.qmd
+        - section: "Scaling up"
+          contents:
+            - guides/running-in-parallel.qmd
         - section: "TF24 in depth"
           contents:
             - guides/tf24-hydraulics-and-acclimation.qmd
@@ -130,6 +140,7 @@ website:
         - develop.qmd
         - section: "Contributing"
           contents:
+            - contributing/how-we-work.qmd
             - contributing/package-organisation.qmd
             - contributing/implementing-a-strategy.qmd
             - contributing/profiling.qmd

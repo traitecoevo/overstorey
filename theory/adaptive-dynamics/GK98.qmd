@@ -59,8 +59,8 @@ library(regnans)
 ```{r singular}
 h <- harness_gk98(d = 1.5, sigma = 1)   # d/sigma = 1.5 > sqrt(1.5) → branching
 
-out <- community_start(bounds(x = c(-4, 4)), harness = h) |>
-  community_solve_singularity_1D()
+out <- community_start(bounds(x = c(-4, 4)), harness = h, trait_scale = "linear") |>
+  community_solve_singularity()
 
 as.numeric(out$traits)   # x* — expected 0 (symmetric three-patch)
 ```
@@ -84,31 +84,26 @@ sqrt(3 / 2)
 
 ### Pairwise invasibility plots either side of the threshold
 
-The left plot uses closely spaced habitat optima and has one stable strategy.
-The right plot uses more widely spaced optima and shows the invasion pattern
-around a branching point.
+The first plot uses closely spaced habitat optima and has one stable strategy.
+The second uses more widely spaced optima and shows the invasion pattern around
+a branching point: the second contour folds back on itself at the singular
+strategy, so some residents can be invaded from three directions. The fold
+appears exactly when $d/\sigma$ exceeds $\sqrt{3/2}$, the branching
+condition.
 
-```{r pip}
-#| fig-width: 8
-#| fig-height: 4.2
-pip <- function(h, xs) {
-  sapply(xs, function(res) {
-    community_start(bounds(x = range(xs)), harness = h) |>
-      community_add(trait_matrix(res, "x")) |>
-      community_demography() |>
-      (\(comm) comm$fitness_function(xs))()
-  })
+```{r pip-css}
+#| fig-width: 5
+#| fig-height: 5
+pip_at <- function(d) {
+  community_start(bounds(x = c(-4, 4)), trait_scale = "linear",
+                  harness = harness_gk98(d = d, sigma = 1)) |>
+    community_pip()
 }
-xs <- seq(-4, 4, length.out = 81)
+plot(pip_at(1.0)) + ggplot2::ggtitle("d/sigma = 1.0 (CSS)")
+```
 
-op <- par(mfrow = c(1, 2))
-for (d in c(1.0, 1.5)) {
-  S <- pip(harness_gk98(d = d, sigma = 1), xs)
-  image(xs, xs, t(sign(S)), col = c("white", "grey85", "forestgreen"),
-        xlab = "resident x", ylab = "mutant y",
-        main = sprintf("d/sigma = %.1f (%s)", d,
-                       if (d > sqrt(1.5)) "branching" else "CSS"))
-  abline(0, 1, lty = 2)
-}
-par(op)
+```{r pip-branching}
+#| fig-width: 5
+#| fig-height: 5
+plot(pip_at(1.5)) + ggplot2::ggtitle("d/sigma = 1.5 (branching)")
 ```

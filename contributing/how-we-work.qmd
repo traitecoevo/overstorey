@@ -1,0 +1,149 @@
+---
+title: "How we work"
+subtitle: "Issue, branch, tests, squash, review — the loop every change in the plant family goes through, and what each step is actually for."
+toc: true
+---
+
+::: {.eyebrow}
+for contributors
+:::
+
+Every change to a plant-family package — `plant`, `odelia`, `regnans`, `phylloptim`, `logpile`, `phytofile`, `overstorey`, `standviz`, `floracle` — travels the same short loop: an **issue** says what we are doing and why, a **feature branch** does it, **automated checks** say whether it still builds and passes, a **pull request** gets read by a human, and a **squash merge** puts exactly one commit on the default branch.
+
+If you have worked in software, that will read as unremarkable — it is close to how most open-source projects operate. If you came to code the way most of us did, through a research question, with the code as a means to an end, it can look like a lot of ceremony for a one-line change. So it is worth saying plainly why it isn't.
+
+Every step in the loop is an answer to a problem that does not exist when one person works on one script for one week, and becomes acute the moment that stops being true. A model that several people modify, that underpins published figures, and that has to still produce the same number in three years has a different characteristic failure from an analysis script. The failure is not that it crashes — it is that it quietly gives a *different* answer, and nobody can say when that started or which paper was affected. Most of the loop exists to make that question answerable:
+
+- **The issue** records why a decision was taken, so it is not re-litigated from memory two years later by someone who wasn't there.
+- **The branch** keeps half-finished work off the version everyone else is building against, so your afternoon can't break someone else's run.
+- **The checks** catch the class of breakage that is invisible on your own machine — a missing dependency, a platform difference, a test you didn't know you'd broken.
+- **The review** means at least one other person has read the change before it becomes permanent.
+- **The squash merge** leaves a history you can bisect: given a number that moved, you can find the change that moved it. That is the difference between an afternoon and a fortnight.
+
+None of it is about tidiness, and none of it assumes anyone is careless. It is about a codebase outliving the memory of the people editing it. The practical upshot is that the cost is paid in small, predictable amounts — a minute writing an issue, ten minutes reading a diff — instead of in one unpredictable week, later, when a figure won't reproduce.
+
+The rest of this page is that reasoning, step by step. The mechanical detail (label names, board fields, commit-message shape) lives in [`plant-meta/governance/`](https://github.com/traitecoevo/plant-meta/tree/main/governance) and is linked from each section rather than repeated here.
+
+## Planning happens on issues
+
+An issue is the unit of planned work. Not a branch, not a to-do list in someone's notes, not a paragraph in a PR — an issue, in the repo the work is *about*.
+
+The reason is that the interesting part of most of our work is deciding what to do, and that reasoning has a long half-life. Which formulation of a cost curve to use, why a solver was replaced rather than tuned, why a parameter default moved: all of that is worth being able to find in three years, and an issue is where it stays findable. It has a stable number, it accumulates discussion, and it can be linked to from a commit, a `NEWS` entry, a manuscript, or another issue.
+
+Three things make issues usable at family scale:
+
+- **One work-type label** — `bug`, `task`, or `epic`. An `epic` is an umbrella; break it down with the board's native sub-issues rather than a checklist in the body, so progress is visible on the card.
+- **An `[area]` prefix in the title** — `[SCM]`, `[env drivers]`, `[TF24 hydraulics]`. Much of our work sits inside one large repo, so the prefix is what gives the board any grain finer than "plant".
+- **`cross-package`, and `breaking` if dependents must change** — the family is a dependency graph, and a `plant` interface change that forces a `regnans` migration needs to be visible as such before it lands, not after.
+
+Work is tracked on one board, [Plant model development (#5)](https://github.com/orgs/traitecoevo/projects/5). New issues auto-add to it with **no Status** — that empty Status *is* the triage queue, which is why there is no `triage` label. A maintainer sets `Status = Backlog` during triage; you don't need to. Status lives on the board, never as a label, so there is only ever one place to look.
+
+Full detail: [`issue-guide.md`](https://github.com/traitecoevo/plant-meta/blob/main/governance/issue-guide.md) for filing and labelling, [`project-board.md`](https://github.com/traitecoevo/plant-meta/blob/main/governance/project-board.md) for the board's fields and the labels-versus-fields split, [`triage.md`](https://github.com/traitecoevo/plant-meta/blob/main/governance/triage.md) for maintainer discipline.
+
+## Feature branches
+
+The model is [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow), lightly applied. In `plant`, which is where it matters most, there are two long-lived branches:
+
+- **`master`** — the stable, released version. This is what a user installs, what a published result was computed against, and what carries the version tags. It only ever changes by a release.
+- **`develop`** — where work is integrated. Everything lands here first and accumulates until a release moves it to `master`.
+
+Each change then gets a **short-lived feature branch** off `develop`, which is merged back when it is done and deleted. We do not use Gitflow's release or hotfix branches; those two branches plus feature branches is the whole of it.
+
+**Check the default branch before you branch — the family is not uniform.** Only `plant` keeps the `master`/`develop` split; the rest are single-branch, and the one branch they have is variously called `master` or `main`. As currently configured:
+
+| Repo | Default branch |
+|---|---|
+| `plant` | `develop` |
+| `odelia`, `regnans`, `phylloptim`, `phytofile`, `overstorey`, `standviz` | `master` |
+| `logpile`, `floracle`, `plant-meta` | `main` |
+
+: Verified 2026-08-26 with `gh api repos/traitecoevo/<repo> --jq .default_branch`.
+
+Nothing is committed straight to a default branch. Every change is a branch and a pull request, and the PR body carries `Closes #NNN` so the issue closes itself on merge and the commit points back at the reasoning.
+
+Two habits make this work rather than merely happen:
+
+**One concern per branch.** A branch that fixes a solver bug *and* renames three parameters *and* tidies a vignette cannot be reviewed — the reviewer can only approve or reject the whole thing, and will approve it, because two thirds of it is obviously fine. It also cannot be reverted, and it lands as one indivisible commit in a history we bisect. If you find a second thing while working, file it; that is what issues are cheap for.
+
+**Branch off the integration branch, and rebase, don't stack, unless you mean to.** A branch built on top of another unmerged branch is fine until the parent is squash-merged — at which point the parent's whole diff exists on the default branch as one new commit that shares no history with the child, and the child's PR now proposes re-landing all of it. The fix is `git rebase --onto` the new default-branch tip and a check that the changed-file count is what you expect *before* merging. This is a real cost of squash merging and it has bitten us; it is not a reason to stop squashing, just a thing to look at.
+
+## What the automated checks are for
+
+Every R package repo runs `R CMD check` and its testthat suite on each PR, defined in that repo's `.github/workflows/`. `plant`, `odelia` and `phylloptim` compile C++, so a green check there also means *it built* — on the CI toolchain, not just on yours, which is a genuinely different question and catches a real class of problem.
+
+The site has its own checks, because its failure modes are different: [`pr-checks.yml`](../develop.qmd) fails a PR whose page source changed without its `_freeze/` being updated, and refuses to merge a reproduction post that still has `fidelity: pending` or a `TODO` in its `paper:` block. A weekly `drift-watch.yml` re-runs the reproductions against `plant` master and reports which published figures have moved — early warning that the model has changed a result we have in print.
+
+It is worth being blunt about what this does and does not buy, because a green tick is very persuasive:
+
+- **CI answers "does it still build and do the assertions still hold".** It does not answer "are the numbers right".
+- **A test that can only skip is not a test.** If a suite skips on CI for want of a fixture, a compiler, or a data file, it is documentation of an intention.
+- **Prose is not asserted.** Vignette chunks and roxygen examples are *run* but nothing checks the sentence next to the number. A paragraph can therefore keep asserting a value the code no longer produces, indefinitely, with everything green. After any solver or default change, re-run the docs and compare.
+- **A golden-file test passes if you change both sides.** Regenerating a reference alongside the code that produces it turns a regression test into a tautology. If a reference file moves in a diff, that is the most interesting line in the PR.
+
+So the useful reviewer question is never "is it green" — it is **"what would have caught this if it were wrong?"** If the answer is nothing, the PR is asking for trust it hasn't earned yet, and the cheapest fix is usually one assertion.
+
+Model behaviour has its own standard: a model should run across a wide range of strategies and conditions and return sensible outputs, *including zero growth or reproduction*, rather than crash — but a physically unrealistic state should fail loudly rather than be continued from. See [`model-robustness.md`](https://github.com/traitecoevo/plant-meta/blob/main/governance/model-robustness.md).
+
+## Why we squash
+
+Every family repo squash-merges — all ten are configured to build the squash message from `PR_TITLE` and `PR_BODY` (verified 2026-08-26). One reviewed change becomes exactly one commit on the default branch.
+
+The benefits are the ordinary ones and they compound:
+
+- **`git log` is a list of changes**, not a list of keystrokes. No `wip`, no `fix typo`, no `merge develop into feature/x` — and `git bisect` steps through reviewed units, which is what makes bisecting a numerical regression tractable at all.
+- **`git blame` lands somewhere useful.** The commit it names is a whole reviewed change with a description, not the midpoint of someone's afternoon.
+- **The commit carries a link.** GitHub appends ` (#NNN)`, so every line of code is one click from the discussion that produced it.
+- **The messy part stays private.** You can commit freely on a branch — that is what a branch is for — without any of it becoming permanent.
+
+The consequence catches everyone once: **the PR title and body *are* the commit message.** GitHub copies them verbatim. That makes a PR description the wrong place to think out loud, and we had drifted a long way into using it as one — measured on `plant` `develop` in August 2026, PR-merged commit bodies had grown to a median of 34 lines against 2 before 2026, while commits typed by hand in a terminal the same week had a median of 1. Same people, same repo: the habit was in the PR box, not the commit box.
+
+The rule we settled on relocates rather than deletes. **Short, durable description; everything else in the first comment on the PR, posted when you open it.** What changed in observable behaviour, why it was needed, what breaks and how to migrate, one line of magnitude if results moved, `Closes #NNN` — that goes in the body, under ten lines. Benchmark tables, what you tried first, hypotheses that turned out wrong, replies to review comments, branch bookkeeping — first comment. Nothing is lost: a PR comment is exactly as permanent as a commit message and the `(#NNN)` links straight to it.
+
+The failure this avoids is not verbosity. A long commit message wastes a reader's time once; a long commit message full of superseded reasoning actively misleads. We have a 147-line commit whose *"What this does not fix"* section describes, in careful detail, a bug the next PR fixed — evidence that became misinformation without anyone touching it.
+
+Shape, the full what-goes-where table, and the repo settings that make it work: [`commit-messages.md`](https://github.com/traitecoevo/plant-meta/blob/main/governance/commit-messages.md). The longer argument: [The commit log is not a lab notebook](../posts/2026-08-05-commit-log-is-not-a-lab-notebook/).
+
+## Reviewing a pull request
+
+### The baseline is low, and worth having anyway
+
+At its simplest, review is: **make sure nobody is committing something silly.** That is not a joke, and it is most of the value. A debug `print` left in a hot loop. Commented-out code kept "just in case". A 40 MB `.RDS` added because it was in the working directory. A stale `_freeze/`. A file added to the wrong package, when the family's whole architecture is a set of source-of-truth rules — the engine in `plant`, the integrator and autodiff in `odelia`, assembly in `regnans`, calibrated parameters in `phytofile`. A change that will break a dependent, unlabelled.
+
+None of that needs deep knowledge of the code. All of it is permanent once merged.
+
+Above that baseline, a good review asks a handful of questions:
+
+- **Does the diff do what the description says?** Nothing more, nothing less. Extra scope in a PR is a signal, not a bonus.
+- **Is there a test, and would it have failed before?**
+- **If a number moved, is the magnitude stated, and is it explained?**
+- **Is anything here already implemented elsewhere in the family?**
+- **Does this need `cross-package` or `breaking`, and are the partner issues linked?**
+- **Do new comments carry contracts and hazards, or the history of the change?** History belongs in the PR, the issue, or `NEWS`.
+
+### What review is not
+
+It is not a proof of correctness, and treating it as one makes people avoid it. It is not the place to relitigate a design decision that has an issue — take it back to the issue. And it is not a style argument; if we care about a convention, it goes in a linter or a governance doc, not into a review comment on a Tuesday.
+
+### The requirement, and overruling it
+
+Review is not *enforced*: no family repo requires an approving review before a merge, and `plant`'s `master` is the only branch carrying any protection rule at all (checked 2026-08-26).
+
+Merging is a privilege, though, not something everyone has. It needs write access to the repo, so a contributor without it opens a PR — from a fork if need be — and a maintainer merges it. If you can merge, you already know you can.
+
+For those who *do* have that access, the latitude is real: a change small, urgent, or obvious enough can be merged without waiting for anyone, and sometimes is. That is a deliberate choice rather than an oversight, because a hard approval gate on a repo with two active developers mostly teaches people to route around it.
+
+The point worth internalising is what those same people do in practice. **Almost everything still goes through a PR, including work by the maintainers who could skip it, and including changes nobody else was ever going to look at.** The value is not the approving click. It is that opening a PR forces you to look at your own diff *as a diff* — separated from the reasoning that produced it, in the order a stranger will read it — and that alone catches a surprising amount. Self-review is the floor, not a formality. If nobody else is going to read it, read it yourself, properly, before you merge.
+
+### Reviewing code you did not write yourself
+
+A large and growing fraction of what lands in these repos is written with AI assistance. That changes what review is for, in a way worth being explicit about: for much of this code, **the PR is the first time a human being reads it at all** — and, because the diff spans whatever the assistant touched, often the first time anyone reads *across* the codebase rather than down one file. That makes the review the most valuable half-hour in the loop, not the most skippable. Take your time.
+
+The failure modes are distinctive, and we have hit each of these:
+
+- **A confident claim in the description that nothing checked.** Measurements taken against a half-reverted build, a speedup that holds in C++ but not in R, a mechanism asserted from a plausible name rather than verified. Descriptions are now the *most* likely place for an error, because they read as authoritative and CI does not test them. Ask what would have to be true, and whether it was checked.
+- **It ran, therefore it worked.** A pipeline target that builds clean and holds zero rows. A guard whose test passes because it reads none of the inputs it is supposed to guard. Green is not populated, and passing is not covering.
+- **Reimplementation.** The assistant cannot see what it did not read, so a function that already exists in a sibling package gets written again, subtly differently. This is the single easiest thing for a human with family context to catch and the hardest for anything else.
+- **Plausible-looking numbers.** Defaults, constants and unit conversions that look right and are not. A pressure in kPa where the formula wants Pa; a conductance on the wrong molecular basis.
+- **Confidently stale prose.** Docs updated to describe the intention rather than the code, next to a chunk that still computes the old thing.
+
+The corresponding habit is simple: **verify the claim, not just the diff.** If the description says a change is 22× faster, or moves a result by 0.2%, or fixes a bug — check that the thing quoted is the thing measured. That question, asked out loud on a PR, has caught more here than any test suite.
