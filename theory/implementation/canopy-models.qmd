@@ -54,7 +54,7 @@ $E(z)$: the fraction of open-sky light reaching height $z$. Every plant both
 *reads* this profile to photosynthesise and *contributes* to it, because its
 leaves lower $E$ for plants beneath them.
 
-This profile is consequential, not a minor implementation detail. It determines
+This profile is consequential, not a minor implementation detail. It determines <!-- SY: Reads like Claude -->
 plant growth, which determines stand size structure and competitive hierarchy,
 and ultimately affects which strategies persist and which traits selection
 favours. Errors in shading can therefore propagate to the ecological and

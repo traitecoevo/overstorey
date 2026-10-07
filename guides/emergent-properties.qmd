@@ -9,6 +9,7 @@ An **emergent property** belongs to the whole patch rather than to any one
 plant. It arises from many individuals growing, recruiting, dying, and changing
 one another's light environment. This example moves from node-density profiles
 to leaf area and growth, then averages patch profiles across a metapopulation.
+<!-- Aren't 'emergent properties' a broader term in modelling? Should we say emergent patch property? -->
 
 ::: {.callout-note}
 A few steps below reach into plant's internal helpers (`plant:::trapezium`,
@@ -122,7 +123,7 @@ below the canopy top.
 
 Which heights contribute most of the patch's leaf area? The collected output
 records individual leaf area as `competition_effect`. Multiplying it by node
-density gives leaf area density. The canopy model later applies the light
+density gives leaf area density. The canopy model later applies the light <!-- SY: When is 'later'? -->
 extinction coefficient `k_I` when computing competition; see
 [Canopy and light environments](../theory/implementation/canopy-models.qmd).
 
@@ -171,10 +172,10 @@ text(height[1, i] + strwidth("x"), growth_rate[1, i],
 
 The earlier curves each describe a patch of one age. A metapopulation contains
 patches of many ages, so its average profile weights every patch age by its
-abundance. Before averaging, we must interpolate each patch profile onto the
+abundance. Before averaging, we must interpolate each patch profile onto the <!-- SY: What does 'interpolate each patch profile onto the same set of heights' mean? -->
 same set of heights. See the
 [size-structured PDE](../theory/size-structured-pde.qmd) for the corresponding
-integral.
+integral. <!-- SY: Add the equation number here? -->
 
 ```{r}
 #| label: fixed-heights
@@ -269,3 +270,7 @@ text(height[1, i] + strwidth("x"), density[1, i],
      adj=c(0, 0))
 points(hh, n_av, col="red", type='l')
 ```
+
+<!-- SY: Could this be explained more biologically? What does the distribution of patch ages look like? That could be another plot? It looks like the metapopulation average looks similar to the old patch ages? -->
+
+<!-- SY: I think the Guides could do with an example with `regnans`, or more examples of biological questions. Coming to the end of it I'm still not feeling too confident on how to run analyses and also what kind of experiments you could do with `plant`. -->
