@@ -74,7 +74,7 @@ typed**, so exactly one place knows where a result lives.
 
 ## One job, one function, one file
 
-The job is an ordinary function of one manifest row. It refines the
+The job is an ordinary function of one manifest row. It refines the <!-- SY: What does this mean? -->
 node-introduction schedule, runs the patch, and returns summaries; a thin wrapper
 saves the result and returns the filename:
 
@@ -134,11 +134,13 @@ solver state per run, while the totals and scalars an analysis actually consumes
 come to about 35 kB. Deciding what a job's artefact is — rather than reflexively
 saving everything — is the cheapest performance decision in a sweep, because
 every later read pays for it.
+<!-- SY: I think it would be nice to un-Claudify this and the Overstorey docs overall. What does this last sentence mean? What is an artefact? -->
 
 ## The serial baseline
 
-Always measure this first. It tells you whether parallelism is worth any
+Always measure how long it takes to run a small number of rows first. It tells you whether parallelism is worth any <!-- SY: Whether parallelism is worth complexity? Or just whether it is worth it? -->
 complexity, and it is the reference your parallel results must match:
+<!-- SY: What exactly does this number tell me? I think it's the time it takes to run 4 rows of the grid right? -->
 
 ```{r}
 #| label: serial
@@ -157,8 +159,8 @@ basename(unlist(files_serial))
 
 ## `mclapply()`: one line, most of the win
 
-`parallel::mclapply()` is `lapply()` with an `mc.cores` argument. For a sweep
-that is genuinely all the change required:
+`parallel::mclapply()` is `lapply()` with an `mc.cores` argument. It lets you run the whole sweep in parallel:
+<!-- SY: Not supported in Windows -->
 
 ```{r}
 #| label: mclapply
@@ -193,6 +195,7 @@ serial path working) and that it is unreliable inside the RStudio GUI — run
 sweeps from a terminal. On Windows, or when workers must outlive one session,
 `mirai` and `future`/`furrr` are the alternatives, at the price of installing
 `plant` into the workers.
+<!-- SY: This seems only relevant to a development build? -->
 
 **`mclapply()` does not stop on error.** A failed job returns a `try-error`
 object *in the result list* while everything else succeeds, so a broken sweep can
@@ -257,9 +260,11 @@ illustrative constant and patch lifetimes are shortened for speed, so the net
 reproduction ratio sits below 1 everywhere and none of these patches is at
 equilibrium. Solving for equilibrium birth rates is a different job — see
 [Emergent properties](emergent-properties.qmd) — and the sweep machinery is
-identical either way.
+identical either way. <!-- SY: I dont' think this linked page solves for equilibrium birth rates. Is that supposed to be part of the `regnans` package? -->
 
-### The idiom that gets you into trouble
+<!-- SY: Net reproduction ratio is never defined in Overstorey docs. Also demographic equilibrium won't have been encountered unless someone read the Theory first. -->
+
+### The idiom that gets you into trouble <!-- SY: Why 'idiom'? -->
 
 The natural next step is to make the sweep resumable by skipping finished jobs:
 
@@ -270,11 +275,8 @@ length(todo)
 ```
 
 Zero, because the sweep above already finished all eight — rerun the script and
-nothing recomputes. That is exactly the behaviour you want, and exactly where the
-trap is.
-
-This is the right instinct and the wrong mechanism. `file.exists()` answers only
-"is this file missing?", which leaves three failure modes:
+nothing recomputes. However, there are three other instances that aren't addressed by 
+`file.exists()`, which answers only "is this file missing?":
 
 - **A parameter changed that is not in the filename.** Nothing reruns. Your
   output directory now mixes vintages, with no record of which is which.
@@ -282,8 +284,8 @@ This is the right instinct and the wrong mechanism. `file.exists()` answers only
   `run_patch()` invalidates *every* result while all the files still exist.
 - **A job crashed mid-write.** A truncated `.rds` exists, so it counts as done.
 
-None of these announce themselves. They surface weeks later as a figure that
-cannot be reproduced. Fixing it properly means tracking parameters *and* code.
+To address these, we want to track parameters *and* code.
+<!-- SY: De-claudify the above -->
 
 ## `targets`: when the sweep is something you maintain
 
@@ -293,7 +295,7 @@ jobs whose hashes changed. Parallelism comes from a
 [`crew`](https://wlandau.github.io/crew/) controller, so it is the same one-line
 change as `mc.cores`.
 
-A pipeline is a project directory rather than a script: `_targets.R` declares the
+A parallel pipeline is a project directory rather than a script: `_targets.R` declares the
 steps, and the functions live in `R/`.
 
 ```{r}
@@ -330,6 +332,8 @@ pipeline runs locally and on a cluster:
 ```bash
 NWORKERS=8 Rscript -e 'targets::tar_make()'
 ```
+
+<!-- SY: The rest is quite hard to read as a beginner. -->
 
 Three of those lines deserve comment.
 
