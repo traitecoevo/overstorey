@@ -107,3 +107,169 @@ pip <- community_start(bounds(x = c(-2, 2)), trait_scale = "linear", harness = h
   community_pip()
 plot(pip) + ggplot2::ggtitle("DD99 (sigma_C = 0.4 < sigma_K = 1)")
 ```
+
+## How the singular strategy moves with a parameter
+
+So far the parameters have been fixed. Often the question is how the outcome depends on them: where the singular strategy sits as competition becomes less local, and at what parameter value a branching point becomes a stable strategy. Re-solving the model on a grid of parameter values answers this, but `regnans` can also follow a singular strategy directly as a parameter changes.
+
+A singular strategy $x^\*$ is a root of the selection gradient, $g(x^\*, p) = 0$. When a parameter $p$ changes, the root moves, and differentiating $g(x^\*(p), p) = 0$ gives the rate at which it moves:
+
+$$
+\frac{dx^\*}{dp} = -\left(\frac{\partial g}{\partial x}\right)^{-1} \frac{\partial g}{\partial p} .
+$$
+
+`community_parameter_sensitivity()` computes this sensitivity. For a community of several residents, $\partial g / \partial x$ is a matrix that couples their gradients: the residents share one environment, so moving one changes the selection on the others, and they respond together.
+
+`community_continue_singularity()` uses the sensitivity to follow a singular strategy across a series of parameter values. At each new value it predicts where $x^\*$ will be, solves for the singular strategy from that prediction, and classifies the result again. The output is a one-parameter bifurcation diagram: the singular strategy and its classification along the parameter, with the values at which the classification changes.
+
+Both functions need the model as a function of the parameter, one that takes a value $p$ and returns a community built at it. `community_parameter_map()` writes this function for any parameter of the model, and `community_parameter_values()` reads the value a community was built at:
+
+```{r parameter-map}
+by_sigma_C <- community_parameter_map(out, "sigma_C")
+community_parameter_values(by_sigma_C(0.7), by_sigma_C)
+```
+
+```{r path-helpers}
+#| code-fold: true
+#| code-summary: "Plotting helpers: plot_path(), add_path() and legend_path()"
+class_col <- c("CSS" = "#2a78d6", "branching point" = "#eb6834", "degenerate" = "grey45")
+class_pch <- c("CSS" = 16, "branching point" = 17, "degenerate" = 1)
+
+# One line per resident, each point marked by its classification, and a grey
+# band where the classification changes between two parameter values.
+add_path <- function(path) {
+  ch <- path$changes
+  if (nrow(ch) > 0)
+    rect(ch$p_before, par("usr")[3], ch$p_after, par("usr")[4],
+         col = "grey92", border = NA)
+  cls <- path$classification
+  for (j in seq_len(ncol(path$traits))) {
+    lines(path$p, path$traits[, j], col = "grey40")
+    points(path$p, path$traits[, j], pch = class_pch[cls], col = class_col[cls])
+  }
+}
+plot_path <- function(path, xlab, ylab, ylim = range(path$traits), ...) {
+  plot(range(path$p), ylim, type = "n", xlab = xlab, ylab = ylab, ...)
+  add_path(path)
+}
+# A legend for the classifications on a plot, and optionally one reference line.
+legend_path <- function(where, cls, line = NULL, lty = 2) {
+  n <- length(line)
+  legend(where, legend = c(cls, line), bty = "n",
+         pch = c(class_pch[cls], rep(NA, n)), col = c(class_col[cls], rep("grey40", n)),
+         lty = c(rep(0, length(cls)), rep(lty, n)))
+}
+```
+
+### A branching point becomes a stable strategy
+
+Start from the singular strategy solved above, at $\sigma_C = 0.4$, and follow it as the competition kernel widens past the resource kernel ($\sigma_K = 1$):
+
+```{r path-sigma-C}
+path_C <- community_continue_singularity(out, by_sigma_C, seq(0.4, 1.3, by = 0.05))
+path_C
+path_C$changes
+```
+
+The singular strategy stays at $x_0$ all along the path, since $x^\* = x_0$ whatever the kernels. What changes is its classification. It is a branching point while competition is more local than the resource ($\sigma_C < \sigma_K$) and a CSS once it is less local. Exactly at $\sigma_C = \sigma_K$ the curvature of invasion fitness is zero and the second-order test cannot decide, so that point is classified as degenerate.
+
+The classification rests on the curvature of invasion fitness in the mutant direction at the resident, which for DD99 has the closed form
+
+$$
+\frac{\partial^2 s}{\partial y^2}\bigg|_{y = x = x_0} = r\left(\frac{1}{\sigma_C^2} - \frac{1}{\sigma_K^2}\right).
+$$
+
+Each point of the path records its full classification, including this curvature. The curvature computed numerically along the path lies on the closed form and changes sign where the classification does:
+
+```{r path-sigma-C-curvature}
+#| fig-width: 5.5
+#| fig-height: 4
+curvature <- vapply(path_C$classifications, function(cl) as.numeric(cl$hessian), 0)
+
+plot(path_C$p, curvature, type = "n", xlab = expression(sigma[C]),
+     ylab = "curvature of invasion fitness at x*")
+ch <- path_C$changes
+rect(ch$p_before, par("usr")[3], ch$p_after, par("usr")[4], col = "grey92", border = NA)
+abline(h = 0, lty = 3)
+curve(1 / x^2 - 1, add = TRUE, col = "grey40")
+points(path_C$p, curvature, pch = class_pch[path_C$classification],
+       col = class_col[path_C$classification])
+legend_path("topright", unique(path_C$classification), "closed form", lty = 1)
+```
+
+### A pair of strategies
+
+When $\sigma_C < \sigma_K$ the population branches, and the two lineages settle at a pair of strategies placed symmetrically about $x_0$. The pair is at $x_0 \pm a^\*$, where
+
+$$
+a^\* = \sigma_C \sqrt{\tfrac{1}{2}\ln\frac{1 - c}{c}},
+\qquad
+c = \frac{\sigma_C^2}{2\sigma_K^2} .
+$$
+
+Solving for the pair from two starting residents, and taking its sensitivity to three parameters at once:
+
+```{r pair-sensitivity}
+pair <- community_solve_singularity(out, x0 = trait_matrix(c(-0.3, 0.3), "x"))
+pair$traits
+
+S <- community_parameter_sensitivity(pair, community_parameter_map(pair, c("x0", "sigma_C", "sigma_K")))
+round(S[, ], 4)
+```
+
+Each row is a resident and each column a parameter. Both residents move one for one with $x_0$: the whole pair shifts with the resource optimum. Their responses to the two kernel widths are equal and opposite, so widening either kernel spreads the pair apart without moving its centre. These are the derivatives of $\pm a^\*$:
+
+```{r pair-closed-form}
+a_star <- function(sigma_C, sigma_K = 1) {
+  c0 <- sigma_C^2 / (2 * sigma_K^2)
+  sigma_C * sqrt(log((1 - c0) / c0) / 2)
+}
+d <- 1e-6
+c(sigma_C = (a_star(0.4 + d) - a_star(0.4 - d)) / (2 * d),
+  sigma_K = (a_star(0.4, 1 + d) - a_star(0.4, 1 - d)) / (2 * d))
+```
+
+Following the pair as the resource kernel widens, both residents move outwards, on the closed form. The pair is itself a branching point at every value: with Gaussian kernels each of its residents can branch again, as the [assembly examples](assembly.qmd) show.
+
+```{r pair-sigma-K}
+#| fig-width: 5.5
+#| fig-height: 4
+path_K <- community_continue_singularity(pair, community_parameter_map(pair, "sigma_K"),
+                                         seq(1, 2, by = 0.1))
+path_K
+
+plot_path(path_K, xlab = expression(sigma[K]), ylab = "singular coalition x*",
+          ylim = c(-0.6, 0.6))
+curve(a_star(0.4, x), add = TRUE, lty = 2, col = "grey40")
+curve(-a_star(0.4, x), add = TRUE, lty = 2, col = "grey40")
+legend_path("right", unique(path_K$classification), "closed form")
+```
+
+### Where the pair disappears
+
+As $\sigma_C$ grows, the pair first spreads a little, then closes up on $x_0$: $a^\*$ falls to zero as $\sigma_C$ approaches $\sigma_K$. At $\sigma_C = \sigma_K$ the two residents merge into the single singular strategy, which is where it turns from a branching point into a CSS. Beyond that there is no pair to follow. This is a pitchfork bifurcation.
+
+The continuation sees this coming: the sensitivity grows without bound as the pair closes, and a path asked to go past the bifurcation stops at the first value it cannot reach. It warns at that point and keeps everything before it:
+
+```{r pair-sigma-C}
+#| warning: true
+path_pair_C <- community_continue_singularity(pair, by_sigma_C,
+                                              c(seq(0.4, 0.95, by = 0.05), 0.97, 0.99, 1.05))
+path_pair_C$stopped
+tail(cbind(sigma_C = path_pair_C$p, path_pair_C$sensitivity), 4)
+```
+
+The warning says that at $\sigma_C = 1.05$ the solver, started from the predicted pair, found the two residents merged into one: the pair no longer exists. The last rows of the sensitivity show the residents moving faster and faster as the bifurcation approaches.
+
+Drawn together with the single resident from above, the two paths make the pitchfork. The branching point at $x_0$ splits into the pair, which closes up again as $\sigma_C$ grows and meets $x_0$ where the single strategy becomes a CSS:
+
+```{r pitchfork}
+#| fig-width: 5.5
+#| fig-height: 4
+plot_path(path_C, xlab = expression(sigma[C]), ylab = "singular strategy or coalition x*",
+          ylim = c(-0.6, 0.6))
+add_path(path_pair_C)
+curve(a_star(x), from = 0.4, to = 1, add = TRUE, lty = 2, col = "grey40")
+curve(-a_star(x), from = 0.4, to = 1, add = TRUE, lty = 2, col = "grey40")
+legend_path("topright", c("branching point", "degenerate", "CSS"), "closed form")
+```

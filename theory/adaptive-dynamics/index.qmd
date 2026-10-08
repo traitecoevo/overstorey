@@ -38,5 +38,7 @@ plots and run the full [community-assembly algorithm](assembly.qmd). The example
 show how branching and limiting similarity build a multi-strategy community,
 including a two-trait version of DD99.
 
+The DD99, GM99 and JJ12 pages also show how a singular strategy moves when a model parameter changes. They follow it along the parameter and mark where its classification changes: in DD99 a branching point becomes a stable strategy and a pair of strategies merges back into one, and in GM99 a stable pair of seed sizes becomes a branching point again.
+
 > Rendering these pages requires [`regnans`](https://github.com/traitecoevo/regnans)  (and its dependency [`plant`](https://github.com/traitecoevo/plant)) to be
 > installed, not just loaded from source.
