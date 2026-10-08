@@ -47,7 +47,7 @@ is difficult to calculate directly in a structured metacommunity because plants
 differ in size and occupy patches of different ages
 [@Gyllenberg-2001; @Metz-2001].
 
-At demographic equilibrium, we can instead use the **basic reproduction
+At demographic equilibrium, we can instead use the **basic reproduction <!-- SY: Redefine demographic equilibrium here -->
 ratio**: the expected number of new dispersers ultimately produced by one
 dispersing seed. This ratio gives the same evolutionary ordering as the
 long-term per-capita growth rate, so it can be used to decide whether a mutant
@@ -102,7 +102,7 @@ The threshold is replacement:
 
 Repeating this calculation across mutant trait values gives an invasion-fitness
 landscape. A resident that cannot be invaded by nearby alternatives is
-evolutionarily stable. That is distinct from convergence stability: a trait can
+evolutionarily stable. That is distinct from convergence stability: a trait value can
 be approached by gradual evolution yet still be invasible once reached, in
 which case it can be an evolutionary branching point rather than an endpoint.
 The [adaptive-dynamics examples](adaptive-dynamics/index.qmd) show both kinds of

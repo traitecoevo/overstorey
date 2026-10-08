@@ -31,7 +31,7 @@ K(x) = K_0 \exp\!\left(-\frac{(x-x_0)^2}{2\sigma_K^2}\right),
 C(d) = \exp\!\left(-\frac{d^2}{2\sigma_C^2}\right).
 $$
 
-<!-- SY: What do these equations represent? -->
+<!-- SY: What do these equations represent? Variables are not defined. I assume fitness and competition, but good to make that explicit. -->
 
 For a rare mutant `y` in a resident community $\{x_i, N_i\}$ at demographic
 equilibrium, the invasion fitness (a per-capita growth **rate**, which is zero for the
