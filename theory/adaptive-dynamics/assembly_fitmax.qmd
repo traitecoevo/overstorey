@@ -27,6 +27,8 @@ library(ggplot2)
 
 ## Assembly
 
+<!-- SY: More hand holding throughout please! -->
+
 ```{r lma-assembly}
 # At each step, introduce the mutant with the highest invasion fitness and
 # return the community to demographic equilibrium.

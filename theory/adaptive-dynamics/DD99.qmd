@@ -112,12 +112,12 @@ plot(pip) + ggplot2::ggtitle("DD99 (sigma_C = 0.4 < sigma_K = 1)")
 
 So far the parameters have been fixed. Often the question is how the outcome depends on them: where the singular strategy sits as competition becomes less local, and at what parameter value a branching point becomes a stable strategy. Re-solving the model on a grid of parameter values answers this, but `regnans` can also follow a singular strategy directly as a parameter changes.
 
-A singular strategy $x^\*$ is a root of the selection gradient, $g(x^\*, p) = 0$. When a parameter $p$ changes, the root moves, and differentiating $g(x^\*(p), p) = 0$ gives the rate at which it moves:
+A singular strategy $x^\*$ is a root of the selection gradient, $g(x^\*, p) = 0$. When a parameter $p$ changes, the root moves, and differentiating $g(x^\*(p), p) = 0$ gives the rate at which it moves: <!-- SY: So g is selection? -->
 
 $$
 \frac{dx^\*}{dp} = -\left(\frac{\partial g}{\partial x}\right)^{-1} \frac{\partial g}{\partial p} .
 $$
-
+<!-- SY: I think this page is hard to grasp as a beginner. -->
 `community_parameter_sensitivity()` computes this sensitivity. For a community of several residents, $\partial g / \partial x$ is a matrix that couples their gradients: the residents share one environment, so moving one changes the selection on the others, and they respond together.
 
 `community_continue_singularity()` uses the sensitivity to follow a singular strategy across a series of parameter values. At each new value it predicts where $x^\*$ will be, solves for the singular strategy from that prediction, and classifies the result again. The output is a one-parameter bifurcation diagram: the singular strategy and its classification along the parameter, with the values at which the classification changes.

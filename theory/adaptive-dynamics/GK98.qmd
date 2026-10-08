@@ -90,6 +90,7 @@ a branching point: the second contour folds back on itself at the singular
 strategy, so some residents can be invaded from three directions. The fold
 appears exactly when $d/\sigma$ exceeds $\sqrt{3/2}$, the branching
 condition.
+<!-- SY: I think this page needs more hand holding. The first plot is a ESS because at resident x = 0, there is no mutant x that has positive fitness (i.e. is in the green areas of the graph). In the second plot, why can residents be invaded from three directions? What is the second contour and the fold? Where is $\sqrt{3/2}$? -->
 
 ```{r pip-css}
 #| fig-width: 5

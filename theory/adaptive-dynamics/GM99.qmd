@@ -14,7 +14,7 @@ each one is more expensive to make.
 Seeds land at discrete **safe sites**, and the number arriving at any site is
 Poisson distributed. Seedlings at the same site then compete for its resources
 in a size-asymmetric lottery: larger seeds have an advantage. If that advantage
-is strong enough, the intermediate seed-size strategy becomes a branching
+is strong enough, the intermediate seed-size strategy becomes a branching <!-- SY: Got lost here. Why does an intermediate seed-size strategy become a branching point if the advantage of large seeds is strong enough? -->
 point. Small, numerous seeds can then coexist with large, highly competitive
 seeds.
 
@@ -38,9 +38,9 @@ expected share of the site, averaged across all possible seed arrivals, is
 $$
 g = \mathbb{E}\!\left[\frac{c(x')}{c(x') + \sum_j k_j\,c(x_j)}\right].
 $$
-
+<!-- SY: Define variables? -->
 Invasion fitness is the mutant's expected number of established offspring (a
-lifetime reproductive ratio, **= 1**, i.e. log = 0, at equilibrium):
+lifetime reproductive ratio, **= 1**, i.e. log = 0, at equilibrium): <!-- SY: Confused here. Aren't we trying to calculate invasion finess, why is it = 1 at equilibrium? -->
 
 $$
 W(x') = \frac{R}{x'}\, s(x')\, g .
@@ -51,6 +51,7 @@ $\tfrac{R}{x}s(x)\,\tfrac{1-e^{-N}}{N} = 1$. Only the products $\alpha R$ and
 $\beta R$ affect the outcome. There is no formula for the singular strategy, so
 we find it numerically. Branching becomes more likely as the competitive
 asymmetry $\alpha$ increases.
+<!-- What is R? -->
 
 ## Example analysis with `regnans`
 

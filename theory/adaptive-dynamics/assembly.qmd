@@ -13,7 +13,7 @@ At each assembly step, the algorithm:
 1. finds the mutant with the highest invasion fitness;
 2. adds that mutant to the resident community;
 3. returns the community to demographic equilibrium; and
-4. removes any resident strategies whose populations fall to zero.
+4. removes any resident strategies whose populations fall to zero. <!-- SY: If a mutant doesn't affect the environment, why does the community need to be returned to demographic equilibrium? Why would populations fall to zero? -->
 
 Repeating these steps shows how evolutionary branching and competition can
 build a multi-strategy community. The small models in `regnans` make this process
