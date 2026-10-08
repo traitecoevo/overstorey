@@ -12,11 +12,11 @@ best balances two outcomes: opening stomata increases photosynthesis, but more
 negative water potential increases hydraulic risk.
 
 The standard TF24 model solves this optimisation from scratch each time. TF24f
-("f" for fast or forecasting) instead carries the operating point forward and
+("f" for fast or forecasting) instead carries the operating point forward and <!-- SY: What does operating point mean here? -->
 allows it to adjust as conditions change. In practical terms, **TF24 repeatedly
 finds the optimum, whereas TF24f tracks it**.
 
-Tracking can reduce repeated calculations and also introduces a finite
+Tracking can reduce repeated calculations and also introduces a finite <!-- SY: Be more specific about what this acclimation means biologically? Why use TF24f instead of TF24? -->
 acclimation time. This guide explains that approximation, compares the two
 models, and shows the parameter that controls tracking speed.
 
@@ -88,11 +88,12 @@ bind_rows(
   labs(title = "Same biology, two ways of resolving the leaf optimum")
 ```
 
-TF24f records the tracked potential in `opt_root_psi_state`. TF24 reports its
+TF24f records the tracked root-collar water potential in `opt_root_psi_state`. TF24 reports its
 newly optimised value as `opt_root_psi`, with the opposite sign convention in
 this output. Plotting them together reveals the acclimation lag: early in life,
 the optimum moves faster than the finite-gain state can follow. The gap then
 narrows as growth slows.
+<!-- SY: To me it looks like it tracks really well early on and the gap slowly increases as patch age increases? -->
 
 ```{r}
 #| label: tracking
@@ -114,7 +115,7 @@ bind_rows(
 A larger `k` makes the tracked state respond more quickly, but it also makes the
 extra ODE state **stiffer**, which can force the adaptive solver to take many
 smaller steps.
-A smaller `k` is easier to integrate but produces a longer acclimation lag.
+A smaller `k` is easier to integrate but produces a longer acclimation lag. <!-- SY: Why is it a 'but'? Doesn't it depend on the biological question? -->
 There is therefore no universal best value: compare TF24f against TF24 over the
 environmental range and time scale relevant to the analysis.
 
@@ -128,7 +129,7 @@ as a numerical sensitivity setting and checked explicitly.
 Each new seedling starts with its tracked state at the current optimum. Without
 this initial full solve, a seedling would begin at a non-physical value and
 could temporarily escape the light limitation that should suppress it. After
-initialisation, TF24f resumes tracking rather than re-optimising at every step.
+initialisation, TF24f resumes tracking.
 
 ## Status
 

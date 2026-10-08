@@ -14,7 +14,7 @@ one poor day or season.
 TF24 now represents this buffer with an explicit carbon-storage state. Earlier
 versions linked growth and mortality directly to instantaneous net production.
 During a severe productivity trough, that formulation could produce mortality
-rates near $10^{32}$ and overflow the size-density equations (issue #550).
+rates near $10^{32}$ and overflow the size-density equations.
 
 This guide follows carbon into and out of the storage pool, then uses a simple
 drought experiment to show its effects. The governing idea is:
@@ -88,6 +88,7 @@ can fund only a few percent of its production rate — so a discharge-rate limit
 would choke establishment and collapse reproduction under light competition.
 Gating the *rate* instead preserves healthy growth while still enforcing "no
 growth without reserves".
+<!-- SY: I think I understand it but the paragraph could be worded a bit clearer and de-Claudified. -->
 
 ### Reserves-based mortality
 
@@ -219,13 +220,14 @@ The storage model produces three linked responses during the shaded drought:
 - **Recovery is buffered, not instantaneous.** When water returns, the reserve
   gate directs much of the carbon towards refilling the pool. Height growth
   strengthens as reserves recover rather than switching on all at once.
+<!-- SY: It looks like height growth resumes almost instantaneously after the drought is over. -->
 
 ## The growth threshold `a_st2`
 
 `a_st2` is the reserve fraction at which the growth gate is half open. Raising it
 requires fuller reserves before growth proceeds strongly; lowering it allows
 growth at lower reserve levels. In this particular setup, a well-watered plant
-settles near $r \approx 0.45$, so thresholds up to roughly 0.2 mainly affect the
+settles near $r \approx 0.45$, so thresholds up to roughly 0.2 mainly affect the <!-- SY: What does this sentence mean? -->
 drought response. These values are model outcomes, not universal biological
 thresholds. The default is `0.10`.
 
@@ -308,4 +310,4 @@ reserve-to-mortality relationship still need to be evaluated against suitable
 observations. TF24f inherits the same storage pool.
 
 An independent soil-water singularity at the residual moisture floor was also
-fixed while testing this regime (issue #549; PR #554).
+fixed while testing this regime. <!-- SY: What does this mean? -->
