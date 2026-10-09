@@ -14,7 +14,13 @@ the notation here is unfamiliar.
 
 ## The idea first
 
-`plant` never tracks a continuous size distribution directly. Instead, it samples it at a finite collection of nodes. Each node follows the plants born at one instant, carrying their size and their density per unit birth date; the plants born between two adjacent nodes form a cohort, whose abundance the solver estimates by integrating the density across the gap. As the nodes grow and thin, the model must decide when to add a new one and how to space them so that the collection still represents the size distribution faithfully.
+`plant` never tracks a continuous size distribution directly. Instead, it
+samples it at a finite collection of nodes. Each node follows the plants born at
+one instant, carrying their size and their density per unit birth date; the
+plants born between two adjacent nodes form a cohort, whose abundance the solver
+estimates by integrating the density across the gap. As the nodes grow and thin,
+the model must decide when to add a new one and how to space them so that the
+collection still represents the size distribution faithfully.
 
 This creates a genuine trade-off. Too few or too widely spaced nodes smooth
 over population structure that matters for growth and competition. Too many

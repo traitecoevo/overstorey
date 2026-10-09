@@ -175,21 +175,36 @@ Solving the PDE on a fixed grid would mean repeatedly moving plants from one
 height cell to the next. `plant` instead uses the **method of characteristics**:
 rather than watching fixed heights, it follows plants as they grow.
 
-Follow the plants that all germinated at one instant. Their height simply obeys the growth rate,
+Follow the plants that all germinated at one instant. Their height simply obeys
+the growth rate,
 
 $$
 \frac{{\rm d}H}{{\rm d}a} = g,
 $$
 
-so they trace a curve along the height axis. That curve is a *characteristic* of the PDE. Moving along it, the density changes for two reasons: plants die, and plants born slightly earlier or later spread apart or bunch together as growth speeds up or slows down. Both effects appear in one equation,
+so they trace a curve along the height axis. That curve is a *characteristic* of
+the PDE. Moving along it, the density changes for two reasons: plants die, and
+plants born slightly earlier or later spread apart or bunch together as growth
+speeds up or slows down. Both effects appear in one equation,
 
 $$
 \frac{{\rm d}}{{\rm d}a}\ln N = -\left(\, d + \frac{\partial g}{\partial H}\,\right).
 $$
 
-The $d$ term represents deaths, as before. The $\partial g / \partial H$ term describes how growth changes with height. If growth *slows* with height ($\partial g/\partial H < 0$), plants born in succession bunch together and density rises. If growth speeds up, they spread apart and density falls. This is the same population change described by the PDE, viewed while moving along a characteristic.
+The $d$ term represents deaths, as before. The $\partial g / \partial H$ term
+describes how growth changes with height. If growth *slows* with height
+($\partial g/\partial H < 0$), plants born in succession bunch together and
+density rises. If growth speeds up, they spread apart and density falls. This is
+the same population change described by the PDE, viewed while moving along a
+characteristic.
 
-The calculation therefore represents a whole patch with a finite set of characteristics, called **nodes**. Each node carries two values — its height and its log density — which advance together under simple differential equations. The plants recruited between two adjacent nodes form a **cohort**, whose abundance is the density integrated across that interval. `plant` adaptively chooses how many nodes to use and when to introduce them (see [node spacing](implementation/node-spacing.qmd)).
+The calculation therefore represents a whole patch with a finite set of
+characteristics, called **nodes**. Each node carries two values — its height and
+its log density — which advance together under simple differential equations.
+The plants recruited between two adjacent nodes form a **cohort**, whose
+abundance is the density integrated across that interval. `plant` adaptively
+chooses how many nodes to use and when to introduce them (see [node
+spacing](implementation/node-spacing.qmd)).
 
 ## Step 5 — competition through shade
 
@@ -204,8 +219,8 @@ $$
 
 Here $z$ is a height in the canopy, $E_a(z)$ is the fraction of open-sky light
 reaching it, and $k_{\rm I}$ is the extinction coefficient (how strongly leaves
-block light). The "leaf area above $z$" is itself found by adding up the leaf area
-of every plant taller than $z$ — that is, by integrating over the size
+block light). The "leaf area above $z$" is itself found by adding up the leaf
+area of every plant taller than $z$ — that is, by integrating over the size
 distribution $N$.
 
 We can now close the feedback loop from [the big picture](overview.qmd). The

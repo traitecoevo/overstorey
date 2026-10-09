@@ -21,10 +21,10 @@ numbers, so that each term has a concrete meaning before we return to the genera
 form.
 
 We will begin with one plant, add a second node, introduce shading, and finally
-zoom out to the landscape. At every step we use the *same symbols* as the primer.
-The numbers are **toy values chosen to make the arithmetic simple, not FF16
-outputs**. What matters is the structure of each calculation, not the particular
-values.
+zoom out to the landscape. At every step we use the *same symbols* as the
+primer. The numbers are **toy values chosen to make the arithmetic simple, not
+FF16 outputs**. What matters is the structure of each calculation, not the
+particular values.
 
 ## A toy strategy
 
@@ -83,14 +83,23 @@ plants remain alive to reproduce. Each column shows one of the three integrals.
 
 ## Step 2 — from one plant to a distribution
 
-Now follow plants born at a **second** time, five years after the first. Each birth time we follow is a **node**. At any later patch age $a$, the second node has had five fewer years to grow, so its height is $H_0 + g\,(a - 5)$. At patch age $a = 20$, the two nodes have reached different heights:
+Now follow plants born at a **second** time, five years after the first. Each
+birth time we follow is a **node**. At any later patch age $a$, the second node
+has had five fewer years to grow, so its height is $H_0 + g\,(a - 5)$. At patch
+age $a = 20$, the two nodes have reached different heights:
 
 | node | born at $a_0$ | height at $a=20$ |
 |--------|:---:|:---:|
 | A | 0 | $0.4 + 0.5(20) = 10.4\ {\rm m}$ |
 | B | 5 | $0.4 + 0.5(15) = 7.9\ {\rm m}$ |
 
-Each height also has an associated density, so the two nodes give us two samples of the **size-density distribution** $N(H \mid x, a)$ introduced in [Step 3 of the primer](maths-primer.qmd). The plants born between them — those recruited between $a_0 = 0$ and $a_0 = 5$ — form a **cohort**, spread across heights from 7.9 to 10.4 m. If we add nodes at more recruitment times, these samples trace out a curve over height. Growth moves every node towards larger $H$, while death reduces its density. The central PDE describes both changes at once:
+Each height also has an associated density, so the two nodes give us two samples
+of the **size-density distribution** $N(H \mid x, a)$ introduced in [Step 3 of
+the primer](maths-primer.qmd). The plants born between them — those recruited
+between $a_0 = 0$ and $a_0 = 5$ — form a **cohort**, spread across heights from
+7.9 to 10.4 m. If we add nodes at more recruitment times, these samples trace
+out a curve over height. Growth moves every node towards larger $H$, while death
+reduces its density. The central PDE describes both changes at once:
 
 $$
 \frac{\partial N}{\partial a} = -\,d\,N \;-\; \frac{\partial}{\partial H}\big(g\,N\big)
@@ -132,11 +141,11 @@ the starting density of each node.
 ## Step 4 — closing the light loop, once
 
 So far, the rates have been fixed. In a light-competition strategy, $g$ and $d$
-depend on light, while the light profile depends on the plants themselves. We can
-take one pass around this feedback loop by hand. Node A (10.4 m) sits above
+depend on light, while the light profile depends on the plants themselves. We
+can take one pass around this feedback loop by hand. Node A (10.4 m) sits above
 node B (7.9 m), so A's leaves shade B. Suppose the leaf area above B is $L = 2$.
-Using the Beer's-law relationship from
-[Step 5 of the primer](maths-primer.qmd), the light reaching B is
+Using the Beer's-law relationship from [Step 5 of the primer](maths-primer.qmd),
+the light reaching B is
 
 $$
 E_a = \exp(-k_{\rm I}\,L) = \exp(-0.5 \times 2) \approx 0.37.
