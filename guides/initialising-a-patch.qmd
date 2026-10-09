@@ -6,7 +6,7 @@ title: "Initialising a patch"
 guide
 :::
 
-By default a `plant` patch starts empty and grows from seed: nodes (cohorts) are
+By default a `plant` patch starts empty and grows from seed: nodes are
 introduced on a schedule and integrated forward as characteristics of the
 [size-structured PDE](../theory/size-structured-pde.qmd). Sometimes you instead
 want a patch to *start* with plants already in it — either to **resume** a run

@@ -20,13 +20,14 @@ growth constantly moves plants from one size class to another, coupling size
 and time in a partial differential equation (PDE).
 
 The method of characteristics takes a different route. Instead of watching the
-grid, you follow individual plants—or cohorts of plants that started life
-together—as they grow. Each one traces a path through time as its size changes,
-and along that path you can also track how many individuals remain and how their
-local density evolves. Because you move with the plant rather than watching it
-pass through fixed points, the partial differential equation reduces to an
-ordinary differential equation for each trajectory. These equations are much
-easier to solve one step at a time with a standard numerical stepper.
+grid, you follow individual plants—or, equivalently, all the plants that started
+life at the same instant—as they grow. Each one traces a path through time as
+its size changes, and along that path you can also track how many individuals
+remain and how their local density evolves. Because you move with the plant
+rather than watching it pass through fixed points, the partial differential
+equation reduces to an ordinary differential equation for each trajectory. These
+equations are much easier to solve one step at a time with a standard numerical
+stepper.
 
 `plant` uses this characteristic-method approach to solve the size-density
 distribution [@Angulo-2004; @Angulo-2014; @Angulo-2016]. Earlier versions used

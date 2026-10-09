@@ -338,7 +338,7 @@ ggplot(comp, aes(competition, z, colour = model)) +
 ```
 
 **The hard step does not even run.** Summed over a population of discrete
-cohorts, step competition makes the patch light profile discontinuous,
+nodes, step competition makes the patch light profile discontinuous,
 which the adaptive light-environment spline cannot represent — the model
 fails before a stand can develop:
 
