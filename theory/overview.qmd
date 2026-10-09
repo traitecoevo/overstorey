@@ -453,7 +453,10 @@ the standard deterministic `plant` workflow are:
 
 ## Glossary
 
-The [glossary](../glossary.qmd) defines the terms used throughout the theory and guides, including the distinction between [nodes](../glossary.qmd#node) and [cohorts](../glossary.qmd#cohort) and between a [model](../glossary.qmd#model) and a [strategy](../glossary.qmd#strategy).
+The [glossary](../glossary.qmd) defines the terms used throughout the theory and
+guides, including the distinction between [nodes](../glossary.qmd#node) and
+[cohorts](../glossary.qmd#cohort) and between a [model](../glossary.qmd#model)
+and a [strategy](../glossary.qmd#strategy).
 
 ## Where to go next
 
