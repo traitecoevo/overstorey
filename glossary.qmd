@@ -1,0 +1,119 @@
+---
+title: "Glossary"
+description: "What the terms used across the guides and theory pages mean in plant."
+---
+
+::: {.eyebrow}
+reference · terms
+:::
+
+The guides and theory pages use these words in the specific senses below. Where a word has an everyday or wider-literature meaning that differs, the entry says so. Each term has an anchor, so pages can link straight to it, for example `glossary.qmd#node`.
+
+::: {.callout-note}
+## Model and strategy
+
+`plant` is renaming its rule-set classes from *strategy* to *model* ([plant#641](https://github.com/traitecoevo/plant/issues/641)). This glossary already uses the new vocabulary: a **model** is FF16, TF24, TF24f, or K93, and a **strategy** is one species' trait values. Until the rename lands, the code still calls the rule set a strategy, as in `FF16_Strategy`, `strategy_default()`, and `Individual$strategy`.
+:::
+
+## Models, parameters, and traits
+
+[Model]{#model}
+: The equations that map a plant's traits, size, and environment to growth, fecundity, mortality, and its effect on competition. `plant` ships FF16, TF24, TF24f, and K93.
+
+[Parameters]{#parameters}
+: The constants a model needs that are shared across every species in a run, such as the light-extinction coefficient or the disturbance regime.
+
+[Strategy]{#strategy}
+: One species' set of trait values: a point in trait space. Evolution and community assembly act on strategies. "The TF24 model, run with three strategies" is the intended usage.
+
+[Trait]{#trait}
+: A measurable plant property that differs between strategies, such as leaf mass per area (LMA) or wood density. Traits enter a model only through its parameters, usually via a hyperparameterisation.
+
+[Hyperparameterisation]{#hyperparameterisation}
+: An R function that turns a small set of traits into a consistent set of model parameters, encoding links between traits (for example, LMA also sets leaf turnover). FF16's is `FF16_hyperpar()`.
+
+[Individual]{#individual}
+: One plant, following a model with one strategy. Its state includes a size coordinate — height for FF16 and TF24, stem diameter for K93 — and, for some models, further physiological state.
+
+## Size structure and the solver
+
+[Size distribution]{#size-distribution}
+: The density of plants across the size coordinate, for one strategy, in one patch at one patch age. For K93 the size coordinate is stem diameter, but the solver still stores it in a column named `height`.
+
+[Characteristic]{#characteristic}
+: The path through size and patch age traced by plants born at one instant. Following characteristics turns the size-structured PDE into ordinary differential equations along each path; see [the characteristic method](theory/implementation/characteristic-method.qmd).
+
+[Node]{#node}
+: A numerical point that samples the size distribution of one strategy at one recruitment time. A node follows one characteristic, carrying a size and a density per unit recruitment time. Nodes are the objects the solver introduces, steps forward, and plots as lines.
+
+[Cohort]{#cohort}
+: The plants of one strategy recruited between two adjacent nodes. A cohort's abundance is the node density integrated over that interval of recruitment times, which the solver approximates with the trapezium rule; this is why node spacing matters. Not "each node represents a cohort": in an escalator boxcar train a cohort is a point mass, but `plant` is a density method; see [Size or age](posts/2026-08-04-size-or-age-coordinates/index.qmd).
+
+[Node-introduction schedule]{#node-introduction-schedule}
+: The recruitment times at which the solver introduces new nodes. `run_scm(..., refine_schedule = TRUE)` refines it adaptively, adding nodes where removing one would make a population integral too inaccurate; see [node spacing](theory/implementation/node-spacing.qmd). Refining the schedule improves numerical accuracy; it does not change birth rates.
+
+[SCM]{#scm}
+: The deterministic solver that integrates a patch's size distributions along characteristics, run with `run_scm()`. `plant` also has a stochastic, finite-population solver that tracks individuals.
+
+## Patches and the landscape
+
+[Patch]{#patch}
+: A local community of competing plants, followed from one disturbance onward. A patch starts empty unless it is [initialised](guides/initialising-a-patch.qmd) with a population.
+
+[Patch age]{#patch-age}
+: Time since the patch was last disturbed. The solver runs one patch trajectory, so patch age is also its time coordinate.
+
+[Disturbance]{#disturbance}
+: A stand-replacing event that removes all plants and resets patch age to zero. The default regime is Weibull with a fixed shape, parameterised by `max_patch_lifetime`.
+
+[Patch-age distribution]{#patch-age-distribution}
+: How common patches of each age are in the landscape under the disturbance regime. Landscape averages are patch outputs weighted by this distribution.
+
+[Metacommunity]{#metacommunity}
+: The landscape of patches of different ages, linked by a shared pool of dispersing seeds. It is implicit: one patch trajectory supplies the state at every patch age, and no separate object is created per patch.
+
+[Competitive environment]{#competitive-environment}
+: The shared quantity through which plants affect each other: the canopy-light profile for FF16 and TF24 (plus soil water where it is simulated), or the basal area of larger neighbours for K93.
+
+[Canopy openness]{#canopy-openness}
+: The fraction of open-sky light reaching a given height in the canopy, set by the leaf area above that height through Beer's law.
+
+## Demography and equilibrium
+
+[Birth rate]{#birth-rate}
+: The rate at which seeds of a strategy arrive in a patch. Older code and papers call this *seed rain*.
+
+[Offspring production]{#offspring-production}
+: The dispersing seeds a strategy produces, integrated across its plants and across patch ages.
+
+[Net reproduction ratio]{#net-reproduction-ratio}
+: Offspring production per incoming seed. `run_scm()` reports it for each strategy; a value of one means the strategy exactly replaces itself.
+
+[Demographic equilibrium]{#demographic-equilibrium}
+: A state in which each resident's seed output matches its seed input, so its net reproduction ratio is one. Finding it is a fixed-point search over birth rates, separate from running one patch.
+
+## Invasion and evolution
+
+[Resident]{#resident}
+: A strategy that is already established and sets the competitive environment.
+
+[Mutant]{#mutant}
+: A rare new strategy, assumed too rare to change the residents' competitive environment.
+
+[Invasion fitness]{#invasion-fitness}
+: The long-term per-capita growth rate of a rare mutant in the residents' environment. At demographic equilibrium, `plant` uses the mutant's basic reproduction ratio, which gives the same ordering of strategies.
+
+[Basic reproduction ratio]{#basic-reproduction-ratio}
+: $R(x', x)$: the expected number of dispersing seeds ultimately produced by one dispersing seed of mutant $x'$ among residents $x$. The mutant can invade if $R > 1$.
+
+[Fitness landscape]{#fitness-landscape}
+: Invasion fitness as a function of mutant trait values, for a fixed set of residents.
+
+[Singular strategy]{#singular-strategy}
+: A strategy at which the fitness gradient is zero, so gradual evolution neither pushes it up nor down in trait value.
+
+[Evolutionarily stable]{#evolutionarily-stable}
+: A resident strategy that no nearby mutant can invade.
+
+[Convergence stable]{#convergence-stable}
+: A singular strategy that gradual evolution approaches from nearby. A strategy can be convergence stable without being evolutionarily stable; it is then an [evolutionary branching point]{#branching-point}, where the population can split into two strategies. See [adaptive dynamics](theory/adaptive-dynamics.qmd).

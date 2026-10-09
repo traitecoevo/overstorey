@@ -453,22 +453,7 @@ the standard deterministic `plant` workflow are:
 
 ## Glossary
 
-| Term | Meaning here |
-|---|---|
-| **Strategy** | The functions and parameters that translate a plant's state and surroundings into growth, mortality, fecundity, and competition effects |
-| **Trait** | A measurable plant property used to distinguish strategies or derive physiological parameters |
-| **Individual** | One biological plant governed by a strategy |
-| **Cohort** | Plants of one strategy recruited between two adjacent nodes; its abundance is the density integrated over that interval |
-| **Node** | A numerical point sampling the continuous size distribution at one recruitment time, carrying a size and a density |
-| **Patch** | A local population of competing plants followed from disturbance onward |
-| **Size distribution** | Plant density across the model's size coordinate: height for FF16/TF24 or stem diameter for K93 (stored under the generic state name `height`) |
-| **Competitive environment** | The shared quantity through which plants interact, such as the canopy-light profile or basal area of larger neighbours |
-| **Metacommunity** | A landscape of patches of different ages connected by seed dispersal |
-| **Birth rate / seed rain** | The rate at which seeds of a strategy arrive in a patch |
-| **Demographic equilibrium** | A state in which resident seed input and seed output are self-consistent, giving a net reproduction ratio of one |
-| **Invasion criterion** | Whether a rare strategy produces more than one dispersing offspring per incoming seed in the resident environment |
-
-: Terms used throughout the theory and guides.
+The [glossary](../glossary.qmd) defines the terms used throughout the theory and guides, including the distinction between [nodes](../glossary.qmd#node) and [cohorts](../glossary.qmd#cohort) and between a [model](../glossary.qmd#model) and a [strategy](../glossary.qmd#strategy).
 
 ## Where to go next
 
