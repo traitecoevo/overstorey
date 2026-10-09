@@ -138,18 +138,15 @@ leaf-level calculations used by the hydraulically explicit strategies.
 
 ## From an individual to a landscape
 
-The ecological model is organised at three scales: individuals, patches, and
-the metacommunity. **Nodes are not a fourth ecological scale.** They are the
-numerical objects that the solver uses to represent groups of similar plants
-within a patch.
+The ecological model is organised at three scales: individuals, patches, and the metacommunity. **Nodes are not a fourth ecological scale.** They are the numerical points at which the solver samples the size distribution within a patch.
 
 ```{mermaid}
 flowchart LR
 accTitle: Ecological scales and their numerical representation in plant
-accDescr: Similar individuals are grouped into cohorts represented numerically by nodes. Nodes describe a size-structured population within one patch. Patch states at different ages are weighted together to represent the landscape-scale metacommunity.
-  I["Individuals<br/>biological plants"] --> C["Cohorts<br/>same strategy and recruitment time"]
-  C -. "represented by" .-> N["Nodes<br/>numerical objects"]
-  N --> P["Patch<br/>one local competing population"]
+accDescr: Individuals are grouped into cohorts by recruitment time. Nodes are numerical points on the size distribution at chosen recruitment times, and each cohort is the plants recruited between two adjacent nodes. Together they describe a size-structured population within one patch. Patch states at different ages are weighted together to represent the landscape-scale metacommunity.
+  I["Individuals<br/>biological plants"] --> C["Cohorts<br/>recruited between two adjacent nodes"]
+  N["Nodes<br/>numerical points on the distribution"] -. "bound" .-> C
+  C --> P["Patch<br/>one local competing population"]
   P --> M["Metacommunity<br/>implicit landscape representation"]
 ```
 
@@ -157,18 +154,13 @@ The distinction can be summarised as follows:
 
 | Term | What it is | What makes another one different? |
 |---|---|---|
-| **Node** | One numerical representation of a cohort within a patch | A different strategy or recruitment time produces a different cohort and therefore a different node |
+| **Node** | One numerical point sampling a strategy's size distribution within a patch | A different strategy or recruitment time gives a different node; the plants recruited between two adjacent nodes form a cohort |
 | **Patch** | One local community followed through time after disturbance | A different time since disturbance gives a different patch age and community state |
 | **Metacommunity** | The landscape represented by patches of different ages, connected through a shared seed pool | It combines patch-level states rather than adding more nodes to a single patch |
 
 : The relationship between nodes, patches, and the metacommunity.
 
-Here is a concrete way to picture the nesting. Consider a patch that is 40
-years old. It contains plants that recruited at different times during those
-40 years. For each strategy, the solver uses nodes to represent these cohorts:
-an early node might represent a small number of large survivors, while a recent
-node might represent many small recruits. Together, all the nodes describe the
-current population in that one patch.
+Here is a concrete way to picture the nesting. Consider a patch that is 40 years old. It contains plants that recruited at different times during those 40 years. For each strategy, the solver places nodes at a set of recruitment times and follows the size and density of plants born at each one. The plants recruited between two adjacent nodes form a cohort: an early cohort might hold a small number of large survivors, while a recent one might hold many small recruits. Together, all the nodes describe the current population in that one patch.
 
 Now zoom out to the landscape. Some patches were disturbed recently and are
 young; others have developed for decades. The metacommunity combines the
@@ -201,20 +193,16 @@ size-structured solver does not store every literal individual. It represents
 the population by a **size distribution**: the density of plants at each size,
 for each strategy, at a given patch age.
 
-The numerical method follows a finite set of **nodes** along this distribution.
-Each node belongs to one strategy and represents plants that recruited at a
-particular patch age, so those plants follow the same deterministic trajectory.
-As the patch develops, the node's position records the cohort's changing size,
-while its density records how many plants from that cohort remain per unit
-area. New nodes are introduced to represent continuing recruitment.
+The numerical method follows a finite set of **nodes** along this distribution. Each node belongs to one strategy and marks one recruitment time; plants recruited at that instant all follow the same deterministic trajectory. As the patch develops, the node's position records their changing size, while its density records the density of plants at that point of the distribution, per unit area and per unit recruitment time. New nodes are introduced to represent continuing recruitment.
 
 The words *individual*, *cohort*, and *node* therefore refer to related but
 different things:
 
 - an **individual** is one biological plant;
-- a **cohort** is a group of plants sharing a recruitment time and strategy;
-- a **node** is the numerical point used to represent that cohort and sample the
-  continuous size distribution.
+- a **node** is a numerical point that samples the continuous size distribution of one strategy, at one recruitment time;
+- a **cohort** is the plants of one strategy recruited between two adjacent nodes.
+
+A node carries a density, not a number of plants. A cohort's abundance is that density integrated over the recruitment times between its two nodes, which the solver approximates with the trapezium rule, so the spacing between nodes matters. The post [Size or age](../posts/2026-08-04-size-or-age-coordinates/index.qmd) explains why this makes `plant` a density method rather than an Escalator Boxcar Train, which tracks cohorts as point masses.
 
 Following nodes as they grow is an application of the
 [method of characteristics](implementation/characteristic-method.qmd). The
@@ -444,8 +432,8 @@ the standard deterministic `plant` workflow are:
 | **Strategy** | The functions and parameters that translate a plant's state and surroundings into growth, mortality, fecundity, and competition effects |
 | **Trait** | A measurable plant property used to distinguish strategies or derive physiological parameters |
 | **Individual** | One biological plant governed by a strategy |
-| **Cohort** | Plants with the same strategy and recruitment time following the same deterministic trajectory |
-| **Node** | A numerical point representing a cohort and sampling the continuous size distribution |
+| **Cohort** | Plants of one strategy recruited between two adjacent nodes; its abundance is the density integrated over that interval |
+| **Node** | A numerical point sampling the continuous size distribution at one recruitment time, carrying a size and a density |
 | **Patch** | A local population of competing plants followed from disturbance onward |
 | **Size distribution** | Plant density across the model's size coordinate: height for FF16/TF24 or stem diameter for K93 (stored under the generic state name `height`) |
 | **Competitive environment** | The shared quantity through which plants interact, such as the canopy-light profile or basal area of larger neighbours |

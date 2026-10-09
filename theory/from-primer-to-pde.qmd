@@ -20,7 +20,7 @@ such as $H(a) = H_0 + \int g\,{\rm d}a$ and evaluate them with a few simple
 numbers, so that each term has a concrete meaning before we return to the general
 form.
 
-We will begin with one plant, add a second cohort, introduce shading, and finally
+We will begin with one plant, add a second node, introduce shading, and finally
 zoom out to the landscape. At every step we use the *same symbols* as the primer.
 The numbers are **toy values chosen to make the arithmetic simple, not FF16
 outputs**. What matters is the structure of each calculation, not the particular
@@ -83,33 +83,25 @@ plants remain alive to reproduce. Each column shows one of the three integrals.
 
 ## Step 2 — from one plant to a distribution
 
-Now introduce a **second** cohort five years after the first. At any later patch
-age $a$, the second cohort has had five fewer years to grow, so its height is
-$H_0 + g\,(a - 5)$. At patch age $a = 20$, the two cohorts have reached different
-heights:
+Now follow plants born at a **second** time, five years after the first. Each birth time we follow is a **node**. At any later patch age $a$, the second node has had five fewer years to grow, so its height is $H_0 + g\,(a - 5)$. At patch age $a = 20$, the two nodes have reached different heights:
 
-| cohort | born at $a_0$ | height at $a=20$ |
+| node | born at $a_0$ | height at $a=20$ |
 |--------|:---:|:---:|
 | A | 0 | $0.4 + 0.5(20) = 10.4\ {\rm m}$ |
 | B | 5 | $0.4 + 0.5(15) = 7.9\ {\rm m}$ |
 
-Each height also has an associated density, so the two cohorts give us two samples
-of the **size-density distribution** $N(H \mid x, a)$ introduced in
-[Step 3 of the primer](maths-primer.qmd). If we add cohorts at more recruitment
-times, these samples trace out a curve over height. Growth moves every cohort
-towards larger $H$, while death reduces its density. The central PDE describes
-both changes at once:
+Each height also has an associated density, so the two nodes give us two samples of the **size-density distribution** $N(H \mid x, a)$ introduced in [Step 3 of the primer](maths-primer.qmd). The plants born between them — those recruited between $a_0 = 0$ and $a_0 = 5$ — form a **cohort**, spread across heights from 7.9 to 10.4 m. If we add nodes at more recruitment times, these samples trace out a curve over height. Growth moves every node towards larger $H$, while death reduces its density. The central PDE describes both changes at once:
 
 $$
 \frac{\partial N}{\partial a} = -\,d\,N \;-\; \frac{\partial}{\partial H}\big(g\,N\big)
 $$
 
-Our two-cohort example is a sparse, hand-built version of the distribution in
+Our two-node example is a sparse, hand-built version of the distribution in
 this equation.
 
-## Step 3 — why following cohorts is the easy way
+## Step 3 — why following nodes is the easy way
 
-Next, follow the density of one cohort as the cohort grows. The characteristic
+Next, follow the density at one node as it grows. The characteristic
 equation from [Step 4 of the primer](maths-primer.qmd) was
 
 $$
@@ -117,7 +109,7 @@ $$
 $$
 
 Our toy growth is *constant*, so $\partial g/\partial H = 0$ and the second term
-vanishes. The cohort's density then obeys
+vanishes. The node's density then obeys
 
 $$
 \frac{{\rm d}}{{\rm d}a}\ln N = -d
@@ -126,23 +118,23 @@ N(a) = N(a_0)\,e^{-d\,(a - a_0)},
 $$
 
 which has the same exponential form as the survival curve in Step 1. This makes
-sense: when growth does not vary with height, cohorts neither spread apart nor
+sense: when growth does not vary with height, nodes neither spread apart nor
 bunch together, so only death changes their density. In a strategy where growth
 does vary with height, the $\partial g/\partial H$ term accounts for that extra
-change. Cohorts bunch together where growth slows and spread apart where it speeds
+change. Nodes bunch together where growth slows and spread apart where it speeds
 up. The [full PDE page](size-structured-pde.qmd) develops this general case.
 
-We also need to specify how each new cohort enters the distribution. At the
+We also need to specify how each new node enters the distribution. At the
 smallest height, the flow of plants must equal the arrival rate of viable
 seedlings, $g(H_0)\,N(H_0) = Y_x\,S_{\rm G}$. This boundary condition determines
-the starting density of each cohort.
+the starting density of each node.
 
 ## Step 4 — closing the light loop, once
 
 So far, the rates have been fixed. In a light-competition strategy, $g$ and $d$
 depend on light, while the light profile depends on the plants themselves. We can
-take one pass around this feedback loop by hand. Cohort A (10.4 m) sits above
-cohort B (7.9 m), so A's leaves shade B. Suppose the leaf area above B is $L = 2$.
+take one pass around this feedback loop by hand. Node A (10.4 m) sits above
+node B (7.9 m), so A's leaves shade B. Suppose the leaf area above B is $L = 2$.
 Using the Beer's-law relationship from
 [Step 5 of the primer](maths-primer.qmd), the light reaching B is
 
@@ -169,13 +161,13 @@ an average of the corresponding patch result over this age distribution.
 The seed rain adds one more connection between scales. The seeds that patches
 *produce* must match the seed rain that *feeds* the boundary condition,
 $Y_x = \Phi(Y_x)$. Our toy $\tilde R$ represents one seed's contribution to that
-balance, from one cohort in one patch.
+balance, from one node in one patch.
 
 ## Now you are ready
 
 The toy example has now connected each mathematical layer: three integrals
-describe one plant; cohorts sample a size distribution; the characteristic
-equation follows that distribution in a moving frame; shading links the cohorts;
+describe one plant; nodes sample a size distribution; the characteristic
+equation follows that distribution in a moving frame; shading links the nodes;
 and patch-age averaging connects one patch to the landscape. The
 [size-structured PDE](size-structured-pde.qmd) page develops the same structure
 formally, including:
