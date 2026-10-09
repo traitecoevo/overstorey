@@ -1,0 +1,310 @@
+---
+title: "Glossary"
+description: "What the terms used across the guides and theory pages mean in plant."
+---
+
+::: {.eyebrow}
+reference · terms
+:::
+
+The guides and theory pages use these words in the specific senses below. Where
+a word has an everyday or wider-literature meaning that differs, the entry says
+so. Each term has an anchor, so pages can link straight to it, for example
+`glossary.qmd#node`.
+
+::: {.callout-note}
+## Model and strategy
+
+`plant` is renaming its rule-set classes from *strategy* to *model*
+([plant#641](https://github.com/traitecoevo/plant/issues/641)). This glossary
+already uses the new vocabulary: a **model** is FF16, TF24, TF24f, or K93, and a
+**strategy** is one species' trait values. Until the rename lands, the code
+still calls the rule set a strategy, as in `FF16_Strategy`,
+`strategy_default()`, and `Individual$strategy`.
+:::
+
+## Models, parameters, and traits
+
+[Model]{#model}
+:   The equations that map a plant's traits, size, and environment to growth,
+    fecundity, mortality, and its effect on competition. `plant` ships FF16,
+    TF24, TF24f, and K93.
+
+[Parameters]{#parameters}
+:   The constants a model needs that are shared across every species in a run,
+    such as the light-extinction coefficient or the disturbance regime.
+
+[Strategy]{#strategy}
+:   One species' set of trait values: a point in trait space. Evolution and
+    community assembly act on strategies. "The TF24 model, run with three
+    strategies" is the intended usage.
+
+[Trait]{#trait}
+:   A measurable plant property that differs between strategies, such as leaf
+    mass per area (LMA) or wood density. Traits enter a model only through its
+    parameters, usually via a hyperparameterisation.
+
+[Hyperparameterisation]{#hyperparameterisation}
+:   An R function that turns a small set of traits into a consistent set of
+    model parameters, encoding links between traits (for example, LMA also sets
+    leaf turnover). FF16's is `FF16_hyperpar()`.
+
+[Individual]{#individual}
+:   One plant, following a model with one strategy. Its state includes a size
+    coordinate — height for FF16 and TF24, stem diameter for K93 — and, for some
+    models, further physiological state.
+
+## Size structure and nodes
+
+[Size distribution]{#size-distribution}
+:   The density of plants across the size coordinate, for one strategy, in one
+    patch at one patch age. For K93 the size coordinate is stem diameter, but
+    the solver still stores it in a column named `height`.
+
+[Characteristic]{#characteristic}
+:   The path through size and patch age traced by plants born at one instant.
+    Following characteristics turns the size-structured PDE into ODEs along each
+    path; see [the characteristic
+    method](theory/implementation/characteristic-method.qmd).
+
+[Node]{#node}
+:   A numerical point that samples the size distribution of one strategy at one
+    recruitment time. A node follows one characteristic, carrying a size and a
+    density per unit recruitment time. Nodes are the objects the solver
+    introduces, steps forward, and plots as lines.
+
+[Cohort]{#cohort}
+:   The plants of one strategy recruited between two adjacent nodes. A cohort's
+    abundance is the node density integrated over that interval of recruitment
+    times, which the solver approximates with the trapezium rule; this is why
+    node spacing matters. Not "each node represents a cohort": in an escalator
+    boxcar train a cohort is a point mass, but `plant` is a density method; see
+    [Size or age](posts/2026-08-04-size-or-age-coordinates/index.qmd).
+
+[Node-introduction schedule]{#node-introduction-schedule}
+:   The recruitment times at which the solver introduces new nodes.
+    `run_scm(..., refine_schedule = TRUE)` refines it adaptively, adding nodes
+    where removing one would make a population integral too inaccurate
+    (threshold `schedule_eps`); see [node
+    spacing](theory/implementation/node-spacing.qmd). Refining the schedule
+    improves numerical accuracy; it does not change birth rates.
+
+[SCM]{#scm}
+:   The deterministic solver that integrates a patch's size distributions along
+    characteristics, run with `run_scm()`. `plant` also has a stochastic,
+    finite-population solver that tracks individuals.
+
+## Patches and the landscape
+
+[Patch]{#patch}
+:   A local community of competing plants, followed from one disturbance
+    onward. A patch starts empty unless it is
+    [initialised](guides/initialising-a-patch.qmd) with a population.
+
+[Patch age]{#patch-age}
+:   Time since the patch was last disturbed. The solver runs one patch
+    trajectory, so patch age is also its time coordinate.
+
+[Disturbance]{#disturbance}
+:   A stand-replacing event that removes all plants and resets patch age to
+    zero. The default regime is Weibull with a fixed shape, parameterised by
+    `max_patch_lifetime`.
+
+[Patch-age distribution]{#patch-age-distribution}
+:   How common patches of each age are in the landscape under the disturbance
+    regime. Landscape averages are patch outputs weighted by this distribution.
+
+[Metacommunity]{#metacommunity}
+:   The landscape of patches of different ages, linked by a shared pool of
+    dispersing seeds. It is implicit: one patch trajectory supplies the state at
+    every patch age, and no separate object is created per patch.
+
+[Competitive environment]{#competitive-environment}
+:   The shared quantity through which plants affect each other: the canopy-light
+    profile for FF16 and TF24 (plus soil water where it is simulated), or the
+    basal area of larger neighbours for K93.
+
+[Canopy openness]{#canopy-openness}
+:   The fraction of open-sky light reaching a given height in the canopy, set by
+    the leaf area above that height through Beer's law.
+
+## Demography and equilibrium
+
+[Birth rate]{#birth-rate}
+:   The rate at which seeds of a strategy arrive in a patch. Older code and
+    papers call this *seed rain*.
+
+[Offspring production]{#offspring-production}
+:   The dispersing seeds a strategy produces, integrated across its plants and
+    across patch ages.
+
+[Net reproduction ratio]{#net-reproduction-ratio}
+:   Offspring production per incoming seed. `run_scm()` reports it for each
+    strategy; a value of one means the strategy exactly replaces itself.
+
+[Demographic equilibrium]{#demographic-equilibrium}
+:   A state in which each resident's seed output matches its seed input, so its
+    net reproduction ratio is one. Finding it is a fixed-point search over birth
+    rates, separate from running one patch.
+
+## Adaptive dynamics
+
+[Adaptive dynamics]{#adaptive-dynamics}
+:   The framework for asking how traits evolve when evolution proceeds by rare
+    mutants with small trait differences invading a resident community at
+    demographic equilibrium. See [adaptive
+    dynamics](theory/adaptive-dynamics.qmd).
+
+[Resident]{#resident}
+:   A strategy that is already established, at demographic equilibrium, and sets
+    the competitive environment.
+
+[Mutant]{#mutant}
+:   A rare new strategy, assumed too rare to change the residents' competitive
+    environment.
+
+[Invasion fitness]{#invasion-fitness}
+:   The long-term per-capita growth rate of a rare mutant in the residents'
+    environment. At demographic equilibrium, `plant` uses the mutant's basic
+    reproduction ratio, which gives the same ordering of strategies.
+
+[Basic reproduction ratio]{#basic-reproduction-ratio}
+:   $R(x', x)$: the expected number of dispersing seeds ultimately produced by
+    one dispersing seed of mutant $x'$ among residents $x$. The mutant can
+    invade if $R > 1$.
+
+[Fitness landscape]{#fitness-landscape}
+:   Invasion fitness as a function of mutant trait values, for a fixed set of
+    residents.
+
+[Pairwise invasibility plot (PIP)]{#pip}
+:   A map over resident trait (one axis) and mutant trait (the other) showing
+    where the mutant can invade. Singular strategies and their stability can be
+    read off its shape.
+
+[Selection gradient]{#selection-gradient}
+:   The slope of invasion fitness with respect to the mutant's trait, evaluated
+    at the resident's trait value. A positive gradient favours mutants with a
+    slightly larger trait value, a negative one slightly smaller.
+
+[Singular strategy]{#singular-strategy}
+:   A strategy at which the selection gradient is zero, so gradual evolution
+    pushes the trait neither up nor down.
+
+[Evolutionarily stable strategy (ESS)]{#ess}
+:   A resident strategy that no nearby mutant can invade: it sits at a maximum
+    of its own fitness landscape.
+
+[Convergence stable]{#convergence-stable}
+:   A singular strategy that gradual evolution approaches from nearby trait
+    values. Convergence stability and evolutionary stability are independent:
+    a strategy can have either without the other.
+
+[Evolutionary attractor]{#evolutionary-attractor}
+:   A convergence-stable singular strategy: where gradual evolution heads. If it
+    is also an ESS, evolution stops there. `regnans` finds attractors with
+    `community_solve_singularity()`.
+
+[Evolutionary branching point]{#branching-point}
+:   A convergence-stable singular strategy that is not an ESS. Evolution
+    approaches it, then nearby mutants on both sides can invade, and the
+    population can split into two strategies.
+
+[Community assembly]{#community-assembly}
+:   Building a multi-strategy community step by step: add the mutant with the
+    highest invasion fitness, return the community to demographic equilibrium,
+    remove any resident that goes extinct, and repeat. See [community
+    assembly](theory/adaptive-dynamics/assembly.qmd).
+
+## Numerical methods
+
+[ODE]{#ode}
+:   Ordinary differential equation: a rate of change with respect to one
+    variable, here time. Each node's size, survival, and seed production follow
+    ODEs.
+
+[PDE]{#pde}
+:   Partial differential equation: rates of change with respect to more than
+    one variable. The [size-structured PDE](theory/size-structured-pde.qmd)
+    describes how the size distribution changes in both size and patch age;
+    following characteristics turns it into ODEs.
+
+[Step]{#step}
+:   One advance of every ODE state from time $t$ to $t + h$, where $h$ is the
+    step size.
+
+[Stepper]{#stepper}
+:   The numerical method that takes one step and estimates that step's error,
+    such as RK45.
+
+[Solver]{#solver}
+:   The code that drives a stepper across an interval, choosing each step size
+    to keep the error within tolerance and stopping at the times requested.
+    `plant` uses `odelia::ode::Solver`; the SCM wraps it, introducing nodes and
+    updating the competitive environment between steps.
+
+[RK45]{#rk45}
+:   The Cash–Karp Runge–Kutta 4(5) stepper, `plant`'s default. It is explicit
+    and adaptive: each step's fourth- and fifth-order estimates are compared to
+    measure error and set the next step size. Setting `fixed_time_step` switches
+    to fixed steps; see [ODE stepping](theory/implementation/ode-stepping.qmd).
+
+[Error tolerance]{#error-tolerance}
+:   The local error the solver accepts per step, set by `ode_tol_rel` and
+    `ode_tol_abs`. Tighter tolerances mean smaller steps and more work.
+
+[Explicit and implicit methods]{#explicit-implicit}
+:   An explicit method computes the next state directly from the current state
+    and its rates; an implicit method solves an equation involving the next
+    state too. Implicit methods cost more per step but stay stable on stiff
+    systems.
+
+[Stiff system]{#stiff-system}
+:   An ODE system whose processes run on very different time scales, so an
+    explicit stepper needs impractically small steps to stay stable. Adding
+    soil water (the Richards equation) to `plant` made its system stiff, as did
+    continuous seed feedback in a reimplementation of FF16.
+
+[Trapezium rule]{#trapezium-rule}
+:   Quadrature that joins neighbouring points with straight lines. `plant` uses
+    it to integrate over nodes, such as leaf area above a height or a cohort's
+    abundance, so its accuracy depends on node spacing.
+
+[Spline]{#spline}
+:   A smooth piecewise curve fitted through sampled points. `plant` computes
+    canopy openness at an adaptively chosen set of heights and evaluates a
+    spline elsewhere, rather than recomputing it for every node.
+
+[Finite difference]{#finite-difference}
+:   A derivative estimated from function values at nearby points. `plant` uses
+    it for the growth-rate derivative $\partial g / \partial H$ in the
+    characteristic equation, optionally improved by Richardson extrapolation.
+
+## Packages
+
+[plant]{#plant}
+:   The R package these pages document: size-, trait-, and patch-structured
+    forest models (FF16, TF24, TF24f, K93), solved with the method of
+    characteristics or as a stochastic, finite population.
+    [Source](https://github.com/traitecoevo/plant).
+
+[odelia]{#odelia}
+:   A C++ header library, with an R interface, for solving ODEs. It provides
+    `plant`'s adaptive solver and steppers, an implicit Rosenbrock stepper for
+    stiff systems, interpolators, and support for automatic differentiation.
+    [Source](https://github.com/traitecoevo/odelia).
+
+[regnans]{#regnans}
+:   An R package for community assembly and adaptive dynamics with `plant`: it
+    iterates demography to equilibrium, computes selection gradients and
+    invasion fitness, and solves for evolutionary attractors. It also includes
+    four small models with explicit solutions ([models in
+    regnans](theory/adaptive-dynamics/index.qmd)).
+    [Source](https://github.com/traitecoevo/regnans).
+
+[phylloptim]{#phylloptim}
+:   An R package and C++ headers for leaf gas exchange with explicit plant
+    hydraulics, extracted from the TF24 model so that it can be tested and
+    reused on its own. In current `plant` (the `develop` branch), TF24 calls it
+    for its leaf-level calculations.
+    [Source](https://github.com/traitecoevo/phylloptim).

@@ -125,8 +125,13 @@ so a page with a `library(plant)` chunk or an inline helper (e.g.
   interval. Say "node" for anything the solver introduces, spaces, steps, or
   plots as a line; keep "cohort" for a group of recruits from a time window.
   Never write "nodes (cohorts)" or "each node represents a cohort".
-  `theory/overview.qmd` holds the definition. Dated posts keep the wording of
-  their time.
+  `glossary.qmd` holds the definition. Dated posts keep the wording of their
+  time.
+- **Glossary.** `glossary.qmd` (navbar) is the one place terms are defined. When
+  a page introduces a term readers will meet again, add it there and link to its
+  anchor (`glossary.qmd#node`) rather than defining it again in the page. It
+  already uses plant#641's vocabulary (model = rule set, strategy = trait
+  values).
 
 ## Local loop
 
