@@ -114,6 +114,12 @@ still calls the rule set a strategy, as in `FF16_Strategy`,
 :   How common patches of each age are in the landscape under the disturbance
     regime. Landscape averages are patch outputs weighted by this distribution.
 
+[Stationary distribution]{#stationary-distribution}
+:   The long-run fraction of time, or of patches, spent in each local state once
+    a system has settled. The patch-age distribution is the stationary
+    distribution when patch age is the state; under pulsed rain without
+    disturbance, the state is soil water together with the plants in it.
+
 [Metacommunity]{#metacommunity}
 :   The landscape of patches of different ages, linked by a shared pool of
     dispersing seeds. It is implicit: one patch trajectory supplies the state at
@@ -172,6 +178,12 @@ still calls the rule set a strategy, as in `FF16_Strategy`,
 :   $R(x', x)$: the expected number of dispersing seeds ultimately produced by
     one dispersing seed of mutant $x'$ among residents $x$. The mutant can
     invade if $R > 1$.
+
+[Long-run growth rate]{#long-run-growth-rate}
+:   In a fluctuating environment, the time average of the log of a lineage's
+    multiplication per generation. It is the invasion criterion when the
+    environment varies within a lifetime, as for annuals; for long-lived plants
+    it is close to $\log R$.
 
 [Fitness landscape]{#fitness-landscape}
 :   Invasion fitness as a function of mutant trait values, for a fixed set of
