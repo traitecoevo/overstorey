@@ -6,6 +6,8 @@ plant-ref: "develop"
 plant-sha: "f39bcb3e0128e6cdce08fa7aa54c778970091a7f"
 categories: [fitness, adaptive-dynamics, semi-arid, theory]
 reading-time: true
+code-fold: true
+code-summary: "Show the code"
 ---
 
 ```{r setup, include=FALSE}
