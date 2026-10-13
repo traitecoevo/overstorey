@@ -75,7 +75,7 @@ Three things that made the forest calculation work are gone.
 - **There is no reset.** Without stand-replacing disturbance, nothing pins a patch
   to a known starting point, so patch age tells you nothing.
 - **The environment has memory.** Rain arrives as pulses of random size at random
-  times. The soil stores them, and plants store carbon and lose leaves in response.
+  times. The soil stores them, and plants store carbon and grow roots in response.
   What a seedling meets depends on the recent sequence of rain, not on a single
   number.
 - **Rain is shared.** A big wet year is wet across a whole catchment. Patches are
@@ -155,10 +155,10 @@ burn <- 3650                               # let the bucket forget its start
 x <- x[-(1:burn)]; rain <- rain[-(1:burn)]
 nd <- length(x)
 
-## One plant. A seed landing on day t0 germinates if the soil is wetter than
-## theta_g. It dies in any dry spell where soil water stays below theta_d for D
-## days in a row. From age m it makes seed at a rate set by soil water above
-## theta_c. It lives at most L days. Returns lifetime output by arrival day.
+## One plant. A seedling starting on day t0 dies in any dry spell where soil
+## water stays below theta_d for D days in a row. From age m it makes seed at a
+## rate set by soil water above theta_c. It lives at most L days. Returns
+## lifetime output by start day, and zero on days too dry to germinate.
 lifetime_output <- function(x, theta_g = 25, theta_d = 8, D = 90,
                             m = 3 * 365, L = 40 * 365, theta_c = 10) {
   nd  <- length(x)
@@ -177,14 +177,22 @@ lifetime_output <- function(x, theta_g = 25, theta_d = 8, D = 90,
   out
 }
 
-## Strategy A. Scale output so A exactly replaces itself (R = 1), as a resident
-## at equilibrium would.
-RA      <- lifetime_output(x)
-c_scale <- 1 / mean(RA, na.rm = TRUE)
-RA      <- RA * c_scale
-## Strategy B: survives 95-day dry spells, but needs more water before it seeds.
-RB <- lifetime_output(x, D = 95, theta_c = 10.2) * c_scale
-ok <- !is.na(RA) & !is.na(RB)
+## Seeds wait in the soil until rain wets it past theta_g, so every life starts
+## on a germinating rain: a day the soil crosses theta_g on the way up.
+germinating_rains <- function(x, theta_g = 25) {
+  which(x[-1] > theta_g & x[-length(x)] <= theta_g) + 1L
+}
+
+## Strategy A, and strategy B: survives 95-day dry spells, but needs more water
+## before it seeds. Keep the rains whose cohorts can live out their lives, and
+## scale output so A exactly replaces itself (R = 1), as a resident would.
+RA <- lifetime_output(x)
+RB <- lifetime_output(x, D = 95, theta_c = 10.2)
+ev <- germinating_rains(x)
+ev <- ev[!is.na(RA[ev]) & !is.na(RB[ev])]
+c_scale <- 1 / mean(RA[ev])
+RA <- RA * c_scale
+RB <- RB * c_scale
 
 green <- "#2E6B3F"; sand <- "#C08A3E"; grey <- "grey55"
 theme_set(theme_minimal(base_size = 11) +
@@ -223,12 +231,19 @@ the run has not settled.
 The trouble is that a plant's lifetime output depends on the **order** in which
 states arrive, not only on how often each occurs. Drought kills by duration: a
 long run of dry days, not one dry day. Establishment needs a wet start followed by
-enough wet weeks. @fig-arrival shows what that does to the lifetime output of a
-seed in the toy, depending on the day it lands.
+enough wet weeks.
+
+First, when does a plant's life start? Seeds are shed at one time and germinate
+at another. Buried seeds wait in the soil, dying at a roughly steady rate, until
+a rain wets it enough to germinate them. A seed shed on a dry day is not lost,
+only waiting, so every life starts on a germinating rain. In the toy that is a
+rain that takes the soil past 25 mm, which happens about
+`r sprintf("%.0f", length(germinating_rains(x)) / (nd / 365))` times a year.
+@fig-arrival shows the lifetime output of the cohort each of those rains starts.
 
 ```{r}
 #| label: fig-arrival
-#| fig-cap: "**Lifetime output depends on what follows the arrival.** Each point is the lifetime seed output of one toy seed, by the day it lands, over 60 years. Most seeds land on dry soil and never germinate (zero). Of those that germinate, some land just before a long drought and die young; others land after one and live for decades. Grey lines mark the day each lethal drought reaches 90 days and kills every plant then alive."
+#| fig-cap: "**Lifetime output depends on what follows germination.** Each point is the lifetime seed output of one toy cohort, by the day the rain that germinated it fell, over 60 years. Every cohort starts from much the same soil, just wetted past the germination threshold. Some germinate just before a long drought and die young; others germinate after one and live for decades. Grey lines mark the day each lethal drought reaches 90 days and kills every plant then alive."
 #| fig-width: 9
 #| fig-height: 3
 win <- 1:(60 * 365)
@@ -237,10 +252,11 @@ dry_end <- cumsum(dry$lengths)
 dry_start <- dry_end - dry$lengths + 1
 kill_days <- dry_start[dry$values & dry$lengths >= 90] + 89
 kill_days <- kill_days[kill_days %in% win]
-ggplot(data.frame(t = win / 365, R = RA[win])) +
+ev60 <- ev[ev %in% win]
+ggplot(data.frame(t = ev60 / 365, R = RA[ev60])) +
   geom_vline(xintercept = kill_days / 365, colour = "grey85") +
-  geom_point(aes(t, R), size = 0.3, colour = green) +
-  labs(x = "arrival day (years)", y = "lifetime output")
+  geom_point(aes(t, R), size = 0.9, colour = green) +
+  labs(x = "germination day (years)", y = "lifetime output")
 ```
 
 The cleanest way to see it is to keep the distribution and destroy the order.
@@ -254,8 +270,10 @@ was, but long dry spells vanish, because dry days no longer come in runs.
 #| fig-height: 3.2
 xs <- sample(x)
 RS <- lifetime_output(xs) * c_scale
+es <- germinating_rains(xs)
+es <- es[!is.na(RS[es])]
 fit <- data.frame(series = c("real order", "shuffled"),
-                  R = c(mean(RA, na.rm = TRUE), mean(RS, na.rm = TRUE)))
+                  R = c(mean(RA[ev]), mean(RS[es])))
 pa <- ggplot() +
   geom_histogram(aes(x, y = after_stat(density)), data.frame(x = x),
                  bins = 80, fill = green, alpha = 0.45) +
@@ -278,7 +296,7 @@ the distribution alone cannot tell these two apart. So the distribution supplies
 the **weights**, but something has to supply the **sequence** that follows each
 starting state.
 
-## The method: one long run, many arrival times
+## The method: one long run, many germinating rains
 
 Here is the cut-through. It is the forest calculation with time in place of
 patch age.
@@ -288,28 +306,31 @@ patch age.
    state. Steady here means stationary: the community keeps fluctuating with the
    rain, but its long-run statistics stop changing. This burn-in is paid once.
    Save the state at the end of it.
-2. **Introduce mutant seeds at many arrival times** across a window that starts
-   after the burn-in. `plant` already introduces nodes at a schedule of times;
-   only the weighting changes.
-3. **Record each one's lifetime output** $\tilde R(t_0)$, running past the end of
+2. **Introduce mutant seedlings at each germinating rain** in a window that
+   starts after the burn-in. `plant` already introduces nodes at a schedule of
+   times; only the schedule and the weighting change.
+3. **Record each one's lifetime output** $\tilde R(t_i)$, running past the end of
    the window long enough for late arrivals to live out their lives.
-4. **Average over arrival time:**
+4. **Average over the $N$ germinating rains** $t_1, \dots, t_N$ in the window:
 $$
-R = \frac{1}{T_2 - T_1} \int_{T_1}^{T_2} \tilde R(t_0)\, \mathrm{d}t_0 .
+R = \frac{1}{N} \sum_{i=1}^{N} \tilde R(t_i) .
 $$
 
-Because the run is stationary, the soil-water states at those arrival times are
-distributed exactly as the closed form says. That was the point of
-@fig-soil. So averaging over arrival times *is* averaging over the stationary
-distribution, which is what Metz and Gyllenberg ask for. And each arrival carries
-the real sequence that follows it, which is what @fig-shuffle shows we need. One
-run delivers both the weights and the sequence.
+Because the run is stationary, the germinating rains in the window are a fair
+sample of all the germinating rains the climate produces, and the soil and stand
+at those moments are a fair sample of the states that seedlings start from. So
+averaging over them *is* the average over the stationary distribution of states
+that seeds land in, which is what Metz and Gyllenberg ask for. And each cohort
+carries the real sequence that follows it, which is what @fig-shuffle shows we
+need. One run delivers both the weights and the sequence.
 
 In code this is a small change. In the forest the weight on a seed arriving at
-age $a$ is the patch-age density $P(a)$. Here the weight is flat across the
-window and zero outside it, or proportional to the chance of germinating on that
-day if seeds wait for rain. Everything downstream, from the fitness integral in
-`plant` to the assembly loop in `regnans`, is untouched.
+age $a$ is the patch-age density $P(a)$. Here the weight sits on the germinating
+rains in the window, equally on each, and is zero everywhere else. Weighting
+each rain equally assumes, as a first approximation, that when a seed was shed
+does not matter, only that it survives in the soil until a rain germinates it.
+Everything downstream, from the fitness integral in `plant` to the assembly loop
+in `regnans`, is untouched.
 
 ## Annuals and perennials on the same run
 
@@ -340,8 +361,12 @@ tell us whether $R$ is close enough or the growth rate is needed.
 ## Uphill and downhill
 
 Landscape position adds a dimension but not a new idea. Run one long patch per
-position, each with its own effective rainfall: the upslope patch sheds water,
-the downslope patch receives it in larger events. Then ask where seeds go. If a
+position, both under the same storms. The upslope patch keeps each storm only up
+to what its soil can hold and sheds the rest; the downslope patch receives that
+excess on top of its own rain. Water only flows downhill, so the upslope run can
+go first and hand its runoff, storm by storm, to the downslope run. Because the
+downslope gain comes in the same storms as the upslope loss, the two positions
+must share one rain series. Then ask where seeds go. If a
 seed produced in position $i$ lands in position $j$ with probability $D_{ij}$,
 the expected number of offspring in $j$ per seed in $i$ is $D_{ij} \tilde R_j$.
 With two positions that is a $2 \times 2$ matrix, and the mutant's fitness is its
@@ -362,21 +387,20 @@ toy gives a feel for the answer.
 #| fig-cap: "**Comparisons converge faster than levels, if they share a rain series.** Spread (standard deviation) of toy fitness estimates against window length, across non-overlapping windows of the 10,000-year run. Green: the fitness of one strategy. Brown, solid: the difference in fitness between strategies A and B, estimated on the same rain series. Brown, dashed: the same difference estimated on separate series. The dotted line is the true difference; a comparison is resolved roughly where its curve falls well below it."
 #| fig-width: 7
 #| fig-height: 3.6
-okidx <- which(ok)
+yr <- (ev - 1) %/% 365                        # year of each germinating rain
 W <- c(25, 50, 100, 200, 400)
 spread <- do.call(rbind, lapply(W, function(wy) {
-  w <- wy * 365
-  block <- (seq_along(okidx) - 1) %/% w
+  block <- yr %/% wy
   keep  <- block < max(block)                 # drop the last, partial block
-  mA <- tapply(RA[okidx][keep], block[keep], mean)
-  mB <- tapply(RB[okidx][keep], block[keep], mean)
+  mA <- tapply(RA[ev][keep], block[keep], mean)
+  mB <- tapply(RB[ev][keep], block[keep], mean)
   nb <- length(mA)
   data.frame(
     years = wy,
     what  = c("fitness of A", "A vs B, same series", "A vs B, separate series"),
     sd    = c(sd(mA), sd(mB - mA), sd(mB[-1] - mA[-nb])))  # separate: next block
 }))
-true_diff <- mean(RB[ok] - RA[ok])
+true_diff <- mean(RB[ev] - RA[ev])
 spread$what <- factor(spread$what, levels = c(
   "fitness of A", "A vs B, separate series", "A vs B, same series"))
 ggplot(spread, aes(years, sd, colour = what, linetype = what)) +
@@ -403,17 +427,11 @@ ind   <- spread$sd[spread$what == "A vs B, separate series"]
 saving <- (ind / crn)^2
 ## Years for a 1% spread in a level, extrapolating variance ~ 1/window.
 years_1pct <- max(W) * (lev[W == max(W)] / 0.01)^2
-## Stratifying arrival days by soil water at arrival, weighted by the closed form.
-set.seed(3)
-brk <- c(0, 25, 35, 50, Inf)
-pbin <- diff(pgamma(brk, lambda / k, scale = alpha))
-bin  <- cut(x, brk)
-idx_by_bin <- split(okidx, bin[okidx])
-n <- 1000
-srs  <- replicate(400, mean(sample(RA[ok], n)))
-strt <- replicate(400, sum(pbin * mapply(function(i, m) mean(RA[sample(i, m)]),
-                                         idx_by_bin, pmax(2, round(n * pbin)))))
-strat_gain <- 1 - sqrt(mean((strt - 1)^2)) / sqrt(mean((srs - 1)^2))
+## Share of the spread in lifetime output explained by soil water at
+## germination, grouped into deciles.
+xg <- x[ev]
+state_r2 <- summary(lm(RA[ev] ~ cut(xg, quantile(xg, 0:10 / 10),
+                                    include.lowest = TRUE)))$r.squared
 ```
 
 Three lessons, all from the toy, so read them as orders of magnitude rather than
@@ -423,9 +441,9 @@ numbers for TF24.
   `r sprintf("%.0f%%", 100 * lev[W == max(W)])` after `r max(W)` years. Pinning
   fitness down to a percent by brute force would take something like
   `r formatC(signif(years_1pct, 1), format = "d", big.mark = ",")` years. The
-  reason is that seeds landing within one lifetime of each other share the same
-  future droughts, so their outputs rise and fall together; the run has to cover
-  many lifetimes' worth of drought history before the luck averages out.
+  reason is that cohorts germinating within one lifetime of each other share the
+  same future droughts, so their outputs rise and fall together; the run has to
+  cover many lifetimes' worth of drought history before the luck averages out.
 - **Comparisons are cheaper, if they share the rain.** Evolution acts on
   *differences* between strategies, and selection gradients are differences too.
   Running both strategies through the same rain series removes the luck of the
@@ -438,17 +456,18 @@ numbers for TF24.
   times larger than the difference. The rule that
   follows is simple: **every fitness evaluation in an assembly uses the same rain
   series**, and we check the answer on a second series separately.
-- **Sampling arrivals by soil-water state helps only a little.** Choosing arrival
-  days in proportion to the closed-form distribution, bin by bin, reduced the
-  error by about `r sprintf("%.0f%%", 100 * strat_gain)` in the toy. Most of the
-  spread in @fig-arrival comes from what happens *after* a seed lands, which the
-  state at landing cannot predict.
+- **Sampling arrivals by soil-water state does not help.** Every cohort starts
+  on a germinating rain, from much the same soil, and in the toy the soil water
+  at germination explains `r sprintf("%.0f%%", 100 * state_r2)` of the spread in
+  lifetime output. The spread in @fig-arrival comes from what happens *after*
+  germination, so choosing arrivals by their soil state cannot shorten the run.
 
-There is a third route to a shorter run, which is to give up the single long run
-after the burn-in. The saved steady state is a library of starting points: start
-many short mutant runs, each one lifetime long, from states sampled along it. The
-total simulated time is similar, but each run is short, they run in parallel, and
-gradients only need to be carried back through one lifetime.
+There is one more route, which shortens each run rather than the total: give up
+the single long run after the burn-in. The saved steady state is a library of
+starting points: start many short mutant runs, each one lifetime long, from
+states sampled along it. The total simulated time is similar, but each run is
+short, they run in parallel, and gradients only need to be carried back through
+one lifetime.
 
 ## What has to be built
 
@@ -460,9 +479,10 @@ for the window, keeps the lifetime output of every node while thinning the rest
 of its history, and stops tracking old plants individually without losing their
 seed output. That is [plant#519](https://github.com/traitecoevo/plant/issues/519),
 and its requirements are listed there. It depends on rainfall arriving as
-discrete events ([plant#628](https://github.com/traitecoevo/plant/issues/628))
-and, for uphill and downhill patches that exchange water, on the multi-patch work
-in [plant#427](https://github.com/traitecoevo/plant/issues/427).
+discrete events ([plant#628](https://github.com/traitecoevo/plant/issues/628)).
+Handing runoff downhill one storm at a time needs only those events and a record
+of each storm's runoff; patches that exchange water both ways need the
+multi-patch work in [plant#427](https://github.com/traitecoevo/plant/issues/427).
 
 Two things are open and will be answered by measurement, not argument. Does a
 stand of mulga under pulsed rain settle into a steady state with no disturbance,
@@ -480,8 +500,9 @@ for TF24, as opposed to the toy?
 - The distribution alone is not fitness, because drought and establishment depend
   on the sequence. Shuffling the toy's soil-water record leaves the distribution
   unchanged and roughly quadruples its fitness.
-- One long stationary run, with mutants introduced across a window, samples the
-  distribution by time and keeps the sequence. In code it is a change of weights.
+- One long stationary run, with mutant seedlings introduced at each germinating
+  rain in a window, samples the states seedlings start from and keeps the
+  sequence that follows each. In code it is a change of weights.
 - Perennials use the average lifetime output; annuals use the average log of
   yearly multiplication; both come from the same run. Landscape positions combine
   through a small matrix.
