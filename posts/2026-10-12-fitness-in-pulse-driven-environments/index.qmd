@@ -233,11 +233,12 @@ states arrive, not only on how often each occurs. Drought kills by duration: a
 long run of dry days, not one dry day. Establishment needs a wet start followed by
 enough wet weeks.
 
-First, when does a plant's life start? Seeds are shed at one time and germinate
-at another. Buried seeds wait in the soil, dying at a roughly steady rate, until
-a rain wets it enough to germinate them. A seed shed on a dry day is not lost,
-only waiting, so every life starts on a germinating rain. In the toy that is a
-rain that takes the soil past 25 mm, which happens about
+First, when does a plant's life start? As Mark Westoby pointed out to us, seeds
+are shed at one time and germinate at another. Buried seeds wait in the soil,
+dying at a roughly steady rate, until a rain wets it enough to germinate them. A
+seed shed on a dry day is not lost, only waiting, so every life starts on a
+germinating rain. In the toy that is a rain that takes the soil past 25 mm,
+which happens about
 `r sprintf("%.0f", length(germinating_rains(x)) / (nd / 365))` times a year.
 @fig-arrival shows the lifetime output of the cohort each of those rains starts.
 
