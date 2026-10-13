@@ -117,7 +117,10 @@ described a climate not by its mean aridity but by the probability distribution 
 "types of time": just wetted, staying wet, and drying out
 [@Westoby-1980]. Different growth forms use different types of time, and each
 distribution should have a characteristic mixture of growth forms. He did not
-compute that mixture for any climate.
+compute that mixture for any climate. Mark describes the idea as loosely like
+coexistence by subdividing successional time in a forest, except that rainfall
+pulses, not disturbance, create the different kinds of time. That is why the
+forest calculation is the right place to start.
 
 The first half is now easy. Under pulsed rain, with random timing and depth, and
 losses that depend on how wet the soil is, the long-run distribution of soil
