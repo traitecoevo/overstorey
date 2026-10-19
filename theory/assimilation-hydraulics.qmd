@@ -134,7 +134,7 @@ A~(C_i) = \frac{g_c(\psi_{l})(C_a - C_i)}{P_{atm}}.
 $$ {#eq-assim-ci}
 
 Here, $P_{atm}~(kPa)$ is atmospheric pressure and $g_c$ is stomatal
-conductance to $CO_2$. Water vapour and carbon dioxide diffuse at different <!--SY: Is the same as g_s which is used later in calculating E_demand?-->
+conductance to $CO_2$. Water vapour and carbon dioxide diffuse at different <!-- SY: Is it the same as g_s which is used later in calculating E_demand?-->
 rates, so conductance to $CO_2$ is calculated from conductance to water,
 $g_w$, as
 

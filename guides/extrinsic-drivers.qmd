@@ -144,7 +144,7 @@ A species' birth rate describes the seed rain entering each patch. In the
 [size-structured PDE](../theory/size-structured-pde.qmd), it is the boundary
 condition that introduces new plants.
 
-<!-- SY: How do birth rates relate to the node introduction schedule? If a node gets introduced at time x, does the birth rate define the density of recruits at that time x? -->
+<!-- SY: How do birth rates relate to the node introduction schedule? If a node gets introduced at time x, does the birth rate define the density of recruits at that time x? Could add a little callout box for those who are curious. -->
 
 Pass birth rates to `add_strategies()`. Each species needs one entry: either a
 constant number or a list of `x` and `y` control points.

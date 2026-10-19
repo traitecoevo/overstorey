@@ -181,7 +181,7 @@ matplot(t, h, lty=1, col=util_colour_set_opacity("black", 0.25), type="l",
         las=1, xlab="Time (years)", ylab="Height (m)")
 ```
 
-<!-- SY: Still trying to wrap my head around nodes and cohorts. Nodes are a numerical implementation thing but also does it have a biological meaning, like this is what the size distribution looks like given continuous recruitment through time? Are nodes removed below a certain density? -->
+<!-- SY: Still trying to wrap my head around nodes and cohorts. Nodes are a numerical implementation thing but also does it have a biological meaning, like this is what the size distribution looks like given continuous recruitment through time? Are nodes removed below a certain density? 2026-10-19 Update: since writing this comment I've gotten help with this but we might need to flesh it out for the reader more. -->
 
 The light environment — canopy openness as a function of height — is stored over
 each time step; see [Canopy & light-environment models](../theory/implementation/canopy-models.qmd)

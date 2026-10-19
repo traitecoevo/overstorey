@@ -196,7 +196,7 @@ data_species_tot
 ```
 
 Plotting that total shows how stem density changes as the patch develops:
-<!-- SY: Why stem density, not individual density? -->
+<!-- SY: Why stem density, not individual density? I'm guessing they're synonymous? -->
 
 ```{r}
 #| label: plot-total-density
