@@ -107,6 +107,7 @@ plot(times_default, cex=.2, pch=19, ylab="Time (years)", las=1)
 The gaps between introduction times change in steps rather than continuously.
 This makes it more likely that different species introduce nodes at the same
 time, allowing the solver to update them together and reducing the total work.
+<!-- SY: This is a bit unclear. The gaps change in steps rather than continuously? Also how does this link to the default node introduction times? -->
 
 ```{r}
 #| label: time-differences

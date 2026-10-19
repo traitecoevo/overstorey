@@ -72,6 +72,7 @@ A minimal run needs base parameters, at least one strategy, and an environment.
 The first call refines the node-introduction schedule; the second runs the patch
 and collects its state:
 <!-- SY: Maybe should explain more why two runs are needed? Are they always necessary? If we're interested in two strategies why are we doing a minimal run and refining the node-introduction schedule with one strategy? I thought there was an argument to refine the schedule in `run_scm`? -->
+<!-- SY: I see later this is explained in the node-scheduling algorithm page. Worth briefly mentioning it here though. -->
 
 ```{r}
 #| label: minimal-run
