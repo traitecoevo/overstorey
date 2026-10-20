@@ -529,7 +529,7 @@ x$Value <- extract_strategy_parameter_values(x$Symbol)
 knitr::kable(x,  align = "l")
 ```
 
-<!-- SY: value column is empty, so should fill or remove -->
+<!-- SY: value column is empty -->
 
 ```{r}
 #| label: tbl-params-hyper

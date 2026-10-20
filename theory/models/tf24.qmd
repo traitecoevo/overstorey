@@ -56,7 +56,7 @@ why it was added to the model and how it connects to whole-plant growth.
 | Water | implicit | explicit supply–demand hydraulics with a vulnerability curve |
 | Stomata | — | conductance set by profit maximisation |
 | Allocation / growth | functional balance (shared) | functional balance (shared) |
-<!-- SY: Could say none or not modelled instead '—' maybe? -->
+<!-- SY: Could say none or not modelled instead of '—' maybe? -->
 <!-- SY: Still not sure what functional balance means -->
 
 TF24 changes how the plant calculates carbon income at the leaf. The

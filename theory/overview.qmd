@@ -53,7 +53,7 @@ These inputs are specified by the user. What is not specified directly is the
 resulting stand structure. Plant sizes, population densities, canopy structure,
 self-thinning, and changes in community composition arise from the simulated
 growth, death, recruitment, and competition.
-<!-- SY: Can seed input be defined by the eco-evolutionary dynamics in the regnans package? Is it always initially defined by the user? I thought seed input is defined by fecundity when the metacommunity is at equilibrium? -->
+<!-- SY: Can seed input be defined by the eco-evolutionary dynamics in the regnans package? Is it always initially defined by the user? I thought seed input is defined by fecundity when the metacommunity is at equilibrium? 2026-10-19 Update: Yes it is a fixed user input but its relationship to `regnans` and demographic equilibrium isn't clear. -->
 <!-- SY: It's not clear to me yet how disturbance regime is linked to 'the duration and age weighting of patches' and 'how a patch trajectory is scaled up to a landscape' -->
 
 ## Biology and population dynamics
@@ -342,7 +342,7 @@ guide shows how to calculate landscape summaries from model output.
 Each strategy has a birth rate describing the arrival of seeds into a patch.
 Given these birth rates, `run_scm()` simulates the patch and reports offspring
 production and the **net reproduction ratio** for each strategy.
-<!-- SY: Is it the strategy (growth model) or the demographic solver that has a birth rate? -->
+<!-- SY: Is it the strategy (growth model) or the species that has a birth rate? -->
 
 At demographic equilibrium, the seed input must be consistent with the seed
 output from the metacommunity. For each resident strategy, one incoming seed
