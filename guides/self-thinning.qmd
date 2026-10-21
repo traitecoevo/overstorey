@@ -51,10 +51,10 @@ lma_trait <- trait_matrix(0.1457419, "lma")
 
 p1 <- add_strategies(p0, lma_trait)
 
-stand_results <- run_scm(p1, ctrl = ctrl, refine_schedule = TRUE)$parameters
+refined_params <- run_scm(p1, ctrl = ctrl, refine_schedule = TRUE)$parameters
 # refines the node-introduction schedule where the estimated error is largest
 
-out <- run_scm(stand_results, ctrl = ctrl, collect = TRUE)
+out <- run_scm(refined_params, ctrl = ctrl, collect = TRUE)
 # run the SCM model
 ```
 

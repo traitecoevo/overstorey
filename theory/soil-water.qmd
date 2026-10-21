@@ -87,6 +87,7 @@ gravitational drainage from the layer's base, and $u_i$ is the total root
 water uptake by plants rooted in layer $i$ (the `resource_depletion` vector
 passed in from the patch). @sec-infiltration and @sec-drainage define
 $q_{{\rm in}}$ and $q_{{\rm out}}$; @sec-plant-coupling defines $u$.
+<!-- SY: Would be cool to have a conceptual figure here! -->
 
 ## Infiltration and runoff {#sec-infiltration}
 
@@ -115,8 +116,7 @@ conductivity. Conductivity rises steeply with moisture content, following the
 Clapp & Hornberger (1978) form as parameterised by Zeng & Decker (2009, their
 Eq. 5):
 
-<!-- SY: Horton's equation shows that infiltration rate decreases with time, i.e. is fastest at the beginning when soils are drier. Meanwhile this suggests that water flows down faster as the soil becomes wetter. Are the two consolidated in @sec-infiltration as there's more runoff as the soil becomes wetter? -->
-<!-- SY: Apparently there's two forces that drive infiltration, one is gravity and one is water potential gradient. The water potential gradient is the stronger force. If the soil is really dry (water potential very negative) then that will pull water down really fast. As the soil becomes wetter the water potential gradient lessens and so infiltration slows down. But at the same time conductivity increases (according to the below equation) and so the effectiveness of gravity increases, but the magnitude of this is not significant compared to the lessening of the water potential gradient. I'm wondering if this is accounted for in the current model -->
+<!-- SY: Could it be worth adding a callout box here about how we've simplified the soil water model and acknowledge the Richards equation is more realistic but difficult to implement? Our simplification means we don't have water flow due to water potential gradients, only flow due to gravity * conductivity (which depends on saturation of the) -->
 
 $$
 q_{{\rm out},i} = K(\theta_i) = K_{\rm sat}\left(\frac{\theta_i}{\theta_{\rm sat}}\right)^{2n_\psi + 3},
@@ -228,7 +228,6 @@ $g$ = `gravity_head` = $9.8\times10^{-3}$ MPa m$^{-1}$. Two special cases are
 handled exactly rather than with this general form: when
 $P_{x,r} = \Psi_{{\rm soil},i}$, the layer is driven only by gravity; and when the
 potential gradient exactly balances the gravitational head, $E_i = 0$.
-<!-- SY: Since gravity is moving water down (thus is negative), E supply must also be negative right? -->
 
 The root vulnerability curve is non-linear in $\psi$. For that reason, the
 horizontal resistance in @eq-layer-uptake is averaged over the potential

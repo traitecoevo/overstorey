@@ -85,8 +85,8 @@ p1 <- add_strategies(p0, traits)
 
 env <- make_tf24_env(max_patch_lifetime)
 
-results <- run_scm(p1, env = env, refine_schedule = TRUE)$parameters
-results <- run_scm(results, env = env, collect = TRUE)
+refined_params <- run_scm(p1, env = env, refine_schedule = TRUE)$parameters
+results <- run_scm(refined_params, env = env, collect = TRUE)
 ```
 
 For repeated analyses, helper functions keep assumptions in one place. The <!-- SY: What assumptions? -->
