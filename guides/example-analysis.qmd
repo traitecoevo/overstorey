@@ -202,7 +202,8 @@ Plotting that total shows how stem density changes as the patch develops:
 #| label: plot-total-density
 data_species_tot %>%
   ggplot(aes(time, density, colour=species)) +
-  geom_line()
+  geom_line() +
+  theme_classic()
 ```
 
 <!-- SY: Maybe better to label species 1 and 2 with their LMA values? -->
@@ -230,7 +231,8 @@ data_species_tot <-
 
 data_species_tot %>%
   ggplot(aes(time, area_leaf, colour = species)) +
-  geom_line()
+  geom_line() +
+  theme_classic()
 ```
 
 
