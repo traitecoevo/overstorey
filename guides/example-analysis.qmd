@@ -89,7 +89,7 @@ refined_params <- run_scm(p1, env = env, refine_schedule = TRUE)$parameters
 results <- run_scm(refined_params, env = env, collect = TRUE)
 ```
 
-For repeated analyses, helper functions keep assumptions in one place. The <!-- SY: What assumptions? -->
+For repeated analyses, helper functions keep assumptions in one place. The <!-- SY: What assumptions? Parameters? -->
 first helper starts from TF24 defaults and changes four strategy parameters:
 
 ```{r}
@@ -340,6 +340,8 @@ These rows contain estimates at heights of 1, 5, and 10 metres:
 #| label: interpolated-height-values
 tidy_species_new %>% drop_na()
 ```
+
+<!-- SY: It looks like it didn't interpolate to the specified heights? Not sure what heights the red dots on the plot are meant to correspond to? What is going on with this plot? -->
 
 Again, plotting the estimates as red points against the recorded profiles makes
 the interpolation easy to assess:
