@@ -463,7 +463,7 @@ window.Quarto = {
 <li>where a single plant’s rates come from (the carbon economy);</li>
 <li>an individual as three running totals;</li>
 <li>from one plant to a whole size distribution (the central PDE);</li>
-<li>how that PDE is actually solved — by following cohorts;</li>
+<li>how that PDE is actually solved — by following nodes along characteristics;</li>
 <li>competition through shade;</li>
 <li>patches, disturbance, and the seed-rain balance;</li>
 <li>invasion fitness, and reading off averages.</li>
@@ -627,16 +627,16 @@ g(H_0) \, N(H_0 \mid x, a) = Y_x \, S_{\rm G},
 <section id="step-4-how-the-pde-is-actually-solved" class="level2">
 <h2 class="anchored" data-anchor-id="step-4-how-the-pde-is-actually-solved">Step 4 — how the PDE is actually solved</h2>
 <p>Solving the PDE on a fixed grid would mean repeatedly moving plants from one height cell to the next. <code>plant</code> instead uses the <strong>method of characteristics</strong>: rather than watching fixed heights, it follows plants as they grow.</p>
-<p>Follow one cohort — a group of plants that all germinated together. Its height simply obeys the growth rate,</p>
+<p>Follow the plants that all germinated at one instant. Their height simply obeys the growth rate,</p>
 <p><span class="math display">\[
 \frac{{\rm d}H}{{\rm d}a} = g,
 \]</span></p>
-<p>so the cohort traces a curve along the height axis. That curve is a <em>characteristic</em> of the PDE. As the cohort moves, its density changes for two reasons: plants die, and neighbouring cohorts spread apart or bunch together as growth speeds up or slows down. Both effects appear in one equation,</p>
+<p>so they trace a curve along the height axis. That curve is a <em>characteristic</em> of the PDE. Moving along it, the density changes for two reasons: plants die, and plants born slightly earlier or later spread apart or bunch together as growth speeds up or slows down. Both effects appear in one equation,</p>
 <p><span class="math display">\[
 \frac{{\rm d}}{{\rm d}a}\ln N = -\left(\, d + \frac{\partial g}{\partial H}\,\right).
 \]</span></p>
-<p>The <span class="math inline">\(d\)</span> term represents deaths, as before. The <span class="math inline">\(\partial g / \partial H\)</span> term describes how growth changes with height. If growth <em>slows</em> with height (<span class="math inline">\(\partial g/\partial H &lt; 0\)</span>), successive cohorts bunch together and density rises. If growth speeds up, they spread apart and density falls. This is the same population change described by the PDE, viewed while moving with a cohort.</p>
-<p>The calculation therefore represents a whole patch with a finite set of cohorts. Each cohort carries two values — its height and its log density — which advance together under simple differential equations. <code>plant</code> adaptively chooses how many cohorts to use and when to introduce them (see <a href="../theory/implementation/node-spacing.html">node spacing</a>).</p>
+<p>The <span class="math inline">\(d\)</span> term represents deaths, as before. The <span class="math inline">\(\partial g / \partial H\)</span> term describes how growth changes with height. If growth <em>slows</em> with height (<span class="math inline">\(\partial g/\partial H &lt; 0\)</span>), plants born in succession bunch together and density rises. If growth speeds up, they spread apart and density falls. This is the same population change described by the PDE, viewed while moving along a characteristic.</p>
+<p>The calculation therefore represents a whole patch with a finite set of characteristics, called <strong>nodes</strong>. Each node carries two values — its height and its log density — which advance together under simple differential equations. The plants recruited between two adjacent nodes form a <strong>cohort</strong>, whose abundance is the density integrated across that interval. <code>plant</code> adaptively chooses how many nodes to use and when to introduce them (see <a href="../theory/implementation/node-spacing.html">node spacing</a>).</p>
 </section>
 <section id="step-5-competition-through-shade" class="level2">
 <h2 class="anchored" data-anchor-id="step-5-competition-through-shade">Step 5 — competition through shade</h2>
@@ -644,7 +644,7 @@ g(H_0) \, N(H_0 \mid x, a) = Y_x \, S_{\rm G},
 <p><span class="math display">\[
 E_a(z) = \exp\!\left(-k_{\rm I} \times (\text{leaf area above height } z)\right).
 \]</span></p>
-<p>Here <span class="math inline">\(z\)</span> is a height in the canopy, <span class="math inline">\(E_a(z)\)</span> is the fraction of open-sky light reaching it, and <span class="math inline">\(k_{\rm I}\)</span> is the extinction coefficient (how strongly leaves block light). The “leaf area above <span class="math inline">\(z\)</span>” is itself found by adding up the leaf area of every cohort taller than <span class="math inline">\(z\)</span> — that is, by integrating over the size distribution <span class="math inline">\(N\)</span>.</p>
+<p>Here <span class="math inline">\(z\)</span> is a height in the canopy, <span class="math inline">\(E_a(z)\)</span> is the fraction of open-sky light reaching it, and <span class="math inline">\(k_{\rm I}\)</span> is the extinction coefficient (how strongly leaves block light). The “leaf area above <span class="math inline">\(z\)</span>” is itself found by adding up the leaf area of every plant taller than <span class="math inline">\(z\)</span> — that is, by integrating over the size distribution <span class="math inline">\(N\)</span>.</p>
 <p>We can now close the feedback loop from <a href="../theory/overview.html">the big picture</a>. The distribution <span class="math inline">\(N\)</span> determines leaf area; leaf area determines the light <span class="math inline">\(E_a\)</span>; and light changes the growth and death rates that reshape <span class="math inline">\(N\)</span>. Taller plants usually shade a larger fraction of a shorter plant’s crown than the reverse, so this competition is strongly size-asymmetric.</p>
 </section>
 <section id="step-6-patches-disturbance-and-the-seed-rain-balance" class="level2">

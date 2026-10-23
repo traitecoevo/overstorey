@@ -407,8 +407,8 @@ window.Quarto = {
 <div class="eyebrow">
 <p>guide</p>
 </div>
-<p>This guide moves from one individual to a <strong>patch</strong>: an area in which many plants grow and compete for resources. You will run a one-species patch, follow its cohorts through time, inspect its light environment, and then add a second species.</p>
-<p>Rather than simulating every plant separately, <code>plant</code> represents cohorts as <strong>nodes</strong> and follows their changing size and density. These trajectories are the characteristics of the model’s partial differential equation. See the <a href="../theory/size-structured-pde.html">size-structured PDE</a> being solved and the <a href="../theory/implementation/characteristic-method.html">characteristic method</a> used to solve it.</p>
+<p>This guide moves from one individual to a <strong>patch</strong>: an area in which many plants grow and compete for resources. You will run a one-species patch, follow its nodes through time, inspect its light environment, and then add a second species.</p>
+<p>Rather than simulating every plant separately, <code>plant</code> samples the size distribution at a set of <strong>nodes</strong> and follows their changing size and density. These trajectories are the characteristics of the model’s partial differential equation. See the <a href="../theory/size-structured-pde.html">size-structured PDE</a> being solved and the <a href="../theory/implementation/characteristic-method.html">characteristic method</a> used to solve it.</p>
 <section id="set-up-the-patch" class="level2">
 <h2 class="anchored" data-anchor-id="set-up-the-patch">Set up the patch</h2>
 <p>First we instantiate the basic parameters of the <code>FF16</code> strategy. <code>max_patch_lifetime</code> is the oldest patch age integrated by the solver and also parameterises the default disturbance distribution. Its default is about 105 years; the corresponding mean disturbance interval is a separate derived value of 30 years.</p>

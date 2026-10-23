@@ -716,7 +716,7 @@ $ode_a_dydt
 </section>
 <section id="fixing-step-sizes-bounds-option-1" class="level3">
 <h3 class="anchored" data-anchor-id="fixing-step-sizes-bounds-option-1">Fixing step sizes: bounds (option 1)</h3>
-<p>Setting identical minimum and maximum sizes requests an exact step size. Other times can still occur because of the cohort schedule.</p>
+<p>Setting identical minimum and maximum sizes requests an exact step size. Other times can still occur because of the node-introduction schedule.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">Control</span>()</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ctrl<span class="sc">$</span>ode_step_size_min <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
@@ -764,7 +764,7 @@ $ode_a_dydt
 </section>
 <section id="sec-adaptive-vs-fixed-step" class="level2">
 <h2 class="anchored" data-anchor-id="sec-adaptive-vs-fixed-step">Adaptive versus fixed-step integration</h2>
-<p>By default, <code>plant</code> integrates a patch with the <strong>adaptive, error-controlled Cash–Karp Runge–Kutta (RK45)</strong> stepper described above. It chooses each step size to keep the local error within a tolerance: very small steps early in a run, when newly introduced cohorts diverge rapidly, and much coarser steps later, once the stand has settled.</p>
+<p>By default, <code>plant</code> integrates a patch with the <strong>adaptive, error-controlled Cash–Karp Runge–Kutta (RK45)</strong> stepper described above. It chooses each step size to keep the local error within a tolerance: very small steps early in a run, when newly introduced nodes diverge rapidly, and much coarser steps later, once the stand has settled.</p>
 <p>Many widely used <strong>dynamic global vegetation models (DGVMs)</strong> instead move the state forward on a <em>fixed</em> grid, most often with a <strong>daily</strong> time step, using plain forward (explicit) Euler. <code>plant</code> can do this too through <code>fixed_time_step</code> (option 3 above). This section shows how to enable it, then uses a <strong>work–precision diagram</strong> to make the key comparison concrete: at <em>matched accuracy</em>, adaptive stepping performs far less work.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
@@ -881,7 +881,7 @@ Figure&nbsp;1: Work-precision diagram. Lower and to the left is better (less wor
 <p>The curves show the same underlying pattern:</p>
 <ul>
 <li><strong>Forward Euler is first-order.</strong> Halving the step size roughly halves the error, so the Euler curve descends slowly — buying an extra digit of accuracy costs roughly a <em>tenfold</em> increase in work.</li>
-<li><strong>Adaptive RK45 is high-order <em>and</em> adaptive.</strong> It spends small steps only where the dynamics demand them (the first weeks, while cohorts diverge) and coarsens dramatically once the stand stabilises. It reaches an error floor — set by the node-introduction schedule rather than the ODE tolerance — at a fraction of the evaluations Euler would need to match it.</li>
+<li><strong>Adaptive RK45 is high-order <em>and</em> adaptive.</strong> It spends small steps only where the dynamics demand them (the first weeks, while nodes diverge) and coarsens dramatically once the stand stabilises. It reaches an error floor — set by the node-introduction schedule rather than the ODE tolerance — at a fraction of the evaluations Euler would need to match it.</li>
 </ul>
 <p>To bring daily Euler’s accuracy <em>down to</em> the adaptive frontier, it would need a sub-daily step everywhere. That includes the long, smooth tail of the simulation, where the adaptive solver can take steps of years. This is wasted work, and it is exactly the inefficiency adaptive stepping avoids.</p>
 <p>In practice, fixed-step Euler is useful for <strong>operational-realism comparisons</strong>: it runs <code>plant</code> on the same footing as a daily-step DGVM. It is not the best way to obtain an accurate or inexpensive solution. For that, retain the default adaptive solver.</p>

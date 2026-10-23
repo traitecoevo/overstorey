@@ -420,7 +420,7 @@ window.Quarto = {
   <li><a href="#a-toy-strategy" id="toc-a-toy-strategy" class="nav-link active" data-scroll-target="#a-toy-strategy">A toy strategy</a></li>
   <li><a href="#step-1-one-plant-as-three-running-totals" id="toc-step-1-one-plant-as-three-running-totals" class="nav-link" data-scroll-target="#step-1-one-plant-as-three-running-totals">Step 1 — one plant, as three running totals</a></li>
   <li><a href="#step-2-from-one-plant-to-a-distribution" id="toc-step-2-from-one-plant-to-a-distribution" class="nav-link" data-scroll-target="#step-2-from-one-plant-to-a-distribution">Step 2 — from one plant to a distribution</a></li>
-  <li><a href="#step-3-why-following-cohorts-is-the-easy-way" id="toc-step-3-why-following-cohorts-is-the-easy-way" class="nav-link" data-scroll-target="#step-3-why-following-cohorts-is-the-easy-way">Step 3 — why following cohorts is the easy way</a></li>
+  <li><a href="#step-3-why-following-nodes-is-the-easy-way" id="toc-step-3-why-following-nodes-is-the-easy-way" class="nav-link" data-scroll-target="#step-3-why-following-nodes-is-the-easy-way">Step 3 — why following nodes is the easy way</a></li>
   <li><a href="#step-4-closing-the-light-loop-once" id="toc-step-4-closing-the-light-loop-once" class="nav-link" data-scroll-target="#step-4-closing-the-light-loop-once">Step 4 — closing the light loop, once</a></li>
   <li><a href="#step-5-one-patch-among-many" id="toc-step-5-one-patch-among-many" class="nav-link" data-scroll-target="#step-5-one-patch-among-many">Step 5 — one patch among many</a></li>
   <li><a href="#now-you-are-ready" id="toc-now-you-are-ready" class="nav-link" data-scroll-target="#now-you-are-ready">Now you are ready</a></li>
@@ -466,7 +466,7 @@ window.Quarto = {
 </div>
 </div>
 <p>The <a href="../theory/maths-primer.html">primer</a> introduced the equations in words. The <a href="../theory/size-structured-pde.html">size-structured PDE</a> page presents the full derivations and boundary conditions. This page connects the two. We will take expressions such as <span class="math inline">\(H(a) = H_0 + \int g\,{\rm d}a\)</span> and evaluate them with a few simple numbers, so that each term has a concrete meaning before we return to the general form.</p>
-<p>We will begin with one plant, add a second cohort, introduce shading, and finally zoom out to the landscape. At every step we use the <em>same symbols</em> as the primer. The numbers are <strong>toy values chosen to make the arithmetic simple, not FF16 outputs</strong>. What matters is the structure of each calculation, not the particular values.</p>
+<p>We will begin with one plant, add a second node, introduce shading, and finally zoom out to the landscape. At every step we use the <em>same symbols</em> as the primer. The numbers are <strong>toy values chosen to make the arithmetic simple, not FF16 outputs</strong>. What matters is the structure of each calculation, not the particular values.</p>
 <section id="a-toy-strategy" class="level2">
 <h2 class="anchored" data-anchor-id="a-toy-strategy">A toy strategy</h2>
 <p>We begin by assigning three constant rates and two starting values. In a real strategy, these rates depend on size and the competitive environment; the <a href="../theory/models/ff16.html">FF16</a> page gives one such model. Holding them constant here lets us do each calculation by hand:</p>
@@ -569,11 +569,11 @@ S_{\rm I}(a) = 0.25\,e^{-0.05\,a}.
 </section>
 <section id="step-2-from-one-plant-to-a-distribution" class="level2">
 <h2 class="anchored" data-anchor-id="step-2-from-one-plant-to-a-distribution">Step 2 — from one plant to a distribution</h2>
-<p>Now introduce a <strong>second</strong> cohort five years after the first. At any later patch age <span class="math inline">\(a\)</span>, the second cohort has had five fewer years to grow, so its height is <span class="math inline">\(H_0 + g\,(a - 5)\)</span>. At patch age <span class="math inline">\(a = 20\)</span>, the two cohorts have reached different heights:</p>
+<p>Now follow plants born at a <strong>second</strong> time, five years after the first. Each birth time we follow is a <strong>node</strong>. At any later patch age <span class="math inline">\(a\)</span>, the second node has had five fewer years to grow, so its height is <span class="math inline">\(H_0 + g\,(a - 5)\)</span>. At patch age <span class="math inline">\(a = 20\)</span>, the two nodes have reached different heights:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
-<th>cohort</th>
+<th>node</th>
 <th style="text-align: center;">born at <span class="math inline">\(a_0\)</span></th>
 <th style="text-align: center;">height at <span class="math inline">\(a=20\)</span></th>
 </tr>
@@ -591,30 +591,30 @@ S_{\rm I}(a) = 0.25\,e^{-0.05\,a}.
 </tr>
 </tbody>
 </table>
-<p>Each height also has an associated density, so the two cohorts give us two samples of the <strong>size-density distribution</strong> <span class="math inline">\(N(H \mid x, a)\)</span> introduced in <a href="../theory/maths-primer.html">Step 3 of the primer</a>. If we add cohorts at more recruitment times, these samples trace out a curve over height. Growth moves every cohort towards larger <span class="math inline">\(H\)</span>, while death reduces its density. The central PDE describes both changes at once:</p>
+<p>Each height also has an associated density, so the two nodes give us two samples of the <strong>size-density distribution</strong> <span class="math inline">\(N(H \mid x, a)\)</span> introduced in <a href="../theory/maths-primer.html">Step 3 of the primer</a>. The plants born between them — those recruited between <span class="math inline">\(a_0 = 0\)</span> and <span class="math inline">\(a_0 = 5\)</span> — form a <strong>cohort</strong>, spread across heights from 7.9 to 10.4 m. If we add nodes at more recruitment times, these samples trace out a curve over height. Growth moves every node towards larger <span class="math inline">\(H\)</span>, while death reduces its density. The central PDE describes both changes at once:</p>
 <p><span class="math display">\[
 \frac{\partial N}{\partial a} = -\,d\,N \;-\; \frac{\partial}{\partial H}\big(g\,N\big)
 \]</span></p>
-<p>Our two-cohort example is a sparse, hand-built version of the distribution in this equation.</p>
+<p>Our two-node example is a sparse, hand-built version of the distribution in this equation.</p>
 </section>
-<section id="step-3-why-following-cohorts-is-the-easy-way" class="level2">
-<h2 class="anchored" data-anchor-id="step-3-why-following-cohorts-is-the-easy-way">Step 3 — why following cohorts is the easy way</h2>
-<p>Next, follow the density of one cohort as the cohort grows. The characteristic equation from <a href="../theory/maths-primer.html">Step 4 of the primer</a> was</p>
+<section id="step-3-why-following-nodes-is-the-easy-way" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-why-following-nodes-is-the-easy-way">Step 3 — why following nodes is the easy way</h2>
+<p>Next, follow the density at one node as it grows. The characteristic equation from <a href="../theory/maths-primer.html">Step 4 of the primer</a> was</p>
 <p><span class="math display">\[
 \frac{{\rm d}}{{\rm d}a}\ln N = -\left(d + \frac{\partial g}{\partial H}\right).
 \]</span></p>
-<p>Our toy growth is <em>constant</em>, so <span class="math inline">\(\partial g/\partial H = 0\)</span> and the second term vanishes. The cohort’s density then obeys</p>
+<p>Our toy growth is <em>constant</em>, so <span class="math inline">\(\partial g/\partial H = 0\)</span> and the second term vanishes. The node’s density then obeys</p>
 <p><span class="math display">\[
 \frac{{\rm d}}{{\rm d}a}\ln N = -d
 \qquad\Longrightarrow\qquad
 N(a) = N(a_0)\,e^{-d\,(a - a_0)},
 \]</span></p>
-<p>which has the same exponential form as the survival curve in Step 1. This makes sense: when growth does not vary with height, cohorts neither spread apart nor bunch together, so only death changes their density. In a strategy where growth does vary with height, the <span class="math inline">\(\partial g/\partial H\)</span> term accounts for that extra change. Cohorts bunch together where growth slows and spread apart where it speeds up. The <a href="../theory/size-structured-pde.html">full PDE page</a> develops this general case.</p>
-<p>We also need to specify how each new cohort enters the distribution. At the smallest height, the flow of plants must equal the arrival rate of viable seedlings, <span class="math inline">\(g(H_0)\,N(H_0) = Y_x\,S_{\rm G}\)</span>. This boundary condition determines the starting density of each cohort.</p>
+<p>which has the same exponential form as the survival curve in Step 1. This makes sense: when growth does not vary with height, nodes neither spread apart nor bunch together, so only death changes their density. In a strategy where growth does vary with height, the <span class="math inline">\(\partial g/\partial H\)</span> term accounts for that extra change. Nodes bunch together where growth slows and spread apart where it speeds up. The <a href="../theory/size-structured-pde.html">full PDE page</a> develops this general case.</p>
+<p>We also need to specify how each new node enters the distribution. At the smallest height, the flow of plants must equal the arrival rate of viable seedlings, <span class="math inline">\(g(H_0)\,N(H_0) = Y_x\,S_{\rm G}\)</span>. This boundary condition determines the starting density of each node.</p>
 </section>
 <section id="step-4-closing-the-light-loop-once" class="level2">
 <h2 class="anchored" data-anchor-id="step-4-closing-the-light-loop-once">Step 4 — closing the light loop, once</h2>
-<p>So far, the rates have been fixed. In a light-competition strategy, <span class="math inline">\(g\)</span> and <span class="math inline">\(d\)</span> depend on light, while the light profile depends on the plants themselves. We can take one pass around this feedback loop by hand. Cohort A (10.4 m) sits above cohort B (7.9 m), so A’s leaves shade B. Suppose the leaf area above B is <span class="math inline">\(L = 2\)</span>. Using the Beer’s-law relationship from <a href="../theory/maths-primer.html">Step 5 of the primer</a>, the light reaching B is</p>
+<p>So far, the rates have been fixed. In a light-competition strategy, <span class="math inline">\(g\)</span> and <span class="math inline">\(d\)</span> depend on light, while the light profile depends on the plants themselves. We can take one pass around this feedback loop by hand. Node A (10.4 m) sits above node B (7.9 m), so A’s leaves shade B. Suppose the leaf area above B is <span class="math inline">\(L = 2\)</span>. Using the Beer’s-law relationship from <a href="../theory/maths-primer.html">Step 5 of the primer</a>, the light reaching B is</p>
 <p><span class="math display">\[
 E_a = \exp(-k_{\rm I}\,L) = \exp(-0.5 \times 2) \approx 0.37.
 \]</span></p>
@@ -623,11 +623,11 @@ E_a = \exp(-k_{\rm I}\,L) = \exp(-0.5 \times 2) \approx 0.37.
 <section id="step-5-one-patch-among-many" class="level2">
 <h2 class="anchored" data-anchor-id="step-5-one-patch-among-many">Step 5 — one patch among many</h2>
 <p>Finally, zoom out from one patch to the whole landscape. The landscape contains patches of different ages, and each age is weighted by how common it is. Under <code>plant</code>’s default rising disturbance risk, that weight follows <span class="math inline">\(P(a)\propto S_{\rm P}(a) = \exp(-\lambda a^2)\)</span> (<a href="../theory/maths-primer.html">Step 6 of the primer</a>). A landscape-level result is therefore an average of the corresponding patch result over this age distribution.</p>
-<p>The seed rain adds one more connection between scales. The seeds that patches <em>produce</em> must match the seed rain that <em>feeds</em> the boundary condition, <span class="math inline">\(Y_x = \Phi(Y_x)\)</span>. Our toy <span class="math inline">\(\tilde R\)</span> represents one seed’s contribution to that balance, from one cohort in one patch.</p>
+<p>The seed rain adds one more connection between scales. The seeds that patches <em>produce</em> must match the seed rain that <em>feeds</em> the boundary condition, <span class="math inline">\(Y_x = \Phi(Y_x)\)</span>. Our toy <span class="math inline">\(\tilde R\)</span> represents one seed’s contribution to that balance, from one node in one patch.</p>
 </section>
 <section id="now-you-are-ready" class="level2">
 <h2 class="anchored" data-anchor-id="now-you-are-ready">Now you are ready</h2>
-<p>The toy example has now connected each mathematical layer: three integrals describe one plant; cohorts sample a size distribution; the characteristic equation follows that distribution in a moving frame; shading links the cohorts; and patch-age averaging connects one patch to the landscape. The <a href="../theory/size-structured-pde.html">size-structured PDE</a> page develops the same structure formally, including:</p>
+<p>The toy example has now connected each mathematical layer: three integrals describe one plant; nodes sample a size distribution; the characteristic equation follows that distribution in a moving frame; shading links the nodes; and patch-age averaging connects one patch to the landscape. The <a href="../theory/size-structured-pde.html">size-structured PDE</a> page develops the same structure formally, including:</p>
 <ul>
 <li>the PDE and its boundary condition, derived rather than assembled;</li>
 <li>the method of characteristics in general, with the <span class="math inline">\(\partial g/\partial H\)</span> term carrying its full weight;</li>

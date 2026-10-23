@@ -473,8 +473,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="the-idea-first" class="level2">
 <h2 class="anchored" data-anchor-id="the-idea-first">The idea first</h2>
-<p><code>plant</code> never tracks a continuous size distribution directly. Instead, it uses a finite collection of cohorts. Each cohort contains one representative individual that stands in for all plants born at roughly the same time. As the cohorts grow and thin, the model must decide when to add a new one and how to space them so that the collection still represents the size distribution faithfully.</p>
-<p>This creates a genuine trade-off. Too few or too widely spaced cohorts smooth over population structure that matters for growth and competition. Too many cohorts spend computation refining parts of the distribution that were already accurate enough. The node-spacing algorithm aims to use the smallest set that keeps approximation error below a chosen tolerance throughout patch development.</p>
+<p><code>plant</code> never tracks a continuous size distribution directly. Instead, it samples it at a finite collection of nodes. Each node follows the plants born at one instant, carrying their size and their density per unit birth date; the plants born between two adjacent nodes form a cohort, whose abundance the solver estimates by integrating the density across the gap. As the nodes grow and thin, the model must decide when to add a new one and how to space them so that the collection still represents the size distribution faithfully.</p>
+<p>This creates a genuine trade-off. Too few or too widely spaced nodes smooth over population structure that matters for growth and competition. Too many nodes spend computation refining parts of the distribution that were already accurate enough. The node-spacing algorithm aims to use the smallest set that keeps approximation error below a chosen tolerance throughout patch development.</p>
 <p>The rest of this page makes this precise.</p>
 </section>
 <section id="background" class="level2">
@@ -569,15 +569,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>offspring_production_default <span class="ot">&lt;-</span> <span class="fu">run_with_times</span>(p, times_default)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Time to solve: 0.16"</code></pre>
+<pre><code>[1] "Time to solve: 0.17"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>offspring_production_2x <span class="ot">&lt;-</span> <span class="fu">run_with_times</span>(p, times_2x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Time to solve: 0.28"</code></pre>
+<pre><code>[1] "Time to solve: 0.3"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>offspring_production_4x <span class="ot">&lt;-</span> <span class="fu">run_with_times</span>(p, times_4x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Time to solve: 0.85"</code></pre>
+<pre><code>[1] "Time to solve: 0.97"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>node_range <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">length</span>(times_default), <span class="fu">length</span>(times_2x),</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">length</span>(times_4x))</span>

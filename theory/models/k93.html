@@ -696,7 +696,7 @@ B(t, a, x) = \frac{\pi}{4 \cdot s(t, a)} \int_{x}^{x_{max}} y^2 \cdot f(t, a, y)
 </section>
 <section id="patches" class="level3">
 <h3 class="anchored" data-anchor-id="patches">Patches</h3>
-<p>To move from an individual to a patch, we add its strategy to a parameter object and run the size-structured community model with <code>run_scm()</code>. Setting <code>collect = TRUE</code> retains the state at each output time. We then reshape the result and plot the DBH trajectory of every cohort:</p>
+<p>To move from an individual to a patch, we add its strategy to a parameter object and run the size-structured community model with <code>run_scm()</code>. Setting <code>collect = TRUE</code> retains the state at each output time. We then reshape the result and plot the DBH trajectory of every node:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
@@ -711,7 +711,7 @@ B(t, a, x) = \frac{\pi}{4 \cdot s(t, a)} \int_{x}^{x_{max}} y^2 \cdot f(t, a, y)
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(par, <span class="at">collect =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co"># `K93_expand_state()` returns a tidy data frame with one row per node per</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># output time, so we can plot the height of each cohort directly.</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># output time, so we can plot the height of each node directly.</span></span>
 <span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>tidy <span class="ot">&lt;-</span> <span class="fu">K93_expand_state</span>(results)<span class="sc">$</span>species</span>
 <span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(tidy, <span class="fu">aes</span>(time, height, <span class="at">group =</span> node)) <span class="sc">+</span></span>
@@ -726,7 +726,7 @@ B(t, a, x) = \frac{\pi}{4 \cdot s(t, a)} \int_{x}^{x_{max}} y^2 \cdot f(t, a, y)
 </div>
 </div>
 </div>
-<p>The run stops at about 105 years because that is the default <code>max_patch_lifetime</code> for K93. At that point, the simulated patch is still developing. Extending its maximum lifetime to 700 years allows the oldest cohorts to approach their maximum size of 136 cm DBH, as in Fig. 2 of <span class="citation" data-cites="Kohyama-1993">Kohyama (<a href="#ref-Kohyama-1993" role="doc-biblioref">1993</a>)</span>:</p>
+<p>The run stops at about 105 years because that is the default <code>max_patch_lifetime</code> for K93. At that point, the simulated patch is still developing. Extending its maximum lifetime to 700 years allows the oldest nodes to approach their maximum size of 136 cm DBH, as in Fig. 2 of <span class="citation" data-cites="Kohyama-1993">Kohyama (<a href="#ref-Kohyama-1993" role="doc-biblioref">1993</a>)</span>:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>par<span class="sc">$</span>max_patch_lifetime <span class="ot">&lt;-</span> <span class="dv">700</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(par, <span class="at">collect =</span> <span class="cn">TRUE</span>)</span>
@@ -767,7 +767,7 @@ B(t, a, x) = \frac{\pi}{4 \cdot s(t, a)} \int_{x}^{x_{max}} y^2 \cdot f(t, a, y)
 </div>
 </div>
 </div>
-<p>The previous lines give every cohort the same visual weight, even when few individuals remain in it. Mapping line transparency to cohort density makes the changing abundance of trees visible and helps reveal the formation of canopy gaps:</p>
+<p>The previous lines give every node the same visual weight, even when few individuals remain near it. Mapping line transparency to node density makes the changing abundance of trees visible and helps reveal the formation of canopy gaps:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>tidy <span class="sc">%&gt;%</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(density <span class="sc">&gt;</span> <span class="fl">1e-7</span>) <span class="sc">%&gt;%</span></span>
@@ -830,7 +830,7 @@ B(t, a, x) = \frac{\pi}{4 \cdot s(t, a)} \int_{x}^{x_{max}} y^2 \cdot f(t, a, y)
 </section>
 <section id="what-to-take-away" class="level2">
 <h2 class="anchored" data-anchor-id="what-to-take-away">What to take away</h2>
-<p>K93 reduces a complex forest to a clear demographic picture: trees change in diameter, and larger trees suppress smaller ones through cumulative basal area. Species differ through the coefficients in their vital-rate equations, not through an explicit carbon budget or a set of physiological traits. The <code>plant</code> package then embeds those individual rules in its shared framework for cohorts, patches, recruitment, and disturbance.</p>
+<p>K93 reduces a complex forest to a clear demographic picture: trees change in diameter, and larger trees suppress smaller ones through cumulative basal area. Species differ through the coefficients in their vital-rate equations, not through an explicit carbon budget or a set of physiological traits. The <code>plant</code> package then embeds those individual rules in its shared framework for nodes, patches, recruitment, and disturbance.</p>
 
 
 

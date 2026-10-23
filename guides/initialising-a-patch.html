@@ -405,7 +405,7 @@ window.Quarto = {
 <div class="eyebrow">
 <p>guide</p>
 </div>
-<p>By default a <code>plant</code> patch starts empty and grows from seed: nodes (cohorts) are introduced on a schedule and integrated forward as characteristics of the <a href="../theory/size-structured-pde.html">size-structured PDE</a>. Sometimes you instead want a patch to <em>start</em> with plants already in it — either to <strong>resume</strong> a run you stopped earlier, or to <strong>seed</strong> a patch with an arbitrary initial size distribution and watch it evolve.</p>
+<p>By default a <code>plant</code> patch starts empty and grows from seed: nodes are introduced on a schedule and integrated forward as characteristics of the <a href="../theory/size-structured-pde.html">size-structured PDE</a>. Sometimes you instead want a patch to <em>start</em> with plants already in it — either to <strong>resume</strong> a run you stopped earlier, or to <strong>seed</strong> a patch with an arbitrary initial size distribution and watch it evolve.</p>
 <p>This guide covers both. In each case, the starting state is attached to a <code>Parameters</code> object—the object that holds the strategies and settings for a run. When the patch is reset, an ordinary <code>run_scm(p)</code> reads that state without needing a special run argument.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
