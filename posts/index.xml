@@ -10,7 +10,1557 @@
 <atom:link href="https://traitecoevo.github.io/overstorey/posts/index.xml" rel="self" type="application/rss+xml"/>
 <description>a field guide to the plant model</description>
 <generator>quarto-1.10.19</generator>
-<lastBuildDate>Thu, 20 Aug 2026 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Mon, 12 Oct 2026 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>How to calculate fitness in pulse-driven environments</title>
+  <link>https://traitecoevo.github.io/overstorey/posts/2026-10-12-fitness-in-pulse-driven-environments/</link>
+  <description><![CDATA[ 
+
+
+
+
+<p><span class="version-badge version-badge--dev">plant @develop f39bcb3</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What this post is, and is not
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a <strong>method</strong>, written for PhD students and team members joining the semi-arid work. None of it is in <code>plant</code> yet; the pin above is the state of <code>develop</code> it was written against. The figures come from a deliberately small toy model in base R, not from <code>plant</code>, so you can read every line of it. The toy has no competition and one made-up plant. It is there to make the ideas visible, not to predict anything.</p>
+</div>
+</div>
+<section id="the-question" class="level2">
+<h2 class="anchored" data-anchor-id="the-question">The question</h2>
+<p>We want to use <code>plant</code> and <a href="https://github.com/traitecoevo/regnans"><code>regnans</code></a> to ask eco-evolutionary questions about semi-arid Australia. Which combinations of traits are evolutionarily stable under a given rainfall regime? Can annual herbs, perennial grasses and woody shrubs coexist, and on what terms? How does the answer change between an upslope patch that sheds water and a downslope patch that receives it?</p>
+<p>Every one of those questions runs through one calculation: the <a href="../../glossary.html#invasion-fitness">invasion fitness</a> of a rare <a href="../../glossary.html#mutant">mutant</a> strategy in the environment created by the <a href="../../glossary.html#resident">residents</a>. Get that number, and the <a href="../../glossary.html#community-assembly">community assembly</a> machinery in <code>regnans</code> does the rest. The difficulty is that the way <code>plant</code> computes it today was built for forests.</p>
+</section>
+<section id="how-plant-calculates-fitness-now" class="level2">
+<h2 class="anchored" data-anchor-id="how-plant-calculates-fitness-now">How plant calculates fitness now</h2>
+<p>In a forest, a patch is reset by disturbance and then develops along the same trajectory every time. So a patch’s age since disturbance tells you everything about it: how tall the canopy is, how much light reaches the ground, how much competition a seedling faces. Disturbance strikes patches independently, so across the landscape the <a href="../../glossary.html#patch-age-distribution">distribution of patch ages</a> <img src="https://latex.codecogs.com/png.latex?P(a)"> stays fixed even though every patch is changing.</p>
+<p>That makes fitness cheap. A mutant seed that lands in a patch of age <img src="https://latex.codecogs.com/png.latex?a"> goes on to produce some number of dispersing seeds over its life, <img src="https://latex.codecogs.com/png.latex?%5Ctilde%20R(a)">. Its fitness is the average of that over all the ages it might land in <span class="citation" data-cites="Falster-2017 Falster-2015">(D. S. Falster, Brännström, Westoby, &amp; Dieckmann, 2015; Daniel S. Falster, Brännström, Westoby, &amp; Dieckmann, 2017)</span>:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AR%20=%20%5Cint_0%5E%5Cinfty%20P(a)%5C,%20%5Ctilde%20R(a)%5C,%20%5Cmathrm%7Bd%7Da%20.%0A"></p>
+<p>Above one, the mutant can invade. To compute it, <code>plant</code> runs <strong>one</strong> patch from bare ground, introduces mutant <a href="../../glossary.html#node">nodes</a> along the way, and weights each by how common patches of its age are. One run stands in for the whole landscape. The <a href="../../theory/adaptive-dynamics.html#sec-invasion-fitness">Theory page</a> has the details.</p>
+</section>
+<section id="what-breaks-in-the-semi-arid" class="level2">
+<h2 class="anchored" data-anchor-id="what-breaks-in-the-semi-arid">What breaks in the semi-arid</h2>
+<p>Three things that made the forest calculation work are gone.</p>
+<ul>
+<li><strong>There is no reset.</strong> Without stand-replacing disturbance, nothing pins a patch to a known starting point, so patch age tells you nothing.</li>
+<li><strong>The environment has memory.</strong> Rain arrives as pulses of random size at random times. The soil stores them, and plants store carbon and grow roots in response. What a seedling meets depends on the recent sequence of rain, not on a single number.</li>
+<li><strong>Rain is shared.</strong> A big wet year is wet across a whole catchment. Patches are not independent draws, so the landscape does not average itself out at every moment the way a disturbance mosaic does.</li>
+</ul>
+<p>And a fourth thing is added: landscape position. An upslope patch and a downslope patch receive different effective rainfall from the same storms.</p>
+<p>The obvious response is brute force: simulate many patches under many random draws of rainfall and count seeds. That is expensive, and it turns out to be unnecessary.</p>
+</section>
+<section id="the-principle-underneath" class="level2">
+<h2 class="anchored" data-anchor-id="the-principle-underneath">The principle underneath</h2>
+<p>The forest calculation is one application of a more general result. Metz and Gyllenberg showed that in a metapopulation of patches, a rare mutant’s fitness is its expected lifetime output of dispersing seeds, averaged over the <a href="../../glossary.html#stationary-distribution"><strong>stationary distribution</strong></a> of the local states that its seeds land in <span class="citation" data-cites="Metz-2001 Gyllenberg-2001">(Gyllenberg &amp; Metz, 2001; Metz &amp; Gyllenberg, 2001)</span>.</p>
+<p>“Stationary” means the long-run distribution: the fraction of time, or of patches, in each state once the system has settled down. In a forest the local state that matters is patch age, and its stationary distribution is <img src="https://latex.codecogs.com/png.latex?P(a)">. That is the only reason patch age appears in the formula. The principle does not care what the state is.</p>
+<p>In the semi-arid, the local state is the soil-water profile together with the plants standing in it. So the job becomes: find the stationary distribution of soil-water states, and find the lifetime output of a seed that lands in each.</p>
+</section>
+<section id="westobys-suggestion-the-distribution-of-soil-water-states" class="level2">
+<h2 class="anchored" data-anchor-id="westobys-suggestion-the-distribution-of-soil-water-states">Westoby’s suggestion: the distribution of soil-water states</h2>
+<p>Mark Westoby suggested starting exactly there: work out the distribution of soil-water states that a rainfall regime and a landscape position produce, then ask what each growth form makes of it. The idea goes back to his 1980 paper, which described a climate not by its mean aridity but by the probability distribution of “types of time”: just wetted, staying wet, and drying out <span class="citation" data-cites="Westoby-1980">(Westoby, 1980)</span>. Different growth forms use different types of time, and each distribution should have a characteristic mixture of growth forms. He did not compute that mixture for any climate. Mark describes the idea as loosely like coexistence by subdividing successional time in a forest, except that rainfall pulses, not disturbance, create the different kinds of time. That is why the forest calculation is the right place to start.</p>
+<p>The first half is now easy. Under pulsed rain, with random timing and depth, and losses that depend on how wet the soil is, the long-run distribution of soil moisture has a closed form <span class="citation" data-cites="RodriguezIturbe-1999 Laio-2001">(Rodriguez-Iturbe, Porporato, Ridolfi, Isham, &amp; Cox, 1999; Laio, Porporato, Ridolfi, &amp; Rodriguez-Iturbe, 2001)</span>. In the simplest version, storms arrive at rate <img src="https://latex.codecogs.com/png.latex?%5Clambda"> with mean depth <img src="https://latex.codecogs.com/png.latex?%5Calpha"> and the soil loses a fixed fraction <img src="https://latex.codecogs.com/png.latex?k"> of its water per day; the stationary soil water is then gamma-distributed with shape <img src="https://latex.codecogs.com/png.latex?%5Clambda%20/%20k"> and scale <img src="https://latex.codecogs.com/png.latex?%5Calpha">.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>The toy model: rain, a soil bucket, and one plant</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(patchwork)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb1-4"></span>
+<span id="cb1-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## Rain: storms at random times, exponential depths. Soil: a bucket losing a</span></span>
+<span id="cb1-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## fixed fraction k of its water per day. Simulated exactly, sampled daily.</span></span>
+<span id="cb1-7">years  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span></span>
+<span id="cb1-8">lambda <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># storms per day</span></span>
+<span id="cb1-9">alpha  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>       <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># mean storm depth, mm</span></span>
+<span id="cb1-10">k      <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">25</span>   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># fraction of soil water lost per day</span></span>
+<span id="cb1-11">ndays  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> years <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">365</span></span>
+<span id="cb1-12">n_ev   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rpois</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, lambda <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> ndays)</span>
+<span id="cb1-13">t_ev   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sort</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">runif</span>(n_ev, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, ndays))</span>
+<span id="cb1-14">d_ev   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rexp</span>(n_ev, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> alpha)</span>
+<span id="cb1-15">day    <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ceiling</span>(t_ev)</span>
+<span id="cb1-16">inc    <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">numeric</span>(ndays)</span>
+<span id="cb1-17">agg    <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tapply</span>(d_ev <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">exp</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>k <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (day <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> t_ev)), day, sum)</span>
+<span id="cb1-18">inc[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.integer</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(agg))] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> agg</span>
+<span id="cb1-19">x <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">numeric</span>(ndays); x[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> inc[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb1-20"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>ndays) x[i] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> x[i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">exp</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>k) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> inc[i]</span>
+<span id="cb1-21">rain <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> inc</span>
+<span id="cb1-22">burn <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3650</span>                               <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># let the bucket forget its start</span></span>
+<span id="cb1-23">x <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> x[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>burn)]; rain <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> rain[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>burn)]</span>
+<span id="cb1-24">nd <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(x)</span>
+<span id="cb1-25"></span>
+<span id="cb1-26"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## One plant. A seedling starting on day t0 dies in any dry spell where soil</span></span>
+<span id="cb1-27"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## water stays below theta_d for D days in a row. From age m it makes seed at a</span></span>
+<span id="cb1-28"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## rate set by soil water above theta_c. It lives at most L days. Returns</span></span>
+<span id="cb1-29"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## lifetime output by start day, and zero on days too dry to germinate.</span></span>
+<span id="cb1-30">lifetime_output <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">theta_g =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">25</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">theta_d =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">D =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">90</span>,</span>
+<span id="cb1-31">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">m =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">365</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">L =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">40</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">365</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">theta_c =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>) {</span>
+<span id="cb1-32">  nd  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(x)</span>
+<span id="cb1-33">  run <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">integer</span>(nd); r <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>L</span>
+<span id="cb1-34">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq_len</span>(nd)) { r <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (x[i] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> theta_d) r <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>L <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>L; run[i] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> r }</span>
+<span id="cb1-35">  nk <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rep</span>(.Machine<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>integer.max, nd)</span>
+<span id="cb1-36">  nk[run <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> D] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">which</span>(run <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> D)</span>
+<span id="cb1-37">  nk <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rev</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cummin</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rev</span>(nk)))                  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># next killing day at or after t</span></span>
+<span id="cb1-38">  C  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cumsum</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pmax</span>(x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> theta_c, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)))</span>
+<span id="cb1-39">  t0 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq_len</span>(nd)</span>
+<span id="cb1-40">  start <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> t0 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> m</span>
+<span id="cb1-41">  end   <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pmin</span>(nk <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>L, t0 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> L, nd)</span>
+<span id="cb1-42">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ifelse</span>(end <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> start, C[end <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> C[start], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)</span>
+<span id="cb1-43">  out[x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> theta_g] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>                      <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># did not germinate</span></span>
+<span id="cb1-44">  out[t0 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> L <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> nd]  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NA</span>                     <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># life would run past the end</span></span>
+<span id="cb1-45">  out</span>
+<span id="cb1-46">}</span>
+<span id="cb1-47"></span>
+<span id="cb1-48"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## Seeds wait in the soil until rain wets it past theta_g, so every life starts</span></span>
+<span id="cb1-49"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## on a germinating rain: a day the soil crosses theta_g on the way up.</span></span>
+<span id="cb1-50">germinating_rains <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">theta_g =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">25</span>) {</span>
+<span id="cb1-51">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">which</span>(x[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> theta_g <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> x[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(x)] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> theta_g) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>L</span>
+<span id="cb1-52">}</span>
+<span id="cb1-53"></span>
+<span id="cb1-54"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## Strategy A, and strategy B: survives 95-day dry spells, but needs more water</span></span>
+<span id="cb1-55"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## before it seeds. Keep the rains whose nodes can live out their lives, and</span></span>
+<span id="cb1-56"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## scale output so A exactly replaces itself (R = 1), as a resident would.</span></span>
+<span id="cb1-57">RA <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lifetime_output</span>(x)</span>
+<span id="cb1-58">RB <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lifetime_output</span>(x, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">D =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">95</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">theta_c =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10.2</span>)</span>
+<span id="cb1-59">ev <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">germinating_rains</span>(x)</span>
+<span id="cb1-60">ev <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> ev[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.na</span>(RA[ev]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.na</span>(RB[ev])]</span>
+<span id="cb1-61">c_scale <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(RA[ev])</span>
+<span id="cb1-62">RA <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> RA <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> c_scale</span>
+<span id="cb1-63">RB <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> RB <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> c_scale</span>
+<span id="cb1-64"></span>
+<span id="cb1-65">green <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#2E6B3F"</span>; sand <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#C08A3E"</span>; grey <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"grey55"</span></span>
+<span id="cb1-66"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_set</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">base_size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">11</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb1-67">            <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">panel.grid.minor =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_blank</span>()))</span></code></pre></div></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">idx <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">365</span>)</span>
+<span id="cb2-2">pa <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">t =</span> idx <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">365</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> x[idx], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rain =</span> rain[idx])) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_col</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(t, rain), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> grey, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">width =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">365</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(t, x), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> green, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"years"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mm"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"(a) storms and soil water"</span>)</span>
+<span id="cb2-6">pb <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> x), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_histogram</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">after_stat</span>(density)), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bins =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">80</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"grey80"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dgamma, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">shape =</span> lambda <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> k, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">scale =</span> alpha),</span>
+<span id="cb2-9">                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> green, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_cartesian</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">90</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"soil water (mm)"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"density"</span>,</span>
+<span id="cb2-12">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"(b) time spent in each state"</span>)</span>
+<span id="cb2-13">pa <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> pb <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot_layout</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">widths =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.6</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span></code></pre></div></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-soil" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-soil-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://traitecoevo.github.io/overstorey/posts/2026-10-12-fitness-in-pulse-driven-environments/index_files/figure-html/fig-soil-1.png" class="img-fluid figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-soil-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: <strong>One long run samples the distribution.</strong> (a) Three years of the toy: storms (bars) and the soil water they leave behind (line). (b) Soil water over all 10,000 years of the run (histogram) against the closed-form stationary distribution (line). They agree because the run is stationary: averaging over time is averaging over the distribution.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>So for any rainfall regime and landscape position, we can write down the distribution of soil-water states without simulating anything. That is a fast screen: for anything that depends only on the water state <em>at the moment</em>, such as carbon gain at a given leaf area, the long-run average is just an average over this curve. It is also a check. Whatever we simulate must reproduce the curve, or the run has not settled.</p>
+</section>
+<section id="why-the-distribution-alone-is-not-fitness" class="level2">
+<h2 class="anchored" data-anchor-id="why-the-distribution-alone-is-not-fitness">Why the distribution alone is not fitness</h2>
+<p>The trouble is that a plant’s lifetime output depends on the <strong>order</strong> in which states arrive, not only on how often each occurs. Drought kills by duration: a long run of dry days, not one dry day. Establishment needs a wet start followed by enough wet weeks.</p>
+<p>First, when does a plant’s life start? As Mark Westoby pointed out to us, seeds are shed at one time and germinate at another. Buried seeds wait in the soil, dying at a roughly steady rate, until a rain wets it enough to germinate them. A seed shed on a dry day is not lost, only waiting, so every life starts on a germinating rain. In the toy that is a rain that takes the soil past 25 mm, which happens about 6 times a year. Figure&nbsp;2 shows the lifetime output of the node each of those rains starts.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">win <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">60</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">365</span>)</span>
+<span id="cb3-2">dry <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rle</span>(x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>)</span>
+<span id="cb3-3">dry_end <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cumsum</span>(dry<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lengths)</span>
+<span id="cb3-4">dry_start <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> dry_end <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> dry<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lengths <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span>
+<span id="cb3-5">kill_days <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> dry_start[dry<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>values <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> dry<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lengths <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">90</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">89</span></span>
+<span id="cb3-6">kill_days <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> kill_days[kill_days <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> win]</span>
+<span id="cb3-7">ev60 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> ev[ev <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> win]</span>
+<span id="cb3-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">t =</span> ev60 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">365</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">R =</span> RA[ev60])) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_vline</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xintercept =</span> kill_days <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">365</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"grey85"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(t, R), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.9</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> green) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"germination day (years)"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lifetime output"</span>)</span></code></pre></div></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-arrival" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-arrival-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://traitecoevo.github.io/overstorey/posts/2026-10-12-fitness-in-pulse-driven-environments/index_files/figure-html/fig-arrival-1.png" class="img-fluid figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-arrival-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: <strong>Lifetime output depends on what follows germination.</strong> Each point is the lifetime seed output of one toy node, by the day the rain that germinated it fell, over 60 years. Every node starts from much the same soil, just wetted past the germination threshold. Some germinate just before a long drought and die young; others germinate after one and live for decades. Grey lines mark the day each lethal drought reaches 90 days and kills every plant then alive.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The cleanest way to see it is to keep the distribution and destroy the order. Shuffling the days of the soil-water record leaves the histogram exactly as it was, but long dry spells vanish, because dry days no longer come in runs.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">xs <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sample</span>(x)</span>
+<span id="cb4-2">RS <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lifetime_output</span>(xs) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> c_scale</span>
+<span id="cb4-3">es <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">germinating_rains</span>(xs)</span>
+<span id="cb4-4">es <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> es[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.na</span>(RS[es])]</span>
+<span id="cb4-5">fit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">series =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"real order"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"shuffled"</span>),</span>
+<span id="cb4-6">                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">R =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(RA[ev]), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(RS[es])))</span>
+<span id="cb4-7">pa <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_histogram</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">after_stat</span>(density)), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> x),</span>
+<span id="cb4-9">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bins =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">80</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> green, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.45</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_freqpoly</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">after_stat</span>(density)), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> xs),</span>
+<span id="cb4-11">                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bins =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">80</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> sand, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_cartesian</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">90</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"soil water (mm)"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"density"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"(a) the distribution"</span>,</span>
+<span id="cb4-14">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"filled: real order    line: shuffled"</span>)</span>
+<span id="cb4-15">pb <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(fit, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(series, R, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> series)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-16">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_col</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">width =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">show.legend =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_hline</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yintercept =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linetype =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"grey40"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_fill_manual</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(green, sand)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-19">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"fitness R"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"(b) the fitness"</span>)</span>
+<span id="cb4-20">pa <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> pb <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot_layout</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">widths =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.6</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span></code></pre></div></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-shuffle" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-shuffle-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://traitecoevo.github.io/overstorey/posts/2026-10-12-fitness-in-pulse-driven-environments/index_files/figure-html/fig-shuffle-1.png" class="img-fluid figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-shuffle-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: <strong>Same distribution, different order, different fitness.</strong> (a) The soil-water record and a shuffled copy of it have identical distributions; the two histograms overlap exactly. (b) The fitness of the same toy plant on each. On the real sequence it exactly replaces itself. On the shuffled one, with no long droughts, its fitness is about four times higher.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>On the shuffled record the toy plant’s fitness is 4.0; on the real one it is 1. A fitness calculated from the distribution alone cannot tell these two apart. So the distribution supplies the <strong>weights</strong>, but something has to supply the <strong>sequence</strong> that follows each starting state.</p>
+</section>
+<section id="the-method-one-long-run-many-germinating-rains" class="level2">
+<h2 class="anchored" data-anchor-id="the-method-one-long-run-many-germinating-rains">The method: one long run, many germinating rains</h2>
+<p>Here is the cut-through. It is the forest calculation with time in place of patch age.</p>
+<ol type="1">
+<li><strong>Run one patch for a long time</strong> under one realisation of the rainfall process, with the resident community in it, until it settles into a steady state. Steady here means stationary: the community keeps fluctuating with the rain, but its long-run statistics stop changing. This burn-in is paid once. Save the state at the end of it.</li>
+<li><strong>Introduce mutant seedlings at each germinating rain</strong> in a window that starts after the burn-in. <code>plant</code> already introduces nodes at a schedule of times; only the schedule and the weighting change.</li>
+<li><strong>Record each one’s lifetime output</strong> <img src="https://latex.codecogs.com/png.latex?%5Ctilde%20R(t_i)">, running past the end of the window long enough for late arrivals to live out their lives.</li>
+<li><strong>Average over the <img src="https://latex.codecogs.com/png.latex?N"> germinating rains</strong> <img src="https://latex.codecogs.com/png.latex?t_1,%20%5Cdots,%20t_N"> in the window: <img src="https://latex.codecogs.com/png.latex?%0AR%20=%20%5Cfrac%7B1%7D%7BN%7D%20%5Csum_%7Bi=1%7D%5E%7BN%7D%20%5Ctilde%20R(t_i)%20.%0A"></li>
+</ol>
+<p>Because the run is stationary, the germinating rains in the window are a fair sample of all the germinating rains the climate produces, and the soil and stand at those moments are a fair sample of the states that seedlings start from. So averaging over them <em>is</em> the average over the stationary distribution of states that seeds land in, which is what Metz and Gyllenberg ask for. And each node carries the real sequence that follows it, which is what Figure&nbsp;3 shows we need. One run delivers both the weights and the sequence.</p>
+<p>In code this is a small change. In the forest the weight on a seed arriving at age <img src="https://latex.codecogs.com/png.latex?a"> is the patch-age density <img src="https://latex.codecogs.com/png.latex?P(a)">. Here the weight sits on the germinating rains in the window, equally on each, and is zero everywhere else. Weighting each rain equally assumes, as a first approximation, that when a seed was shed does not matter, only that it survives in the soil until a rain germinates it. Everything downstream, from the fitness integral in <code>plant</code> to the assembly loop in <code>regnans</code>, is untouched.</p>
+</section>
+<section id="annuals-and-perennials-on-the-same-run" class="level2">
+<h2 class="anchored" data-anchor-id="annuals-and-perennials-on-the-same-run">Annuals and perennials on the same run</h2>
+<p>For a long-lived shrub, one life spans dozens of rain pulses and several droughts, so each individual experiences something close to the long-run average and <img src="https://latex.codecogs.com/png.latex?R"> above is the right fitness. For an annual it is not. An annual lives one season, and its population multiplies by a different factor every year: large after a good year, near zero after a bad one. What matters then is the <a href="../../glossary.html#long-run-growth-rate"><strong>long-run growth rate</strong></a>, the average of the <em>logarithm</em> of the yearly multiplication, not the average multiplication itself <span class="citation" data-cites="Tuljapurkar-1980 Metz-1992">(Tuljapurkar &amp; Orzack, 1980; Metz, Nisbet, &amp; Geritz, 1992)</span>. With a seed bank that survives a year with probability <img src="https://latex.codecogs.com/png.latex?s">, a fraction <img src="https://latex.codecogs.com/png.latex?g"> of seeds germinating, and <img src="https://latex.codecogs.com/png.latex?Y_t"> seeds per germinant in year <img src="https://latex.codecogs.com/png.latex?t">, an annual invades when</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B1%7D%7BN%7D%20%5Csum_%7Bt=1%7D%5E%7BN%7D%20%5Clog%5Cbigl(s%5C,(1-g)%20+%20g%5C,Y_t%5Cbigr)%20%3E%200%20.%0A"></p>
+<p>This is Cohen’s classic germination problem <span class="citation" data-cites="Cohen-1966">(Cohen, 1966)</span>, and it is the storage effect of coexistence theory <span class="citation" data-cites="Chesson-2000">(Chesson, 2000)</span> computed directly instead of decomposed into parts. The useful thing is that <img src="https://latex.codecogs.com/png.latex?Y_t"> comes from <strong>the same run</strong>: introduce an annual node at each year’s germinating rain, harvest it at the end of the season. Annuals and perennials are judged on one run and one rainfall series, which is what the annual–woody coexistence question needs. For in-between life histories, like a perennial grass living ten years, the toy and the pilot will tell us whether <img src="https://latex.codecogs.com/png.latex?R"> is close enough or the growth rate is needed.</p>
+</section>
+<section id="uphill-and-downhill" class="level2">
+<h2 class="anchored" data-anchor-id="uphill-and-downhill">Uphill and downhill</h2>
+<p>Landscape position adds a dimension but not a new idea. Run one long patch per position, both under the same storms. The upslope patch keeps each storm only up to what its soil can hold and sheds the rest; the downslope patch receives that excess on top of its own rain. Water only flows downhill, so the upslope run can go first and hand its runoff, storm by storm, to the downslope run. Because the downslope gain comes in the same storms as the upslope loss, the two positions must share one rain series. Then ask where seeds go. If a seed produced in position <img src="https://latex.codecogs.com/png.latex?i"> lands in position <img src="https://latex.codecogs.com/png.latex?j"> with probability <img src="https://latex.codecogs.com/png.latex?D_%7Bij%7D">, the expected number of offspring in <img src="https://latex.codecogs.com/png.latex?j"> per seed in <img src="https://latex.codecogs.com/png.latex?i"> is <img src="https://latex.codecogs.com/png.latex?D_%7Bij%7D%20%5Ctilde%20R_j">. With two positions that is a <img src="https://latex.codecogs.com/png.latex?2%20%5Ctimes%202"> matrix, and the mutant’s fitness is its largest eigenvalue: the long-run multiplication of a lineage that keeps moving between positions. This is the same Metz and Gyllenberg result, now with two kinds of patch <span class="citation" data-cites="Metz-2001">(Metz &amp; Gyllenberg, 2001)</span>. It is also where source–sink structure appears: a position where a strategy cannot replace itself can still hold it, fed by seed from a position where it can.</p>
+</section>
+<section id="how-long-a-run" class="level2">
+<h2 class="anchored" data-anchor-id="how-long-a-run">How long a run?</h2>
+<p>A fitness estimated from a finite window is noisy, because a few droughts more or less in the window shift it. The question is how long the window must be, and the toy gives a feel for the answer.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">yr <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (ev <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%/%</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">365</span>                        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># year of each germinating rain</span></span>
+<span id="cb5-2">W <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">25</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">200</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">400</span>)</span>
+<span id="cb5-3">spread <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">do.call</span>(rbind, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(W, <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(wy) {</span>
+<span id="cb5-4">  block <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> yr <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%/%</span> wy</span>
+<span id="cb5-5">  keep  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> block <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">max</span>(block)                 <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># drop the last, partial block</span></span>
+<span id="cb5-6">  mA <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tapply</span>(RA[ev][keep], block[keep], mean)</span>
+<span id="cb5-7">  mB <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tapply</span>(RB[ev][keep], block[keep], mean)</span>
+<span id="cb5-8">  nb <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(mA)</span>
+<span id="cb5-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(</span>
+<span id="cb5-10">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">years =</span> wy,</span>
+<span id="cb5-11">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">what  =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"fitness of A"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"A vs B, same series"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"A vs B, separate series"</span>),</span>
+<span id="cb5-12">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sd    =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(mA), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(mB <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> mA), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(mB[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> mA[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>nb])))  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># separate: next block</span></span>
+<span id="cb5-13">}))</span>
+<span id="cb5-14">true_diff <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(RB[ev] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> RA[ev])</span>
+<span id="cb5-15">spread<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>what <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(spread<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>what, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">levels =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(</span>
+<span id="cb5-16">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"fitness of A"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"A vs B, separate series"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"A vs B, same series"</span>))</span>
+<span id="cb5-17"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(spread, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(years, sd, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> what, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linetype =</span> what)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.7</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.4</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-19">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_hline</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yintercept =</span> true_diff, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linetype =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"grey40"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-20">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">annotate</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"text"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">25</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> true_diff, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">label =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"true A–B difference"</span>,</span>
+<span id="cb5-21">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">vjust =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.2</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"grey30"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-22">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_log10</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">breaks =</span> W) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-23">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_log10</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">breaks =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-24">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_colour_manual</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(green, sand, sand)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-25">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_linetype_manual</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-26">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"window length (years)"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"spread of estimate"</span>,</span>
+<span id="cb5-27">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linetype =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>)</span></code></pre></div></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-window" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-window-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://traitecoevo.github.io/overstorey/posts/2026-10-12-fitness-in-pulse-driven-environments/index_files/figure-html/fig-window-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-window-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: <strong>Comparisons converge faster than levels, if they share a rain series.</strong> Spread (standard deviation) of toy fitness estimates against window length, across non-overlapping windows of the 10,000-year run. Green: the fitness of one strategy. Brown, solid: the difference in fitness between strategies A and B, estimated on the same rain series. Brown, dashed: the same difference estimated on separate series. The dotted line is the true difference; a comparison is resolved roughly where its curve falls well below it.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Three lessons, all from the toy, so read them as orders of magnitude rather than numbers for TF24.</p>
+<ul>
+<li><strong>Levels are expensive.</strong> The spread of one strategy’s fitness is still 32% after 400 years. Pinning fitness down to a percent by brute force would take something like 400,000 years. The reason is that nodes germinating within one lifetime of each other share the same future droughts, so their outputs rise and fall together; the run has to cover many lifetimes’ worth of drought history before the luck averages out.</li>
+<li><strong>Comparisons are cheaper, if they share the rain.</strong> Evolution acts on <em>differences</em> between strategies, and selection gradients are differences too. Running both strategies through the same rain series removes the luck of the draw that they have in common. In the toy, the same precision needs between 5 and 14 times fewer years, more as the window lengthens. After 400 years on a shared series, the difference between A and B, 0.22, is 1.8 times its spread; on separate series the spread is still 2.1 times larger than the difference. The rule that follows is simple: <strong>every fitness evaluation in an assembly uses the same rain series</strong>, and we check the answer on a second series separately.</li>
+<li><strong>Sampling arrivals by soil-water state does not help.</strong> Every node starts on a germinating rain, from much the same soil, and in the toy the soil water at germination explains 0% of the spread in lifetime output. The spread in Figure&nbsp;2 comes from what happens <em>after</em> germination, so choosing arrivals by their soil state cannot shorten the run.</li>
+</ul>
+<p>There is one more route, which shortens each run rather than the total: give up the single long run after the burn-in. The saved steady state is a library of starting points: start many short mutant runs, each one lifetime long, from states sampled along it. The total simulated time is similar, but each run is short, they run in parallel, and gradients only need to be carried back through one lifetime.</p>
+</section>
+<section id="what-has-to-be-built" class="level2">
+<h2 class="anchored" data-anchor-id="what-has-to-be-built">What has to be built</h2>
+<p><code>plant</code> cannot do this yet. It runs a patch for a fixed period after a disturbance, from a fixed schedule of node introductions. The method needs a <strong>continuous patch</strong>: one that keeps introducing nodes as it goes, can start from a saved state, stops on a convergence test for the burn-in and a fixed horizon for the window, keeps the lifetime output of every node while thinning the rest of its history, and stops tracking old plants individually without losing their seed output. That is <a href="https://github.com/traitecoevo/plant/issues/519">plant#519</a>, and its requirements are listed there. It depends on rainfall arriving as discrete events (<a href="https://github.com/traitecoevo/plant/issues/628">plant#628</a>). Handing runoff downhill one storm at a time needs only those events and a record of each storm’s runoff; patches that exchange water both ways need the multi-patch work in <a href="https://github.com/traitecoevo/plant/issues/427">plant#427</a>.</p>
+<p>Two things are open and will be answered by measurement, not argument. Does a stand of mulga under pulsed rain settle into a steady state with no disturbance, and how long does it take? And how long a window does a selection gradient need for TF24, as opposed to the toy?</p>
+</section>
+<section id="take-aways" class="level2">
+<h2 class="anchored" data-anchor-id="take-aways">Take-aways</h2>
+<ul>
+<li><code>plant</code>’s fitness was never really about patch age. It is an average of a seed’s lifetime output over the stationary distribution of the states seeds land in; patch age is that state in a forest.</li>
+<li>In the semi-arid the state is soil water and the plants in it. Its distribution is known in closed form for a rainfall regime and landscape position, which gives a fast screen and a check.</li>
+<li>The distribution alone is not fitness, because drought and establishment depend on the sequence. Shuffling the toy’s soil-water record leaves the distribution unchanged and roughly quadruples its fitness.</li>
+<li>One long stationary run, with mutant seedlings introduced at each germinating rain in a window, samples the states seedlings start from and keeps the sequence that follows each. In code it is a change of weights.</li>
+<li>Perennials use the average lifetime output; annuals use the average log of yearly multiplication; both come from the same run. Landscape positions combine through a small matrix.</li>
+<li>Fitness levels are very expensive to pin down; fitness differences on a shared rain series are many times cheaper. Always compare strategies on the same series.</li>
+</ul>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2">
+<div id="ref-Chesson-2000" class="csl-entry">
+Chesson, P. (2000). Mechanisms of maintenance of species diversity. <em>Annual Review of Ecology and Systematics</em>, <em>31</em>, 343–366. doi:<a href="https://doi.org/10.1146/annurev.ecolsys.31.1.343">10.1146/annurev.ecolsys.31.1.343</a>
+</div>
+<div id="ref-Cohen-1966" class="csl-entry">
+Cohen, D. (1966). Optimizing reproduction in a randomly varying environment. <em>Journal of Theoretical Biology</em>, <em>12</em>(1), 119–129. doi:<a href="https://doi.org/10.1016/0022-5193(66)90188-3">10.1016/0022-5193(66)90188-3</a>
+</div>
+<div id="ref-Falster-2015" class="csl-entry">
+Falster, D. S., Brännström, Åke, Westoby, M., &amp; Dieckmann, U. (2015). Multi-trait eco-evolutionary dynamics explain niche diversity and evolved neutrality in forests. <em>bioRxiv</em>, 014605. doi:<a href="https://doi.org/10.1101/014605">10.1101/014605</a>
+</div>
+<div id="ref-Falster-2017" class="csl-entry">
+Falster, Daniel S., Brännström, Åke, Westoby, M., &amp; Dieckmann, U. (2017). Multitrait successional forest dynamics enable diverse competitive coexistence. <em>Proceedings of the National Academy of Sciences</em>, <em>114</em>(13). doi:<a href="https://doi.org/10.1073/pnas.1610206114">10.1073/pnas.1610206114</a>
+</div>
+<div id="ref-Gyllenberg-2001" class="csl-entry">
+Gyllenberg, M., &amp; Metz, J. A. J. (2001). On fitness in structured metapopulations. <em>Journal of Mathematical Biology</em>, <em>43</em>(6), 545–560.
+</div>
+<div id="ref-Laio-2001" class="csl-entry">
+Laio, F., Porporato, A., Ridolfi, L., &amp; Rodriguez-Iturbe, I. (2001). Plants in water-controlled ecosystems: Active role in hydrologic processes and response to water stress. <span>II</span>. <span>Probabilistic</span> soil moisture dynamics. <em>Advances in Water Resources</em>, <em>24</em>(7), 707–723. doi:<a href="https://doi.org/10.1016/S0309-1708(01)00005-7">10.1016/S0309-1708(01)00005-7</a>
+</div>
+<div id="ref-Metz-2001" class="csl-entry">
+Metz, J. A. J., &amp; Gyllenberg, M. (2001). How should we define fitness in structured metapopulation models? <span>Including</span> an application to the calculation of evolutionarily stable dispersal strategies. <em>Proceedings of the Royal Society of London - Series B: Biological Sciences</em>, <em>268</em>(1466), 499–508.
+</div>
+<div id="ref-Metz-1992" class="csl-entry">
+Metz, J. A. J., Nisbet, R. M., &amp; Geritz, S. A. H. (1992). How should we define ’fitness’ for general ecological scenarios? <em>Trends in Ecology and Evolution</em>, <em>7</em>(6), 198–202. doi:<a href="https://doi.org/10.1016/0169-5347(92)90073-K">10.1016/0169-5347(92)90073-K</a>
+</div>
+<div id="ref-RodriguezIturbe-1999" class="csl-entry">
+Rodriguez-Iturbe, I., Porporato, A., Ridolfi, L., Isham, V., &amp; Cox, D. R. (1999). Probabilistic modelling of water balance at a point: The role of climate, soil and vegetation. <em>Proceedings of the Royal Society of London. Series A: Mathematical, Physical and Engineering Sciences</em>, <em>455</em>(1990), 3789–3805. doi:<a href="https://doi.org/10.1098/rspa.1999.0477">10.1098/rspa.1999.0477</a>
+</div>
+<div id="ref-Tuljapurkar-1980" class="csl-entry">
+Tuljapurkar, S. D., &amp; Orzack, S. H. (1980). Population dynamics in variable environments <span>I</span>. <span class="nocase">Long-run</span> growth rates and extinction. <em>Theoretical Population Biology</em>, <em>18</em>(3), 314–342. doi:<a href="https://doi.org/10.1016/0040-5809(80)90057-X">10.1016/0040-5809(80)90057-X</a>
+</div>
+<div id="ref-Westoby-1980" class="csl-entry">
+Westoby, M. (1980). Elements of a theory of vegetation dynamics in arid rangelands. <em>Israel Journal of Botany</em>, <em>28</em>, 169–194.
+</div>
+</div>
+
+
+</section>
+
+ ]]></description>
+  <category>fitness</category>
+  <category>adaptive-dynamics</category>
+  <category>semi-arid</category>
+  <category>theory</category>
+  <guid>https://traitecoevo.github.io/overstorey/posts/2026-10-12-fitness-in-pulse-driven-environments/</guid>
+  <pubDate>Mon, 12 Oct 2026 00:00:00 GMT</pubDate>
+</item>
 <item>
   <title>A flat maximum costs you half your digits</title>
   <link>https://traitecoevo.github.io/overstorey/posts/2026-08-20-flat-maximum-half-your-digits/</link>

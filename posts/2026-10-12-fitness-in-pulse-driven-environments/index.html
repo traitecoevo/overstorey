@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-10-12">
+<meta name="description" content="plant calculates fitness by averaging a seed’s lifetime output over the ages of the patches it might land in. That works for forests reset by disturbance. It does not obviously work for a semi-arid landscape driven by rainfall pulses, with no reset at all. This post explains the principle underneath the forest calculation, why it carries over, and the one-long-run method we plan to use, with a toy model you can run in a few seconds.">
+
+<title>Overstorey – How to calculate fitness in pulse-driven environments</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e30b0f8ea5685d2ef6f683bb78d13b16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../assets/extras.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Overstorey</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../guides/index.html"> 
+<span class="menu-text">Guides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../theory/index.html"> 
+<span class="menu-text">Theory</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/index.html"> 
+<span class="menu-text">Adaptively</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/reproductions.html"> 
+<span class="menu-text">Reproductions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../glossary.html"> 
+<span class="menu-text">Glossary</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://traitecoevo.github.io/plant/reference/" target="_blank"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../develop.html"> 
+<span class="menu-text">Pipeline</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant" target="_blank"> <i class="bi bi-github" role="img" aria-label="plant source on GitHub">
+</i> 
+<span class="menu-text">plant source</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-question" id="toc-the-question" class="nav-link active" data-scroll-target="#the-question">The question</a></li>
+  <li><a href="#how-plant-calculates-fitness-now" id="toc-how-plant-calculates-fitness-now" class="nav-link" data-scroll-target="#how-plant-calculates-fitness-now">How plant calculates fitness now</a></li>
+  <li><a href="#what-breaks-in-the-semi-arid" id="toc-what-breaks-in-the-semi-arid" class="nav-link" data-scroll-target="#what-breaks-in-the-semi-arid">What breaks in the semi-arid</a></li>
+  <li><a href="#the-principle-underneath" id="toc-the-principle-underneath" class="nav-link" data-scroll-target="#the-principle-underneath">The principle underneath</a></li>
+  <li><a href="#westobys-suggestion-the-distribution-of-soil-water-states" id="toc-westobys-suggestion-the-distribution-of-soil-water-states" class="nav-link" data-scroll-target="#westobys-suggestion-the-distribution-of-soil-water-states">Westoby’s suggestion: the distribution of soil-water states</a></li>
+  <li><a href="#why-the-distribution-alone-is-not-fitness" id="toc-why-the-distribution-alone-is-not-fitness" class="nav-link" data-scroll-target="#why-the-distribution-alone-is-not-fitness">Why the distribution alone is not fitness</a></li>
+  <li><a href="#the-method-one-long-run-many-germinating-rains" id="toc-the-method-one-long-run-many-germinating-rains" class="nav-link" data-scroll-target="#the-method-one-long-run-many-germinating-rains">The method: one long run, many germinating rains</a></li>
+  <li><a href="#annuals-and-perennials-on-the-same-run" id="toc-annuals-and-perennials-on-the-same-run" class="nav-link" data-scroll-target="#annuals-and-perennials-on-the-same-run">Annuals and perennials on the same run</a></li>
+  <li><a href="#uphill-and-downhill" id="toc-uphill-and-downhill" class="nav-link" data-scroll-target="#uphill-and-downhill">Uphill and downhill</a></li>
+  <li><a href="#how-long-a-run" id="toc-how-long-a-run" class="nav-link" data-scroll-target="#how-long-a-run">How long a run?</a></li>
+  <li><a href="#what-has-to-be-built" id="toc-what-has-to-be-built" class="nav-link" data-scroll-target="#what-has-to-be-built">What has to be built</a></li>
+  <li><a href="#take-aways" id="toc-take-aways" class="nav-link" data-scroll-target="#take-aways">Take-aways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/posts/2026-10-12-fitness-in-pulse-driven-environments/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">How to calculate fitness in pulse-driven environments</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">fitness</div>
+    <div class="quarto-category">adaptive-dynamics</div>
+    <div class="quarto-category">semi-arid</div>
+    <div class="quarto-category">theory</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    plant calculates fitness by averaging a seed’s lifetime output over the ages of the patches it might land in. That works for forests reset by disturbance. It does not obviously work for a semi-arid landscape driven by rainfall pulses, with no reset at all. This post explains the principle underneath the forest calculation, why it carries over, and the one-long-run method we plan to use, with a toy model you can run in a few seconds.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 12, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><span class="version-badge version-badge--dev">plant @develop f39bcb3</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What this post is, and is not
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a <strong>method</strong>, written for PhD students and team members joining the semi-arid work. None of it is in <code>plant</code> yet; the pin above is the state of <code>develop</code> it was written against. The figures come from a deliberately small toy model in base R, not from <code>plant</code>, so you can read every line of it. The toy has no competition and one made-up plant. It is there to make the ideas visible, not to predict anything.</p>
+</div>
+</div>
+<section id="the-question" class="level2">
+<h2 class="anchored" data-anchor-id="the-question">The question</h2>
+<p>We want to use <code>plant</code> and <a href="https://github.com/traitecoevo/regnans"><code>regnans</code></a> to ask eco-evolutionary questions about semi-arid Australia. Which combinations of traits are evolutionarily stable under a given rainfall regime? Can annual herbs, perennial grasses and woody shrubs coexist, and on what terms? How does the answer change between an upslope patch that sheds water and a downslope patch that receives it?</p>
+<p>Every one of those questions runs through one calculation: the <a href="../../glossary.html#invasion-fitness">invasion fitness</a> of a rare <a href="../../glossary.html#mutant">mutant</a> strategy in the environment created by the <a href="../../glossary.html#resident">residents</a>. Get that number, and the <a href="../../glossary.html#community-assembly">community assembly</a> machinery in <code>regnans</code> does the rest. The difficulty is that the way <code>plant</code> computes it today was built for forests.</p>
+</section>
+<section id="how-plant-calculates-fitness-now" class="level2">
+<h2 class="anchored" data-anchor-id="how-plant-calculates-fitness-now">How plant calculates fitness now</h2>
+<p>In a forest, a patch is reset by disturbance and then develops along the same trajectory every time. So a patch’s age since disturbance tells you everything about it: how tall the canopy is, how much light reaches the ground, how much competition a seedling faces. Disturbance strikes patches independently, so across the landscape the <a href="../../glossary.html#patch-age-distribution">distribution of patch ages</a> <span class="math inline">\(P(a)\)</span> stays fixed even though every patch is changing.</p>
+<p>That makes fitness cheap. A mutant seed that lands in a patch of age <span class="math inline">\(a\)</span> goes on to produce some number of dispersing seeds over its life, <span class="math inline">\(\tilde R(a)\)</span>. Its fitness is the average of that over all the ages it might land in <span class="citation" data-cites="Falster-2017 Falster-2015">(<a href="#ref-Falster-2015" role="doc-biblioref">D. S. Falster, Brännström, Westoby, &amp; Dieckmann, 2015</a>; <a href="#ref-Falster-2017" role="doc-biblioref">Daniel S. Falster, Brännström, Westoby, &amp; Dieckmann, 2017</a>)</span>:</p>
+<p><span class="math display">\[
+R = \int_0^\infty P(a)\, \tilde R(a)\, \mathrm{d}a .
+\]</span></p>
+<p>Above one, the mutant can invade. To compute it, <code>plant</code> runs <strong>one</strong> patch from bare ground, introduces mutant <a href="../../glossary.html#node">nodes</a> along the way, and weights each by how common patches of its age are. One run stands in for the whole landscape. The <a href="../../theory/adaptive-dynamics.html#sec-invasion-fitness">Theory page</a> has the details.</p>
+</section>
+<section id="what-breaks-in-the-semi-arid" class="level2">
+<h2 class="anchored" data-anchor-id="what-breaks-in-the-semi-arid">What breaks in the semi-arid</h2>
+<p>Three things that made the forest calculation work are gone.</p>
+<ul>
+<li><strong>There is no reset.</strong> Without stand-replacing disturbance, nothing pins a patch to a known starting point, so patch age tells you nothing.</li>
+<li><strong>The environment has memory.</strong> Rain arrives as pulses of random size at random times. The soil stores them, and plants store carbon and grow roots in response. What a seedling meets depends on the recent sequence of rain, not on a single number.</li>
+<li><strong>Rain is shared.</strong> A big wet year is wet across a whole catchment. Patches are not independent draws, so the landscape does not average itself out at every moment the way a disturbance mosaic does.</li>
+</ul>
+<p>And a fourth thing is added: landscape position. An upslope patch and a downslope patch receive different effective rainfall from the same storms.</p>
+<p>The obvious response is brute force: simulate many patches under many random draws of rainfall and count seeds. That is expensive, and it turns out to be unnecessary.</p>
+</section>
+<section id="the-principle-underneath" class="level2">
+<h2 class="anchored" data-anchor-id="the-principle-underneath">The principle underneath</h2>
+<p>The forest calculation is one application of a more general result. Metz and Gyllenberg showed that in a metapopulation of patches, a rare mutant’s fitness is its expected lifetime output of dispersing seeds, averaged over the <a href="../../glossary.html#stationary-distribution"><strong>stationary distribution</strong></a> of the local states that its seeds land in <span class="citation" data-cites="Metz-2001 Gyllenberg-2001">(<a href="#ref-Gyllenberg-2001" role="doc-biblioref">Gyllenberg &amp; Metz, 2001</a>; <a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>.</p>
+<p>“Stationary” means the long-run distribution: the fraction of time, or of patches, in each state once the system has settled down. In a forest the local state that matters is patch age, and its stationary distribution is <span class="math inline">\(P(a)\)</span>. That is the only reason patch age appears in the formula. The principle does not care what the state is.</p>
+<p>In the semi-arid, the local state is the soil-water profile together with the plants standing in it. So the job becomes: find the stationary distribution of soil-water states, and find the lifetime output of a seed that lands in each.</p>
+</section>
+<section id="westobys-suggestion-the-distribution-of-soil-water-states" class="level2">
+<h2 class="anchored" data-anchor-id="westobys-suggestion-the-distribution-of-soil-water-states">Westoby’s suggestion: the distribution of soil-water states</h2>
+<p>Mark Westoby suggested starting exactly there: work out the distribution of soil-water states that a rainfall regime and a landscape position produce, then ask what each growth form makes of it. The idea goes back to his 1980 paper, which described a climate not by its mean aridity but by the probability distribution of “types of time”: just wetted, staying wet, and drying out <span class="citation" data-cites="Westoby-1980">(<a href="#ref-Westoby-1980" role="doc-biblioref">Westoby, 1980</a>)</span>. Different growth forms use different types of time, and each distribution should have a characteristic mixture of growth forms. He did not compute that mixture for any climate. Mark describes the idea as loosely like coexistence by subdividing successional time in a forest, except that rainfall pulses, not disturbance, create the different kinds of time. That is why the forest calculation is the right place to start.</p>
+<p>The first half is now easy. Under pulsed rain, with random timing and depth, and losses that depend on how wet the soil is, the long-run distribution of soil moisture has a closed form <span class="citation" data-cites="RodriguezIturbe-1999 Laio-2001">(<a href="#ref-RodriguezIturbe-1999" role="doc-biblioref">Rodriguez-Iturbe, Porporato, Ridolfi, Isham, &amp; Cox, 1999</a>; <a href="#ref-Laio-2001" role="doc-biblioref">Laio, Porporato, Ridolfi, &amp; Rodriguez-Iturbe, 2001</a>)</span>. In the simplest version, storms arrive at rate <span class="math inline">\(\lambda\)</span> with mean depth <span class="math inline">\(\alpha\)</span> and the soil loses a fixed fraction <span class="math inline">\(k\)</span> of its water per day; the stationary soil water is then gamma-distributed with shape <span class="math inline">\(\lambda / k\)</span> and scale <span class="math inline">\(\alpha\)</span>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>The toy model: rain, a soil bucket, and one plant</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Rain: storms at random times, exponential depths. Soil: a bucket losing a</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="do">## fixed fraction k of its water per day. Simulated exactly, sampled daily.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>years  <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>lambda <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="dv">15</span>   <span class="co"># storms per day</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>alpha  <span class="ot">&lt;-</span> <span class="dv">12</span>       <span class="co"># mean storm depth, mm</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>k      <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="dv">25</span>   <span class="co"># fraction of soil water lost per day</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>ndays  <span class="ot">&lt;-</span> years <span class="sc">*</span> <span class="dv">365</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>n_ev   <span class="ot">&lt;-</span> <span class="fu">rpois</span>(<span class="dv">1</span>, lambda <span class="sc">*</span> ndays)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>t_ev   <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">runif</span>(n_ev, <span class="dv">0</span>, ndays))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>d_ev   <span class="ot">&lt;-</span> <span class="fu">rexp</span>(n_ev, <span class="dv">1</span> <span class="sc">/</span> alpha)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>day    <span class="ot">&lt;-</span> <span class="fu">ceiling</span>(t_ev)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>inc    <span class="ot">&lt;-</span> <span class="fu">numeric</span>(ndays)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>agg    <span class="ot">&lt;-</span> <span class="fu">tapply</span>(d_ev <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>k <span class="sc">*</span> (day <span class="sc">-</span> t_ev)), day, sum)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>inc[<span class="fu">as.integer</span>(<span class="fu">names</span>(agg))] <span class="ot">&lt;-</span> agg</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">numeric</span>(ndays); x[<span class="dv">1</span>] <span class="ot">&lt;-</span> inc[<span class="dv">1</span>]</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>ndays) x[i] <span class="ot">&lt;-</span> x[i <span class="sc">-</span> <span class="dv">1</span>] <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>k) <span class="sc">+</span> inc[i]</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>rain <span class="ot">&lt;-</span> inc</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>burn <span class="ot">&lt;-</span> <span class="dv">3650</span>                               <span class="co"># let the bucket forget its start</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> x[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span>burn)]; rain <span class="ot">&lt;-</span> rain[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span>burn)]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">length</span>(x)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="do">## One plant. A seedling starting on day t0 dies in any dry spell where soil</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="do">## water stays below theta_d for D days in a row. From age m it makes seed at a</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="do">## rate set by soil water above theta_c. It lives at most L days. Returns</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="do">## lifetime output by start day, and zero on days too dry to germinate.</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>lifetime_output <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">theta_g =</span> <span class="dv">25</span>, <span class="at">theta_d =</span> <span class="dv">8</span>, <span class="at">D =</span> <span class="dv">90</span>,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>                            <span class="at">m =</span> <span class="dv">3</span> <span class="sc">*</span> <span class="dv">365</span>, <span class="at">L =</span> <span class="dv">40</span> <span class="sc">*</span> <span class="dv">365</span>, <span class="at">theta_c =</span> <span class="dv">10</span>) {</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  nd  <span class="ot">&lt;-</span> <span class="fu">length</span>(x)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  run <span class="ot">&lt;-</span> <span class="fu">integer</span>(nd); r <span class="ot">&lt;-</span> <span class="dv">0</span>L</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(nd)) { r <span class="ot">&lt;-</span> <span class="cf">if</span> (x[i] <span class="sc">&lt;</span> theta_d) r <span class="sc">+</span> <span class="dv">1</span>L <span class="cf">else</span> <span class="dv">0</span>L; run[i] <span class="ot">&lt;-</span> r }</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  nk <span class="ot">&lt;-</span> <span class="fu">rep</span>(.Machine<span class="sc">$</span>integer.max, nd)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  nk[run <span class="sc">==</span> D] <span class="ot">&lt;-</span> <span class="fu">which</span>(run <span class="sc">==</span> D)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  nk <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">cummin</span>(<span class="fu">rev</span>(nk)))                  <span class="co"># next killing day at or after t</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  C  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">cumsum</span>(<span class="fu">pmax</span>(x <span class="sc">-</span> theta_c, <span class="dv">0</span>)))</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  t0 <span class="ot">&lt;-</span> <span class="fu">seq_len</span>(nd)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  start <span class="ot">&lt;-</span> t0 <span class="sc">+</span> m</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  end   <span class="ot">&lt;-</span> <span class="fu">pmin</span>(nk <span class="sc">-</span> <span class="dv">1</span>L, t0 <span class="sc">+</span> L, nd)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(end <span class="sc">&gt;=</span> start, C[end <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">-</span> C[start], <span class="dv">0</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  out[x <span class="sc">&lt;=</span> theta_g] <span class="ot">&lt;-</span> <span class="dv">0</span>                      <span class="co"># did not germinate</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  out[t0 <span class="sc">+</span> L <span class="sc">&gt;</span> nd]  <span class="ot">&lt;-</span> <span class="cn">NA</span>                     <span class="co"># life would run past the end</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  out</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="do">## Seeds wait in the soil until rain wets it past theta_g, so every life starts</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="do">## on a germinating rain: a day the soil crosses theta_g on the way up.</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>germinating_rains <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">theta_g =</span> <span class="dv">25</span>) {</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">which</span>(x[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">&gt;</span> theta_g <span class="sc">&amp;</span> x[<span class="sc">-</span><span class="fu">length</span>(x)] <span class="sc">&lt;=</span> theta_g) <span class="sc">+</span> <span class="dv">1</span>L</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="do">## Strategy A, and strategy B: survives 95-day dry spells, but needs more water</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="do">## before it seeds. Keep the rains whose nodes can live out their lives, and</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="do">## scale output so A exactly replaces itself (R = 1), as a resident would.</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>RA <span class="ot">&lt;-</span> <span class="fu">lifetime_output</span>(x)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>RB <span class="ot">&lt;-</span> <span class="fu">lifetime_output</span>(x, <span class="at">D =</span> <span class="dv">95</span>, <span class="at">theta_c =</span> <span class="fl">10.2</span>)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>ev <span class="ot">&lt;-</span> <span class="fu">germinating_rains</span>(x)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>ev <span class="ot">&lt;-</span> ev[<span class="sc">!</span><span class="fu">is.na</span>(RA[ev]) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(RB[ev])]</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>c_scale <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">mean</span>(RA[ev])</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>RA <span class="ot">&lt;-</span> RA <span class="sc">*</span> c_scale</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>RB <span class="ot">&lt;-</span> RB <span class="sc">*</span> c_scale</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>green <span class="ot">&lt;-</span> <span class="st">"#2E6B3F"</span>; sand <span class="ot">&lt;-</span> <span class="st">"#C08A3E"</span>; grey <span class="ot">&lt;-</span> <span class="st">"grey55"</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">11</span>) <span class="sc">+</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>            <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span>(<span class="dv">3</span> <span class="sc">*</span> <span class="dv">365</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>pa <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">t =</span> idx <span class="sc">/</span> <span class="dv">365</span>, <span class="at">x =</span> x[idx], <span class="at">rain =</span> rain[idx])) <span class="sc">+</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(t, rain), <span class="at">fill =</span> grey, <span class="at">width =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="dv">365</span>) <span class="sc">+</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(t, x), <span class="at">colour =</span> green, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"years"</span>, <span class="at">y =</span> <span class="st">"mm"</span>, <span class="at">title =</span> <span class="st">"(a) storms and soil water"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>pb <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">x =</span> x), <span class="fu">aes</span>(x)) <span class="sc">+</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">bins =</span> <span class="dv">80</span>, <span class="at">fill =</span> <span class="st">"grey80"</span>) <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> dgamma, <span class="at">args =</span> <span class="fu">list</span>(<span class="at">shape =</span> lambda <span class="sc">/</span> k, <span class="at">scale =</span> alpha),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">colour =</span> green, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">90</span>)) <span class="sc">+</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"soil water (mm)"</span>, <span class="at">y =</span> <span class="st">"density"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"(b) time spent in each state"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>pa <span class="sc">+</span> pb <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">widths =</span> <span class="fu">c</span>(<span class="fl">1.6</span>, <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-soil" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-soil-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-soil-1.png" class="img-fluid figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-soil-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: <strong>One long run samples the distribution.</strong> (a) Three years of the toy: storms (bars) and the soil water they leave behind (line). (b) Soil water over all 10,000 years of the run (histogram) against the closed-form stationary distribution (line). They agree because the run is stationary: averaging over time is averaging over the distribution.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>So for any rainfall regime and landscape position, we can write down the distribution of soil-water states without simulating anything. That is a fast screen: for anything that depends only on the water state <em>at the moment</em>, such as carbon gain at a given leaf area, the long-run average is just an average over this curve. It is also a check. Whatever we simulate must reproduce the curve, or the run has not settled.</p>
+</section>
+<section id="why-the-distribution-alone-is-not-fitness" class="level2">
+<h2 class="anchored" data-anchor-id="why-the-distribution-alone-is-not-fitness">Why the distribution alone is not fitness</h2>
+<p>The trouble is that a plant’s lifetime output depends on the <strong>order</strong> in which states arrive, not only on how often each occurs. Drought kills by duration: a long run of dry days, not one dry day. Establishment needs a wet start followed by enough wet weeks.</p>
+<p>First, when does a plant’s life start? As Mark Westoby pointed out to us, seeds are shed at one time and germinate at another. Buried seeds wait in the soil, dying at a roughly steady rate, until a rain wets it enough to germinate them. A seed shed on a dry day is not lost, only waiting, so every life starts on a germinating rain. In the toy that is a rain that takes the soil past 25 mm, which happens about 6 times a year. <a href="#fig-arrival" class="quarto-xref">Figure&nbsp;2</a> shows the lifetime output of the node each of those rains starts.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>win <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span>(<span class="dv">60</span> <span class="sc">*</span> <span class="dv">365</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dry <span class="ot">&lt;-</span> <span class="fu">rle</span>(x <span class="sc">&lt;</span> <span class="dv">8</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>dry_end <span class="ot">&lt;-</span> <span class="fu">cumsum</span>(dry<span class="sc">$</span>lengths)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>dry_start <span class="ot">&lt;-</span> dry_end <span class="sc">-</span> dry<span class="sc">$</span>lengths <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>kill_days <span class="ot">&lt;-</span> dry_start[dry<span class="sc">$</span>values <span class="sc">&amp;</span> dry<span class="sc">$</span>lengths <span class="sc">&gt;=</span> <span class="dv">90</span>] <span class="sc">+</span> <span class="dv">89</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>kill_days <span class="ot">&lt;-</span> kill_days[kill_days <span class="sc">%in%</span> win]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>ev60 <span class="ot">&lt;-</span> ev[ev <span class="sc">%in%</span> win]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">t =</span> ev60 <span class="sc">/</span> <span class="dv">365</span>, <span class="at">R =</span> RA[ev60])) <span class="sc">+</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> kill_days <span class="sc">/</span> <span class="dv">365</span>, <span class="at">colour =</span> <span class="st">"grey85"</span>) <span class="sc">+</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(t, R), <span class="at">size =</span> <span class="fl">0.9</span>, <span class="at">colour =</span> green) <span class="sc">+</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"germination day (years)"</span>, <span class="at">y =</span> <span class="st">"lifetime output"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-arrival" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-arrival-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-arrival-1.png" class="img-fluid figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-arrival-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: <strong>Lifetime output depends on what follows germination.</strong> Each point is the lifetime seed output of one toy node, by the day the rain that germinated it fell, over 60 years. Every node starts from much the same soil, just wetted past the germination threshold. Some germinate just before a long drought and die young; others germinate after one and live for decades. Grey lines mark the day each lethal drought reaches 90 days and kills every plant then alive.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The cleanest way to see it is to keep the distribution and destroy the order. Shuffling the days of the soil-water record leaves the histogram exactly as it was, but long dry spells vanish, because dry days no longer come in runs.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>xs <span class="ot">&lt;-</span> <span class="fu">sample</span>(x)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>RS <span class="ot">&lt;-</span> <span class="fu">lifetime_output</span>(xs) <span class="sc">*</span> c_scale</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>es <span class="ot">&lt;-</span> <span class="fu">germinating_rains</span>(xs)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>es <span class="ot">&lt;-</span> es[<span class="sc">!</span><span class="fu">is.na</span>(RS[es])]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">series =</span> <span class="fu">c</span>(<span class="st">"real order"</span>, <span class="st">"shuffled"</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">R =</span> <span class="fu">c</span>(<span class="fu">mean</span>(RA[ev]), <span class="fu">mean</span>(RS[es])))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>pa <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(x, <span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="fu">data.frame</span>(<span class="at">x =</span> x),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">bins =</span> <span class="dv">80</span>, <span class="at">fill =</span> green, <span class="at">alpha =</span> <span class="fl">0.45</span>) <span class="sc">+</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_freqpoly</span>(<span class="fu">aes</span>(x, <span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="fu">data.frame</span>(<span class="at">x =</span> xs),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">bins =</span> <span class="dv">80</span>, <span class="at">colour =</span> sand, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">90</span>)) <span class="sc">+</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"soil water (mm)"</span>, <span class="at">y =</span> <span class="st">"density"</span>, <span class="at">title =</span> <span class="st">"(a) the distribution"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"filled: real order    line: shuffled"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>pb <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(fit, <span class="fu">aes</span>(series, R, <span class="at">fill =</span> series)) <span class="sc">+</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">colour =</span> <span class="st">"grey40"</span>) <span class="sc">+</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(green, sand)) <span class="sc">+</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"fitness R"</span>, <span class="at">title =</span> <span class="st">"(b) the fitness"</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>pa <span class="sc">+</span> pb <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">widths =</span> <span class="fu">c</span>(<span class="fl">1.6</span>, <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-shuffle" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-shuffle-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-shuffle-1.png" class="img-fluid figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-shuffle-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: <strong>Same distribution, different order, different fitness.</strong> (a) The soil-water record and a shuffled copy of it have identical distributions; the two histograms overlap exactly. (b) The fitness of the same toy plant on each. On the real sequence it exactly replaces itself. On the shuffled one, with no long droughts, its fitness is about four times higher.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>On the shuffled record the toy plant’s fitness is 4.0; on the real one it is 1. A fitness calculated from the distribution alone cannot tell these two apart. So the distribution supplies the <strong>weights</strong>, but something has to supply the <strong>sequence</strong> that follows each starting state.</p>
+</section>
+<section id="the-method-one-long-run-many-germinating-rains" class="level2">
+<h2 class="anchored" data-anchor-id="the-method-one-long-run-many-germinating-rains">The method: one long run, many germinating rains</h2>
+<p>Here is the cut-through. It is the forest calculation with time in place of patch age.</p>
+<ol type="1">
+<li><strong>Run one patch for a long time</strong> under one realisation of the rainfall process, with the resident community in it, until it settles into a steady state. Steady here means stationary: the community keeps fluctuating with the rain, but its long-run statistics stop changing. This burn-in is paid once. Save the state at the end of it.</li>
+<li><strong>Introduce mutant seedlings at each germinating rain</strong> in a window that starts after the burn-in. <code>plant</code> already introduces nodes at a schedule of times; only the schedule and the weighting change.</li>
+<li><strong>Record each one’s lifetime output</strong> <span class="math inline">\(\tilde R(t_i)\)</span>, running past the end of the window long enough for late arrivals to live out their lives.</li>
+<li><strong>Average over the <span class="math inline">\(N\)</span> germinating rains</strong> <span class="math inline">\(t_1, \dots, t_N\)</span> in the window: <span class="math display">\[
+R = \frac{1}{N} \sum_{i=1}^{N} \tilde R(t_i) .
+\]</span></li>
+</ol>
+<p>Because the run is stationary, the germinating rains in the window are a fair sample of all the germinating rains the climate produces, and the soil and stand at those moments are a fair sample of the states that seedlings start from. So averaging over them <em>is</em> the average over the stationary distribution of states that seeds land in, which is what Metz and Gyllenberg ask for. And each node carries the real sequence that follows it, which is what <a href="#fig-shuffle" class="quarto-xref">Figure&nbsp;3</a> shows we need. One run delivers both the weights and the sequence.</p>
+<p>In code this is a small change. In the forest the weight on a seed arriving at age <span class="math inline">\(a\)</span> is the patch-age density <span class="math inline">\(P(a)\)</span>. Here the weight sits on the germinating rains in the window, equally on each, and is zero everywhere else. Weighting each rain equally assumes, as a first approximation, that when a seed was shed does not matter, only that it survives in the soil until a rain germinates it. Everything downstream, from the fitness integral in <code>plant</code> to the assembly loop in <code>regnans</code>, is untouched.</p>
+</section>
+<section id="annuals-and-perennials-on-the-same-run" class="level2">
+<h2 class="anchored" data-anchor-id="annuals-and-perennials-on-the-same-run">Annuals and perennials on the same run</h2>
+<p>For a long-lived shrub, one life spans dozens of rain pulses and several droughts, so each individual experiences something close to the long-run average and <span class="math inline">\(R\)</span> above is the right fitness. For an annual it is not. An annual lives one season, and its population multiplies by a different factor every year: large after a good year, near zero after a bad one. What matters then is the <a href="../../glossary.html#long-run-growth-rate"><strong>long-run growth rate</strong></a>, the average of the <em>logarithm</em> of the yearly multiplication, not the average multiplication itself <span class="citation" data-cites="Tuljapurkar-1980 Metz-1992">(<a href="#ref-Tuljapurkar-1980" role="doc-biblioref">Tuljapurkar &amp; Orzack, 1980</a>; <a href="#ref-Metz-1992" role="doc-biblioref">Metz, Nisbet, &amp; Geritz, 1992</a>)</span>. With a seed bank that survives a year with probability <span class="math inline">\(s\)</span>, a fraction <span class="math inline">\(g\)</span> of seeds germinating, and <span class="math inline">\(Y_t\)</span> seeds per germinant in year <span class="math inline">\(t\)</span>, an annual invades when</p>
+<p><span class="math display">\[
+\frac{1}{N} \sum_{t=1}^{N} \log\bigl(s\,(1-g) + g\,Y_t\bigr) &gt; 0 .
+\]</span></p>
+<p>This is Cohen’s classic germination problem <span class="citation" data-cites="Cohen-1966">(<a href="#ref-Cohen-1966" role="doc-biblioref">Cohen, 1966</a>)</span>, and it is the storage effect of coexistence theory <span class="citation" data-cites="Chesson-2000">(<a href="#ref-Chesson-2000" role="doc-biblioref">Chesson, 2000</a>)</span> computed directly instead of decomposed into parts. The useful thing is that <span class="math inline">\(Y_t\)</span> comes from <strong>the same run</strong>: introduce an annual node at each year’s germinating rain, harvest it at the end of the season. Annuals and perennials are judged on one run and one rainfall series, which is what the annual–woody coexistence question needs. For in-between life histories, like a perennial grass living ten years, the toy and the pilot will tell us whether <span class="math inline">\(R\)</span> is close enough or the growth rate is needed.</p>
+</section>
+<section id="uphill-and-downhill" class="level2">
+<h2 class="anchored" data-anchor-id="uphill-and-downhill">Uphill and downhill</h2>
+<p>Landscape position adds a dimension but not a new idea. Run one long patch per position, both under the same storms. The upslope patch keeps each storm only up to what its soil can hold and sheds the rest; the downslope patch receives that excess on top of its own rain. Water only flows downhill, so the upslope run can go first and hand its runoff, storm by storm, to the downslope run. Because the downslope gain comes in the same storms as the upslope loss, the two positions must share one rain series. Then ask where seeds go. If a seed produced in position <span class="math inline">\(i\)</span> lands in position <span class="math inline">\(j\)</span> with probability <span class="math inline">\(D_{ij}\)</span>, the expected number of offspring in <span class="math inline">\(j\)</span> per seed in <span class="math inline">\(i\)</span> is <span class="math inline">\(D_{ij} \tilde R_j\)</span>. With two positions that is a <span class="math inline">\(2 \times 2\)</span> matrix, and the mutant’s fitness is its largest eigenvalue: the long-run multiplication of a lineage that keeps moving between positions. This is the same Metz and Gyllenberg result, now with two kinds of patch <span class="citation" data-cites="Metz-2001">(<a href="#ref-Metz-2001" role="doc-biblioref">Metz &amp; Gyllenberg, 2001</a>)</span>. It is also where source–sink structure appears: a position where a strategy cannot replace itself can still hold it, fed by seed from a position where it can.</p>
+</section>
+<section id="how-long-a-run" class="level2">
+<h2 class="anchored" data-anchor-id="how-long-a-run">How long a run?</h2>
+<p>A fitness estimated from a finite window is noisy, because a few droughts more or less in the window shift it. The question is how long the window must be, and the toy gives a feel for the answer.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>yr <span class="ot">&lt;-</span> (ev <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">%/%</span> <span class="dv">365</span>                        <span class="co"># year of each germinating rain</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">400</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>spread <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(W, <span class="cf">function</span>(wy) {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  block <span class="ot">&lt;-</span> yr <span class="sc">%/%</span> wy</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  keep  <span class="ot">&lt;-</span> block <span class="sc">&lt;</span> <span class="fu">max</span>(block)                 <span class="co"># drop the last, partial block</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  mA <span class="ot">&lt;-</span> <span class="fu">tapply</span>(RA[ev][keep], block[keep], mean)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  mB <span class="ot">&lt;-</span> <span class="fu">tapply</span>(RB[ev][keep], block[keep], mean)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  nb <span class="ot">&lt;-</span> <span class="fu">length</span>(mA)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">years =</span> wy,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">what  =</span> <span class="fu">c</span>(<span class="st">"fitness of A"</span>, <span class="st">"A vs B, same series"</span>, <span class="st">"A vs B, separate series"</span>),</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd    =</span> <span class="fu">c</span>(<span class="fu">sd</span>(mA), <span class="fu">sd</span>(mB <span class="sc">-</span> mA), <span class="fu">sd</span>(mB[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">-</span> mA[<span class="sc">-</span>nb])))  <span class="co"># separate: next block</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>true_diff <span class="ot">&lt;-</span> <span class="fu">mean</span>(RB[ev] <span class="sc">-</span> RA[ev])</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>spread<span class="sc">$</span>what <span class="ot">&lt;-</span> <span class="fu">factor</span>(spread<span class="sc">$</span>what, <span class="at">levels =</span> <span class="fu">c</span>(</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fitness of A"</span>, <span class="st">"A vs B, separate series"</span>, <span class="st">"A vs B, same series"</span>))</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(spread, <span class="fu">aes</span>(years, sd, <span class="at">colour =</span> what, <span class="at">linetype =</span> what)) <span class="sc">+</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.7</span>) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.4</span>) <span class="sc">+</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> true_diff, <span class="at">linetype =</span> <span class="dv">3</span>, <span class="at">colour =</span> <span class="st">"grey40"</span>) <span class="sc">+</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">25</span>, <span class="at">y =</span> true_diff, <span class="at">label =</span> <span class="st">"true A–B difference"</span>,</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">size =</span> <span class="fl">3.2</span>, <span class="at">colour =</span> <span class="st">"grey30"</span>) <span class="sc">+</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">breaks =</span> W) <span class="sc">+</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">0.5</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(green, sand, sand)) <span class="sc">+</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"window length (years)"</span>, <span class="at">y =</span> <span class="st">"spread of estimate"</span>,</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">colour =</span> <span class="cn">NULL</span>, <span class="at">linetype =</span> <span class="cn">NULL</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-window" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-window-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-window-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-window-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: <strong>Comparisons converge faster than levels, if they share a rain series.</strong> Spread (standard deviation) of toy fitness estimates against window length, across non-overlapping windows of the 10,000-year run. Green: the fitness of one strategy. Brown, solid: the difference in fitness between strategies A and B, estimated on the same rain series. Brown, dashed: the same difference estimated on separate series. The dotted line is the true difference; a comparison is resolved roughly where its curve falls well below it.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Three lessons, all from the toy, so read them as orders of magnitude rather than numbers for TF24.</p>
+<ul>
+<li><strong>Levels are expensive.</strong> The spread of one strategy’s fitness is still 32% after 400 years. Pinning fitness down to a percent by brute force would take something like 400,000 years. The reason is that nodes germinating within one lifetime of each other share the same future droughts, so their outputs rise and fall together; the run has to cover many lifetimes’ worth of drought history before the luck averages out.</li>
+<li><strong>Comparisons are cheaper, if they share the rain.</strong> Evolution acts on <em>differences</em> between strategies, and selection gradients are differences too. Running both strategies through the same rain series removes the luck of the draw that they have in common. In the toy, the same precision needs between 5 and 14 times fewer years, more as the window lengthens. After 400 years on a shared series, the difference between A and B, 0.22, is 1.8 times its spread; on separate series the spread is still 2.1 times larger than the difference. The rule that follows is simple: <strong>every fitness evaluation in an assembly uses the same rain series</strong>, and we check the answer on a second series separately.</li>
+<li><strong>Sampling arrivals by soil-water state does not help.</strong> Every node starts on a germinating rain, from much the same soil, and in the toy the soil water at germination explains 0% of the spread in lifetime output. The spread in <a href="#fig-arrival" class="quarto-xref">Figure&nbsp;2</a> comes from what happens <em>after</em> germination, so choosing arrivals by their soil state cannot shorten the run.</li>
+</ul>
+<p>There is one more route, which shortens each run rather than the total: give up the single long run after the burn-in. The saved steady state is a library of starting points: start many short mutant runs, each one lifetime long, from states sampled along it. The total simulated time is similar, but each run is short, they run in parallel, and gradients only need to be carried back through one lifetime.</p>
+</section>
+<section id="what-has-to-be-built" class="level2">
+<h2 class="anchored" data-anchor-id="what-has-to-be-built">What has to be built</h2>
+<p><code>plant</code> cannot do this yet. It runs a patch for a fixed period after a disturbance, from a fixed schedule of node introductions. The method needs a <strong>continuous patch</strong>: one that keeps introducing nodes as it goes, can start from a saved state, stops on a convergence test for the burn-in and a fixed horizon for the window, keeps the lifetime output of every node while thinning the rest of its history, and stops tracking old plants individually without losing their seed output. That is <a href="https://github.com/traitecoevo/plant/issues/519">plant#519</a>, and its requirements are listed there. It depends on rainfall arriving as discrete events (<a href="https://github.com/traitecoevo/plant/issues/628">plant#628</a>). Handing runoff downhill one storm at a time needs only those events and a record of each storm’s runoff; patches that exchange water both ways need the multi-patch work in <a href="https://github.com/traitecoevo/plant/issues/427">plant#427</a>.</p>
+<p>Two things are open and will be answered by measurement, not argument. Does a stand of mulga under pulsed rain settle into a steady state with no disturbance, and how long does it take? And how long a window does a selection gradient need for TF24, as opposed to the toy?</p>
+</section>
+<section id="take-aways" class="level2">
+<h2 class="anchored" data-anchor-id="take-aways">Take-aways</h2>
+<ul>
+<li><code>plant</code>’s fitness was never really about patch age. It is an average of a seed’s lifetime output over the stationary distribution of the states seeds land in; patch age is that state in a forest.</li>
+<li>In the semi-arid the state is soil water and the plants in it. Its distribution is known in closed form for a rainfall regime and landscape position, which gives a fast screen and a check.</li>
+<li>The distribution alone is not fitness, because drought and establishment depend on the sequence. Shuffling the toy’s soil-water record leaves the distribution unchanged and roughly quadruples its fitness.</li>
+<li>One long stationary run, with mutant seedlings introduced at each germinating rain in a window, samples the states seedlings start from and keeps the sequence that follows each. In code it is a change of weights.</li>
+<li>Perennials use the average lifetime output; annuals use the average log of yearly multiplication; both come from the same run. Landscape positions combine through a small matrix.</li>
+<li>Fitness levels are very expensive to pin down; fitness differences on a shared rain series are many times cheaper. Always compare strategies on the same series.</li>
+</ul>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-Chesson-2000" class="csl-entry" role="listitem">
+Chesson, P. (2000). Mechanisms of maintenance of species diversity. <em>Annual Review of Ecology and Systematics</em>, <em>31</em>, 343–366. doi:<a href="https://doi.org/10.1146/annurev.ecolsys.31.1.343">10.1146/annurev.ecolsys.31.1.343</a>
+</div>
+<div id="ref-Cohen-1966" class="csl-entry" role="listitem">
+Cohen, D. (1966). Optimizing reproduction in a randomly varying environment. <em>Journal of Theoretical Biology</em>, <em>12</em>(1), 119–129. doi:<a href="https://doi.org/10.1016/0022-5193(66)90188-3">10.1016/0022-5193(66)90188-3</a>
+</div>
+<div id="ref-Falster-2015" class="csl-entry" role="listitem">
+Falster, D. S., Brännström, Åke, Westoby, M., &amp; Dieckmann, U. (2015). Multi-trait eco-evolutionary dynamics explain niche diversity and evolved neutrality in forests. <em>bioRxiv</em>, 014605. doi:<a href="https://doi.org/10.1101/014605">10.1101/014605</a>
+</div>
+<div id="ref-Falster-2017" class="csl-entry" role="listitem">
+Falster, Daniel S., Brännström, Åke, Westoby, M., &amp; Dieckmann, U. (2017). Multitrait successional forest dynamics enable diverse competitive coexistence. <em>Proceedings of the National Academy of Sciences</em>, <em>114</em>(13). doi:<a href="https://doi.org/10.1073/pnas.1610206114">10.1073/pnas.1610206114</a>
+</div>
+<div id="ref-Gyllenberg-2001" class="csl-entry" role="listitem">
+Gyllenberg, M., &amp; Metz, J. A. J. (2001). On fitness in structured metapopulations. <em>Journal of Mathematical Biology</em>, <em>43</em>(6), 545–560.
+</div>
+<div id="ref-Laio-2001" class="csl-entry" role="listitem">
+Laio, F., Porporato, A., Ridolfi, L., &amp; Rodriguez-Iturbe, I. (2001). Plants in water-controlled ecosystems: Active role in hydrologic processes and response to water stress. <span>II</span>. <span>Probabilistic</span> soil moisture dynamics. <em>Advances in Water Resources</em>, <em>24</em>(7), 707–723. doi:<a href="https://doi.org/10.1016/S0309-1708(01)00005-7">10.1016/S0309-1708(01)00005-7</a>
+</div>
+<div id="ref-Metz-2001" class="csl-entry" role="listitem">
+Metz, J. A. J., &amp; Gyllenberg, M. (2001). How should we define fitness in structured metapopulation models? <span>Including</span> an application to the calculation of evolutionarily stable dispersal strategies. <em>Proceedings of the Royal Society of London - Series B: Biological Sciences</em>, <em>268</em>(1466), 499–508.
+</div>
+<div id="ref-Metz-1992" class="csl-entry" role="listitem">
+Metz, J. A. J., Nisbet, R. M., &amp; Geritz, S. A. H. (1992). How should we define ’fitness’ for general ecological scenarios? <em>Trends in Ecology and Evolution</em>, <em>7</em>(6), 198–202. doi:<a href="https://doi.org/10.1016/0169-5347(92)90073-K">10.1016/0169-5347(92)90073-K</a>
+</div>
+<div id="ref-RodriguezIturbe-1999" class="csl-entry" role="listitem">
+Rodriguez-Iturbe, I., Porporato, A., Ridolfi, L., Isham, V., &amp; Cox, D. R. (1999). Probabilistic modelling of water balance at a point: The role of climate, soil and vegetation. <em>Proceedings of the Royal Society of London. Series A: Mathematical, Physical and Engineering Sciences</em>, <em>455</em>(1990), 3789–3805. doi:<a href="https://doi.org/10.1098/rspa.1999.0477">10.1098/rspa.1999.0477</a>
+</div>
+<div id="ref-Tuljapurkar-1980" class="csl-entry" role="listitem">
+Tuljapurkar, S. D., &amp; Orzack, S. H. (1980). Population dynamics in variable environments <span>I</span>. <span class="nocase">Long-run</span> growth rates and extinction. <em>Theoretical Population Biology</em>, <em>18</em>(3), 314–342. doi:<a href="https://doi.org/10.1016/0040-5809(80)90057-X">10.1016/0040-5809(80)90057-X</a>
+</div>
+<div id="ref-Westoby-1980" class="csl-entry" role="listitem">
+Westoby, M. (1980). Elements of a theory of vegetation dynamics in arid rangelands. <em>Israel Journal of Botany</em>, <em>28</em>, 169–194.
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/traitecoevo\.github\.io\/overstorey");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Built with Quarto · frozen for reproducibility</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/posts/2026-10-12-fitness-in-pulse-driven-environments/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant/blob/master/LICENSE">
+<p>License</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
