@@ -50,6 +50,8 @@ website:
         file: posts/index.qmd
       - text: "Reproductions"
         file: posts/reproductions.qmd
+      - text: "Glossary"
+        file: glossary.qmd
       - text: "Reference"
         href: "https://traitecoevo.github.io/plant/reference/"
         target: _blank
