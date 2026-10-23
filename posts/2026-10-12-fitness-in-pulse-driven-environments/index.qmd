@@ -187,7 +187,7 @@ germinating_rains <- function(x, theta_g = 25) {
 }
 
 ## Strategy A, and strategy B: survives 95-day dry spells, but needs more water
-## before it seeds. Keep the rains whose cohorts can live out their lives, and
+## before it seeds. Keep the rains whose nodes can live out their lives, and
 ## scale output so A exactly replaces itself (R = 1), as a resident would.
 RA <- lifetime_output(x)
 RB <- lifetime_output(x, D = 95, theta_c = 10.2)
@@ -243,11 +243,11 @@ seed shed on a dry day is not lost, only waiting, so every life starts on a
 germinating rain. In the toy that is a rain that takes the soil past 25 mm,
 which happens about
 `r sprintf("%.0f", length(germinating_rains(x)) / (nd / 365))` times a year.
-@fig-arrival shows the lifetime output of the cohort each of those rains starts.
+@fig-arrival shows the lifetime output of the node each of those rains starts.
 
 ```{r}
 #| label: fig-arrival
-#| fig-cap: "**Lifetime output depends on what follows germination.** Each point is the lifetime seed output of one toy cohort, by the day the rain that germinated it fell, over 60 years. Every cohort starts from much the same soil, just wetted past the germination threshold. Some germinate just before a long drought and die young; others germinate after one and live for decades. Grey lines mark the day each lethal drought reaches 90 days and kills every plant then alive."
+#| fig-cap: "**Lifetime output depends on what follows germination.** Each point is the lifetime seed output of one toy node, by the day the rain that germinated it fell, over 60 years. Every node starts from much the same soil, just wetted past the germination threshold. Some germinate just before a long drought and die young; others germinate after one and live for decades. Grey lines mark the day each lethal drought reaches 90 days and kills every plant then alive."
 #| fig-width: 9
 #| fig-height: 3
 win <- 1:(60 * 365)
@@ -324,7 +324,7 @@ Because the run is stationary, the germinating rains in the window are a fair
 sample of all the germinating rains the climate produces, and the soil and stand
 at those moments are a fair sample of the states that seedlings start from. So
 averaging over them *is* the average over the stationary distribution of states
-that seeds land in, which is what Metz and Gyllenberg ask for. And each cohort
+that seeds land in, which is what Metz and Gyllenberg ask for. And each node
 carries the real sequence that follows it, which is what @fig-shuffle shows we
 need. One run delivers both the weights and the sequence.
 
@@ -445,7 +445,7 @@ numbers for TF24.
   `r sprintf("%.0f%%", 100 * lev[W == max(W)])` after `r max(W)` years. Pinning
   fitness down to a percent by brute force would take something like
   `r formatC(signif(years_1pct, 1), format = "d", big.mark = ",")` years. The
-  reason is that cohorts germinating within one lifetime of each other share the
+  reason is that nodes germinating within one lifetime of each other share the
   same future droughts, so their outputs rise and fall together; the run has to
   cover many lifetimes' worth of drought history before the luck averages out.
 - **Comparisons are cheaper, if they share the rain.** Evolution acts on
@@ -460,7 +460,7 @@ numbers for TF24.
   times larger than the difference. The rule that
   follows is simple: **every fitness evaluation in an assembly uses the same rain
   series**, and we check the answer on a second series separately.
-- **Sampling arrivals by soil-water state does not help.** Every cohort starts
+- **Sampling arrivals by soil-water state does not help.** Every node starts
   on a germinating rain, from much the same soil, and in the toy the soil water
   at germination explains `r sprintf("%.0f%%", 100 * state_r2)` of the spread in
   lifetime output. The spread in @fig-arrival comes from what happens *after*
