@@ -54,8 +54,8 @@ The first two terms move density along the height axis. The third is a
 converge and density piles up. It is the term that requires knowing how the
 growth rate varies with size, and it is the whole difficulty.
 
-Now change variables. Let $\tau$ be a cohort's introduction time — constant
-along its characteristic, by definition. Write $J = \partial H/\partial\tau$ for
+Now change variables. Let $\tau$ be a node's introduction time — constant along
+its characteristic, by definition. Write $J = \partial H/\partial\tau$ for
 the Jacobian of the map, and define $\nu = N\,|J|$: abundance per unit birth
 date rather than per unit height. The first two terms are exactly the material
 derivative and collapse into $\partial/\partial a|_\tau$; the third is precisely
@@ -100,15 +100,15 @@ flow through it. Its unknowns are densities in fixed size bins. Because the grid
 does not move with the population, the flux divergence is unavoidable — the
 whole content of the scheme is bookkeeping how much mass crosses each bin
 boundary. That is a perfectly good engineering choice: bounded work per step, no
-schedule to tune, trivially parallel, no cohorts accumulating over time. It is
+schedule to tune, trivially parallel, no nodes accumulating over time. It is
 what finite-volume schemes and Integral Projection Model transition matrices do.
 But such a solver has no birth-date coordinate available to it, because *its
 grid is the coordinate*. Asking it to count by birth date would mean discarding
 the grid.
 
-A **Lagrangian** solver moves its unknowns with the population. Each unknown is
-a cohort travelling along a characteristic. Here the coordinate is a *label*,
-and the obvious label is the birth date. The transport term vanishes
+A **Lagrangian** solver moves its unknowns with the population. Each unknown
+travels along a characteristic. Here the coordinate is a *label*, and the
+obvious label is the birth date. The transport term vanishes
 identically, not approximately.
 
 `plant` is Lagrangian and always has been — the SCM *is* a characteristics
@@ -129,10 +129,10 @@ through $G(r)$, $r = S/S_{\max}$ — so height growth is no longer a function of
 size and environment alone.
 
 The compression term the PDE needs is the **total** derivative of $g$ along a
-cohort's own trajectory:
+node's own trajectory:
 
 $$
-\frac{\rm d}{{\rm d}a}\log N = -d - \sum_k \frac{\partial g_H}{\partial x_k}\,\frac{{\rm d}x_k}{{\rm d}H}\bigg|_{\text{cohort curve}}
+\frac{\rm d}{{\rm d}a}\log N = -d - \sum_k \frac{\partial g_H}{\partial x_k}\,\frac{{\rm d}x_k}{{\rm d}H}\bigg|_{\text{characteristic}}
 $$
 
 `Node::growth_rate_gradient` computed only the $k = H$ term, by perturbing height
@@ -142,7 +142,7 @@ rates — which is why this was correct for a decade. For TF24 they do not.
 
 Andrew's sharpest observation is about the mechanism rather than the size of the
 discrepancy. The probe moves height while holding *absolute* carbon fixed, so it
-shifts the reserve fraction; a real cohort grows with $r$ roughly constant. The
+shifts the reserve fraction; a real plant grows with $r$ roughly constant. The
 finite difference is therefore accurate about a physiological state the plant
 never occupies. In his phrasing, the estimate "stops computing the required
 quantity — not approximately, but at all — as soon as growth depends on any state
@@ -154,8 +154,8 @@ he derives the omitted term for TF24 in closed form.
 **The boundary special case disappears.** The height coordinate's boundary
 condition divides by the growth rate, with a `g > 0` branch and a requirement
 that $S_{\rm G}/g \to 0$ as $g \to 0$ [@Falster-2011]. In birth date the birth
-density is `birth_rate · pr_estab` — finite always. The zero-density cohorts we
-had catalogued as expected SCM behaviour are ordinary cohorts occupying a
+density is `birth_rate · pr_estab` — finite always. The zero-density nodes we
+had catalogued as expected SCM behaviour are ordinary nodes occupying a
 compressed band of height space.
 
 **Density runaway becomes structurally impossible.** `plant` carries a hard
@@ -172,11 +172,11 @@ coordinate where it is singular.
 
 **Age is monotone by construction; size is monotone only by assumption.** The
 size coordinate is valid only while $\tau \mapsto H$ stays invertible, i.e. while
-cohorts never converge in height. Reserve-gated growth can violate that — under
+nodes never converge in height. Reserve-gated growth can violate that — under
 full-amplitude seasonal stress Andrew counts 66 crossings among 10,011 interior
 pairs, against zero under a constant environment. Age needs no such assumption:
-${\rm d}\alpha/{\rm d}a = 1 > 0$ always, so cohorts can never overtake one
-another in age, and their ordering is fixed at birth. The fragility was
+${\rm d}\alpha/{\rm d}a = 1 > 0$ always, so nodes can never overtake one another
+in age, and their ordering is fixed at birth. The fragility was
 inherited from the coordinate, not from the biology.
 
 **Accuracy, at the same cost.** For FF16 and K93 the two coordinates must
@@ -198,7 +198,7 @@ three-species K93 cases, per species, including a competitively marginal species
 ~90× below the dominant one.
 
 **Speed.** `growth_rate_gradient` is not called, which removes a leaf solve per
-cohort per Runge–Kutta stage: Andrew measures 1.91–2.39×.
+node per Runge–Kutta stage: Andrew measures 1.91–2.39×.
 
 **It is indifferent to state dimension.** $\partial\log\nu/\partial a = -d$ is
 unchanged for one state or twenty, because the label space has the dimension of
@@ -322,4 +322,11 @@ issue #566 was evaluated on the old one. The theory pages
 [the characteristic method](../../theory/implementation/characteristic-method.qmd))
 still present the height-coordinate derivation, including the `g > 0` boundary
 caveat that this change retires.
+:::
+
+::: {.callout-note appearance="minimal"}
+**Edited 2026-10-23.** Where this post said "cohort" for the solver's points on
+the size distribution, it now says "node". A cohort is the plants recruited
+between two adjacent nodes ([definition](../../theory/overview.qmd#from-an-individual-to-a-landscape));
+the Escalator Boxcar Train's cohorts keep their name. Nothing else changed.
 :::

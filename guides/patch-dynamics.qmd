@@ -7,15 +7,15 @@ guide
 
 This guide moves from one individual to a **patch**: an area in which many
 plants grow and compete for resources. You will run a one-species patch, follow
-its cohorts through time, inspect its light environment, and then add a second
+its nodes through time, inspect its light environment, and then add a second
 species.
 
-Rather than simulating every plant separately, `plant` represents cohorts as
-**nodes** and follows their changing size and density. These trajectories are
-the characteristics of the model's partial differential equation. See the
-[size-structured PDE](../theory/size-structured-pde.qmd) being solved and the
-[characteristic method](../theory/implementation/characteristic-method.qmd)
-used to solve it.
+Rather than simulating every plant separately, `plant` samples the size
+distribution at a set of **nodes** and follows their changing size and density.
+These trajectories are the characteristics of the model's partial differential
+equation. See the [size-structured PDE](../theory/size-structured-pde.qmd) being
+solved and the [characteristic
+method](../theory/implementation/characteristic-method.qmd) used to solve it.
 
 ## Set up the patch
 

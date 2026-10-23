@@ -298,7 +298,7 @@ f(out3$ode_times, "min 0.01")
 ### Fixing step sizes: bounds (option 1)
 
 Setting identical minimum and maximum sizes requests an exact step size. Other
-times can still occur because of the cohort schedule.
+times can still occur because of the node-introduction schedule.
 
 ```{r}
 #| eval: false
@@ -360,7 +360,7 @@ The current interface still leaves several implementation questions open:
 By default, `plant` integrates a patch with the **adaptive, error-controlled
 Cash–Karp Runge–Kutta (RK45)** stepper described above. It chooses each step
 size to keep the local error within a tolerance: very small steps early in a
-run, when newly introduced cohorts diverge rapidly, and much coarser steps
+run, when newly introduced nodes diverge rapidly, and much coarser steps
 later, once the stand has settled.
 
 Many widely used **dynamic global vegetation models (DGVMs)** instead move the
@@ -489,7 +489,7 @@ The curves show the same underlying pattern:
   error, so the Euler curve descends slowly — buying an extra digit of accuracy
   costs roughly a *tenfold* increase in work.
 - **Adaptive RK45 is high-order *and* adaptive.** It spends small steps only
-  where the dynamics demand them (the first weeks, while cohorts diverge) and
+  where the dynamics demand them (the first weeks, while nodes diverge) and
   coarsens dramatically once the stand stabilises. It reaches an error floor —
   set by the node-introduction schedule rather than the ODE tolerance — at a
   fraction of the evaluations Euler would need to match it.

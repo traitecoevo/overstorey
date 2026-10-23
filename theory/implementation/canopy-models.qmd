@@ -129,7 +129,7 @@ LPJ-GUESS, use a similar discrete-layer view of canopy competition, so these
 are useful approximations to examine rather than dismiss:
 
 * **`"flat-top-box"`** -- casts a hard *step* of shade: full below the crown
-  centre and none above. Across cohorts this makes the patch light profile
+  centre and none above. Summed across nodes this makes the patch light profile
   discontinuous, so `plant` cannot solve the stand at all.
 * **`"flat-top-soft-box"`** -- uses the same box competition but smooths the step
   into a continuous drop, allowing the light environment to be built. It runs,
@@ -199,8 +199,8 @@ its size distribution, leaf area index, and vertical light profile.
 ### Size distribution
 
 The size distribution consists of node height trajectories. Each line follows a
-cohort introduced at a particular patch age; line opacity is scaled by cohort
-density, so sparse cohorts appear faint. `plant`'s `plot_size_distribution()`
+node introduced at a particular patch age; line opacity is scaled by node
+density, so sparse nodes appear faint. `plant`'s `plot_size_distribution()`
 builds this view directly from the tidy `species` table, and facets by `method`
 make the shading models easy to compare.
 
@@ -215,7 +215,7 @@ p_size <- plot_size_distribution(species_all) +
 p_size
 ```
 
-The discrete layers in `"ppa"` create visibly different trajectories. Cohorts
+The discrete layers in `"ppa"` create visibly different trajectories. Nodes
 grow under nearly constant light within a layer, then accelerate as they emerge
 into a brighter one.
 
@@ -541,7 +541,7 @@ The box profile is a step; the soft box replaces that step with a
 continuous-but-incorrect drop concentrated near the crown centre.
 
 **The hard step does not even run.** When summed across a population of discrete
-cohorts, step competition produces a discontinuous, piecewise-constant patch
+nodes, step competition produces a discontinuous, piecewise-constant patch
 light profile. The adaptive light-environment spline cannot represent it, so the
 model fails before a stand develops:
 

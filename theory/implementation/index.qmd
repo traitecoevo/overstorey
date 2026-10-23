@@ -15,12 +15,12 @@ that you already know the structure of the C++ code.
 A patch simulation can be understood as a sequence of five connected tasks:
 
 1. The **characteristic method** turns the population-level partial
-   differential equation into trajectories for representative cohorts.
+   differential equation into trajectories for a set of nodes.
 2. An **ODE solver** advances the size, survival, and reproduction of those
-   cohorts through time.
-3. The **node-spacing algorithm** decides when another cohort is needed to
+   nodes through time.
+3. The **node-spacing algorithm** decides when another node is needed to
    represent the population accurately.
-4. The **canopy model** combines the cohorts into a vertical light profile,
+4. The **canopy model** combines the nodes into a vertical light profile,
    which then affects their growth.
 5. Numerical tools such as quadrature, finite differences, and splines make the
    repeated integrations and derivative calculations practical.
@@ -32,7 +32,7 @@ introduces the smaller numerical tools used throughout the solver.
 
 The size-structured population model is written as a partial differential
 equation (PDE). Rather than solving that PDE on a fixed size grid, `plant`
-follows representative cohorts as they grow. Each cohort traces a
+follows a set of nodes as they grow. Each node traces a
 *characteristic* through time, turning the original problem into a collection
 of ordinary differential equations (ODEs).
 
@@ -51,19 +51,20 @@ its C++ interface, and the fixed-step alternative.
 
 ## Adaptive node spacing
 
-Each node represents a cohort of plants born at roughly the same time. Too few
-nodes give a poor approximation to the population; too many make the simulation
-unnecessarily expensive. An ordinary run uses the supplied introduction
-schedule. When greater numerical accuracy is needed, users can opt in to a
-refinement step that adds nodes only where removing a node would make an
-important population integral too inaccurate.
+Each node samples the size distribution at one recruitment time, and the plants
+recruited between two adjacent nodes form a cohort. Too few nodes give a poor
+approximation to the population; too many make the simulation unnecessarily
+expensive. An ordinary run uses the supplied introduction schedule. When greater
+numerical accuracy is needed, users can opt in to a refinement step that adds
+nodes only where removing a node would make an important population integral too
+inaccurate.
 
 Read [The node-spacing algorithm](node-spacing.qmd) for the refinement test and
 worked diagnostics.
 
 ## Canopy and shading models
 
-Every cohort both experiences and contributes to a shared light environment.
+Every plant both experiences and contributes to a shared light environment.
 Different canopy models trade biological detail for speed, so the appropriate
 choice depends on whether the goal is stand dynamics, demographic equilibrium,
 or eco-evolutionary analysis.
@@ -108,12 +109,12 @@ Richardson extrapolation. The relevant controls are described on
 
 The trapezium rule approximates the area under a curve by joining neighbouring
 points with straight lines. `plant` uses this rule to integrate quantities such
-as leaf area over the discrete cohort distribution. The internal helper is
+as leaf area over the discrete set of nodes. The internal helper is
 `trapezium(xx, yy)`; its accuracy therefore depends strongly on node spacing.
 
 ### Adaptive splines for the light environment
 
-Calculating canopy openness directly at every cohort would make each solver
+Calculating canopy openness directly at every node would make each solver
 step scale poorly as more nodes are added. Instead, `plant` calculates openness
 at an adaptively chosen set of heights, fits a spline, and then evaluates that
 much cheaper approximation wherever it is needed. The `ResourceSpline` class

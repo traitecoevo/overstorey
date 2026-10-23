@@ -263,7 +263,7 @@ p$ode_rates[2]
 To move from an individual to a patch, we add its strategy to a parameter
 object and run the size-structured community model with `run_scm()`. Setting
 `collect = TRUE` retains the state at each output time. We then reshape the
-result and plot the DBH trajectory of every cohort:
+result and plot the DBH trajectory of every node:
 
 ```{r}
 #| label: plot-patch
@@ -277,7 +277,7 @@ par$strategies[[1]] <- s
 results <- run_scm(par, collect = TRUE)
 
 # `K93_expand_state()` returns a tidy data frame with one row per node per
-# output time, so we can plot the height of each cohort directly.
+# output time, so we can plot the height of each node directly.
 tidy <- K93_expand_state(results)$species
 
 ggplot(tidy, aes(time, height, group = node)) +
@@ -289,7 +289,7 @@ ggplot(tidy, aes(time, height, group = node)) +
 The run stops at about 105 years because that is the default
 `max_patch_lifetime` for K93. At that point, the simulated patch is still
 developing. Extending its maximum lifetime to 700 years allows the oldest
-cohorts to approach their maximum size of 136 cm DBH, as in Fig. 2 of
+nodes to approach their maximum size of 136 cm DBH, as in Fig. 2 of
 @Kohyama-1993:
 
 ```{r}
@@ -324,8 +324,8 @@ ggplot(tidy, aes(time, height, group = node)) +
   theme_bw()
 ```
 
-The previous lines give every cohort the same visual weight, even when few
-individuals remain in it. Mapping line transparency to cohort density makes the
+The previous lines give every node the same visual weight, even when few
+individuals remain near it. Mapping line transparency to node density makes the
 changing abundance of trees visible and helps reveal the formation of canopy
 gaps:
 
@@ -388,4 +388,4 @@ diameter, and larger trees suppress smaller ones through cumulative basal area.
 Species differ through the coefficients in their vital-rate equations, not
 through an explicit carbon budget or a set of physiological traits. The
 `plant` package then embeds those individual rules in its shared framework for
-cohorts, patches, recruitment, and disturbance.
+nodes, patches, recruitment, and disturbance.

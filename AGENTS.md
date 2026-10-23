@@ -118,6 +118,18 @@ so a page with a `library(plant)` chunk or an inline helper (e.g.
   purpose so the lint doesn't gate it. Keep incomplete posts there.
 - The reproduction lint blocks merging any reproduction post with
   `fidelity: pending`, a `TODO` in its `paper:` block, or no version/commit pin.
+- **Node vs cohort.** A *node* is a numerical point on the size distribution:
+  the plants born at one instant, carrying a size and a density per unit birth
+  date, following one characteristic. A *cohort* is the plants recruited between
+  two adjacent nodes; its abundance is that density integrated over the
+  interval. Say "node" for anything the solver introduces, spaces, steps, or
+  plots as a line; keep "cohort" for a group of recruits from a time window.
+  Never write "nodes (cohorts)" or "each node represents a cohort".
+  `theory/overview.qmd` holds the definition. Posts follow it too, except where
+  "cohort" names another method's object (an Escalator Boxcar Train cohort).
+- **Editing a published post.** Add a minimal callout at its end, `**Edited
+  YYYY-MM-DD.**` plus one or two sentences on what changed, so readers can tell
+  later wording from the original. Keep the post's slug so links survive.
 
 ## Local loop
 
