@@ -1,6 +1,6 @@
 ---
-title: "Moving cohort refining into C++"
-description: "Issue #408: the adaptive cohort-schedule refinement loop moves from R into the C++ SCM, and the public API consolidates onto a single run_scm() entry point — behaviour-preserving throughout."
+title: "Moving node-schedule refinement into C++"
+description: "Issue #408: the adaptive node-schedule refinement loop moves from R into the C++ SCM, and the public API consolidates onto a single run_scm() entry point — behaviour-preserving throughout."
 date: 2026-06-20
 plant-ref: "develop"
 plant-sha: "ad280e9946be86bc1305c88f7be3a03f73c313c4"
@@ -15,7 +15,7 @@ source(here::here("R/version-badge.R"))
 `r plant_version_badge()`
 
 This post summarises [issue #408](https://github.com/traitecoevo/plant/issues/408):
-moving the SCM's adaptive cohort-schedule refinement out of R and into C++, and
+moving the SCM's adaptive node-schedule refinement out of R and into C++, and
 collapsing the surrounding R helpers onto one entry point. The governing
 constraint was that the FF16 reference baselines stay green at every step — the
 refactor changes *where* the work happens, not *what* it computes.
@@ -84,4 +84,12 @@ out <- run_scm(x, collect = TRUE)
 The FF16 reference baselines in `tests/testthat/FF16_reference/` are the safety
 net for this whole refactor. If any phase had shifted numerics beyond tolerance,
 that would be a bug — not an expected regeneration.
+:::
+
+::: {.callout-note appearance="minimal"}
+**Edited 2026-10-23.** The title and summary now say "node schedule" where they
+said "cohort schedule": the schedule sets when the solver introduces nodes, and
+a cohort is the plants recruited between two adjacent nodes
+([definition](../../theory/overview.qmd#from-an-individual-to-a-landscape)).
+Nothing else changed.
 :::

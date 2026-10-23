@@ -125,8 +125,11 @@ so a page with a `library(plant)` chunk or an inline helper (e.g.
   interval. Say "node" for anything the solver introduces, spaces, steps, or
   plots as a line; keep "cohort" for a group of recruits from a time window.
   Never write "nodes (cohorts)" or "each node represents a cohort".
-  `theory/overview.qmd` holds the definition. Dated posts keep the wording of
-  their time.
+  `theory/overview.qmd` holds the definition. Posts follow it too, except where
+  "cohort" names another method's object (an Escalator Boxcar Train cohort).
+- **Editing a published post.** Add a minimal callout at its end, `**Edited
+  YYYY-MM-DD.**` plus one or two sentences on what changed, so readers can tell
+  later wording from the original. Keep the post's slug so links survive.
 
 ## Local loop
 
