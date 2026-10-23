@@ -458,8 +458,8 @@ the standard deterministic `plant` workflow are:
 | **Strategy** | The functions and parameters that translate a plant's state and surroundings into growth, mortality, fecundity, and competition effects |
 | **Trait** | A measurable plant property used to distinguish strategies or derive physiological parameters |
 | **Individual** | One biological plant governed by a strategy |
-| **Cohort** | Plants of one strategy recruited between two adjacent nodes; its abundance is the density integrated over that interval |
 | **Node** | A numerical point sampling the continuous size distribution at one recruitment time, carrying a size and a density |
+| **Cohort** | Plants of one strategy recruited between two adjacent nodes; its abundance is the density integrated over that interval |
 | **Patch** | A local population of competing plants followed from disturbance onward |
 | **Size distribution** | Plant density across the model's size coordinate: height for FF16/TF24 or stem diameter for K93 (stored under the generic state name `height`) |
 | **Competitive environment** | The shared quantity through which plants interact, such as the canopy-light profile or basal area of larger neighbours |
