@@ -158,12 +158,12 @@ The distinction can be summarised as follows:
 | Term | What it is | What makes another one different? |
 |---|---|---|
 | **Individual** | One biological plant, governed by a strategy | A different strategy, recruitment time, or patch; plants of one strategy recruited at the same instant in the same patch follow the same deterministic trajectory |
-| **Cohort** | The plants of one strategy recruited between two adjacent nodes | A different strategy or a different interval of recruitment times |
 | **Node** | One numerical point sampling a strategy's size distribution within a patch | A different strategy or recruitment time |
+| **Cohort** | The plants of one strategy recruited between two adjacent nodes | A different strategy or a different interval of recruitment times |
 | **Patch** | One local community followed through time after disturbance | A different time since disturbance gives a different patch age and community state |
 | **Metacommunity** | The landscape represented by patches of different ages, connected through a shared seed pool | It combines patch-level states rather than adding more nodes to a single patch |
 
-: The relationship between individuals, cohorts, nodes, patches, and the
+: The relationship between individuals, nodes, cohorts, patches, and the
 metacommunity.
 
 Here is a concrete way to picture the nesting. Consider a patch that is 40 years
