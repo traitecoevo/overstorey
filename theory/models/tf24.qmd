@@ -294,7 +294,7 @@ range of behaviours rather than one fixed alternative to TF24:
 
 | | TF24 | TF24f |
 |---|---|---|
-| Operating-point solve | golden-section search for the profit optimum, every step | gradient-ascent relaxation toward the optimum, tracked as an ODE state |
+| Operating-point solve | the leaf solved for the profit-maximising collar potential, every step | gradient-ascent relaxation toward the optimum, tracked as an ODE state |
 | Assumption | instantaneous (quasi-steady-state) acclimation | finite acclimation lag, set by `k_acclim` |
 | Extra state | — | `opt_root_psi_state` (appended after TF24's states) |
 | Gradient source | not needed (search only evaluates profit) | `Leaf::dprofit_droot_collar_psi` (exact, AD) |
