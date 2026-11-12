@@ -77,13 +77,14 @@ them; use this table to find the input relevant to your scenario.
 
 | Driver         | Meaning                                    | TF24 default |
 |----------------|---------------------------------------------|:-------------:|
-| `PPFD`         | Photosynthetic photon flux density, i.e. light ($\mu$mol m$^{-2}$ s$^{-1}$) | `1800` |
+| `SWdown`       | Incoming shortwave radiation above the canopy, i.e. light (W m$^{-2}$) | `900` |
 | `rainfall`     | Rainfall, driving the soil-water balance    | `1` |
 | `atm_vpd`      | Atmospheric vapour-pressure deficit (kPa)   | `1` |
 | `ca`           | Atmospheric CO$_2$ partial pressure (Pa — so the default `40` is $\approx$ 400 ppm) | `40` |
 | `leaf_temp`    | Leaf temperature ($^\circ$C)                | `25` |
 | `atm_o2_kpa`   | Atmospheric O$_2$ partial pressure (kPa)    | `21` |
-| `atm_kpa`      | Atmospheric pressure (kPa)                  | `100.5` |
+| `atm_kpa`      | Atmospheric pressure (kPa)                  | `101.3` |
+| `wind_speed`   | Wind speed, read only by the leaf energy balance (m s$^{-1}$) | `2` |
 
 `birth_rate` uses the same driver machinery but is set separately for each
 species rather than on the environment.
@@ -157,7 +158,7 @@ birth_rates <- list(
     species2 = 3.14
   )
 
-p1 <- add_strategies(p0, lmas, TF24_hyperpar,
+p1 <- add_strategies(p0, lmas, default_hyperpar("TF24"),
           keep_existing = FALSE,
           birth_rate = birth_rates)
 

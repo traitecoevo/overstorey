@@ -144,7 +144,7 @@ website:
           contents:
             - contributing/how-we-work.qmd
             - contributing/package-organisation.qmd
-            - contributing/implementing-a-strategy.qmd
+            - contributing/implementing-a-model.qmd
             - contributing/profiling.qmd
 
   page-footer:

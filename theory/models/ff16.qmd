@@ -353,7 +353,8 @@ plant strategy that violates an assumed biological trade-off.
 To keep linked parameters consistent, `plant` **hyper-parameterises** FF16:
 trait values are passed through a set of relationships that update several
 physiological parameters together. Those relationships are described below.
-Their implementation is in the `make_FF16_hyperpar()` function.
+`plant`'s frozen copy of them, used by its tests, is `default_hyperpar("FF16")`;
+the recommended trade-off functions are in the `fieldtrial` package.
 
 ### Leaf mass per unit area
 
@@ -468,8 +469,8 @@ parameter values used above. They are generated directly from the installed
 #| echo: false
 extract_strategy_parameter_values <- function(vars){
 
-  s <- c(FF16_Strategy(),
-         lapply(as.list(args(make_FF16_hyperpar)), eval))
+  s <- c(FF16_Model()$pars,
+         attr(default_hyperpar("FF16"), "coefficients"))
 
   out <- rep(NA_character_, length(vars))
 

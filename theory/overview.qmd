@@ -49,26 +49,26 @@ It helps to separate two parts of the model.
 ```{mermaid}
 flowchart LR
 accTitle: Biology and population dynamics in plant
-accDescr: A strategy converts plant state and surroundings into demographic rates. The demographic solver applies those rates to the population through time.
-  A["Plant state<br/>and surroundings"] --> B["Strategy<br/>individual biology"]
+accDescr: A model converts plant state and surroundings into demographic rates. The demographic solver applies those rates to the population through time.
+  A["Plant state<br/>and surroundings"] --> B["Model<br/>individual biology"]
   B --> C["Growth, mortality,<br/>and fecundity rates"]
   C --> D["Demographic solver<br/>population change"]
   D --> E["Patch structure<br/>through time"]
 ```
 
-The **strategy** contains the biology. Given the state of a plant and its
+The **model** contains the biology. Given the state of a plant and its
 environmental and competitive conditions, it returns instantaneous rates of
-growth, mortality, and fecundity. Depending on the strategy, this calculation
-may include photosynthesis, tissue turnover, carbon allocation, hydraulics, or
+growth, mortality, and fecundity. Depending on the model, this calculation may
+include photosynthesis, tissue turnover, carbon allocation, hydraulics, or
 phenomenological relationships fitted directly to size and competition.
 
 The **demographic solver** keeps track of how those individual rates change the
 population. It integrates growth and mortality through time, introduces new
 recruits, and updates the competitive environment as the population changes.
 The solver does not need to know how photosynthesis or hydraulics were
-calculated; it only needs the rates supplied by the strategy.
+calculated; it only needs the rates supplied by the model.
 
-This separation is central to `plant`. Changing the strategy changes the
+This separation is central to `plant`. Changing the model changes the
 individual biology, while leaving the size-structured demographic machinery in
 place.
 
@@ -422,7 +422,7 @@ particular scenario.
 
 | Task | Main `plant` interface | Detailed guide |
 |---|---|---|
-| Choose a strategy and parameters | `scm_base_parameters("FF16")` | [Strategies and traits](../guides/strategies.qmd) |
+| Choose a model and parameters | `scm_base_parameters("FF16")` | [Strategies and traits](../guides/strategies.qmd) |
 | Add trait values and seed input | `trait_matrix()`, `add_strategies()` | [Strategies and traits](../guides/strategies.qmd) |
 | Configure external drivers | `Environment("FF16")` or `Environment("TF24")` | [Extrinsic drivers](../guides/extrinsic-drivers.qmd) |
 | Simulate a patch | `run_scm()` | [Patch dynamics](../guides/patch-dynamics.qmd) |

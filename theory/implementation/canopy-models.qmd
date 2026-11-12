@@ -369,7 +369,7 @@ time_model <- function(model, times = NULL, reps = 5) {
   if (use_fixed) p$ode_times <- times
   ctrl <- Control()
   ctrl$shading_model <- model
-  run1 <- function() run_scm(p, ctrl = ctrl, use_ode_times = use_fixed)
+  run1 <- function() run_scm(p, ctrl = ctrl)
   run1()                                   # warm up
   median(replicate(reps, system.time(run1())[["elapsed"]]))
 }
@@ -411,8 +411,8 @@ sharper boundaries (smaller `ppa_layer_smoothing`) make this effect stronger.
 
 ### Fixed ODE schedule: per-step cost
 
-When all models are pinned to the *same* fixed schedule
-(`run_scm(..., use_ode_times = TRUE)`), the step-count effect disappears and
+When all models are pinned to the *same* fixed schedule (a grid of times in
+`p$ode_times`, which `run_scm()` steps to), the step-count effect disappears and
 only per-step cost remains. PPA's advantage is then clear: like
 `"crown-centre"`, it skips crown-depth quadrature, so both are markedly faster
 than `"deep-crown"`.
@@ -468,11 +468,11 @@ tryCatch(
 )
 ```
 
-A *fixed* schedule (`run_scm(..., use_ode_times = TRUE)`) avoids the
-error-control loop because it simply takes its prescribed steps. However, it
-then has no protection against a large explicit step overshooting the jump,
-which sends growth to non-finite values unless the schedule is very fine. A hard
-step is therefore not robustly handled by either approach.
+A *fixed* schedule (a grid of times in `p$ode_times`) avoids the error-control
+loop because it simply takes its prescribed steps. However, it then has no
+protection against a large explicit step overshooting the jump, which sends
+growth to non-finite values unless the schedule is very fine. A hard step is
+therefore not robustly handled by either approach.
 
 Changing the rounding direction (using light at the top rather than the bottom
 of a layer) does not solve this. The problem is the discontinuity, not its
@@ -515,7 +515,7 @@ inspect the difference directly.
 #| fig-height: 3.6
 #| fig-cap: "Shade cast (competition profile) by a 10 m plant under the correct crown-centre profile versus the hard and soft box approximations."
 comp_profile <- function(model, height = 10) {
-  s <- FF16_Strategy()
+  s <- FF16_Model()
   s$control$shading_model <- model
   ind <- FF16_Individual(s)
   ind$set_state("height", height)

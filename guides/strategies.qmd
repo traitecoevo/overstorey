@@ -21,7 +21,7 @@ contains biological parameters, numerical controls, recruitment settings, and
 other model information:
 
 ```{r}
-s <- FF16_Strategy()
+s <- FF16_Model()
 names(s)
 ```
 
@@ -55,10 +55,13 @@ leaf turnover and respiration.
 
 `plant` represents these links with a **hyperparameterisation**: an R function
 that translates a small set of input traits into a consistent set of model
-parameters. FF16 uses `FF16_hyperpar()`:
+parameters. The recommended functions are in the `fieldtrial` package; `plant`
+keeps a frozen copy of FF16's for its tests, `default_hyperpar("FF16")`, which
+this guide uses:
 
 ```{r}
-FF16_hyperpar
+hp <- default_hyperpar("FF16")
+hp
 ```
 
 You will rarely call this function directly. Looking at its output is useful,
@@ -68,7 +71,7 @@ includes photosynthesis per leaf area (`a_p1`), which is derived from leaf
 nitrogen per area (`narea`) rather than LMA itself.
 
 ```{r}
-FF16_hyperpar(trait_matrix(0.1, "lma"), s)
+hp(trait_matrix(0.1, "lma"), s)
 ```
 
 The three returned quantities are:
@@ -90,10 +93,12 @@ trait_matrix(c(0.1, 500), "rho")
 
 The preferred workflow uses `generate_strategy()` or `add_strategies()`. Both
 start from a `Parameters` object, which collects the settings needed for a
-patch run and stores the default strategy from which new strategies are built:
+patch run and stores the default strategy from which new strategies are built.
+`default_parameters()` builds one that carries the frozen hyperparameterisation
+above, and warns that it is a testing set unless `quiet = TRUE`:
 
 ```{r}
-p <- FF16_Parameters()
+p <- default_parameters("FF16", quiet = TRUE)
 ```
 
 Its top-level names show the main groups of settings:
@@ -102,10 +107,15 @@ Its top-level names show the main groups of settings:
 names(p)
 ```
 
-`param_hyperpar()` retrieves the linking function associated with the model:
+A `Parameters` object carries its linking function in `p$hyperpar`, which
+`param_hyperpar()` retrieves; here it is the same function as
+`default_hyperpar("FF16")`. One built with `scm_base_parameters()` or
+`FF16_Parameters()` carries none, so trait values are written straight to the
+parameters of the same name:
 
 ```{r}
-identical(param_hyperpar(p), FF16_hyperpar)
+is.null(p$hyperpar)
+is.null(scm_base_parameters("FF16")$hyperpar)
 ```
 
 The `strategy_default` member is the template copied when new strategies are
@@ -129,7 +139,7 @@ per row:
 
 ```{r}
 lma <- trait_matrix(seq(0.1, 0.5, length.out=5), "lma")
-FF16_hyperpar(trait_matrix(lma, "lma"), s)
+hp(trait_matrix(lma, "lma"), s)
 
 ss <- generate_strategy(p, lma, birth_rate = rep(1, 5))
 length(ss)

@@ -108,12 +108,12 @@ the second component.
 ## Where the number lives, and the bump rule
 
 The scientific version has one source of truth. It is declared in C++, beside
-the strategy implementation that it describes, as the `scientific_version`
-constant on each strategy class:
+the model implementation that it describes, as the `scientific_version`
+constant on each model class:
 
 ```cpp
-// inst/include/plant/models/ff16_strategy.h
-static constexpr int scientific_version = 1;
+// inst/include/plant/models/ff16_model.h
+static constexpr int scientific_version = 3;
 ```
 
 `TF24f` instead declares `approximation_revision`. The code in
@@ -126,7 +126,7 @@ only when, a changed equation or default parameter changes simulation output
 for identical inputs. Do not increment it for refactors, performance work, or
 interface changes.
 
-When adding a new strategy, developers must add a `scientific_version` constant
+When adding a new model, developers must add a `scientific_version` constant
 to its model header and a matching dispatch arm in
 `src/strategy_version.cpp`.
 
@@ -147,7 +147,7 @@ non-scientific, deliberately accept the new snapshot.
 
 This guard has a limit: it cannot detect a change to an equation when all
 defaults remain unchanged. Those changes still depend on code review and the
-versioning rule documented beside the strategy.
+versioning rule documented beside the model.
 
 ## How downstream tools use it
 

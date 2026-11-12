@@ -185,7 +185,7 @@ basal area from the fixed environmental value:
 s <- p$strategy
 
 # backtransform environment to cumulative basal area
-k_I <- K93_Strategy()$pars$k_I
+k_I <- K93_Model()$pars$k_I
 basal_area_above <- function(e) -log(e) / k_I
 
 # growth has both size and competition dependent terms
@@ -197,7 +197,7 @@ x * (s$pars$b_0 - s$pars$b_1 * log(x) -
 The extinction coefficient $k_I$ controls the mapping between environmental
 availability and cumulative basal area. Its default value is $0.01$, and it is
 stored in the strategy's biological parameters as
-`K93_Strategy()$pars$k_I`.
+`K93_Model()$pars$k_I`.
 
 Fecundity is proportional to an individual's basal area. The original model
 expresses reproduction at the level of the whole forest; here, we calculate one

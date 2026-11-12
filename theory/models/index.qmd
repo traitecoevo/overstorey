@@ -43,4 +43,4 @@ When saving or comparing simulation results, also read
 to tell a change in the model's science from a change only to the software.
 
 To implement your own, see
-[implementing a new strategy](../../contributing/implementing-a-strategy.qmd).
+[implementing a new model](../../contributing/implementing-a-model.qmd).
