@@ -66,17 +66,22 @@ the soil-water conditions supplied to this leaf calculation.
 Several parameters are especially important for the leaf calculation:
 
 - `vcmax_25`: the maximum rate of carboxylation at 25 °C ($\mu mol~m^{-2}~s^{-1}$)
-- `p_50`: the leaf water potential ($\psi_\mathrm{leaf}$) at which 50% of conductivity is lost
-- `K_s`: the maximum hydraulic conductivity ($kg~m^{-2}~s^{-1}~MPa^{-1})$
-- `c`: the shape parameter for the hydraulic vulnerability curve (unitless)
-- `b`: the sensitivity parameter for the hydraulic vulnerability curve (-MPa)
-- `psi_crit`: the critical $\psi_\mathrm{leaf}$ at which 95% of conductivity is lost (-MPa)
+- `stem_P50`: the stem water potential, $P_{50}$, at which 50% of conductivity is lost (MPa)
+- `stem_c`: the shape parameter of the stem's vulnerability curve, $c$ (unitless)
+- `K_s`: the sapwood-specific conductivity of the terminal stem segment, $K_{\rm s}$ ($kg~m^{-1}~s^{-1}~MPa^{-1}$)
+- `TF24_cost_scale`: the carbon cost of losing all conductance, $\gamma$ ($\mu mol~m^{-2}~s^{-1}$)
+- `TF24_beta2`: the exponent of that cost, $\beta$ (unitless)
 
-Together with the other TF24 traits and parameters, these values determine how
-the `Leaf` submodel responds to its environment. The implementation lives in
-`leaf_model.cpp`; the sections below explain the calculation conceptually.
+The scale of the vulnerability curve, $b$ (`stem_b`), and the critical
+potential at which 95% of conductivity is lost, $\psi_\mathrm{crit}$
+(`psi_crit`), are derived from `stem_P50` and `stem_c`; setting either does not
+change the curve. Together with the other TF24 traits and parameters, these
+values determine how the `Leaf` submodel responds to its environment. The leaf
+is the `phylloptim` package's: `plant` reaches it through `leaf_model.h`, which
+makes `plant::Leaf` an alias of `phylloptim::Leaf`. The sections below explain
+the calculation conceptually.
 
-## Profitmax
+## Profit maximisation
 
 Plants vary the aperture of their stomata in response to conditions such as
 soil moisture and atmospheric dryness. Several theoretical frameworks can be
@@ -415,15 +420,14 @@ registry_display("phylloptim:weibull_scale")
 ```
 
 where $P_{50}$ is the potential at which 50% of hydraulic conductance is lost.
-If two points on a hydraulic vulnerability curve are known, they can be used to
-calculate $c$. Here, an empirical value for $c$ is obtained from AusTraits.
-
-$P_{50}$ is in turn calculated from an empirical relationship with the
-hydraulic conductivity of the xylem pathway. In this relationship, more
-conductive stems lose conductivity at a less negative water potential (Liu et
-al. 2019):
-
-$$P_{50} = 1.73\frac{K_s}{2}^{-0.72}$$
+$P_{50}$ and $c$ are traits of the strategy. A trade-off function can set them
+from other traits: the recommended trade-offs live in the `fieldtrial`
+package, and `plant` keeps a frozen set for testing. That frozen set ties both
+to the sapwood conductivity, so that more conductive stems lose conductivity
+at a less negative water potential:
+$P_{50} = 10^{B_{Hv1} + B_{Hv2} \log_{10} K_{\rm s}}$ and
+$c = B_{c1} e^{-B_{c2} P_{50}}$. At its defaults $B_{c2} = 0$, so $c$ does not
+vary with $P_{50}$.
 
 $k_{max}$ is the stem's maximum conductance per unit leaf area, at $\psi = 0$.
 `plant` computes it and hands it to the leaf:
@@ -544,7 +548,8 @@ registry_display("phylloptim:cost_TF24", "eq-hydraulic-cost")
 ```
 
 Here, $\gamma~(\mu mol~m^{-2}~s^{-1})$ is the carbon cost of losing all
-conductance, and $\beta~(unitless)$ controls the shape of the cost curve. The
+conductance, per unit leaf area whatever the plant's size, and
+$\beta~(unitless)$ controls the shape of the cost curve. The
 term in brackets is the proportion of conductivity lost at $\psi$, so the cost
 is zero when $\psi = 0$ and increases as conductivity is lost. TF24 seats
 phylloptim's `TF24_floor` cost curve, which adds a price on water,
@@ -552,13 +557,6 @@ $\lambda_o E$, to this cost; at TF24's default $\lambda_o = 0$ it is this cost
 exactly. Only the hydraulic cost is carbon the plant spends: growth is billed
 the assimilation less this cost, and the price changes only the aperture
 chosen.
-
-The cost does not scale with the volume of sapwood supplying each unit of leaf
-area,
-
-$$z = \frac{\theta*h}{\eta_c}$$
-
-$\gamma$ is a cost per unit leaf area, whatever the plant's size.
 
 ## Profit
 

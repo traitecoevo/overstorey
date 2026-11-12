@@ -58,12 +58,13 @@ why it was added to the model and how it connects to whole-plant growth.
 | Carbon income | prescribed saturating light-response curve | Farquhar photosynthesis coupled to stomatal conductance |
 | Water | implicit | explicit supply–demand hydraulics with a vulnerability curve |
 | Stomata | — | conductance set by profit maximisation |
-| Allocation / growth | functional balance (shared) | functional balance (shared) |
+| Allocation / growth | functional balance | functional balance, paid from a storage pool, with flexible allometry: a plant can shed leaf area and change its Huber value away from what its height implies |
 
-TF24 changes how the plant calculates carbon income at the leaf. The
-subsequent steps are inherited from FF16: assimilated carbon is allocated to
-height, diameter, and tissue pools, and these individual-level rates feed into
-the [size-structured PDE](../size-structured-pde.qmd).
+TF24 changes how the plant calculates carbon income at the leaf, and it adds a
+storage pool between that income and growth, and flexible allometry. The
+allocation that follows is FF16's kind: carbon is allocated to height,
+diameter, and tissue pools, and these individual-level rates feed into the
+[size-structured PDE](../size-structured-pde.qmd).
 
 ## Model origin and scope
 
@@ -160,8 +161,9 @@ carbon-water economy while imposing a cost elsewhere.
   with the nitrogen investment associated with this trait.
 - **Huber value**, $\theta$, is the cross-sectional sapwood area supplying a
   unit of leaf area. More sapwood improves water supply, but the extra sapwood
-  and bark must be built and maintained. A larger sapwood volume can also
-  incur a larger absolute hydraulic repair cost.
+  and bark must be built and maintained. The hydraulic cost is charged per
+  unit leaf area and does not grow with sapwood volume; a higher Huber value
+  lowers it instead, by raising the stem's conductance.
 - **Wood density**, $\rho$, is sapwood mass per unit volume. It makes a given
   volume of sapwood more expensive to construct. In the current default
   parameterisation, it does **not** change cavitation resistance: the

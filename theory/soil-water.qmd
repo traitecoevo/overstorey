@@ -18,12 +18,17 @@ leaf-level profit-maximisation model that this page connects to soil water.
 :::
 
 ::: {.callout-warning}
-## Scope: TF24 and TF24f only
-Only the hydraulically explicit strategies — `TF24` and `TF24f` — carry a soil
-water balance. `FF16` and `K93` have no below-ground state: FF16's environment
-tracks canopy openness, while K93's tracks the cumulative basal area of larger
-neighbours. Throughout this page, "the environment" means
-`TF24_Environment`, not the shared base class.
+## Scope: the TF24 family only
+Only the hydraulically explicit models — `TF24` and its subclasses `TF24f`,
+`TF24t` and `TF24w` — carry a soil water balance. `FF16` and `K93` have no
+below-ground state: FF16's environment tracks canopy openness, while K93's
+tracks the cumulative basal area of larger neighbours. Throughout this page,
+"the environment" means `TF24_Environment`, not the shared base class.
+
+Under `TF24w`, each plant also has a private root-zone column, over the ground
+its crown covers. The column follows the same infiltration, drainage and
+residual floor as the patch's, loses only its own plant's uptake, and mixes
+towards the patch's mean moisture; the bare ground keeps the patch's column.
 :::
 
 ## The idea first
@@ -113,6 +118,14 @@ runoff increases near saturation. For every layer below the surface,
 $q_{{\rm in},i}$ is the drainage flux from the layer above,
 $q_{{\rm out},i-1}$. Water therefore moves down the column one layer at a
 time.
+
+Water can also arrive as a pulse: a scheduled event adds a depth $d$ to one
+layer between solver steps, into layer 0 for rain, or deeper for irrigation or
+a rising water table. A pulse does not pass through @eq-infiltration. The
+layer takes what it can still hold,
+$\min(d, \Delta z_i [\theta_{\rm sat} - \theta_i]^{+})$, and the rest is
+pulse runoff. Under `TF24w` a pulse lands on every private column and on the
+bare ground, each capped in the same way.
 
 ## Gravitational drainage {#sec-drainage}
 
