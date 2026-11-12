@@ -27,11 +27,6 @@ library(dplyr)
 library(ggplot2)
 ```
 
-```{r}
-#| label: console-logging
-plant_log_console()
-```
-
 We begin with one FF16 strategy and rapidly reduce recruitment after
 establishment, isolating the development of the initial cohort. Schedule
 refinement gives the fast early dynamics more resolution:

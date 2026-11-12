@@ -130,14 +130,13 @@ directions.
 To **construct the environment**, the patch calls
 `environment.compute_environment(f, height_max())`, with
 `f = compute_competition`. That calculation passes from patch to species to
-node to individual to strategy. At the node level, density weights the
-individual competitive effect. The strategy ultimately evaluates the leaf area
-above height $z$ from an expression of the form
-`k_I * area_leaf(height) * Q(z, height)`. `ResourceSpline` samples this result
+node to individual to model. At the node level, density weights the individual
+competitive effect. The model ultimately evaluates the leaf area above height
+$z$ from an expression of the form `k_I * area_leaf(height) * Q(z, height)`. `ResourceSpline` samples this result
 across height and builds the light-availability spline.
 
 To **use the environment**, `compute_rates` passes it from patch to species to
-node to individual to strategy. In `FF16_Strategy`, `net_mass_production_dt`
+node to individual to model. In `FF16_Model`, `net_mass_production_dt`
 calls `assimilation`. A `quadrature::QK` integrator then evaluates
 `assimilation_leaf(environment.get_environment_at_height(z)) * q(z, height)`
 over crown depth $z$. Earlier versions used the adaptive `QAG` layer here, but

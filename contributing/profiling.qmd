@@ -50,7 +50,8 @@ for that, use the harness below.
 ```r
 system.time({
   ind <- FF16_Individual()
-  env <- FF16_fixed_environment(1.0)
+  env <- Environment("FF16")
+  env$set_fixed_environment(1.0, 150)
   times <- seq(0, 50, length.out = 101)
   result <- grow_individual_to_time(ind, times, env)
 })
@@ -67,7 +68,8 @@ For longer blocks, wrapping everything in `system.time` is awkward.
 library(tictoc)
 tic()
 ind <- FF16_Individual()
-env <- FF16_fixed_environment(1.0)
+env <- Environment("FF16")
+env$set_fixed_environment(1.0, 150)
 times <- seq(0, 50, length.out = 101)
 result <- grow_individual_to_time(ind, times, env)
 toc()
@@ -98,7 +100,7 @@ helps the other:
 ```
 SCM::run → run_next → ode::Solver::step → derivs → Patch::compute_rates
   → Species::compute_rates → Node::compute_rates → growth_rate_gradient
-  → Individual::growth_rate_given_height → FF16_Strategy::compute_rates
+  → Individual::growth_rate_given_height → FF16_Model::compute_rates
   → net_mass_production_dt → assimilation
 ```
 
@@ -158,13 +160,14 @@ to confirm you are measuring the boundary you think you are, and to track the
 
 **`/usr/bin/sample` (native, macOS).** This is where the real signal is: the C++
 call graph and the hot symbols. A typical `build_schedule` sample puts the cost
-in, roughly in order, `FF16_Strategy::compute_competition`, the assimilation
-quadrature integrand (`QK::integrate` and its callable), `Interpolator::eval` /
-`tk::spline::operator()`, and libm `pow`/`exp`. Note that with our **no-LTO**
-build, small functions defined in a `.cpp` translation unit appear as their own
-sampled frames precisely because they can't be inlined across translation units —
-which is both a reading hint and, as it turned out, a lever (moving a hot helper
-into a header to let it inline was one of the largest single wins).
+in, roughly in order, `FF16_Model::compute_competition`, the assimilation
+quadrature integrand (`QK::integrate` and its callable), the light-spline
+lookup (`odelia`'s `hermite_spline`), and libm `pow`/`exp`. Note that with
+our **no-LTO** build, small functions defined in a `.cpp` translation unit
+appear as their own sampled frames precisely because they can't be inlined
+across translation units — which is both a reading hint and, as it turned out,
+a lever (moving a hot helper into a header to let it inline was one of the
+largest single wins).
 
 On macOS, `/usr/bin/sample` may need permission to inspect the R process. When it
 fails it writes `sample cannot examine process …` to the `.sample.log` and the
@@ -234,13 +237,13 @@ floating-point operation order → same bits out) or not:
   values or relax a named tolerance, and document the magnitude.
 
 After any change, at minimum run the targeted tests for the paths you touched —
-usually `test-interpolator.R`, `test-strategy-ff16.R`, and the relevant
-TF24/individual tests if shared strategy or environment code changed:
+usually `test-model-ff16.R` and the relevant TF24/individual tests if shared
+model or environment code changed:
 
 ```sh
 make compile
 Rscript -e 'devtools::load_all(compile = FALSE); \
-  for (f in c("test-interpolator.R","test-strategy-ff16.R","test-individual.R")) \
+  for (f in c("test-model-ff16.R","test-individual.R")) \
     testthat::test_file(file.path("tests/testthat", f))'
 ```
 
@@ -316,7 +319,7 @@ Setup:
    library("Rgperftools")
    start_profiler("/tmp/profile.out")
    p0 <- scm_base_parameters("FF16")
-   p <- expand_parameters(trait_matrix(0.0825, "lma"), p0)
+   p <- add_strategies(p0, trait_matrix(0.0825, "lma"))
    res <- run_scm(p)
    stop_profiler()
    ```
@@ -380,6 +383,6 @@ shape), #435 (uniform-grid spline index), #470 (LTO — declined, no measurable 
 
 For each change report: exact command, output directory, one-iteration timings,
 20-repeat Rprof totals, speedup vs the same-session baseline, whether the result is
-bit-identical (and which tests passed). Run at least test-interpolator.R,
-test-strategy-ff16.R, and any relevant TF24/individual tests for touched paths.
+bit-identical (and which tests passed). Run at least test-model-ff16.R, and any
+relevant TF24/individual tests for touched paths.
 ````

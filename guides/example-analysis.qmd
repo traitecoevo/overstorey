@@ -33,14 +33,6 @@ library(ggplot2)
 library(patchwork)
 ```
 
-Console logging is optional, but it makes progress visible during the slower
-TF24 run:
-
-```{r}
-#| label: console-logging
-plant_log_console()
-```
-
 Define the shortened patch lifetime and a function that constructs the same
 custom environment every time the model is run:
 
@@ -118,7 +110,7 @@ run_mypatch <- function(
   latitude = 28.182
   ) {
 
-  hyper_par_fn = make_TF24_hyperpar(B_lf1 = B_lf1, latitude = latitude)
+  hyper_par_fn = default_hyperpar("TF24", B_lf1 = B_lf1, latitude = latitude)
   birth_rate <- rep_len(birth_rate, nrow(traits))
   p1 <- add_strategies(p0, traits, hyper_par_fn, birth_rate = birth_rate)
 

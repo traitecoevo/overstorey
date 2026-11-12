@@ -154,9 +154,9 @@ carbon-water economy while imposing a cost elsewhere.
 - **Wood density**, $\rho$, is sapwood mass per unit volume. It makes a given
   volume of sapwood more expensive to construct. In the current default
   parameterisation, it does **not** change cavitation resistance: the
-  density-to-`d_I`, density-to-`g1_TF24`, and density-to-`k_s` exponents are all
-  zero. Those links can be enabled by changing their hyperparameters, but they
-  are inactive by default.
+  density-to-`d_I`, density-to-`TF24_cost_scale`, and density-to-`k_s`
+  exponents are all zero. Those links can be enabled by changing their
+  hyperparameters, but they are inactive by default.
 - **Maximum sapwood-specific conductivity**, $K_{s,\max}$, describes how
   quickly a unit of sapwood can transport water at maximum conductivity. High
   conductivity improves water transport. In the current parameterisation it
@@ -225,7 +225,7 @@ to a change in its environment.
 
 TF24f introduces that adjustment time. It uses the same physiology as TF24:
 the same leaf model, xylem vulnerability curve, and soil-water coupling. The
-implementation subclasses `TF24_Strategy`, so the carbon-income and
+implementation subclasses `TF24_Model`, so the carbon-income and
 water-transport calculations described on
 [Assimilation & hydraulics](../assimilation-hydraulics.qmd) are inherited
 unchanged. The only difference is *how the plant moves towards the most
@@ -234,7 +234,7 @@ profitable hydraulic operating point*.
 In TF24, a golden-section search over root-collar water potential is used at
 every step to find the $\psi$ that maximises the profit $P(\psi_l)$ defined on
 the [assimilation & hydraulics](../assimilation-hydraulics.qmd#eq-profit) page.
-TF24f instead adds a sixth ODE state, `opt_root_psi_state`, which records the
+TF24f instead appends an ODE state, `opt_root_psi_state`, which records the
 plant's current root-collar water potential. Gradient ascent then moves this
 state towards the profit-maximising value rather than allowing it to jump
 there immediately:
@@ -254,16 +254,10 @@ therefore no artificial adjustment period at birth. A lag appears only after
 the environment changes and shifts the optimum away from the plant's current
 operating point.
 
-The `use_ad_gradient` setting selects one of two ways to calculate the
-gradient:
-
-- **`use_ad_gradient = true`** (the default) uses the exact gradient
-  `Leaf::dprofit_droot_collar_psi`. It combines forward-mode automatic
-  differentiation of the photosynthesis and cost calculations, the
-  implicit-function theorem at the $\psi_l \to C_i$ root-find, and analytic
-  spline derivatives for the transport terms.
-- **`use_ad_gradient = false`** uses a finite-difference approximation. It
-  steps $\psi$ by `psi_fd_step` (MPa) and compares the profit on either side.
+The gradient is exact: `Leaf::dprofit_droot_collar_psi` combines forward-mode
+automatic differentiation of the photosynthesis and cost calculations, the
+implicit-function theorem at the $\psi_l \to C_i$ root-find, and analytic
+spline derivatives for the transport terms.
 
 The parameter `k_acclim` controls the acclimation rate. Changing it produces a
 range of behaviours rather than one fixed alternative to TF24:
@@ -281,8 +275,8 @@ range of behaviours rather than one fixed alternative to TF24:
 |---|---|---|
 | Operating-point solve | golden-section search for the profit optimum, every step | gradient-ascent relaxation toward the optimum, tracked as an ODE state |
 | Assumption | instantaneous (quasi-steady-state) acclimation | finite acclimation lag, set by `k_acclim` |
-| Extra state | — | `opt_root_psi_state` (6th ODE state) |
-| Gradient source | not needed (search only evaluates profit) | `Leaf::dprofit_droot_collar_psi` (AD) or finite difference (`psi_fd_step`) |
+| Extra state | — | `opt_root_psi_state` (appended after TF24's states) |
+| Gradient source | not needed (search only evaluates profit) | `Leaf::dprofit_droot_collar_psi` (exact, AD) |
 | Physiology, hydraulics, soil coupling | shared | shared (inherited unchanged from TF24) |
 | Bit-for-bit match to TF24 | — | no — by design, it tracks rather than reproduces the optimum |
 

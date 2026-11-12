@@ -311,13 +311,14 @@ ctrl$ode_step_size_initial <- 0.1
 ### Fixing step sizes: supplied times (option 2)
 
 Alternatively, supply selected exact steps in a vector of `ode_times`.
+`run_scm()` takes a schedule the parameters carry and steps to each time.
 
 ```{r}
 pc <- p
 pc$node_schedule_times[[1]] <- c(0, 0.1, 0.4, 0.8, 1.2)
 pc$ode_times <- seq(0, p$max_patch_lifetime, by=0.1)
 
-result2 <- run_scm(pc, ctrl = ctrl, use_ode_times = TRUE)
+result2 <- run_scm(pc, ctrl = ctrl)
 
 result2$ode_times
 ```
@@ -340,18 +341,16 @@ This mode is not a route to either an accurate or an inexpensive solution:
 forward Euler is first-order, so matching the adaptive solver's accuracy needs
 many more evaluations. The [next section](#sec-adaptive-vs-fixed-step) shows
 this trade-off with a work–precision diagram. `fixed_time_step` is also
-incompatible with the mutant-fitness replay path
-(`save_RK45_cache` / `use_ode_times`) and errors clearly if combined.
+incompatible with a pinned ODE schedule, which includes the mutant-fitness
+replay (`run_mutant()`) and supplied `ode_times`, and errors clearly if
+combined.
 
 ### Possible future changes
 
 The current interface still leaves several implementation questions open:
 
-- `NodeSchedule` interleaves `ode_times` with `node_schedule_times`. Simplifying
+- `Schedule` interleaves `ode_times` with `node_schedule_times`. Simplifying
   that code may not justify the regression risk without a clear use case.
-- Should supplied `ode_times` be stored in the parameters and used
-  automatically?
-- If they are present, should they always take precedence over adaptive times?
 - When is reusing the times from an earlier run scientifically or
   computationally useful?
 
@@ -562,9 +561,9 @@ interpreted as fitness or as a solution. The fixed-step solver makes them
 - **Mutant fitness / resident replay is not supported under `fixed_time_step`.**
   The mutant pathway replays a resident run by reusing the six cached RK
   sub-step environments per step; forward Euler has a single stage and no such
-  cache. Combining `fixed_time_step > 0` with `save_RK45_cache` (or with a pinned
-  `use_ode_times` replay) raises a clear error rather than returning a wrong
-  fitness.
+  cache. Combining `fixed_time_step > 0` with `run_mutant()` (or with any other
+  pinned ODE schedule, such as supplied `ode_times`) raises a clear error rather
+  than returning a wrong fitness.
 - **Discontinuous/"hard-step" environment variants** only *run to completion*
   under a fixed grid and do not converge as the step shrinks (see the section
   above) — any apparent result is a grid artefact, not a solution. Do not
