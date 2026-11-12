@@ -59,6 +59,11 @@ library(plant)
 ```
 
 ```{r}
+#| include: false
+source(here::here("R/registry-display.R"))
+```
+
+```{r}
 #| label: tbl-definitions
 #| echo: false
 #| output: asis
@@ -96,23 +101,36 @@ and mortality rates.
 
 Height at patch age $a$ is initial height plus all growth accumulated since
 germination:
-$$
-H(x, a_0, a) = H_0(x) + \int_{a_0}^{a} g(x, H(x, a_0, a^\prime), E_{a^\prime}) \, {\rm d}a^\prime
-$$ {#eq-size}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("height_trajectory", "eq-size")
+```
 
 Survival has two parts: the probability of surviving germination, followed by
 survival against the mortality hazard accumulated as the plant grows:
-$$
-S_{\rm I} (x, a_0, a) = S_{\rm G} (x, H_0, E_{{\rm a}0}) \, \exp\left(- \int_{a_0}^{a} d(x, H(x, a_0, a^\prime), E_{a^\prime}) \, {\rm d} a^\prime \right)
-$$ {#eq-survivalindividual}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("survival_individual", "eq-survivalindividual")
+```
 
 Here $S_{\rm G} (x, H_0, E_{{\rm a}0})$ is the probability that a seed
 germinates successfully. Finally, cumulative seed output adds fecundity over
 time, but discounts seed production by the probability that the plant is still
-alive:
-$$
-\tilde{R}(x, a_0, a) = \int_{a_0}^{a} f(x, H(x, a_0, a^\prime), E_{a^\prime}) \, S_{\rm I} (x, a_0, a^\prime) \, {\rm d} a^\prime
-$$ {#eq-tilder1}
+alive and that its patch has not been disturbed since it arrived:
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("lifetime_offspring", "eq-tilder1")
+```
+
+The patch-survival probability $S_{\rm P} (a_0, a^\prime)$ is defined below, in
+@eq-survivalpatch. $\tilde{R}$ counts seeds as they are produced, before any
+are lost in dispersal.
 
 Thus Eqs. [-@eq-size]--[-@eq-tilder1] are three running totals along the same
 life history: accumulated growth, accumulated mortality risk, and accumulated
@@ -137,17 +155,23 @@ another. TF24's physiological rates also respond to the soil-water state.
 Following standard biophysical principles, we let the canopy openness
 $E_a(z)$ at height $z$ in a patch of age $a$ decline exponentially
 with the total amount of leaf area above $z$,
-$$
-E_a(z) = \exp \left(-k_{\rm I} \sum_{i = 1}^{K} \int_{0}^{\infty} A_{\rm l}(H) \, Q(z, H) \, N(H | x_i, a) \, {\rm d}H \right),
-$$ {#eq-light}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("canopy_openness", "eq-light")
+```
+
 where $A_{\rm l}(H)$ is the total leaf area of a plant with height $H$, $Q(z, H)$ is the fraction of
 this leaf area situated above height $z$ for plants of height $H$,
-$k_{\rm I}$ is the light extinction coefficient, and $K$ is the number
-of species in the metacommunity.
+$k_{\rm I}$ is the light extinction coefficient, $A_{\rm P}$ is the ground area
+of the patch (1 by default), and $K$ is the number of species in the
+metacommunity.
 
 Read @eq-light from the inside out. For species $i$, the integral totals leaf
 area above $z$ across all plant heights; the sum then combines the $K$ species.
-Multiplying by $k_{\rm I}$ converts leaf area into optical depth, and the
+Dividing by $A_{\rm P}$ turns that total into leaf area per unit ground area,
+multiplying by $k_{\rm I}$ converts it into optical depth, and the
 exponential converts optical depth into the fraction of light that remains.
 The result is a single patch light profile that every plant both contributes to
 and experiences.
@@ -155,9 +179,13 @@ and experiences.
 Assuming patches are sufficiently large, the dynamics of $N$ can be modelled
 deterministically via the following partial differential equation (PDE)
 [@Kohyama-1993; @Deroos-1997; @Moorcroft-2001],
-$$
-\frac{\partial}{\partial a} N(H | x, a) = - d(x, H, E_a) \, N(H | x, a) - \frac{\partial}{\partial H} \left[g(x, H, E_a) \, N(H | x, a)\right].
-$$ {#eq-pde}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("density_pde_height", "eq-pde")
+```
+
 See @sec-derivation-size-structured for the derivation of this PDE.
 
 The two terms on the right-hand side are a population ledger. The first removes
@@ -166,18 +194,28 @@ height axis as they grow: plants leave one height interval and enter the next.
 It is written as the derivative of the flux $gN$, so changes in both growth
 rate and density are handled together.
 
+`plant` never solves @eq-pde on a grid of heights. It integrates it along
+characteristics, the paths plants follow as they grow (see [The characteristic
+method](implementation/characteristic-method.qmd)). Carrying the density in
+height needs growth to depend on size and light alone, so a model whose own
+state feeds back into growth, such as TF24, carries the density per unit birth
+date instead and converts it to height (@sec-converting-density) only to
+report it.
+
 @eq-pde also needs two boundary conditions. The first supplies recruits at the
 smallest height $H_0(x)$. It links the flux of seedlings entering the
-size-density distribution to the rate $Y_{x}$ at which seeds arrive in the
-patch,
-$$
-N(H_0 | x, a_0) = \left\{
-\begin{array}{ll} \frac{Y_{x} \, S_{\rm G} (x, H_0, E_{{\rm a}0}) }{ g(x, H_0, E_{{\rm a}0}) } & \textrm{if } g(x, H_0, E_{{\rm a}0}) > 0 \\
-0 & \textrm{otherwise.}
-\end{array} \right.
-$$ {#eq-bc1}
-The function $S_{\rm G} (x, H_0, E_{{\rm a}0})$ denotes survival through
-germination and must be chosen such that
+size-density distribution to the rate $Y_{x}(a_0)$ at which seeds arrive in the
+patch when it is age $a_0$,
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("density_boundary_height", "eq-bc1")
+```
+
+By default the arrival rate is constant, $Y_x(a_0) = Y_x$, but `plant` allows
+it to vary with $a_0$. The function $S_{\rm G} (x, H_0, E_{{\rm a}0})$ denotes
+survival through germination and must be chosen such that
 $S_{\rm G} (x, H_0, E_{{\rm a}0}) / g(x, H_0, E_{{\rm a}0}) \rightarrow 0$ as
 $g(x, H_0, E_{{\rm a}0}) \rightarrow 0$, to ensure a smooth decline in
 initial density as conditions deteriorate [@Falster-2011].
@@ -190,11 +228,17 @@ into the size distribution.
 The second boundary condition specifies the state of a patch immediately after
 disturbance, at $a = 0$. Throughout, we consider situations starting with an
 empty patch,
-$$
-N\left(H|x,0\right) = 0,
-$$ {#eq-bc2}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("density_initial", "eq-bc2")
+```
+
 although non--zero distributions could alternatively be specified
-[e.g. @Kohyama-1993; @Moorcroft-2001].
+[e.g. @Kohyama-1993; @Moorcroft-2001]. The empty patch is `plant`'s default; a
+non-empty `initial_state` in its parameters starts the patch from that stand
+instead, for example to resume a run.
 
 ### Age structure of patches {#sec-age-structured-distribution}
 
@@ -207,43 +251,46 @@ the instantaneous disturbance rate, or hazard, for a patch of age $a$.
 We first focus on an equilibrium patch-age distribution. See
 @sec-derivation-age-structured for the time-dependent derivation. At
 equilibrium, patches flow steadily toward older ages and leave each age class
-when disturbed [@Mckendrick-1926; @Vonfoerster-1959]:
-$$
-\frac{{\rm d}}{{\rm d} a} P(a) = - d_{\rm P}(a) \, P(a) ,
-$$ {#eq-agepde}
-with the boundary condition
-$$
-P(0) = \int_0^\infty d_{\rm P}(a) \, P(a) \, {\rm d} a.
-$$ {#eq-agepd2}
+when disturbed [@Mckendrick-1926; @Vonfoerster-1959]. The second equation
+below is the boundary condition:
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("patch_age_ode", "eq-agepde")
+```
 
 The boundary condition says that the flow of newly disturbed, age-zero patches
 must equal the total disturbance flow out of all older ages.
 
 The probability that a patch remains undisturbed from patch age $a_0$ to patch age $a$ is
 then given by
-$$
-S_{\rm P} (a_0, a) = \exp\left( - \int_{a_0}^{a} d_{\rm P}(a^\prime) \, {\rm d} a^\prime \right).
-$$ {#eq-survivalpatch}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("patch_survival", "eq-survivalpatch")
+```
 
 This has the same survival form as the individual-plant equation: cumulative
 hazard appears inside a negative exponential. The difference is that the event
 is patch disturbance rather than plant death.
 
 These equations lead to an equilibrium distribution of patch ages,
-$$
-P(a) = P(0) S_{\rm P} (0, a),
-$$ {#eq-agepde3}
-where
-$$
-P(0) = \frac1{\int_0^\infty S_{\rm P} (0, a) {\rm d}a}
-$$ {#eq-agepde4}
-is the average disturbance frequency of a patch and, at the same time, the frequency-density of patches of
-age $0$.
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("patch_age_density", "eq-agepde4")
+```
+
+where $P(0)$ is the average disturbance frequency of a patch and, at the same
+time, the frequency-density of patches of age $0$.
 
 In plain language, the abundance of patches of age $a$ equals the rate at which
 new patches are created, $P(0)$, multiplied by the chance that a patch survives
-undisturbed to age $a$. The normalising expression in @eq-agepde4 makes the
-total area under $P(a)$ equal to one.
+undisturbed to age $a$. The normalising expression for $P(0)$ in @eq-agepde4
+makes the total area under $P(a)$ equal to one.
 
 The default approach in `plant` is to assume that $d_{\rm P}(a)$
 increases linearly with patch age, which leads to a Weibull distribution for $P$,
@@ -267,18 +314,34 @@ metacommunity. Eqs. [-@eq-pde]--[-@eq-agepde4] describe its demographic
 dynamics.
 
 The disperser pool links the patch and landscape scales. For each strategy
-$x$, its landscape-wide seed rain $Y_x$ is the rate at which viable seeds are
-produced across all patches,
-$$
-Y_x  = \int_0^{\infty} \int_0^{\infty} P(a) \, S_{\rm D} \, f(x, H, E_a) \, N(H | x, a) \, {\rm d} H \, {\rm d} a,
-$$ {#eq-seed-rain}
-where $S_{\rm D}$ is the survival probability of seeds during dispersal.
+$x$, its landscape-wide seed rain $Y_x^{\rm out}$ is the rate at which viable
+seeds are produced across all patches. `plant` adds it up by the patch age
+$a_0$ at which each seed arrived,
 
-Again, read the double integral from the inside out. At a given patch age $a$,
-the inner integral adds fecundity over every plant height, weighted by plant
-density. The outer integral averages that patch output across patch ages,
-weighted by how common each age is. $S_{\rm D}$ retains only seeds that survive
-dispersal.
+```{r}
+#| echo: false
+#| output: asis
+registry_display("offspring_production", "eq-seed-rain")
+```
+
+where $S_{\rm D}$ is the survival probability of seeds during dispersal and
+$a_{\rm max}$ is the patch age at which a run ends.
+
+Again, read the integral from the inside out. Seeds arrive in patches of age
+$a_0$ at rate $Y_x(a_0)$, and patches of that age have frequency-density
+$P(a_0)$. Each seed that arrives goes on to produce
+$\tilde{R}(x, a_0, a_{\rm max})$ seeds over its life (@eq-tilder1), and
+$S_{\rm D}$ retains only those that survive dispersal. The same total can be
+written over plant heights and patch ages instead,
+$\int_0^{\infty} \int_0^{\infty} P(a) \, S_{\rm D} \, f(x, H, E_a) \, N(H | x, a) \, {\rm d} H \, {\rm d} a$:
+at a given patch age the inner integral adds fecundity over every plant height,
+weighted by plant density, and the outer integral averages that patch output
+across patch ages, weighted by how common each age is. The two forms agree,
+since the plants in a height interval ${\rm d}H$ are the survivors of the seeds
+that arrived over the matching interval of arrival ages ${\rm d}a_0$,
+$N \, {\rm d}H = Y_x(a_0) \, S_{\rm I} \, {\rm d}a_0$, and
+$P(a) = P(a_0) \, S_{\rm P}(a_0, a)$. `plant` stops at $a_{\rm max}$ rather
+than at infinity.
 
 At metacommunity equilibrium, the seed-arrival rate $Y_x$ is constant. If every
 disturbance also leaves the same empty initial state, all patches then follow
@@ -287,11 +350,11 @@ were disturbed. This is why one patch trajectory, combined with the patch-age
 distribution, can represent the whole metacommunity.
 
 To model the temporal dynamics of an archetypal patch, we need a value for
-$Y_x$. But that value is both an input to the patch through @eq-bc1 and an
-output of the metacommunity through @eq-seed-rain. At demographic equilibrium,
-the two must match. The numerical challenge is therefore to solve
-Eqs. [-@eq-bc1]--[-@eq-seed-rain] simultaneously for all strategies $x$ in the
-metacommunity.
+$Y_x$. But that value is both an input to the patch through @eq-bc1 and, as
+$Y_x^{\rm out}$, an output of the metacommunity through @eq-seed-rain. At
+demographic equilibrium, the two must match, $Y_x^{\rm out} = Y_x$. The
+numerical challenge is therefore to solve Eqs. [-@eq-bc1]--[-@eq-seed-rain]
+simultaneously for all strategies $x$ in the metacommunity.
 
 ### Emergent properties of metacommunities {#sec-emergent-properties}
 
@@ -337,10 +400,10 @@ mortality due to growth processes and disturbance is obtained by setting
 $w(x, H, E_a) = d(x, H, E_a) + d_{\rm P}(a) S_{\rm P}(0, a).$
 
 Sometimes the desired output is a total rather than a per-plant average. We can
-integrate over the size-density distribution to obtain an aggregate feature of
-the vegetation within a patch,
+integrate over the size-density distribution and sum over the $K$ species to
+obtain an aggregate feature of the vegetation within a patch,
 $$
-W(a) = \sum_{i = 1}^{N} \int_{0}^{\infty} N(H | x_i, a)\, w(x_i, H, E_a) \, {\rm d}H,
+W(a) = \sum_{i = 1}^{K} \int_{0}^{\infty} N(H | x_i, a)\, w(x_i, H, E_a) \, {\rm d}H,
 $$ {#eq-wa-a}
 and across the entire metacommunity,
 $$
@@ -433,11 +496,15 @@ $-\partial S_{\rm P}(0, a)/ \partial a = \lambda \psi a^{\psi -1}e^{-\lambda a^\
 $\psi>1$ implies that the probability of disturbance increases with
 patch age, while $\psi<1$ implies that it decreases with
 patch age. For $\psi = 1$, we obtain the exponential distribution, a special
-case of the Weibull distribution. The Weibull distribution results in the following
-distribution of patch ages,
-$$
-S_{\rm P}(0, a) = \exp(-\lambda a^\psi), \, P(0) = \frac{\psi \lambda^{\frac1{\psi}}}{\Gamma\left(\frac1{\psi}\right)},
-$$ {#eq-s-p0a2}
+case of the Weibull distribution. In summary, the Weibull hazard results in the
+following distribution of patch ages,
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("weibull_patch_ages", "eq-s-p0a2")
+```
+
 where $\Gamma(x) = \int_{0}^{\infty}e^{-t}t^{x-1} \, dt$ is the gamma function. We can
 also specify this distribution by the mean  disturbance interval
 $\bar{a} = \frac1{P(0)}$. From this, we can calculate the relevant value for
@@ -445,7 +512,11 @@ $\lambda = \left(\frac{\Gamma\left(\frac1{\psi}\right)}{\psi \bar{a}}\right)^{\p
 
 The default in `plant` is to assume $\psi=2$, such that $d_{\rm P}$ increases as
 a linear function of patch age. The distribution of patch ages is then specified by a
-single parameter, $\bar{a}$.
+single parameter, $\bar{a}$. `plant` sets that parameter indirectly: it takes
+the patch age $a_{\rm max}$ (`max_patch_lifetime`) by which all but a small
+fraction $\epsilon$ of patches have been disturbed,
+$S_{\rm P}(0, a_{\rm max}) = \epsilon$, and derives $\bar{a}$ from it. The
+same $a_{\rm max}$ is the age at which a run ends.
 
 The shape parameter $\psi$ controls how disturbance risk changes with age;
 $\lambda$ then sets the time scale. Fixing $\psi=2$ leaves only the mean
