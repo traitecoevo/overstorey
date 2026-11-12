@@ -5,6 +5,11 @@ title: "TF24"
 model
 :::
 
+```{r}
+#| include: false
+source(here::here("R/registry-display.R"))
+```
+
 ::: {.callout-note}
 ## Prerequisites
 This page builds on [The big picture](../overview.qmd) and the
@@ -112,24 +117,30 @@ Carbon income is only the start of the growth calculation. A trait can increase
 photosynthesis while also making leaves, sapwood, bark, or roots more expensive
 to build and maintain.
 
-As in FF16, TF24 expresses height growth as a chain of four relationships:
+As in FF16, TF24 expresses height growth as a chain of relationships:
 
-$$
-\frac{dH}{dt}
-=
-\frac{dH}{dA_l}
-\frac{dA_l}{dM_a}
-\frac{dM_a}{dB}
-\frac{dB}{dt}.
-$$ {#eq-tf24-height-growth}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("TF24.height_growth", "eq-tf24-height-growth")
+```
 
-Read from right to left, new biomass production ($dB/dt$) is allocated to
-living tissue ($dM_a/dB$); that investment supports additional leaf area
-($dA_l/dM_a$); and the plant's allometry translates added leaf area into
-height growth ($dH/dA_l$). This is the same kind of functional-balance logic
-used by FF16. The hydraulic leaf model changes the carbon income entering the
-right-hand side, while traits can also change the construction and maintenance
-terms further along the chain [@Towers-2024].
+Read from right to left, the chain starts from the growth flux $F$. This is
+the plant's net biomass production, ${\rm d}B/{\rm d}t$, after it has passed
+through a storage pool, which releases it as reserves near capacity and
+withholds it as they empty. A share $b$ of that flux is spent rebuilding a
+thinned canopy, which buys leaf area but no height; $b$ is zero while the
+canopy is whole. The rest is allocated to living tissue
+(${\rm d}M_{\rm a}/{\rm d}B$); that investment supports additional leaf area
+(${\rm d}A_{\rm l}/{\rm d}M_{\rm a}$); and the plant's allometry translates
+added leaf area into height growth (${\rm d}H/{\rm d}A_{\rm l}$). The
+allometric derivatives are taken at $A_{\rm l}^{*}(H)$, the leaf area the
+height implies, and height cannot fall. This is the same kind of
+functional-balance logic used by FF16, with one difference: FF16 grows from
+${\rm d}B/{\rm d}t$ itself and stops when it is not positive, whereas in TF24
+the storage pool takes the shortfall. The hydraulic leaf model changes the
+carbon income entering ${\rm d}B/{\rm d}t$, while traits can also change the
+construction and maintenance terms further along the chain [@Towers-2024].
 
 This complete chain matters because traits can affect more than carbon income.
 They can also change tissue construction, maintenance, turnover, and allometry.
@@ -231,23 +242,31 @@ water-transport calculations described on
 unchanged. The only difference is *how the plant moves towards the most
 profitable hydraulic operating point*.
 
-In TF24, a golden-section search over root-collar water potential is used at
-every step to find the $\psi$ that maximises the profit $P(\psi_l)$ defined on
-the [assimilation & hydraulics](../assimilation-hydraulics.qmd#eq-profit) page.
-TF24f instead adds a sixth ODE state, `opt_root_psi_state`, which records the
-plant's current root-collar water potential. Gradient ascent then moves this
-state towards the profit-maximising value rather than allowing it to jump
-there immediately:
+In TF24, the leaf is solved at every step for the root-collar water potential
+$\psi_{\rm r}^{*}$ that maximises the profit $J$ defined on the
+[assimilation & hydraulics](../assimilation-hydraulics.qmd#eq-profit) page.
+TF24f instead adds one ODE state, `opt_root_psi_state`, which records the
+plant's current root-collar water potential, $\psi_{\rm r}$. Gradient ascent
+then moves this state towards the profit-maximising value rather than allowing
+it to jump there immediately:
 
-$$
-\frac{d\psi}{dt} = k_{\text{acclim}} \cdot \frac{dP}{d\psi}
-$$
+```{r}
+#| echo: false
+#| output: asis
+registry_display("TF24f.collar_tracking")
+```
 
-Here, $k_{\text{acclim}}$ controls how quickly the operating point changes, and
-$dP/d\psi$ indicates which direction increases profit. At each leaf-solve
-step, TF24f evaluates profit at the *current tracked* value of $\psi$. It then
-passes the local gradient $dP/d\psi$ to the ODE system, which advances the
-state through time.
+Here, $k_{\rm acclim}$ controls how quickly the operating point changes, and
+$\partial J/\partial \psi_{\rm r}$ indicates which direction increases profit.
+The gradient is taken at $\tilde\psi_{\rm r}$, the tracked state held inside
+the feasible interval of collar potentials, $[\psi_a, \psi_b]$, so a state
+that has drifted outside it is pulled back in. At each step TF24f evaluates the
+leaf at $\tilde\psi_{\rm r}$, not at the optimum, and passes the gradient to
+the ODE system, which advances the state through time. The gradient is zero
+where phylloptim finds none: no flow, a stem that cannot carry what the soil
+delivers, or a failed point. Where the interval closes and the leaf shuts, the
+gradient is taken at the shut leaf's own collar potential, so the rate then
+does not depend on the state.
 
 At establishment, the tracked state begins at the true optimum. There is
 therefore no artificial adjustment period at birth. A lag appears only after

@@ -1,11 +1,14 @@
 ---
 title: "Soil water & root uptake"
-execute:
-  eval: false
 ---
 ::: {.eyebrow}
 theory
 :::
+
+```{r}
+#| include: false
+source(here::here("R/registry-display.R"))
+```
 
 ::: {.callout-note}
 ## Prerequisites
@@ -49,15 +52,13 @@ The rest of this page makes this precise.
 ::: {.callout-note}
 ## Water-potential sign convention
 
-The TF24 implementation uses two related conventions. The soil-retention and
-leaf calculations use the **positive magnitude** of water potential, so a
-larger value means a more negative physical potential. The soil-to-root
-transport calculation uses **signed, negative** potentials so it can evaluate
-the physical gradient directly.
-
-To keep the distinction visible, this page writes the positive magnitude as
-$\psi^\ast$ and the signed value as $\Psi=-\psi^\ast$. The root-collar
-potential $P_{x,r}$ in @eq-layer-uptake is also signed and normally negative.
+TF24 writes every water potential as a **positive magnitude**, so a larger
+value means a more negative physical potential; the signs live in the
+equations, not in the variables. This page writes the soil's potential as
+$\psi^\ast$. The uptake equation, @eq-layer-uptake, is phylloptim's and uses
+its symbols: $\psi_{s,i}$ for the potential of soil layer $i$, which is
+$\psi^\ast_{{\rm soil},i}$, and $\psi_c$ for the root-collar potential, both
+magnitudes.
 :::
 
 ## The soil column: $N$ layers, one bucket each {#sec-layers}
@@ -76,9 +77,11 @@ $\theta_{\rm sat}$ (`soil_moist_sat`, default 0.428) is a reference value in
 the retention and conductivity curves, not a hard upper bound on this stored
 state. The mass balance for layer $i$ is
 
-$$
-\frac{{\rm d}\theta_i}{{\rm d}t} = \frac{q_{{\rm in},i} - q_{{\rm out},i} - u_i}{\Delta z_i},
-$$ {#eq-layer-balance}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("TF24.layer_balance", "eq-layer-balance")
+```
 
 where $q_{{\rm in},i}$ is the inflow from above, $q_{{\rm out},i}$ is
 gravitational drainage from the layer's base, and $u_i$ is the total root
@@ -92,12 +95,17 @@ Water enters the top layer ($i = 0$) as rainfall, but some of it runs off. The
 runoff share increases as the top layer approaches saturation. Infiltration
 follows a saturation-excess form,
 
-$$
-q_{{\rm in},0} = P\left[1 - a_{\rm infil}\left(\frac{\theta_0}{\theta_{\rm sat}}\right)^{b_{\rm infil}}\right]^{+},
-$$ {#eq-infiltration}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("TF24.infiltration", "eq-infiltration")
+```
 
-where $P$ is the rainfall rate (the extrinsic driver `rainfall`, evaluated at
-the current time). The notation $[\,\cdot\,]^+$ means that the term is floored
+where $P$ is the rainfall rate: the extrinsic driver `rainfall`, evaluated at
+the current time and floored at zero, $P = \max(0, P_{\rm driver}(t))$. The
+floor is there because a spline through intermittent rain can undershoot below
+zero; flooring it adds the area of the undershoot to the rain received. The
+notation $[\,\cdot\,]^+$ means that the term is floored
 at zero, so infiltration cannot be negative. The parameter $a_{\rm infil}$
 controls the overall runoff response: 0 means no runoff, while 1 applies the
 full saturation-excess term. The parameter $b_{\rm infil}$ controls how sharply
@@ -113,16 +121,19 @@ conductivity. Conductivity rises steeply with moisture content, following the
 Clapp & Hornberger (1978) form as parameterised by Zeng & Decker (2009, their
 Eq. 5):
 
-$$
-q_{{\rm out},i} = K(\theta_i) = K_{\rm sat}\left(\frac{\theta_i}{\theta_{\rm sat}}\right)^{2n_\psi + 3},
-$$ {#eq-drainage}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("TF24.drainage", "eq-drainage")
+```
 
 where $K_{\rm sat}$ (`K_sat`) is the saturated hydraulic conductivity and
 $n_\psi$ (`n_psi`) is the retention-curve shape parameter also used in
-@eq-retention. The same function, `soil_K_from_soil_theta`, is used for every
-layer. For this conductivity calculation, the input moisture is clamped to
-$[0, \theta_{\rm sat}]$: a non-positive value gives zero conductivity, and a
-value above saturation gives $K_{\rm sat}$. Each layer's outflow becomes the
+@eq-retention. The same function, `conductivity`, is used for every layer,
+with that layer's $K_{\rm sat}$, $\theta_{\rm sat}$ and $n_\psi$. Its input
+moisture is clamped to $[0, \theta_{\rm sat}]$, giving $\tilde\theta_i$: a
+non-positive value gives zero conductivity, and a value above saturation gives
+$K_{\rm sat}$. Each layer's outflow becomes the
 next layer's inflow, while the outflow from the deepest layer leaves the column
 as deep drainage.
 
@@ -138,120 +149,132 @@ Plants respond not to volumetric moisture directly, but to the corresponding
 water potential $\psi$. The soil water retention curve converts between the
 two,
 
-$$
-\psi^\ast_{\rm soil}(\theta) = \frac{a_\psi}{10^6}\left(\frac{\theta}{\theta_{\rm sat}}\right)^{-n_\psi},
-$$ {#eq-retention}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("TF24.retention", "eq-retention")
+```
 
-(`psi_from_soil_moist`). The factor $10^6$ converts $a_\psi$ from Pa to MPa,
-the unit used throughout the leaf model. The parameters $a_\psi$ (`a_psi`) and
-$n_\psi$ (`n_psi`) define the same retention-curve family as @eq-drainage. As
-a layer dries ($\theta \to 0$), $\psi^\ast_{\rm soil} \to \infty$: drier soil
-requires a root to pull harder to extract water. The inverse,
-`soil_moist_from_psi`, solves the same relationship for $\theta$ given $\psi$.
-
-::: {.callout-warning}
-## Current inverse-unit asymmetry
-`psi_from_soil_moist()` returns the potential magnitude in **MPa**, as in
-@eq-retention. Its apparent inverse, `soil_moist_from_psi()`, currently
-expects its potential argument in **Pa**, because it divides the input directly
-by `a_psi` before applying the inverse power. Thus, for a round trip, multiply
-the MPa result by $10^6$ before passing it to `soil_moist_from_psi()`.
-
-This is an API asymmetry, not a physical distinction. The theory and the leaf
-model use MPa, so a future `plant` change to make the inverse accept MPa would
-be easier to use; until then, callers need to make the conversion explicitly.
-:::
+(`psi_from_soil_moist`). $a_\psi$ (`a_psi`) is held in MPa, the unit used
+throughout the leaf model, so the curve needs no conversion. The parameters
+$a_\psi$ and $n_\psi$ (`n_psi`) define the same retention-curve family as
+@eq-drainage. As a layer dries, $\psi^\ast_{\rm soil}$ rises steeply: drier
+soil requires a root to pull harder to extract water. The moisture is floored
+at the residual moisture $\theta_r$ and the potential capped at
+$\psi^\ast_{\max}$, as the callout below explains. The inverse,
+`soil_moist_from_psi`, solves the same relationship for $\theta$ given
+$\psi^\ast$, also in MPa, so the two round-trip. It applies neither the floor
+nor the cap, so it inverts @eq-retention only between them.
 
 ::: {.callout-note}
 ## Residual-moisture floor
-$\psi^\ast_{\rm soil}(\theta)$ diverges as $\theta \to 0$, and the drainage rate
-@eq-drainage is undefined for $\theta < 0$. An explicit fixed-step solver can
-produce either problem briefly at the edge of a drought. `plant` prevents this
+Without a floor, $\psi^\ast_{\rm soil}(\theta)$ would diverge as
+$\theta \to 0$, and the drainage rate @eq-drainage would be undefined for
+$\theta < 0$. An explicit fixed-step solver can produce either problem briefly
+at the edge of a drought. `plant` prevents this
 with a residual-moisture floor, `soil_moist_residual` (default
 $10^{-2}$ m$^3$ m$^{-3}$). A layer at or below this floor cannot be dried
 further by @eq-layer-balance; only rewetting is allowed. The model also
 evaluates $\psi^\ast_{\rm soil}$ at $\max(\theta, \theta_r)$ rather than at
 $\theta$, keeping the retention curve finite for a depleted layer. The floor
 is well below realistic operating moisture, so it does not affect non-drought
-runs. In addition, the resulting potential is capped at $10^3$ MPa: at the
-residual floor, root conductance is already effectively zero, while the cap
-keeps the coupled hydraulic calculation finite. See issue #485 for the
-numerical failure mode the floor prevents.
+runs. In addition, the resulting potential is capped at $\psi^\ast_{\max}$
+(`soil_psi_max_`): at the residual floor, root conductance is already
+effectively zero, while the cap keeps the coupled hydraulic calculation
+finite. While a layer sits on the floor, its drainage still passes to the
+layer below and its uptake is still booked in the uptake total, so the
+column's water budget closes exactly only while no layer is on the floor. See
+issue #485 for the numerical failure mode the floor prevents.
 :::
 
 ## Coupling to the plant: root-collar water potential {#sec-plant-coupling}
 
-Each layer's moisture state is first converted to a positive potential
-magnitude, $\psi^\ast_{{\rm soil},i}$, via @eq-retention. Before calculating
-soil-to-root flow, the implementation changes it to the signed potential
-$\Psi_{{\rm soil},i}=-\psi^\ast_{{\rm soil},i}$. A plant with roots in several
-layers does not experience $N$ separate root-collar potentials. The flows from
-all layers meet at one potential, $P_{x,r}$, at the root collar.
+Each layer's moisture state is first converted to a potential magnitude,
+$\psi_{s,i} = \psi^\ast_{{\rm soil},i}$, via @eq-retention. A plant with
+roots in several layers does not experience $N$ separate root-collar
+potentials. The flows from all layers meet at one potential, $\psi_c$, at the
+root collar.
 
 Imagine each layer connected to the root collar by its own pipe. The pipe for
 layer $i$ has two parts:
 
 - a horizontal segment that resists movement from the soil into the root,
-  $r_{{\rm R},H,i}$;
+  with resistance $r_{H,\min,i}$ while the roots are fully conductive;
 - a vertical segment that resists movement up the root axis to the collar,
-  $r_{{\rm R},V,i}$.
+  $r_{V,\Sigma,i}$.
 
 The vertical resistance accumulates with depth because water from a deep layer
-must pass through every shallower root segment on its way up. Both resistances
+must pass through every shallower root segment on its way up: $r_{V,\Sigma,i}$
+is the sum of the vertical resistances of layers $0$ to $i$. Both resistances
 depend on the root carbon invested horizontally and vertically in that layer.
-The horizontal resistance is also increased by a root vulnerability curve. This
-curve has the same exponential form as the stem vulnerability curve on the
-[assimilation & hydraulics page](assimilation-hydraulics.qmd), but uses separate
-root parameters (`root_c`, `root_b`, `root_psi_crit`). As roots lose conductance
+The horizontal resistance is also increased by a root vulnerability curve.
+This curve has the same Weibull form as the stem vulnerability curve on the
+[assimilation & hydraulics page](assimilation-hydraulics.qmd), but uses
+separate root parameters (`root_c`, `root_P50`). As roots lose conductance
 under water stress, they become proportionately harder for water to pass
 through.
 
-For a candidate signed root-collar potential $P_{x,r}$ and signed layer
-potential $\Psi_{{\rm soil},i}$, the water drawn from layer $i$ (per unit plant leaf
-area) is
+For a candidate root-collar potential $\psi_c$, the water drawn from layer $i$
+(mol m$^{-2}$ s$^{-1}$ per unit plant leaf area) is
 
-$$
-E_i = \frac{\left(\Psi_{{\rm soil},i} - P_{x,r} - g\,\bar z_i\right)}{r_{{\rm R},i}},
-$$ {#eq-layer-uptake}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("phylloptim:multilayer_uptake", "eq-layer-uptake")
+```
 
-where $r_{{\rm R},i} = r_{{\rm R},H,i} + r_{{\rm R},V,i}$ is the layer's total
-resistance. The term $g\,\bar z_i$ is the gravitational head that must be
-overcome to lift water from the layer midpoint $\bar z_i$ to the collar, with
-$g$ = `gravity_head` = $9.8\times10^{-3}$ MPa m$^{-1}$. Two special cases are
-handled exactly rather than with this general form: when
-$P_{x,r} = \Psi_{{\rm soil},i}$, the layer is driven only by gravity; when the
-potential gradient exactly balances the gravitational head, $E_i = 0$.
+Here $\rho_w g$ is the gravitational head per metre of height (`gravity_head`).
+phylloptim writes the depth of the layer's midpoint as $z_i$, which is the
+$\bar z_i$ of @sec-layers, so $\rho_w g z_i$ is the head that must be overcome
+to lift water from the midpoint to the collar.
 
-The root vulnerability curve is non-linear in $\psi$. For that reason, the
-horizontal resistance in @eq-layer-uptake is averaged over the potential
-interval between the soil and the collar rather than evaluated at a single
-point. Specifically, $r_{{\rm R},H,i}$ scales with the interval's span divided
-by the integral of the vulnerability curve across it.
+The root vulnerability curve is non-linear in $\psi$, so the horizontal
+resistance in @eq-layer-uptake is not evaluated at a single potential. It is
+$r_{H,\min,i}$ divided by the mean root conductivity across the span between
+the collar and the layer: $\Delta\psi_i$ is the width of that span and $I_i$
+the integral of the root vulnerability curve across it, from its lower end
+$\psi_{\rm lo}$ to its upper end $\psi_{\rm hi}$, with conductivity taken as 1
+at negative (positive-pressure) potentials. Two special cases are handled
+exactly rather than with this general form: when $\psi_c$ equals
+$\psi_{s,i}$, the layer is driven by gravity alone; when the potential
+difference exactly balances the gravitational head, $E_i = 0$. Only the
+rooted layers draw water, down to the deepest with root carbon, $L$. A negative
+$E_i$ is a layer gaining water through the roots.
 
-Summing $E_i$ across layers gives the total water the root system can supply at
-a given $P_{x,r}$. The model then solves for the root-collar potential and the
-leaf xylem potential $\psi_l$ together, using the profit-maximisation procedure
-described in [assimilation & hydraulics](assimilation-hydraulics.qmd).
+Summing $E_i$ across the rooted layers gives the total water the root system
+can supply at a given $\psi_c$, $E_{\rm up}$, in kg through the molar mass of
+water $M_w$. The model then solves for the root-collar potential and the leaf
+xylem potential together, using the profit-maximisation procedure described in
+[assimilation & hydraulics](assimilation-hydraulics.qmd).
 
 The solution must reconcile soil-side supply with the demand implied by the
 optimal stomatal conductance. Water arriving at the collar from the soil must
 equal the water carried onward through the root-to-leaf hydraulic path. In
 this way, the layer potentials from this page, together with gravity and root
 vulnerability, provide the "downstream water potential" required by the leaf
-model's cost function. Solving for $P_{x,r}$ links the soil water balance to
+model's cost function. Solving for $\psi_c$ links the soil water balance to
 leaf-level profit maximisation.
+
+Each plant's draw from layer $i$, scaled up from its leaf area, is what the
+patch removes from that layer: $u_i$ in @eq-layer-balance is the sum of those
+draws over every plant in the stand, per unit area of the patch.
 
 ## Diagnostics: cumulative fluxes {#sec-diagnostics}
 
-Alongside the $N$ moisture states, the environment tracks four cumulative
-auxiliary states (`aux_num` = 4). These states integrate the water balance over
+Alongside the $N$ moisture states, the environment tracks five cumulative
+auxiliary states (`aux_num` = 5). These states integrate the water balance over
 time rather than reporting only instantaneous rates:
 
 - cumulative rainfall $\int P\,{\rm d}t$;
 - cumulative infiltration $\int q_{{\rm in},0}\,{\rm d}t$;
 - cumulative deep drainage, the outflow lost from the bottom of the column,
   $\int q_{{\rm out},N-1}\,{\rm d}t$;
-- cumulative total root uptake, $\int \sum_i u_i\,{\rm d}t$.
+- cumulative total root uptake, $\int \sum_i u_i\,{\rm d}t$;
+- cumulative runoff of water pulses, the water a scheduled pulse adds to a
+  layer beyond what the layer can hold. It moves only when a pulse is applied.
+
+Runoff from rain is not accumulated on its own: it is cumulative rainfall less
+cumulative infiltration and pulse runoff.
 
 These running totals are analogous to the cumulative growth and seed output
 tracked for individual plants on the [size-structured PDE
