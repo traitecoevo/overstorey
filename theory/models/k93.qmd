@@ -2,6 +2,12 @@
 title: "K93"
 subtitle: "Kohyama 1993 — the forest architecture hypothesis for the stable coexistence of species"
 ---
+
+```{r}
+#| include: false
+source(here::here("R/registry-display.R"))
+```
+
 ::: {.eyebrow}
 model
 :::
@@ -58,65 +64,89 @@ defines this quantity in full.
 
 ### Growth
 
-Eq. 10 of @Kohyama-1993:
+Eq. 10 of @Kohyama-1993, with negative growth set to zero:
 
-$$
-G(t, a, x) = x \cdot \Bigg(b_0 - b_1 \cdot \ln{x} - b_2 \cdot B(t, a, x)\Bigg)
-$$ {#eq-k93-growth}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("K93.growth", "eq-k93-growth")
+```
 
-The growth rate $G$ is proportional to current diameter $x$. Inside the
-parentheses, $b_0$ sets the baseline growth rate, $b_1$ controls how growth
-changes with size, and $b_2$ controls the reduction caused by competition.
-As the tree becomes larger, the $b_1\ln{x}$ term reduces its proportional
-growth rate. More basal area above the tree also reduces growth.
+The growth rate $G$ is proportional to current diameter $x$, in cm, so $G$ is
+in cm yr⁻¹. Inside the parentheses, $b_0$ sets the baseline growth rate, $b_1$
+controls how growth changes with size, and $b_2$ controls the reduction caused
+by competition. As the tree becomes larger, the $b_1\ln{x}$ term reduces its
+proportional growth rate. More basal area above the tree also reduces growth.
+Without a floor, Eq. 10 can be negative, for a heavily suppressed or very large
+tree; `plant` sets negative growth to zero, so such a tree stops growing rather
+than shrinking.
 
 ### Fecundity
 
-Eq. 12 of @Kohyama-1993:
+After Eq. 12 of @Kohyama-1993:
 
-$$
-R(t, a, x_0) = d_0 \cdot B_0 \cdot \exp{(-d_1 \cdot B(t, a, x_0))}
-$$ {#eq-k93-fecundity}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("K93.fecundity", "eq-k93-fecundity")
+```
 
 Fecundity $R$ increases with the focal tree's basal area, $B_0$, and decreases
 exponentially as competition increases. The coefficient $d_0$ sets reproductive
 output per unit basal area, while $d_1$ determines how strongly competition
 suppresses that output.
 
-In the `plant` implementation, $B_0$ is interpreted as the basal area of one
-individual. Integrating these individual contributions across the stand gives
-the same total reproductive output as Eq. 9 of @Kohyama-1993.
+In the `plant` implementation, $B_0 = \pi x^2 / 4$ is the basal area of one
+individual. Kohyama's Eq. 12 is written at the recruit size $x_0$, with
+suppression $B(t, a, x_0)$; `plant` evaluates it at the parent's own diameter
+$x$, so each tree's output is suppressed by the basal area above that tree.
 
 ### Mortality
 
-Eq. 11 of @Kohyama-1993:
+Eq. 11 of @Kohyama-1993, with negative values set to zero:
 
-$$
-\mu(t, a, x) = - c_0 + c_1 \cdot B(t, a, x)
-$$ {#eq-k93-mortality}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("K93.mortality", "eq-k93-mortality")
+```
 
-Competition-dependent mortality $\mu$ rises linearly with basal area above the
-focal tree. The implementation does not allow this component to become
-negative, so values below zero are set to zero. Mortality associated with
-large-scale disturbance is handled separately by the patch disturbance regime.
+Competition-dependent mortality $\mu$ is zero until the basal area above the
+focal tree exceeds $c_0 / c_1$, and rises linearly with it beyond that. Below
+that point Kohyama's Eq. 11 would be negative; `plant` sets it to zero.
+Mortality associated with large-scale disturbance is handled separately by the
+patch disturbance regime.
 
 ### Size structured competition
 
-Eq. 8 of @Kohyama-1993:
+Eq. 8 of @Kohyama-1993, as `plant` computes it:
 
-$$
-B(t, a, x) = \frac{\pi}{4 \cdot s(t, a)} \int_{x}^{x_{max}} y^2 \cdot f(t, a, y) \, dy
-$$ {#eq-k93-competition}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("K93.basal_area_above", "eq-k93-competition")
+```
 
-This integral sums the basal area of trees with diameters between the focal
+The integral sums the basal area of trees with diameters between the focal
 tree's diameter, $x$, and the largest diameter in the stand, $x_{max}$. The
-function $f(t,a,y)$ describes the density of trees of size $y$, while $s(t,a)$
-provides the patch-level scaling used in the original formulation. Because the
-calculation includes only trees at least as large as the focal tree, small trees
-generally experience more competition than large ones.
+function $f(t,a,y)$ describes the density of trees of size $y$, and dividing by
+the patch area, $A_{\rm P}$, gives basal area per unit ground area; Kohyama's
+Eq. 8 writes this scaling as $s(t,a)$.
 
-The `plant` implementation adds a smoothing parameter, $\eta = 12.0$, so that
-the competitive effect can be interpolated with a continuous function.
+Each larger tree is weighted by $Q(x, y) = (1 - (x/y)^\eta)^2$, the crown
+profile that FF16 uses for leaf area, with a smoothing parameter
+$\eta = 12.0$. The weighting makes the competitive effect a continuous function
+of size that can be interpolated; in the limit $\eta \to \infty$ it is 1 for
+every larger tree, and the integral is Kohyama's. Because $Q(x, x) = 0$, the
+focal tree's own basal area is not counted. Only larger trees count, so small
+trees generally experience more competition than large ones.
+
+`plant` does not evaluate the integral directly. Every tree adds its basal
+area, scaled by $k_{\rm I}$, to a shared environment
+$E_a = \exp(-k_{\rm I} B)$, and K93 recovers $B$ by back-transforming it, as
+the first equality says. $k_{\rm I}$ cancels when every species shares it, as
+in the examples below. Where species differ, it weights each species' basal
+area in the others' competition.
 
 ### Dispersal and establishment
 
