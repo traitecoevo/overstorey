@@ -30,6 +30,7 @@ of 30 years.
 library(plant)
 
 params <- scm_base_parameters("FF16")
+params$hyperpar <- fieldtrial::tradeoffs("FF16")
 ```
 
 ```{r}

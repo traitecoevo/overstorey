@@ -422,10 +422,10 @@ registry_display("phylloptim:weibull_scale")
 
 where $P_{50}$ is the potential at which 50% of hydraulic conductance is lost.
 $P_{50}$ and $c$ are traits of the strategy. A trade-off function can set them
-from other traits: the recommended trade-offs live in the `fieldtrial`
-package, and `plant` keeps a frozen set for testing. That frozen set ties both
-to the sapwood conductivity, so that more conductive stems lose conductivity
-at a less negative water potential:
+from other traits: the `fieldtrial` package supplies the recommended
+trade-offs, and `plant` applies none unless they are attached. Those trade-offs
+tie both to the sapwood conductivity, so that more conductive stems lose
+conductivity at a less negative water potential:
 $P_{50} = 10^{B_{Hv1} + B_{Hv2} \log_{10} K_{\rm s}}$ and
 $c = B_{c1} e^{-B_{c2} P_{50}}$. At its defaults $B_{c2} = 0$, so $c$ does not
 vary with $P_{50}$.

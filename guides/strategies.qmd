@@ -55,12 +55,12 @@ leaf turnover and respiration.
 
 `plant` represents these links with a **hyperparameterisation**: an R function
 that translates a small set of input traits into a consistent set of model
-parameters. The recommended functions are in the `fieldtrial` package; `plant`
-keeps a frozen copy of FF16's for its tests, `default_hyperpar("FF16")`, which
-this guide uses:
+parameters. The `fieldtrial` package supplies the recommended trade-offs;
+`plant` applies none unless they are attached. `fieldtrial::tradeoffs()` builds
+the function for a model:
 
 ```{r}
-hp <- default_hyperpar("FF16")
+hp <- fieldtrial::tradeoffs("FF16")
 hp
 ```
 
@@ -94,11 +94,11 @@ trait_matrix(c(0.1, 500), "rho")
 The preferred workflow uses `generate_strategy()` or `add_strategies()`. Both
 start from a `Parameters` object, which collects the settings needed for a
 patch run and stores the default strategy from which new strategies are built.
-`default_parameters()` builds one that carries the frozen hyperparameterisation
-above, and warns that it is a testing set unless `quiet = TRUE`:
+Attach the trade-offs to it as `p$hyperpar`:
 
 ```{r}
-p <- default_parameters("FF16", quiet = TRUE)
+p <- scm_base_parameters("FF16")
+p$hyperpar <- fieldtrial::tradeoffs("FF16")
 ```
 
 Its top-level names show the main groups of settings:
@@ -108,10 +108,9 @@ names(p)
 ```
 
 A `Parameters` object carries its linking function in `p$hyperpar`, which
-`param_hyperpar()` retrieves; here it is the same function as
-`default_hyperpar("FF16")`. One built with `scm_base_parameters()` or
-`FF16_Parameters()` carries none, so trait values are written straight to the
-parameters of the same name:
+`param_hyperpar()` retrieves. Without one attached, `plant` applies no
+trade-offs, so trait values are written straight to the parameters of the same
+name:
 
 ```{r}
 is.null(p$hyperpar)

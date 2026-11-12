@@ -319,6 +319,7 @@ Setup:
    library("Rgperftools")
    start_profiler("/tmp/profile.out")
    p0 <- scm_base_parameters("FF16")
+   p0$hyperpar <- fieldtrial::tradeoffs("FF16")
    p <- add_strategies(p0, trait_matrix(0.0825, "lma"))
    res <- run_scm(p)
    stop_profiler()

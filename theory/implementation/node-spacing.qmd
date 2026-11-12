@@ -92,6 +92,7 @@ library(parallel)
 ncores <- detectCores() - 1
 
 p0 <- scm_base_parameters("FF16")
+p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 p <- add_strategies(p0, trait_matrix(0.0825, "lma"), birth_rate = 20)
 
 times_default <- p$node_schedule_times[[1]]

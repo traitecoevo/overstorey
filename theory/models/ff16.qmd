@@ -448,11 +448,11 @@ leaf mass per area alters both the cost of constructing leaf area and the rate
 at which leaves turn over. Treating those effects independently could create a
 plant strategy that violates an assumed biological trade-off.
 
-To keep linked parameters consistent, `plant` **hyper-parameterises** FF16:
-trait values are passed through a set of relationships that update several
-physiological parameters together. Those relationships are described below.
-`plant`'s frozen copy of them, used by its tests, is `default_hyperpar("FF16")`;
-the recommended trade-off functions are in the `fieldtrial` package.
+To keep linked parameters consistent, FF16 is **hyper-parameterised**: trait
+values are passed through a set of relationships that update several
+physiological parameters together. Those relationships are described below. The
+`fieldtrial` package supplies the recommended trade-offs, as
+`fieldtrial::tradeoffs("FF16")`; `plant` applies none unless they are attached.
 
 ### Leaf mass per unit area
 
@@ -560,7 +560,8 @@ retaining the effect of $\nu$ derived from the detailed annual calculation.
 
 The following tables collect the notation, allometric relationships, and
 parameter values used above. They are generated directly from the installed
-`plant` package so that the displayed defaults match the implementation.
+`plant` package, and the trade-off coefficients from `fieldtrial`, so that the
+displayed defaults match the implementation.
 
 ```{r}
 #| label: functions
@@ -568,7 +569,7 @@ parameter values used above. They are generated directly from the installed
 extract_strategy_parameter_values <- function(vars){
 
   s <- c(FF16_Model()$pars,
-         attr(default_hyperpar("FF16"), "coefficients"))
+         fieldtrial::tradeoff_coefficients("FF16"))
 
   out <- rep(NA_character_, length(vars))
 
@@ -617,7 +618,7 @@ system.file("docs/FF16", "FF16-eqns.csv", package = "plant") %>%
 x <- system.file("docs/FF16", "FF16-params-core.csv", package = "plant") %>%
   read.csv() %>% dplyr::as_tibble()
 
-x$Value <- extract_strategy_parameter_values(x$Symbol)
+x$Value <- extract_strategy_parameter_values(x$Code)
 knitr::kable(x,  align = "l")
 ```
 

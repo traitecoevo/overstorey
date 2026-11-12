@@ -57,8 +57,9 @@ To inspect all four models in the installed copy of `plant`:
 sapply(c("FF16", "K93", "TF24", "TF24f"), model_id)
 ```
 
-`FF16` and `K93` are scientifically frozen at `v1`, meaning that scientific
-changes to them should be exceptional. `TF24` began at `v2` rather than `v1`
+`FF16` and `K93` are scientifically frozen, meaning that scientific changes to
+them should be exceptional; each has advanced only where a change to how
+`plant` solves it changed its output. `TF24` began at `v2` rather than `v1`
 because a published result used the pre-versioning “v1” science. Its version has
 advanced as the model has developed. `TF24f` uses a compound version, explained
 below.

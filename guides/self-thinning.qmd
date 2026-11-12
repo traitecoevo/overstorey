@@ -34,6 +34,7 @@ refinement gives the fast early dynamics more resolution:
 ```{r}
 #| label: grow-stand
 p0 <- scm_base_parameters("FF16")
+p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 
 p0$strategy_default$pars$recruitment_decay <- 5
 # rapidly reduces later recruitment to isolate the first group of plants

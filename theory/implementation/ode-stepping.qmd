@@ -206,6 +206,7 @@ library(plant)
 
 # configure a patch containing a single species
 p0 <- scm_base_parameters("FF16")
+p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 p0$max_patch_lifetime <- 5
 
 p <- add_strategies(p0, trait_matrix(0.0825, "lma"))
@@ -388,6 +389,7 @@ A *daily* step is therefore `fixed_time_step = 1 / 365`.
 
 ```{r}
 p0 <- scm_base_parameters("FF16")
+p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 p0$max_patch_lifetime <- 60
 
 p <- add_strategies(p0, trait_matrix(0.0825, "lma"), birth_rate = 1.0)

@@ -32,6 +32,14 @@ after `@`. For example:
 remotes::install_github("traitecoevo/plant@v2.0.0", dependencies = TRUE)
 ```
 
+The guides also use the `fieldtrial` package, which supplies the recommended
+trait trade-offs; `plant` applies none unless they are attached. Install it the
+same way:
+
+```r
+remotes::install_github("traitecoevo/fieldtrial")
+```
+
 ## Check the installation
 
 Start a fresh R session and run:
@@ -41,6 +49,7 @@ library(plant)
 packageVersion("plant")
 
 p <- scm_base_parameters("FF16")
+p$hyperpar <- fieldtrial::tradeoffs("FF16")
 p <- add_strategies(p, trait_matrix(0.0825, "lma"))
 results <- run_scm(p, collect = TRUE)
 ```

@@ -63,6 +63,7 @@ and collects its state:
 ```{r}
 #| label: minimal-run
 p0 <- scm_base_parameters("TF24", "TF24_Env")
+p0$hyperpar <- fieldtrial::tradeoffs("TF24")
 p0$max_patch_lifetime <- max_patch_lifetime
 
 traits <- trait_matrix(c(0.07), c("lma"))
@@ -93,10 +94,10 @@ base_parameters <- function() {
 }
 ```
 
-The run helper below combines three kinds of input:
+The run helper below combines two kinds of input:
 
-- biological choices: traits, birth rates, and `B_lf1`;
-- location: latitude, used by the TF24 hyperparameterisation;
+- biological choices: traits, birth rates, and `B_lf1`, a coefficient of the
+  TF24 trade-offs that the `fieldtrial` package supplies;
 - a numerical choice: whether to refine the node-introduction schedule.
 
 ```{r}
@@ -106,13 +107,13 @@ run_mypatch <- function(
   birth_rate = 10,
   B_lf1 = 0.009,
   p0 = base_parameters(),
-  optimise_schedule = FALSE,
-  latitude = 28.182
+  optimise_schedule = FALSE
   ) {
 
-  hyper_par_fn = default_hyperpar("TF24", B_lf1 = B_lf1, latitude = latitude)
+  p0$hyperpar <- fieldtrial::tradeoffs("TF24",
+                                       coefficients = list(B_lf1 = B_lf1))
   birth_rate <- rep_len(birth_rate, nrow(traits))
-  p1 <- add_strategies(p0, traits, hyper_par_fn, birth_rate = birth_rate)
+  p1 <- add_strategies(p0, traits, birth_rate = birth_rate)
 
   env <- make_tf24_env(p0$max_patch_lifetime)
 

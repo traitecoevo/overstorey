@@ -147,6 +147,7 @@ constant number or a list of `x` and `y` control points.
 
 ```{r}
 p0 <- scm_base_parameters("TF24")
+p0$hyperpar <- fieldtrial::tradeoffs("TF24")
 p0$max_patch_lifetime <- 25      # short patch keeps the hydraulic solve fast
 
 # two species
@@ -158,7 +159,7 @@ birth_rates <- list(
     species2 = 3.14
   )
 
-p1 <- add_strategies(p0, lmas, default_hyperpar("TF24"),
+p1 <- add_strategies(p0, lmas,
           keep_existing = FALSE,
           birth_rate = birth_rates)
 

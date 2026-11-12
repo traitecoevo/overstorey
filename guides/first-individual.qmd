@@ -211,19 +211,22 @@ growth trajectory? We compare two FF16 strategies that differ in leaf mass per
 area (LMA). Low LMA describes thinner, cheaper leaves; high LMA describes
 thicker, more expensive leaves.
 
-Changing LMA through a trait matrix also updates linked parameters such as leaf
-turnover and respiration. This is called **hyperparameterisation**. The
-[Strategies and traits](strategies.qmd) guide explains the machinery in more
-detail; here we focus on the resulting plants.
+Changing LMA through a trait matrix can also update linked parameters such as
+leaf turnover and respiration. This is called **hyperparameterisation**. The
+`fieldtrial` package supplies the recommended trade-offs; `plant` applies none
+unless they are attached. The [Strategies and traits](strategies.qmd) guide
+explains the machinery in more detail; here we focus on the resulting plants.
 
-Begin with the default FF16 parameters:
+Begin with the default FF16 parameters, and attach fieldtrial's FF16
+trade-offs:
 
 ```{r}
 params <- scm_base_parameters("FF16")
+params$hyperpar <- fieldtrial::tradeoffs("FF16")
 ```
 
-Generate one low-LMA and one high-LMA strategy. `param_hyperpar()` selects the
-appropriate linking rules for the model stored in `params`:
+Generate one low-LMA and one high-LMA strategy. `generate_strategy()` applies
+the trade-offs attached to `params`:
 
 ```{r}
 s <- generate_strategy(params, trait_matrix(c(0.0825, 0.2625), "lma"),

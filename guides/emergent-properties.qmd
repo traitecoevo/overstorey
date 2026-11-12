@@ -25,6 +25,7 @@ We'll work with a single species and an illustrative constant birth rate:
 library(plant)
 
 p0 <- scm_base_parameters("FF16")
+p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 p <- add_strategies(p0, trait_matrix(0.0825, "lma"), birth_rate = 17.31)
 patch <- run_scm(p, refine_schedule = TRUE)$parameters
 result <- run_scm(patch, collect = TRUE)

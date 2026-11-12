@@ -82,6 +82,7 @@ saves the result and returns the filename:
 #| label: job-fns
 run_patch <- function(row) {
   p0 <- scm_base_parameters("FF16")
+  p0$hyperpar <- fieldtrial::tradeoffs("FF16")
   p0$max_patch_lifetime <- row$max_patch_lifetime
 
   p1 <- add_strategies(p0, trait_matrix(row$lma, "lma"),

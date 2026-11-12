@@ -46,9 +46,9 @@ holds one species' strategy.
 [Hyperparameterisation]{#hyperparameterisation}
 :   An R function that turns a small set of traits into a consistent set of
     model parameters, encoding links between traits (for example, LMA also sets
-    leaf turnover). A `Parameters` object carries its own in `p$hyperpar`;
-    `default_hyperpar("FF16")` is `plant`'s frozen testing copy of FF16's, and
-    the recommended trade-off functions are in the `fieldtrial` package.
+    leaf turnover). The `fieldtrial` package supplies the recommended
+    trade-offs, as `fieldtrial::tradeoffs("FF16")`; `plant` applies none unless
+    they are attached to a `Parameters` object as `p$hyperpar`.
 
 [Individual]{#individual}
 :   One plant, following a model with one strategy. Its state includes a size

@@ -90,10 +90,11 @@ several parts of the model at once.
 Changing one of these traits can change several physiological parameters. For
 example, LMA affects leaf construction cost, turnover, and respiration. Leaf
 nitrogen per area, which can also be supplied to the hyper-parameterisation,
-controls the photosynthetic response. `plant` uses a mapping from these input
-values to the lower-level physiological parameters needed by FF16. This mapping
-is called a **hyper-parameterisation** and is described in the
-[Strategies and traits](../guides/strategies.qmd) guide.
+controls the photosynthetic response. FF16's **hyper-parameterisation** maps
+these input values to the lower-level physiological parameters it needs. The
+`fieldtrial` package supplies the recommended trade-offs, and `plant` applies
+none unless they are attached; the
+[Strategies and traits](../guides/strategies.qmd) guide describes how.
 
 Wood density also changes construction costs and respiration per unit mass.
 Although the hyper-parameterisation can link wood density to mortality and
@@ -396,6 +397,7 @@ For an FF16 patch, the main code path is short:
 library(plant)
 
 p <- scm_base_parameters("FF16")
+p$hyperpar <- fieldtrial::tradeoffs("FF16")
 
 p <- add_strategies(
   p,
@@ -409,7 +411,7 @@ result <- expand_state(result)
 
 This example:
 
-1. creates the default FF16 parameters;
+1. creates the default FF16 parameters and attaches fieldtrial's trade-offs;
 2. adds one strategy with a specified LMA and birth rate;
 3. simulates the patch through time;
 4. collects and expands the state variables into analysis-ready output.
@@ -422,7 +424,7 @@ particular scenario.
 
 | Task | Main `plant` interface | Detailed guide |
 |---|---|---|
-| Choose a model and parameters | `scm_base_parameters("FF16")` | [Strategies and traits](../guides/strategies.qmd) |
+| Choose a model, parameters and trade-offs | `scm_base_parameters("FF16")`, `fieldtrial::tradeoffs("FF16")` | [Strategies and traits](../guides/strategies.qmd) |
 | Add trait values and seed input | `trait_matrix()`, `add_strategies()` | [Strategies and traits](../guides/strategies.qmd) |
 | Configure external drivers | `Environment("FF16")` or `Environment("TF24")` | [Extrinsic drivers](../guides/extrinsic-drivers.qmd) |
 | Simulate a patch | `run_scm()` | [Patch dynamics](../guides/patch-dynamics.qmd) |
