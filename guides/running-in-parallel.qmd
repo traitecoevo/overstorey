@@ -81,15 +81,15 @@ saves the result and returns the filename:
 ```{r}
 #| label: job-fns
 run_patch <- function(row) {
-  p0 <- scm_base_parameters("FF16")
+  p0 <- base_parameters("FF16")
   p0$hyperpar <- fieldtrial::tradeoffs("FF16")
   p0$max_patch_lifetime <- row$max_patch_lifetime
 
   p1 <- add_strategies(p0, trait_matrix(row$lma, "lma"),
                        birth_rate = row$birth_rate)
 
-  pars <- run_scm(p1, refine_schedule = TRUE)$parameters
-  out <- run_scm(pars, collect = TRUE)
+  pars <- run(p1, refine_schedule = TRUE)$scenario$p
+  out <- tidy(run(pars, record = "steps"))
 
   list(row = row, totals = patch_totals(out),
        emergent = emergent_summary(out))
@@ -130,11 +130,11 @@ emergent_summary <- function(out) {
 }
 ```
 
-Note what the job *saves*. `run_scm(collect = TRUE)` returns roughly 1.4 MB of
-solver state per run, while the totals and scalars an analysis actually consumes
-come to about 35 kB. Deciding what a job's artefact is — rather than reflexively
-saving everything — is the cheapest performance decision in a sweep, because
-every later read pays for it.
+Note what the job *saves*. `tidy()` of a run with `record = "steps"` returns
+roughly 1.4 MB of solver state per run, while the totals and scalars an analysis
+actually consumes come to about 35 kB. Deciding what a job's artefact is —
+rather than reflexively saving everything — is the cheapest performance decision
+in a sweep, because every later read pays for it.
 
 ## The serial baseline
 

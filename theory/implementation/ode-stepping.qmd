@@ -205,7 +205,7 @@ For a first example, run a system with the default ODE controls:
 library(plant)
 
 # configure a patch containing a single species
-p0 <- scm_base_parameters("FF16")
+p0 <- base_parameters("FF16")
 p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 p0$max_patch_lifetime <- 5
 
@@ -215,7 +215,7 @@ p <- add_strategies(p0, trait_matrix(0.0825, "lma"))
 ctrl <- Control()
 
 # run
-out <- run_scm(p, ctrl = ctrl)
+out <- run(p, control = ctrl)$solver
 
 # number of steps
 length(out$ode_times)
@@ -262,7 +262,7 @@ ctrl2 <- ctrl
 ctrl2$ode_step_size_max <- 0.1
 
 # run
-out2 <- run_scm(p, ctrl = ctrl2)
+out2 <- run(p, control = ctrl2)$solver
 
 # compare
 length(out$ode_times)
@@ -286,7 +286,7 @@ ctrl3$ode_step_size_min <- 0.01
 ctrl3$ode_step_size_initial <- 0.01
 
 # run
-out3 <- run_scm(p, ctrl = ctrl3)
+out3 <- run(p, control = ctrl3)$solver
 
 # compare
 length(out$ode_times)
@@ -312,14 +312,14 @@ ctrl$ode_step_size_initial <- 0.1
 ### Fixing step sizes: supplied times (option 2)
 
 Alternatively, supply selected exact steps in a vector of `ode_times`.
-`run_scm()` takes a schedule the parameters carry and steps to each time.
+`run()` takes a schedule the parameters carry and steps to each time.
 
 ```{r}
 pc <- p
 pc$node_schedule_times[[1]] <- c(0, 0.1, 0.4, 0.8, 1.2)
 pc$ode_times <- seq(0, p$max_patch_lifetime, by=0.1)
 
-result2 <- run_scm(pc, ctrl = ctrl)
+result2 <- run(pc, control = ctrl)$solver
 
 result2$ode_times
 ```
@@ -335,7 +335,7 @@ derivative evaluation per step and makes no error estimate. Enable it by setting
 ```{r}
 #| eval: false
 ctrl <- Control(fixed_time_step = 1 / 365)  # daily step; 0 = adaptive (default)
-run_scm(p, ctrl = ctrl)
+run(p, control = ctrl)
 ```
 
 This mode is not a route to either an accurate or an inexpensive solution:
@@ -388,7 +388,7 @@ One control field selects the integration mode: `fixed_time_step`, measured in
 A *daily* step is therefore `fixed_time_step = 1 / 365`.
 
 ```{r}
-p0 <- scm_base_parameters("FF16")
+p0 <- base_parameters("FF16")
 p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 p0$max_patch_lifetime <- 60
 
@@ -398,8 +398,8 @@ env <- Environment("FF16")
 ctrl_adaptive <- Control()                       # fixed_time_step = 0
 ctrl_daily    <- Control(fixed_time_step = 1 / 365)
 
-out_adaptive <- run_scm(p, env, ctrl_adaptive)
-out_daily    <- run_scm(p, env, ctrl_daily)
+out_adaptive <- run(p, env, ctrl_adaptive)
+out_daily    <- run(p, env, ctrl_daily)
 ```
 
 Forward Euler performs **one** derivative evaluation per step
@@ -412,8 +412,8 @@ tibble::tibble(
   mode    = c("adaptive RK45", "daily Euler"),
   R0      = c(out_adaptive$net_reproduction_ratios,
               out_daily$net_reproduction_ratios),
-  n_steps = c(length(out_adaptive$ode_times),
-              length(out_daily$ode_times))
+  n_steps = c(length(out_adaptive$solver$ode_times),
+              length(out_daily$solver$ode_times))
 )
 ```
 
@@ -440,16 +440,16 @@ forward Euler across step sizes. For every run, record:
 ctrl_ref <- control_accurate()
 ctrl_ref$ode_tol_rel <- 1e-8
 ctrl_ref$ode_tol_abs <- 1e-8
-R0_ref <- run_scm(p, env, ctrl_ref)$net_reproduction_ratios
+R0_ref <- run(p, env, ctrl_ref)$net_reproduction_ratios
 
 measure <- function(ctrl, mode) {
   stages <- if (mode == "adaptive") 6 else 1   # derivative evals per step
-  scm <- run_scm(p, env, ctrl)
-  n   <- length(scm$ode_times)
+  res <- run(p, env, ctrl)
+  n   <- length(res$solver$ode_times)
   tibble::tibble(
     mode  = mode,
     work  = n * stages,
-    error = abs(scm$net_reproduction_ratios - R0_ref) / R0_ref
+    error = abs(res$net_reproduction_ratios - R0_ref) / R0_ref
   )
 }
 
@@ -526,7 +526,7 @@ seed_output <- function(steps_per_year, smoothing) {
   ctrl <- Control(fixed_time_step = 1 / steps_per_year)
   ctrl$shading_model      <- "ppa"
   ctrl$ppa_layer_smoothing <- smoothing
-  run_scm(p, env, ctrl)$offspring_production
+  run(p, env, ctrl)$offspring_production
 }
 
 convergence <- purrr::map_dfr(c(91, 182, 365, 730, 1460), function(spy) {

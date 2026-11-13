@@ -28,7 +28,7 @@ library(tidyr)
 library(ggplot2)
 
 base <- function(type) {
-  p <- scm_base_parameters(type)
+  p <- base_parameters(type)
   p$hyperpar <- fieldtrial::tradeoffs(type)
   add_strategies(p, trait_matrix(0.0825, "lma"), birth_rate = 20)
 }
@@ -61,13 +61,13 @@ For TF24f we use an illustrative gain of 2; the package default is 1.
 
 ```{r}
 #| label: run-both
-tf24  <- run_scm(base("TF24"),  collect = TRUE, refine_schedule = FALSE)
+tf24  <- tidy(run(base("TF24"), record = "steps"))
 
 p_f <- base("TF24f")
 s <- p_f$strategies[[1]]
 s$k_acclim <- 2
 p_f$strategies[[1]] <- s
-tf24f <- run_scm(p_f, collect = TRUE, refine_schedule = FALSE)
+tf24f <- tidy(run(p_f, record = "steps"))
 ```
 
 In this example, the two size structures remain very similar:

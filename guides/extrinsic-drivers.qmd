@@ -146,7 +146,7 @@ Pass birth rates to `add_strategies()`. Each species needs one entry: either a
 constant number or a list of `x` and `y` control points.
 
 ```{r}
-p0 <- scm_base_parameters("TF24")
+p0 <- base_parameters("TF24")
 p0$hyperpar <- fieldtrial::tradeoffs("TF24")
 p0$max_patch_lifetime <- 25      # short patch keeps the hydraulic solve fast
 
@@ -171,7 +171,7 @@ rain_t <- seq(0, p0$max_patch_lifetime, length.out = 1000)
 env$extrinsic_drivers_set_variable("rainfall", rain_t, 0.25 * sin(2 * pi * rain_t) + 1.0)
 
 ctrl <- Control()
-out <- run_scm(p1, env, ctrl)
+out <- run(p1, env, ctrl)$solver
 ```
 
 Inspecting the driver at a particular time is a useful check that the species

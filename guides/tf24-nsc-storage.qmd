@@ -155,7 +155,7 @@ fixed_env <- function(theta) {
 
 For transparency, this diagnostic uses a small manual Euler step rather than
 the production ODE solver. It follows three years in well-watered soil, a sharp
-drought from year 3 to 4.5, and then recovery. Use `run_scm()` for model runs;
+drought from year 3 to 4.5, and then recovery. Use `run()` for model runs;
 this loop is only a teaching probe.
 
 ```{r}

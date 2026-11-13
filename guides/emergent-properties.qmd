@@ -24,11 +24,11 @@ We'll work with a single species and an illustrative constant birth rate:
 #| label: setup-patch
 library(plant)
 
-p0 <- scm_base_parameters("FF16")
+p0 <- base_parameters("FF16")
 p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 p <- add_strategies(p0, trait_matrix(0.0825, "lma"), birth_rate = 17.31)
-patch <- run_scm(p, refine_schedule = TRUE)$parameters
-result <- run_scm(patch, collect = TRUE)
+patch <- run(p, refine_schedule = TRUE)$scenario$p
+result <- tidy(run(patch, record = "steps"))
 ```
 
 ```{r}
@@ -37,10 +37,10 @@ result <- run_scm(patch, collect = TRUE)
 library(dplyr)
 library(tidyr)
 
-# The tidy `species` table returned by `run_scm(collect = TRUE)` has one row
-# per node per step. This helper reshapes a single variable into a matrix with
-# one row per node and one column per step, padding with `NA` for nodes that
-# had not yet been introduced.
+# The tidy `species` table returned by `tidy()` of a run with
+# `record = "steps"` has one row per node per step. This helper reshapes a
+# single variable into a matrix with one row per node and one column per step,
+# padding with `NA` for nodes that had not yet been introduced.
 sdd_matrix <- function(species_data, var) {
   m <- species_data |>
     dplyr::select(node, step, dplyr::all_of(var)) |>

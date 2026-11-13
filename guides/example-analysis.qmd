@@ -62,7 +62,7 @@ and collects its state:
 
 ```{r}
 #| label: minimal-run
-p0 <- scm_base_parameters("TF24", "TF24_Env")
+p0 <- base_parameters("TF24", "TF24_Env")
 p0$hyperpar <- fieldtrial::tradeoffs("TF24")
 p0$max_patch_lifetime <- max_patch_lifetime
 
@@ -72,8 +72,8 @@ p1 <- add_strategies(p0, traits)
 
 env <- make_tf24_env(max_patch_lifetime)
 
-results <- run_scm(p1, env = env, refine_schedule = TRUE)$parameters
-results <- run_scm(results, env = env, collect = TRUE)
+results <- run(p1, env = env, refine_schedule = TRUE)$scenario$p
+results <- tidy(run(results, env = env, record = "steps"))
 ```
 
 For repeated analyses, helper functions keep assumptions in one place. The
@@ -81,8 +81,8 @@ first helper starts from TF24 defaults and changes four strategy parameters:
 
 ```{r}
 #| label: base-parameters-fn
-base_parameters <- function() {
-  p0 <- scm_base_parameters("TF24", "TF24_Env")
+my_base_parameters <- function() {
+  p0 <- base_parameters("TF24", "TF24_Env")
   p0$max_patch_lifetime <- max_patch_lifetime
 
   p0$strategy_default$pars$hmat <- 15
@@ -106,7 +106,7 @@ run_mypatch <- function(
   traits =  trait_matrix(c(0.07), c("lma")),
   birth_rate = 10,
   B_lf1 = 0.009,
-  p0 = base_parameters(),
+  p0 = my_base_parameters(),
   optimise_schedule = FALSE
   ) {
 
@@ -118,12 +118,12 @@ run_mypatch <- function(
   env <- make_tf24_env(p0$max_patch_lifetime)
 
   if(optimise_schedule)
-    result <- run_scm(p1, env = env, refine_schedule = TRUE)$parameters
+    result <- run(p1, env = env, refine_schedule = TRUE)$scenario$p
   else
     result <- p1
 
   # gather outputs at each time step
-  run_scm(result, env = env, collect = TRUE)
+  tidy(run(result, env = env, record = "steps"))
 }
 ```
 
@@ -141,9 +141,10 @@ results <-
   run_mypatch(traits=trait_matrix(c(0.07, 0.24), c("lma")))
 ```
 
-Because `run_mypatch()` calls `run_scm(..., collect = TRUE)`, its result is
-already organised for analysis. The `species` table has one row per node at
-each recorded step; `steps` and `env` describe patch time and environment.
+Because `run_mypatch()` returns `tidy()` of a run with `record = "steps"`, its
+result is already organised for analysis. The `species` table has one row per
+node at each recorded step; `steps` and `env` describe patch time and
+environment.
 
 ```{r}
 #| label: tidy-results

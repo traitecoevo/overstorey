@@ -114,12 +114,12 @@ name.
 
 Setting height directly changes only one state. Normally we want to integrate
 all states together so that height, fecundity, mortality, and tissue turnover
-describe the same history. `grow_individual_to_time()` provides the simplest
+describe the same history. `run(individual, times = )` provides the simplest
 route. Here we request 101 points over 50 years:
 
 ```{r}
 tt <- seq(0, 50, length.out = 101)
-res <- grow_individual_to_time(FF16_Individual(), tt, env)
+res <- run(FF16_Individual(), times = tt, env = env)
 ```
 
 The returned `state` matrix has one row per requested time and one column per
@@ -172,15 +172,14 @@ points(height ~ time, yy, col="grey", cex=.5)
 ### Grow to a target size
 
 Sometimes the question is not “How large is the plant after 20 years?” but
-“When does it reach 15 metres?” `grow_individual_to_size()` integrates until a
-sequence of target sizes is reached. `grow_individual_to_height()` is a
-convenient height-specific wrapper.
+“When does it reach 15 metres?” `run(individual, sizes = )` integrates until a
+sequence of target sizes is reached.
 
 ```{r}
 # create a sequence from the initial size to height at maturity
 indv <- FF16_Individual()
 heights <- seq(indv$state("height"), indv$strategy$pars$hmat, length.out=20)
-res <- grow_individual_to_size(indv, heights, "height", env)
+res <- run(indv, sizes = heights, size_name = "height", env = env)
 ```
 
 The result contains the time at which each height was reached,
@@ -221,7 +220,7 @@ Begin with the default FF16 parameters, and attach fieldtrial's FF16
 trade-offs:
 
 ```{r}
-params <- scm_base_parameters("FF16")
+params <- base_parameters("FF16")
 params$hyperpar <- fieldtrial::tradeoffs("FF16")
 ```
 
@@ -259,10 +258,10 @@ taller seedling, when LMA is lower.
 heights1 <- seq(indv1$state("height"), s1$pars$hmat, length.out=100L)
 heights2 <- seq(indv2$state("height"), s2$pars$hmat, length.out=100L)
 
-dat1 <- grow_individual_to_height(indv1, heights1, env,
-                             time_max=100, warn=FALSE, filter=TRUE)
-dat2 <- grow_individual_to_height(indv2, heights2, env,
-                             time_max=100, warn=FALSE, filter=TRUE)
+dat1 <- run(indv1, sizes = heights1, env = env,
+            time_max=100, warn=FALSE, filter=TRUE)
+dat2 <- run(indv2, sizes = heights2, env = env,
+            time_max=100, warn=FALSE, filter=TRUE)
 
 plot(dat1$trajectory[, "time"], dat1$trajectory[, "height"],
      type="l", lty=1,
@@ -278,10 +277,10 @@ the LMA strategy, while colour identifies the light environment:
 #| label: fig-trajectories-light
 #| fig-cap: "Height trajectories for both species in high (black) and low (red) light."
 env_low <- fixed_environment(0.5)
-dat1_low <- grow_individual_to_height(indv1, heights1, env_low,
-                                 time_max=100, warn=FALSE, filter=TRUE)
-dat2_low <- grow_individual_to_height(indv2, heights2, env_low,
-                                 time_max=100, warn=FALSE, filter=TRUE)
+dat1_low <- run(indv1, sizes = heights1, env = env_low,
+                time_max=100, warn=FALSE, filter=TRUE)
+dat2_low <- run(indv2, sizes = heights2, env = env_low,
+                time_max=100, warn=FALSE, filter=TRUE)
 
 cols <- c("black", "#e34a33")
 plot(dat1$trajectory[, "time"], dat1$trajectory[, "height"],

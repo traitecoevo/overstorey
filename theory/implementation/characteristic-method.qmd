@@ -219,7 +219,7 @@ general idea of adaptively refining node spacing times was first applied by
 @Falster-2011, and was described further by @Falster-2015.
 
 For a worked example illustrating schedule refinement
-(`run_scm(refine_schedule = TRUE)`, backed by `SCM::refine_schedule()`), see
+(`run(p, refine_schedule = TRUE)`, backed by `SCM::refine_schedule()`), see
 [node spacing](node-spacing.qmd).
 
 ### Calculation of light environment and influence on assimilation {#sec-calculation-of-light-environment-and-influence-on-assimilation}
@@ -237,7 +237,7 @@ Node spacing is the main factor controlling the accuracy of this integration.
 The node introduction times determining the spacing of nodes are
 adaptively refined as described above. This implies that also the trapezium
 integration within the `area_leaf_above` function is adaptively refined via
-`SCM::refine_schedule()` (exposed in R as `run_scm(refine_schedule = TRUE)`).
+`SCM::refine_schedule()` (exposed in R as `run(p, refine_schedule = TRUE)`).
 See [node spacing](node-spacing.qmd) for detail.
 
 The cost of calculating $E_a(z)$ increases linearly with the number of nodes in

@@ -97,7 +97,7 @@ patch run and stores the default strategy from which new strategies are built.
 Attach the trade-offs to it as `p$hyperpar`:
 
 ```{r}
-p <- scm_base_parameters("FF16")
+p <- base_parameters("FF16")
 p$hyperpar <- fieldtrial::tradeoffs("FF16")
 ```
 
@@ -114,7 +114,7 @@ name:
 
 ```{r}
 is.null(p$hyperpar)
-is.null(scm_base_parameters("FF16")$hyperpar)
+is.null(base_parameters("FF16")$hyperpar)
 ```
 
 The `strategy_default` member is the template copied when new strategies are

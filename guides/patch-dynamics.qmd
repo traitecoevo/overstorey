@@ -29,7 +29,7 @@ of 30 years.
 #| label: setup-params
 library(plant)
 
-params <- scm_base_parameters("FF16")
+params <- base_parameters("FF16")
 params$hyperpar <- fieldtrial::tradeoffs("FF16")
 ```
 
@@ -39,10 +39,10 @@ params$hyperpar <- fieldtrial::tradeoffs("FF16")
 library(dplyr)
 library(tidyr)
 
-# The tidy `species` table returned by `run_scm(collect = TRUE)` has one row
-# per node per step. This helper reshapes a single variable into a matrix with
-# one row per node and one column per step, padding with `NA` for nodes that
-# had not yet been introduced.
+# The tidy `species` table returned by `tidy()` of a run with
+# `record = "steps"` has one row per node per step. This helper reshapes a
+# single variable into a matrix with one row per node and one column per step,
+# padding with `NA` for nodes that had not yet been introduced.
 sdd_matrix <- function(species_data, var) {
   m <- species_data |>
     dplyr::select(node, step, dplyr::all_of(var)) |>
@@ -76,7 +76,7 @@ Run the characteristic solver and collect the state after every recorded step:
 
 ```{r}
 #| label: run-patch
-result <- run_scm(patch, collect = TRUE)
+result <- tidy(run(patch, record = "steps"))
 ```
 
 The result contains several components. These are the ones used most often:
@@ -271,7 +271,7 @@ Then collect the patch-level dynamics:
 
 ```{r}
 #| label: run-two-species
-result_2sp <- run_scm(patch_2sp, collect = TRUE)
+result_2sp <- tidy(run(patch_2sp, record = "steps"))
 ```
 
 We can plot the development of each species within the patch:
@@ -405,7 +405,7 @@ axis(1, at=108, labels="Av")
 #' A standard plot for density weighted node trajectories
 #'
 #' Parameters:
-#'  - result: the output of `run_scm(..., collect = TRUE)`
+#'  - result: the output of `tidy(run(..., record = "steps"))`
 #'  - threshold: lower bound on density
 #'
 #' Requires:

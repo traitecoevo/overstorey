@@ -1236,8 +1236,8 @@
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "fieldtrial",
-      "RemoteRef": "73f8b8a0347340b340385d0aa55a473b4a0b6d5c",
-      "RemoteSha": "73f8b8a0347340b340385d0aa55a473b4a0b6d5c"
+      "RemoteRef": "20f53019d0d53ccca15cc3675a94a0cf2507e91f",
+      "RemoteSha": "20f53019d0d53ccca15cc3675a94a0cf2507e91f"
     },
     "fontawesome": {
       "Package": "fontawesome",
@@ -2554,8 +2554,8 @@
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "plant",
-      "RemoteRef": "fc1ccc86c0c635ff652ec7d9d6230f4208d172c8",
-      "RemoteSha": "fc1ccc86c0c635ff652ec7d9d6230f4208d172c8"
+      "RemoteRef": "83a973ffe771e841de46cd5ecb1575b6f8f16f84",
+      "RemoteSha": "83a973ffe771e841de46cd5ecb1575b6f8f16f84"
     },
     "prettyunits": {
       "Package": "prettyunits",
