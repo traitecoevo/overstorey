@@ -37,7 +37,7 @@ export the state part-way through:
 
 ```{r}
 #| label: run-and-export
-scm <- plant:::SCM("FF16", "FF16_Env")(p, Environment("FF16"), Control())
+scm <- run_scm(p, run = FALSE)
 scm$collect <- TRUE
 scm$run()
 

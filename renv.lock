@@ -12,19 +12,7 @@
     "BH": {
       "Package": "BH",
       "Version": "1.90.0-1",
-      "Source": "Repository",
-      "Type": "Package",
-      "Title": "Boost C++ Header Files",
-      "Date": "2025-12-13",
-      "Authors@R": "c(person(\"Dirk\", \"Eddelbuettel\", role = c(\"aut\", \"cre\"), email = \"edd@debian.org\", comment = c(ORCID = \"0000-0001-6419-907X\")), person(\"John W.\", \"Emerson\", role = \"aut\"),  person(\"Michael J.\", \"Kane\", role = \"aut\",  comment = c(ORCID = \"0000-0003-1899-6662\")))",
-      "Description": "Boost provides free peer-reviewed portable C++ source  libraries.  A large part of Boost is provided as C++ template code which is resolved entirely at compile-time without linking.  This  package aims to provide the most useful subset of Boost libraries  for template use among CRAN packages. By placing these libraries in  this package, we offer a more efficient distribution system for CRAN  as replication of this code in the sources of other packages is  avoided. As of release 1.84.0-0, the following Boost libraries are included: 'accumulators' 'algorithm' 'align' 'any' 'atomic' 'beast' 'bimap' 'bind' 'circular_buffer' 'compute' 'concept' 'config' 'container' 'date_time' 'detail' 'dynamic_bitset' 'exception' 'flyweight' 'foreach' 'functional' 'fusion' 'geometry' 'graph' 'heap' 'icl' 'integer' 'interprocess' 'intrusive' 'io' 'iostreams' 'iterator' 'lambda2' 'math' 'move' 'mp11' 'mpl' 'multiprecision' 'numeric' 'pending' 'phoenix' 'polygon' 'preprocessor' 'process' 'propery_tree' 'qvm' 'random' 'range' 'scope_exit' 'smart_ptr' 'sort' 'spirit' 'tuple' 'type_traits' 'typeof' 'unordered' 'url' 'utility' 'uuid'.",
-      "License": "BSL-1.0",
-      "URL": "https://github.com/eddelbuettel/bh, https://dirk.eddelbuettel.com/code/bh.html",
-      "BugReports": "https://github.com/eddelbuettel/bh/issues",
-      "NeedsCompilation": "no",
-      "Author": "Dirk Eddelbuettel [aut, cre] (ORCID: <https://orcid.org/0000-0001-6419-907X>), John W. Emerson [aut], Michael J. Kane [aut] (ORCID: <https://orcid.org/0000-0003-1899-6662>)",
-      "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
-      "Repository": "CRAN"
+      "Source": "Repository"
     },
     "DBI": {
       "Package": "DBI",
@@ -142,36 +130,8 @@
     },
     "Rcpp": {
       "Package": "Rcpp",
-      "Version": "1.1.1-1.1",
-      "Source": "Repository",
-      "Title": "Seamless R and C++ Integration",
-      "Date": "2026-04-19",
-      "Authors@R": "c(person(\"Dirk\", \"Eddelbuettel\", role = c(\"aut\", \"cre\"), email = \"edd@debian.org\", comment = c(ORCID = \"0000-0001-6419-907X\")), person(\"Romain\", \"Francois\", role = \"aut\", comment = c(ORCID = \"0000-0002-2444-4226\")), person(\"JJ\", \"Allaire\", role = \"aut\", comment = c(ORCID = \"0000-0003-0174-9868\")), person(\"Kevin\", \"Ushey\", role = \"aut\", comment = c(ORCID = \"0000-0003-2880-7407\")), person(\"Qiang\", \"Kou\", role = \"aut\", comment = c(ORCID = \"0000-0001-6786-5453\")), person(\"Nathan\", \"Russell\", role = \"aut\"), person(\"Iñaki\", \"Ucar\", role = \"aut\", comment = c(ORCID = \"0000-0001-6403-5550\")), person(\"Doug\", \"Bates\", role = \"aut\", comment = c(ORCID = \"0000-0001-8316-9503\")), person(\"John\", \"Chambers\", role = \"aut\"))",
-      "Description": "The 'Rcpp' package provides R functions as well as C++ classes which offer a seamless integration of R and C++. Many R data types and objects can be mapped back and forth to C++ equivalents which facilitates both writing of new code as well as easier integration of third-party libraries. Documentation about 'Rcpp' is provided by several vignettes included in this package, via the 'Rcpp Gallery' site at <https://gallery.rcpp.org>, the paper by Eddelbuettel and Francois (2011, <doi:10.18637/jss.v040.i08>), the book by Eddelbuettel (2013, <doi:10.1007/978-1-4614-6868-4>) and the paper by Eddelbuettel and Balamuta (2018, <doi:10.1080/00031305.2017.1375990>); see 'citation(\"Rcpp\")' for details.",
-      "Depends": [
-        "R (>= 3.5.0)"
-      ],
-      "Imports": [
-        "methods",
-        "utils"
-      ],
-      "Suggests": [
-        "tinytest",
-        "inline",
-        "rbenchmark",
-        "pkgKitten (>= 0.1.2)"
-      ],
-      "URL": "https://www.rcpp.org, https://dirk.eddelbuettel.com/code/rcpp.html, https://github.com/RcppCore/Rcpp",
-      "License": "GPL (>= 2)",
-      "BugReports": "https://github.com/RcppCore/Rcpp/issues",
-      "MailingList": "rcpp-devel@lists.r-forge.r-project.org",
-      "RoxygenNote": "6.1.1",
-      "Encoding": "UTF-8",
-      "VignetteBuilder": "Rcpp",
-      "NeedsCompilation": "yes",
-      "Author": "Dirk Eddelbuettel [aut, cre] (ORCID: <https://orcid.org/0000-0001-6419-907X>), Romain Francois [aut] (ORCID: <https://orcid.org/0000-0002-2444-4226>), JJ Allaire [aut] (ORCID: <https://orcid.org/0000-0003-0174-9868>), Kevin Ushey [aut] (ORCID: <https://orcid.org/0000-0003-2880-7407>), Qiang Kou [aut] (ORCID: <https://orcid.org/0000-0001-6786-5453>), Nathan Russell [aut], Iñaki Ucar [aut] (ORCID: <https://orcid.org/0000-0001-6403-5550>), Doug Bates [aut] (ORCID: <https://orcid.org/0000-0001-8316-9503>), John Chambers [aut]",
-      "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
-      "Repository": "CRAN"
+      "Version": "1.1.2",
+      "Source": "Repository"
     },
     "S7": {
       "Package": "S7",
@@ -1267,6 +1227,17 @@
       "Author": "Winston Chang [aut, cre], Posit Software, PBC [cph, fnd], Tessil [cph] (hopscotch_map library)",
       "Maintainer": "Winston Chang <winston@posit.co>",
       "Repository": "CRAN"
+    },
+    "fieldtrial": {
+      "Package": "fieldtrial",
+      "Version": "0.0.0.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "traitecoevo",
+      "RemoteRepo": "fieldtrial",
+      "RemoteRef": "73f8b8a0347340b340385d0aa55a473b4a0b6d5c",
+      "RemoteSha": "73f8b8a0347340b340385d0aa55a473b4a0b6d5c"
     },
     "fontawesome": {
       "Package": "fontawesome",
@@ -2397,46 +2368,14 @@
     },
     "odelia": {
       "Package": "odelia",
-      "Version": "0.1.0",
+      "Version": "0.11.1",
       "Source": "GitHub",
-      "Type": "Package",
-      "Title": "ODE Solver with Automatic Differentiation, in C++ Header Files",
-      "Authors@R": "c( person(\"Daniel\", \"Falster\", , \"daniel.falster@unsw.edu.au\", c(\"aut\", \"cre\"),  comment = c(ORCID = \"0000-0002-9814-092X\")), person(\"Richard\", \"FitzJohn\", , \"\", \"aut\"), person(\"Andrew\", \"O'Reilly-Nugent\", , \"\", \"aut\") )",
-      "Maintainer": "Daniel Falster <daniel.falster@unsw.edu.au>",
-      "Description": "odelia provides an ODE solver in C++ header files, using an adaptive-step Runge-Kutta 4-5 method, with an interface to R via Rcpp. ODE systems can be templated on their scalar type to support automatic differentiation, enabling exact gradients for parameter fitting.",
-      "Depends": [
-        "R (>= 4.2.0)"
-      ],
-      "Imports": [
-        "Rcpp (>= 1.0.10)",
-        "R6 (>= 2.5.1)",
-        "dplyr (>= 1.1.0)",
-        "tibble (>= 3.1.0)"
-      ],
-      "Suggests": [
-        "here",
-        "knitr",
-        "rmarkdown",
-        "testthat (>= 3.0.0)",
-        "withr"
-      ],
-      "LinkingTo": [
-        "Rcpp"
-      ],
-      "VignetteBuilder": "knitr",
-      "Encoding": "UTF-8",
-      "License": "AGPL (>= 3)",
-      "URL": "https://github.com/traitecoevo/odelia, https://traitecoevo.github.io/odelia/",
-      "BugReports": "https://github.com/traitecoevo/odelia/issues",
-      "RoxygenNote": "7.3.3",
-      "Config/testthat/edition": "3",
-      "Author": "Daniel Falster [aut, cre] (ORCID: <https://orcid.org/0000-0002-9814-092X>), Richard FitzJohn [aut], Andrew O'Reilly-Nugent [aut]",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "odelia",
-      "RemoteRef": "master",
-      "RemoteSha": "c9ae31bfedffd711555b07708febb4ed6968f661"
+      "RemoteRef": "v0.11.1",
+      "RemoteSha": "ed4fc29dbe05c73957767a563efda5730239d248"
     },
     "openssl": {
       "Package": "openssl",
@@ -2514,6 +2453,17 @@
       "NeedsCompilation": "no",
       "Author": "Thomas Lin Pedersen [cre, aut] (ORCID: <https://orcid.org/0000-0002-5147-4711>)",
       "Repository": "CRAN"
+    },
+    "phylloptim": {
+      "Package": "phylloptim",
+      "Version": "0.36.0",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "traitecoevo",
+      "RemoteRepo": "phylloptim",
+      "RemoteRef": "e2c9460210b2d71343ff2ed112a426de1d2617a7",
+      "RemoteSha": "e2c9460210b2d71343ff2ed112a426de1d2617a7"
     },
     "pillar": {
       "Package": "pillar",
@@ -2598,63 +2548,14 @@
     },
     "plant": {
       "Package": "plant",
-      "Version": "2.0.0.9001",
+      "Version": "2.0.0.9002",
       "Source": "GitHub",
-      "Title": "A Package for Modelling Forest Trait Ecology and Evolution",
-      "Authors@R": "c( person(\"Daniel\", \"Falster\", , \"daniel.falster@unsw.edu.au\", c(\"aut\", \"cre\"),  comment = c(ORCID = \"0000-0002-9814-092X\")), person(\"Richard\", \"FitzJohn\", , \"\", \"aut\"), person(\"Andrew\", \"O'Reilly-Nugent\", , \"\", \"aut\"), person(\"Isaac\", \"Towers\", , \"\", \"aut\"), person(\"Mitchell\", \"Henry\", , \"\", \"ctb\"), person(\"Rafael\", \"Schouten\", , \"\", \"ctb\"), person(\"John\", \"Wilshire\", , \"\", \"ctb\") )",
-      "Maintainer": "Daniel Falster <daniel.falster@unsw.edu.au>",
-      "Description": "Solves trait, size and patch structured model from (Falster et al. 2016) using either method of characteristics or as stochastic, finite-sized population.",
-      "Depends": [
-        "R (>= 4.5.0)"
-      ],
-      "Encoding": "UTF-8",
-      "License": "AGPL (>= 3)",
-      "LinkingTo": [
-        "Rcpp",
-        "BH"
-      ],
-      "Imports": [
-        "Rcpp",
-        "R6",
-        "loggr",
-        "crayon",
-        "magrittr",
-        "tibble",
-        "rlang",
-        "dplyr",
-        "tidyselect (>= 1.2.0)",
-        "tidyr",
-        "purrr"
-      ],
-      "Suggests": [
-        "testthat",
-        "rprojroot",
-        "pkgdown",
-        "here",
-        "deSolve",
-        "numDeriv",
-        "RcppR6 (>= 0.2.3)",
-        "knitr",
-        "rmarkdown",
-        "markdown",
-        "bench",
-        "ggplot2",
-        "ggridges",
-        "patchwork",
-        "kableExtra"
-      ],
-      "VignetteBuilder": "knitr",
-      "URL": "https://github.com/traitecoevo/plant",
-      "BugReports": "https://github.com/traitecoevo/plant/issues",
-      "Config/roxygen2/version": "8.0.0",
-      "Author": "Daniel Falster [aut, cre] (ORCID: <https://orcid.org/0000-0002-9814-092X>), Richard FitzJohn [aut], Andrew O'Reilly-Nugent [aut], Isaac Towers [aut], Mitchell Henry [ctb], Rafael Schouten [ctb], John Wilshire [ctb]",
       "RemoteType": "github",
-      "Remotes": "smbache/loggr, richfitz/RcppR6",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "plant",
-      "RemoteRef": "develop",
-      "RemoteSha": "96941d3b1082cdd645325b34e3af1ef44616bc97"
+      "RemoteRef": "fc1ccc86c0c635ff652ec7d9d6230f4208d172c8",
+      "RemoteSha": "fc1ccc86c0c635ff652ec7d9d6230f4208d172c8"
     },
     "prettyunits": {
       "Package": "prettyunits",
@@ -4196,41 +4097,8 @@
     },
     "withr": {
       "Package": "withr",
-      "Version": "3.0.2",
-      "Source": "Repository",
-      "Title": "Run Code 'With' Temporarily Modified Global State",
-      "Authors@R": "c( person(\"Jim\", \"Hester\", role = \"aut\"), person(\"Lionel\", \"Henry\", , \"lionel@posit.co\", role = c(\"aut\", \"cre\")), person(\"Kirill\", \"Müller\", , \"krlmlr+r@mailbox.org\", role = \"aut\"), person(\"Kevin\", \"Ushey\", , \"kevinushey@gmail.com\", role = \"aut\"), person(\"Hadley\", \"Wickham\", , \"hadley@posit.co\", role = \"aut\"), person(\"Winston\", \"Chang\", role = \"aut\"), person(\"Jennifer\", \"Bryan\", role = \"ctb\"), person(\"Richard\", \"Cotton\", role = \"ctb\"), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")) )",
-      "Description": "A set of functions to run code 'with' safely and temporarily modified global state. Many of these functions were originally a part of the 'devtools' package, this provides a simple package with limited dependencies to provide access to these functions.",
-      "License": "MIT + file LICENSE",
-      "URL": "https://withr.r-lib.org, https://github.com/r-lib/withr#readme",
-      "BugReports": "https://github.com/r-lib/withr/issues",
-      "Depends": [
-        "R (>= 3.6.0)"
-      ],
-      "Imports": [
-        "graphics",
-        "grDevices"
-      ],
-      "Suggests": [
-        "callr",
-        "DBI",
-        "knitr",
-        "methods",
-        "rlang",
-        "rmarkdown (>= 2.12)",
-        "RSQLite",
-        "testthat (>= 3.0.0)"
-      ],
-      "VignetteBuilder": "knitr",
-      "Config/Needs/website": "tidyverse/tidytemplate",
-      "Config/testthat/edition": "3",
-      "Encoding": "UTF-8",
-      "RoxygenNote": "7.3.2",
-      "Collate": "'aaa.R' 'collate.R' 'connection.R' 'db.R' 'defer-exit.R' 'standalone-defer.R' 'defer.R' 'devices.R' 'local_.R' 'with_.R' 'dir.R' 'env.R' 'file.R' 'language.R' 'libpaths.R' 'locale.R' 'makevars.R' 'namespace.R' 'options.R' 'par.R' 'path.R' 'rng.R' 'seed.R' 'wrap.R' 'sink.R' 'tempfile.R' 'timezone.R' 'torture.R' 'utils.R' 'with.R'",
-      "NeedsCompilation": "no",
-      "Author": "Jim Hester [aut], Lionel Henry [aut, cre], Kirill Müller [aut], Kevin Ushey [aut], Hadley Wickham [aut], Winston Chang [aut], Jennifer Bryan [ctb], Richard Cotton [ctb], Posit Software, PBC [cph, fnd]",
-      "Maintainer": "Lionel Henry <lionel@posit.co>",
-      "Repository": "CRAN"
+      "Version": "3.0.3",
+      "Source": "Repository"
     },
     "xfun": {
       "Package": "xfun",
