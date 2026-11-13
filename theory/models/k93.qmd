@@ -313,9 +313,9 @@ results <- tidy(run(par, record = "steps"))
 
 # `K93_expand_state()` returns a tidy data frame with one row per node per
 # output time, so we can plot the height of each node directly.
-tidy <- K93_expand_state(results)$species
+nodes <- K93_expand_state(results)$species
 
-ggplot(tidy, aes(time, height, group = node)) +
+ggplot(nodes, aes(time, height, group = node)) +
   geom_line(colour = util_colour_set_opacity("black", 0.25)) +
   labs(x = "Time (years)", y = "Size (DBH cm)") +
   theme_bw()
@@ -332,9 +332,9 @@ nodes to approach their maximum size of 136 cm DBH, as in Fig. 2 of
 par$max_patch_lifetime <- 700
 results <- tidy(run(par, record = "steps"))
 
-tidy <- K93_expand_state(results)$species
+nodes <- K93_expand_state(results)$species
 
-ggplot(tidy, aes(time, height, group = node)) +
+ggplot(nodes, aes(time, height, group = node)) +
   geom_line(colour = util_colour_set_opacity("black", 0.25)) +
   labs(x = "Time (years)", y = "Size (DBH cm)") +
   theme_bw()
@@ -351,9 +351,9 @@ fast_par$max_patch_lifetime <- 700
 
 results <- tidy(run(fast_par, record = "steps"))
 
-tidy <- K93_expand_state(results)$species
+nodes <- K93_expand_state(results)$species
 
-ggplot(tidy, aes(time, height, group = node)) +
+ggplot(nodes, aes(time, height, group = node)) +
   geom_line(colour = util_colour_set_opacity("black", 0.25)) +
   labs(x = "Time (years)", y = "Size (DBH cm)") +
   theme_bw()
@@ -366,7 +366,7 @@ gaps:
 
 ```{r}
 #| label: plot-density-weighted
-tidy %>%
+nodes %>%
   filter(density > 1e-7) %>%
   ggplot(aes(time, height, group = node, alpha = density)) +
   geom_line() +

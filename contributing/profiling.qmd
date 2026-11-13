@@ -85,7 +85,7 @@ timestamped directory so runs are comparable.
 
 ## The two scenarios
 
-`run_plant_benchmarks()` in [`R/benchmark.R`](https://github.com/traitecoevo/plant/blob/master/R/benchmark.R)
+`run_plant_benchmarks()` in [`R/benchmark.R`](https://github.com/traitecoevo/plant/blob/develop/R/benchmark.R)
 defines the cases everything else builds on:
 
 - **`scm`** — `run()` on a one-species FF16 patch. Exercises the steady

@@ -1,13 +1,16 @@
 # The plant ref the site's pages were last rendered against, and the plant
-# breaking changes they have absorbed. Same convention as regnans and fieldtrial.
-# Posts are pinned to the plant they were built with and are not migrated.
+# breaking changes they have absorbed. Same convention as regnans and
+# fieldtrial. Every change in plant's NEWS up to plant develop@fc1ccc86 was
+# applied by hand before this marker existed (#44); the keys below are those
+# applied after it. Posts are pinned to the plant they were built with and are
+# not migrated.
 migrated_on: 2026-11-14
 plant_version: 2.0.0.9002
 plant_ref: develop@83a973ff (2026-11-14; odelia 0.11.1 @v0.11.1, phylloptim 0.36.0 @e2c9460)
+baseline_before_marker: develop@fc1ccc86
 applied_breaking_changes:
-  - tradeoffs-travel-with-parameters  # bare base parameters attach no trade-offs; pages attach fieldtrial::tradeoffs(model) to p$hyperpar (plant#731)
-  - model-classes-renamed  # *_Strategy -> *_Model (plant#760)
-  - one-run-verb  # run_scm(), grow_individual_to_*() -> run(), returning a plant_run; scm_base_parameters() -> base_parameters() (plant#779)
-  - fitness-from-patch  # an SCM's fitness values and refinement errors are read from scm$patch (plant#781, #460)
-# Checked and not affected (no call sites): fitness_weighting, formerly patch_type
-# (plant#781); run_stochastic_collect() (plant#779); the scenario gateway (#775).
+  - one-run-verb  # plant#779: run_scm(), grow_individual_to_*() -> run(); scm_base_parameters() -> base_parameters()
+  - fitness-from-patch  # plant#781 (#460): an SCM's fitness and refinement errors read from scm$patch
+  - fitness-weighting  # plant#781: patch_type -> fitness_weighting; no page set it
+# Checked and not affected (no call sites): run_stochastic_collect() (plant#779);
+# the scenario gateway (plant#775).
