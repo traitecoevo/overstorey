@@ -55,21 +55,22 @@ error in the final, refined schedule will therefore usually be below the stated
 tolerance.
 
 This optional refinement now lives entirely in C++, inside the `SCM` solver.
-`run_scm()` does not refine the schedule by default
-(`refine_schedule = FALSE`); request it from R with:
+`run()` does not refine the schedule by default (`refine_schedule = FALSE`);
+request it from R with:
 
 ```r
-scm <- run_scm(p, refine_schedule = TRUE)
-p_refined <- scm$parameters
+res <- run(p, refine_schedule = TRUE)
+p_refined <- res$scenario$p
 ```
 
-`run_scm(refine_schedule = TRUE)` calls `SCM::refine_schedule()`, which runs the
+`run(p, refine_schedule = TRUE)` calls `SCM::refine_schedule()`, which runs the
 solver, collects the per-node integration error as the patch develops, splits
 the flagged intervals, and repeats. The refined schedule and the ODE times of
-the final run are written back into the returned `parameters`, so the
-`Parameters` object remains self-describing. (Earlier versions of `plant` did
-this work in R via the `build_schedule()` and `run_scm_error()` functions; both
-have been removed in favour of the in-solver implementation.)
+the final run are written back into the parameters the run returns
+(`res$scenario$p`), so the `Parameters` object remains self-describing. (Earlier
+versions of `plant` did this work in R via the `build_schedule()` and
+`run_scm_error()` functions; both have been removed in favour of the in-solver
+implementation.)
 
 Most users can use the supplied schedule. The examples below show readers who
 opt in to refinement how the SCM chooses its nodes and how that choice affects
@@ -91,7 +92,7 @@ library(plant)
 library(parallel)
 ncores <- detectCores() - 1
 
-p0 <- scm_base_parameters("FF16")
+p0 <- base_parameters("FF16")
 p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 p <- add_strategies(p0, trait_matrix(0.0825, "lma"), birth_rate = 20)
 
@@ -156,7 +157,7 @@ run_with_times <- function(p, t) {
   p$node_schedule_times[[1]] <- t
 
   start <- Sys.time()
-  offspring_production <- run_scm(p)$offspring_production
+  offspring_production <- run(p)$offspring_production
   print(paste("Time to solve:", round(Sys.time() - start, 2)))
 
   return(offspring_production)
@@ -264,7 +265,7 @@ is shown as a pre-rendered figure rather than executed.
 ```{r}
 #| label: node-contributions
 #| eval: false
-default <- run_scm(p)
+default <- run(p)$solver
 
 contributions <- default$patch$species[[1]]$net_reproduction_ratio_by_node
 
@@ -301,7 +302,7 @@ To test that idea, we compare the patch light environment with and without the
 single extra node that produced the largest change in seed output above.
 
 First we run patches with and without the extra node, collecting the complete
-set of patch conditions at each timestep with `run_scm(collect = TRUE)`.
+set of patch conditions at each timestep with `record = "steps"`.
 
 This chunk depends on `top_5` and `insert_time()` from the parallel analysis
 above, so it is shown but not executed.
@@ -311,7 +312,7 @@ above, so it is shown but not executed.
 #| eval: false
 collect_with_times <- function(p, t) {
   p$node_schedule_times[[1]] <- t
-  result <- run_scm(p, collect = TRUE)
+  result <- tidy(run(p, record = "steps"))
   return(result)
 }
 
@@ -398,17 +399,17 @@ The `local_error_integration` function calculates the relative error for each
 integral. The solver samples competition error at every node introduction as
 the patch develops, then calculates offspring-production error at the end of
 the run. When error collection is enabled, `SCM::run()` accumulates both values
-internally. For each node, the larger value is returned in
+internally. For each node, the larger value is held in the patch's
 `refinement_error_by_node`; this is the signal used for refinement:
 
 ```{r}
 #| label: combined-error
 #| fig-cap: "Combined per-node error; nodes above the schedule_eps threshold (red) are split."
-scm <- run_scm(p)            # SCM object
+scm <- run(p)$solver         # SCM object
 scm$collect_refinement_errors <- TRUE
 scm$run()                    # rerun, now accumulating the error signal
 
-combined <- scm$refinement_error_by_node[[1]]
+combined <- scm$patch$refinement_error_by_node[[1]]
 
 plot(times_default, combined, type = "h",
      xlab = "Introduction time (years)", ylab = "Combined per-node error", las = 1)
@@ -427,7 +428,7 @@ snapshot. Rows represent introduction steps and columns represent nodes:
 #| label: competition-error-matrix
 #| fig-cap: "Per-step competition (leaf-area) error matrix as the patch develops."
 competition_error_matrix <- function(p, env = NULL, ctrl = Control()) {
-  scm <- run_scm(p, env, ctrl)   # build + run, returns the SCM object
+  scm <- run(p, env, ctrl)$solver   # build + run, returns the SCM object
   scm$reset()                    # rewind so we can re-run while collecting
   scm$collect <- TRUE
   scm$run()
@@ -451,9 +452,9 @@ uniformly fine schedule everywhere.
 
 ```{r}
 #| label: refine-schedule
-scm_refined <- run_scm(p, refine_schedule = TRUE)
-p_refined <- scm_refined$parameters
-offspring_production_refined <- scm_refined$offspring_production
+refined <- run(p, refine_schedule = TRUE)
+p_refined <- refined$scenario$p
+offspring_production_refined <- refined$offspring_production
 ```
 
 To assess the result, we repeat the earlier sensitivity analysis: insert one

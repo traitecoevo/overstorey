@@ -84,15 +84,15 @@ holds one species' strategy.
 
 [Node-introduction schedule]{#node-introduction-schedule}
 :   The recruitment times at which the solver introduces new nodes.
-    `run_scm(..., refine_schedule = TRUE)` refines it adaptively, adding nodes
-    where removing one would make a population integral too inaccurate
-    (threshold `schedule_eps`); see [node
-    spacing](theory/implementation/node-spacing.qmd). Refining the schedule
-    improves numerical accuracy; it does not change birth rates.
+    `run(..., refine_schedule = TRUE)` refines it adaptively, adding nodes where
+    removing one would make a population integral too inaccurate (threshold
+    `schedule_eps`); see [node spacing](theory/implementation/node-spacing.qmd).
+    Refining the schedule improves numerical accuracy; it does not change birth
+    rates.
 
 [SCM]{#scm}
 :   The deterministic solver that integrates a patch's size distributions along
-    characteristics, run with `run_scm()`. `plant` also has a stochastic,
+    characteristics, run with `run()`. `plant` also has a stochastic,
     finite-population solver that tracks individuals.
 
 ## Patches and the landscape
@@ -146,7 +146,7 @@ holds one species' strategy.
     across patch ages.
 
 [Net reproduction ratio]{#net-reproduction-ratio}
-:   Offspring production per incoming seed. `run_scm()` reports it for each
+:   Offspring production per incoming seed. `run()` reports it for each
     strategy; a value of one means the strategy exactly replaces itself.
 
 [Demographic equilibrium]{#demographic-equilibrium}

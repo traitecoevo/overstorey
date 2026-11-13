@@ -53,7 +53,7 @@ system.time({
   env <- Environment("FF16")
   env$set_fixed_environment(1.0, 150)
   times <- seq(0, 50, length.out = 101)
-  result <- grow_individual_to_time(ind, times, env)
+  result <- run(ind, times = times, env = env)
 })
 #>    user  system elapsed
 #>   0.022   0.000   0.022
@@ -71,7 +71,7 @@ ind <- FF16_Individual()
 env <- Environment("FF16")
 env$set_fixed_environment(1.0, 150)
 times <- seq(0, 50, length.out = 101)
-result <- grow_individual_to_time(ind, times, env)
+result <- run(ind, times = times, env = env)
 toc()
 #> 0.049 sec elapsed
 ```
@@ -88,9 +88,9 @@ timestamped directory so runs are comparable.
 `run_plant_benchmarks()` in [`R/benchmark.R`](https://github.com/traitecoevo/plant/blob/master/R/benchmark.R)
 defines the cases everything else builds on:
 
-- **`scm`** — `run_scm()` on a one-species FF16 patch. Exercises the steady
+- **`scm`** — `run()` on a one-species FF16 patch. Exercises the steady
   per-step solve.
-- **`build_schedule`** — `run_scm(..., refine_schedule = TRUE)`. Exercises
+- **`build_schedule`** — `run(..., refine_schedule = TRUE)`. Exercises
   adaptive node-schedule refinement, which calls the assimilation quadrature far
   more often. This is usually the more sensitive case for crown/light work.
 
@@ -318,10 +318,10 @@ Setup:
    ```r
    library("Rgperftools")
    start_profiler("/tmp/profile.out")
-   p0 <- scm_base_parameters("FF16")
+   p0 <- base_parameters("FF16")
    p0$hyperpar <- fieldtrial::tradeoffs("FF16")
    p <- add_strategies(p0, trait_matrix(0.0825, "lma"))
-   res <- run_scm(p)
+   res <- run(p)
    stop_profiler()
    ```
 

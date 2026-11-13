@@ -328,7 +328,7 @@ guide shows how to calculate landscape summaries from model output.
 ## Seed input and demographic equilibrium
 
 Each strategy has a birth rate describing the arrival of seeds into a patch.
-Given these birth rates, `run_scm()` simulates the patch and reports offspring
+Given these birth rates, `run()` simulates the patch and reports offspring
 production and the **net reproduction ratio** for each strategy.
 
 At demographic equilibrium, the seed input must be consistent with the seed
@@ -341,7 +341,7 @@ running a patch once. The current `plant` API does not expose a general function
 that automatically finds equilibrium birth rates. A user must supply birth
 rates or perform an outer search based on the reported reproduction ratios.
 
-The option `run_scm(..., refine_schedule = TRUE)` has a different purpose: it
+The option `run(..., refine_schedule = TRUE)` has a different purpose: it
 adaptively refines the numerical node-introduction schedule. It improves the
 accuracy with which the size distribution is integrated; it does not adjust the
 birth rates.
@@ -396,7 +396,7 @@ For an FF16 patch, the main code path is short:
 ```r
 library(plant)
 
-p <- scm_base_parameters("FF16")
+p <- base_parameters("FF16")
 p$hyperpar <- fieldtrial::tradeoffs("FF16")
 
 p <- add_strategies(
@@ -405,7 +405,7 @@ p <- add_strategies(
   birth_rate = 20
 )
 
-result <- run_scm(p, collect = TRUE)
+result <- tidy(run(p, record = "steps"))
 result <- expand_state(result)
 ```
 
@@ -416,7 +416,7 @@ This example:
 3. simulates the patch through time;
 4. collects and expands the state variables into analysis-ready output.
 
-`run_scm()` constructs the matching environment when one is not supplied. To
+`run()` constructs the matching environment when one is not supplied. To
 configure an environment explicitly, use a typed constructor such as
 `Environment("FF16")` or `Environment("TF24")`. The TF24 environment includes
 default soil-water and atmospheric conditions, which can be changed for a
@@ -424,12 +424,12 @@ particular scenario.
 
 | Task | Main `plant` interface | Detailed guide |
 |---|---|---|
-| Choose a model, parameters and trade-offs | `scm_base_parameters("FF16")`, `fieldtrial::tradeoffs("FF16")` | [Strategies and traits](../guides/strategies.qmd) |
+| Choose a model, parameters and trade-offs | `base_parameters("FF16")`, `fieldtrial::tradeoffs("FF16")` | [Strategies and traits](../guides/strategies.qmd) |
 | Add trait values and seed input | `trait_matrix()`, `add_strategies()` | [Strategies and traits](../guides/strategies.qmd) |
 | Configure external drivers | `Environment("FF16")` or `Environment("TF24")` | [Extrinsic drivers](../guides/extrinsic-drivers.qmd) |
-| Simulate a patch | `run_scm()` | [Patch dynamics](../guides/patch-dynamics.qmd) |
-| Refine numerical node spacing | `run_scm(..., refine_schedule = TRUE)` | [Node-spacing algorithm](implementation/node-spacing.qmd) |
-| Collect and expand outputs | `collect = TRUE`, `expand_state()` | [Example analysis](../guides/example-analysis.qmd) |
+| Simulate a patch | `run()` | [Patch dynamics](../guides/patch-dynamics.qmd) |
+| Refine numerical node spacing | `run(..., refine_schedule = TRUE)` | [Node-spacing algorithm](implementation/node-spacing.qmd) |
+| Collect and expand outputs | `record = "steps"`, `tidy()`, `expand_state()` | [Example analysis](../guides/example-analysis.qmd) |
 
 : Common tasks and their current `plant` interfaces.
 

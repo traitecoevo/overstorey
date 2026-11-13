@@ -553,10 +553,10 @@ Then `devtools::load_all(".")`
 ```{r}
 #| eval: false
 # Patches of competing plants
-p0 <- scm_base_parameters("K93")
+p0 <- base_parameters("K93")
 p1 <- add_strategies(p0, trait_matrix(0.0825, "b_0"), birth_rate = 20)
 
-data1 <- run_scm(p1, collect = TRUE)
+data1 <- tidy(run(p1, record = "steps"))
 
 matplot(data1$time, data1$species[[1]]["height", , ],
         lty=1, col=util_colour_set_opacity("black", 0.25), type="l",

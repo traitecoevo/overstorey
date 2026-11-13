@@ -296,9 +296,9 @@ p$ode_rates[2]
 ### Patches
 
 To move from an individual to a patch, we add its strategy to a parameter
-object and run the size-structured community model with `run_scm()`. Setting
-`collect = TRUE` retains the state at each output time. We then reshape the
-result and plot the DBH trajectory of every node:
+object and run the size-structured community model with `run()`. Setting
+`record = "steps"` retains the state at each output time, which `tidy()`
+returns. We then reshape the result and plot the DBH trajectory of every node:
 
 ```{r}
 #| label: plot-patch
@@ -309,7 +309,7 @@ class(s)
 par <- K93_Parameters()
 par$strategies[[1]] <- s
 
-results <- run_scm(par, collect = TRUE)
+results <- tidy(run(par, record = "steps"))
 
 # `K93_expand_state()` returns a tidy data frame with one row per node per
 # output time, so we can plot the height of each node directly.
@@ -330,7 +330,7 @@ nodes to approach their maximum size of 136 cm DBH, as in Fig. 2 of
 ```{r}
 #| label: plot-patch-extended
 par$max_patch_lifetime <- 700
-results <- run_scm(par, collect = TRUE)
+results <- tidy(run(par, record = "steps"))
 
 tidy <- K93_expand_state(results)$species
 
@@ -340,16 +340,16 @@ ggplot(tidy, aes(time, height, group = node)) +
   theme_bw()
 ```
 
-The convenience function `scm_base_parameters()` supplies faster numerical
-control settings. These settings make it practical to explore the longer run:
+The convenience function `base_parameters()` supplies faster numerical control
+settings. These settings make it practical to explore the longer run:
 
 ```{r}
 #| label: plot-patch-fast
-fast_par <- scm_base_parameters("K93")
+fast_par <- base_parameters("K93")
 fast_par$strategies[[1]] <- s
 fast_par$max_patch_lifetime <- 700
 
-results <- run_scm(fast_par, collect = TRUE)
+results <- tidy(run(fast_par, record = "steps"))
 
 tidy <- K93_expand_state(results)$species
 
@@ -393,13 +393,13 @@ sp <- trait_matrix(c(0.042, 0.063, 0.052,
                    c("b_0", "b_1", "b_2",
                      "c_0", "c_1", "d_0", "d_1"))
 
-fast_par2 <- scm_base_parameters("K93")
+fast_par2 <- base_parameters("K93")
 fast_par2$max_patch_lifetime <- 700
 fast_par2$strategy_default$pars$k_I <- 1e-6
 
 sp_par <- add_strategies(fast_par2, sp, birth_rate = rep(1, 3))
 
-sp_results <- run_scm(sp_par, collect = TRUE)
+sp_results <- tidy(run(sp_par, record = "steps"))
 
 sp_names <- c("D. racemosum", "I. anisatum", "E. japonica")
 

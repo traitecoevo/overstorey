@@ -157,7 +157,7 @@ the shading model alone.
 
 ```{r}
 #| label: run-models
-params <- scm_base_parameters("FF16")
+params <- base_parameters("FF16")
 params$hyperpar <- fieldtrial::tradeoffs("FF16")
 patch  <- add_strategies(params, trait_matrix(0.0825, "lma"), birth_rate = 1)
 
@@ -166,18 +166,18 @@ models <- c("deep-crown", "mean-light", "crown-centre", "ppa")
 run_model <- function(model) {
   ctrl <- Control()
   ctrl$shading_model <- model
-  run_scm(patch, ctrl = ctrl, collect = TRUE)
+  tidy(run(patch, control = ctrl, record = "steps"))
 }
 
 results <- lapply(models, run_model)
 names(results) <- models
 ```
 
-Each run returns its full collected state (`run_scm(collect = TRUE)`): a tidy
-`species` table, with one row for every node at every step, and the light
-environment (`env$light_availability`). We label each `species` table with its
-shading model, then combine the tables so that `plant`'s tidy helpers can work
-across all four runs.
+Each run returns its full collected state (`record = "steps"`, read by
+`tidy()`): a tidy `species` table, with one row for every node at every step,
+and the light environment (`env$light_availability`). We label each `species`
+table with its shading model, then combine the tables so that `plant`'s tidy
+helpers can work across all four runs.
 
 ```{r}
 #| label: bind-species
@@ -370,7 +370,7 @@ time_model <- function(model, times = NULL, reps = 5) {
   if (use_fixed) p$ode_times <- times
   ctrl <- Control()
   ctrl$shading_model <- model
-  run1 <- function() run_scm(p, ctrl = ctrl)
+  run1 <- function() run(p, control = ctrl)
   run1()                                   # warm up
   median(replicate(reps, system.time(run1())[["elapsed"]]))
 }
@@ -413,7 +413,7 @@ sharper boundaries (smaller `ppa_layer_smoothing`) make this effect stronger.
 ### Fixed ODE schedule: per-step cost
 
 When all models are pinned to the *same* fixed schedule (a grid of times in
-`p$ode_times`, which `run_scm()` steps to), the step-count effect disappears and
+`p$ode_times`, which `run()` steps to), the step-count effect disappears and
 only per-step cost remains. PPA's advantage is then clear: like
 `"crown-centre"`, it skips crown-depth quadrature, so both are markedly faster
 than `"deep-crown"`.
@@ -464,7 +464,7 @@ ctrl_hard$shading_model <- "ppa"
 ctrl_hard$ppa_layer_smoothing <- 0      # hard step, no smoothing
 
 tryCatch(
-  run_scm(patch, ctrl = ctrl_hard),
+  run(patch, control = ctrl_hard),
   error = function(e) conditionMessage(e)
 )
 ```
@@ -551,7 +551,7 @@ model fails before a stand develops:
 ctrl_box <- Control()
 ctrl_box$shading_model <- "flat-top-box"
 tryCatch(
-  run_scm(patch, ctrl = ctrl_box),
+  run(patch, control = ctrl_box),
   error = function(e) conditionMessage(e)
 )
 ```
