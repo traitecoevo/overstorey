@@ -160,6 +160,11 @@ The examples move from one individual to a whole patch. They use the
 package's generic state names, so a column or state labelled `height` should be
 read as diameter at breast height (DBH) for K93.
 
+K93's default parameters are the "all plot trees" column of Kohyama's Table 1,
+fitted to 1.066 ha of warm-temperate rain forest on Yakushima Island
+[@Kohyama-1993], and a newborn starts at the paper's recruitment boundary of
+2 cm DBH.
+
 ### Individuals
 
 First, create a K93 individual and inspect its state variables:
