@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,13 +74,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../guides/calibration.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e30b0f8ea5685d2ef6f683bb78d13b16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -116,11 +117,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="../assets/extras.css">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
@@ -131,8 +132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <span class="navbar-title">Overstorey</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -181,15 +181,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </a>
 </div>
+            <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guides/example-analysis.html">Worked examples</a></li><li class="breadcrumb-item"><a href="../guides/example-analysis.html">Example analysis</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guides/example-analysis.html">Worked examples</a></li><li class="breadcrumb-item"><a href="../guides/example-analysis.html">Example analysis</a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -197,7 +198,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -208,13 +209,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Getting started</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Getting started</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/install.html" class="sidebar-item-text sidebar-link">
@@ -231,13 +229,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Running the model</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Running the model</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/patch-dynamics.html" class="sidebar-item-text sidebar-link">
@@ -272,13 +267,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Worked examples</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">Worked examples</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/example-analysis.html" class="sidebar-item-text sidebar-link active">
@@ -301,13 +293,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
- <span class="menu-text">Scaling up</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">Scaling up</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/running-in-parallel.html" class="sidebar-item-text sidebar-link">
@@ -318,13 +307,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
- <span class="menu-text">TF24 in depth</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">TF24 in depth</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/tf24-hydraulics-and-acclimation.html" class="sidebar-item-text sidebar-link">
@@ -345,7 +331,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
@@ -361,9 +347,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/guides/example-analysis.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guides/example-analysis.html">Worked examples</a></li><li class="breadcrumb-item"><a href="../guides/example-analysis.html">Example analysis</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guides/example-analysis.html">Worked examples</a></li><li class="breadcrumb-item"><a href="../guides/example-analysis.html">Example analysis</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Example analysis</h1>
 </div>
@@ -409,101 +395,97 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Console logging is optional, but it makes progress visible during the slower TF24 run:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plant_log_console</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 <p>Define the shortened patch lifetime and a function that constructs the same custom environment every time the model is run:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>max_patch_lifetime <span class="ot">&lt;-</span> <span class="dv">25</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>make_tf24_env <span class="ot">&lt;-</span> <span class="cf">function</span>(max_patch_lifetime, <span class="at">n_layers =</span> <span class="dv">15</span>, <span class="at">theta0 =</span> <span class="fl">0.2</span>) {</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  env<span class="sc">$</span><span class="fu">set_soil_number_of_depths</span>(n_layers)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  env<span class="sc">$</span><span class="fu">set_soil_water_state</span>(<span class="fu">rep</span>(theta0, n_layers))</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># seasonal rainfall around a mean of 1.0</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, max_patch_lifetime, <span class="at">length.out =</span> <span class="dv">1000</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fl">0.25</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> x) <span class="sc">+</span> <span class="fl">1.0</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_variable</span>(<span class="st">"rainfall"</span>, <span class="at">x =</span> x, <span class="at">y =</span> y)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  env</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>max_patch_lifetime <span class="ot">&lt;-</span> <span class="dv">25</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>make_tf24_env <span class="ot">&lt;-</span> <span class="cf">function</span>(max_patch_lifetime, <span class="at">n_layers =</span> <span class="dv">15</span>, <span class="at">theta0 =</span> <span class="fl">0.2</span>) {</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  env<span class="sc">$</span><span class="fu">set_soil_number_of_depths</span>(n_layers)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  env<span class="sc">$</span><span class="fu">set_soil_water_state</span>(<span class="fu">rep</span>(theta0, n_layers))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># seasonal rainfall around a mean of 1.0</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, max_patch_lifetime, <span class="at">length.out =</span> <span class="dv">1000</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fl">0.25</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> x) <span class="sc">+</span> <span class="fl">1.0</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_variable</span>(<span class="st">"rainfall"</span>, <span class="at">x =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  env</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="run-the-smallest-version" class="level3">
 <h3 class="anchored" data-anchor-id="run-the-smallest-version">Run the smallest version</h3>
 <p>A minimal run needs base parameters, at least one strategy, and an environment. The first call refines the node-introduction schedule; the second runs the patch and collects its state:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"TF24"</span>, <span class="st">"TF24_Env"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>p0<span class="sc">$</span>max_patch_lifetime <span class="ot">&lt;-</span> max_patch_lifetime</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>traits <span class="ot">&lt;-</span> <span class="fu">trait_matrix</span>(<span class="fu">c</span>(<span class="fl">0.07</span>), <span class="fu">c</span>(<span class="st">"lma"</span>))</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(p0, traits)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">make_tf24_env</span>(max_patch_lifetime)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p1, <span class="at">env =</span> env, <span class="at">refine_schedule =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>parameters</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(results, <span class="at">env =</span> env, <span class="at">collect =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">base_parameters</span>(<span class="st">"TF24"</span>, <span class="st">"TF24_Env"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>p0<span class="sc">$</span>hyperpar <span class="ot">&lt;-</span> fieldtrial<span class="sc">::</span><span class="fu">tradeoffs</span>(<span class="st">"TF24"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>p0<span class="sc">$</span>max_patch_lifetime <span class="ot">&lt;-</span> max_patch_lifetime</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>traits <span class="ot">&lt;-</span> <span class="fu">trait_matrix</span>(<span class="fu">c</span>(<span class="fl">0.07</span>), <span class="fu">c</span>(<span class="st">"lma"</span>))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(p0, traits)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>env <span class="ot">&lt;-</span> <span class="fu">make_tf24_env</span>(max_patch_lifetime)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">run</span>(p1, <span class="at">env =</span> env, <span class="at">refine_schedule =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>scenario<span class="sc">$</span>p</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">tidy</span>(<span class="fu">run</span>(results, <span class="at">env =</span> env, <span class="at">record =</span> <span class="st">"steps"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For repeated analyses, helper functions keep assumptions in one place. The first helper starts from TF24 defaults and changes four strategy parameters:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>base_parameters <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  p0 <span class="ot">&lt;-</span> <span class="fu">scm_base_parameters</span>(<span class="st">"TF24"</span>, <span class="st">"TF24_Env"</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>max_patch_lifetime <span class="ot">&lt;-</span> max_patch_lifetime</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>strategy_default<span class="sc">$</span>pars<span class="sc">$</span>hmat <span class="ot">&lt;-</span> <span class="dv">15</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>strategy_default<span class="sc">$</span>pars<span class="sc">$</span>rho <span class="ot">&lt;-</span> <span class="dv">700</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>strategy_default<span class="sc">$</span>pars<span class="sc">$</span>a_l1 <span class="ot">&lt;-</span> <span class="fl">2.17</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>strategy_default<span class="sc">$</span>pars<span class="sc">$</span>a_l2 <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  p0</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>my_base_parameters <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  p0 <span class="ot">&lt;-</span> <span class="fu">base_parameters</span>(<span class="st">"TF24"</span>, <span class="st">"TF24_Env"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>max_patch_lifetime <span class="ot">&lt;-</span> max_patch_lifetime</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>strategy_default<span class="sc">$</span>pars<span class="sc">$</span>hmat <span class="ot">&lt;-</span> <span class="dv">15</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>strategy_default<span class="sc">$</span>pars<span class="sc">$</span>rho <span class="ot">&lt;-</span> <span class="dv">700</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>strategy_default<span class="sc">$</span>pars<span class="sc">$</span>a_l1 <span class="ot">&lt;-</span> <span class="fl">2.17</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>strategy_default<span class="sc">$</span>pars<span class="sc">$</span>a_l2 <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  p0</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The run helper below combines three kinds of input:</p>
+<p>The run helper below combines two kinds of input:</p>
 <ul>
-<li>biological choices: traits, birth rates, and <code>B_lf1</code>;</li>
-<li>location: latitude, used by the TF24 hyperparameterisation;</li>
+<li>biological choices: traits, birth rates, and <code>B_lf1</code>, a coefficient of the TF24 trade-offs that the <code>fieldtrial</code> package supplies;</li>
 <li>a numerical choice: whether to refine the node-introduction schedule.</li>
 </ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>run_mypatch <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">traits =</span>  <span class="fu">trait_matrix</span>(<span class="fu">c</span>(<span class="fl">0.07</span>), <span class="fu">c</span>(<span class="st">"lma"</span>)),</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">birth_rate =</span> <span class="dv">10</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">B_lf1 =</span> <span class="fl">0.009</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">p0 =</span> <span class="fu">base_parameters</span>(),</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimise_schedule =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">latitude =</span> <span class="fl">28.182</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  ) {</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  hyper_par_fn <span class="ot">=</span> <span class="fu">make_TF24_hyperpar</span>(<span class="at">B_lf1 =</span> B_lf1, <span class="at">latitude =</span> latitude)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  birth_rate <span class="ot">&lt;-</span> <span class="fu">rep_len</span>(birth_rate, <span class="fu">nrow</span>(traits))</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(p0, traits, hyper_par_fn, <span class="at">birth_rate =</span> birth_rate)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  env <span class="ot">&lt;-</span> <span class="fu">make_tf24_env</span>(p0<span class="sc">$</span>max_patch_lifetime)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(optimise_schedule)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> <span class="fu">run_scm</span>(p1, <span class="at">env =</span> env, <span class="at">refine_schedule =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>parameters</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> p1</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># gather outputs at each time step</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scm</span>(result, <span class="at">env =</span> env, <span class="at">collect =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>run_mypatch <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">traits =</span>  <span class="fu">trait_matrix</span>(<span class="fu">c</span>(<span class="fl">0.07</span>), <span class="fu">c</span>(<span class="st">"lma"</span>)),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">birth_rate =</span> <span class="dv">10</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">B_lf1 =</span> <span class="fl">0.009</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">p0 =</span> <span class="fu">my_base_parameters</span>(),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimise_schedule =</span> <span class="cn">FALSE</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  ) {</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  p0<span class="sc">$</span>hyperpar <span class="ot">&lt;-</span> fieldtrial<span class="sc">::</span><span class="fu">tradeoffs</span>(<span class="st">"TF24"</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                                       <span class="at">coefficients =</span> <span class="fu">list</span>(<span class="at">B_lf1 =</span> B_lf1))</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  birth_rate <span class="ot">&lt;-</span> <span class="fu">rep_len</span>(birth_rate, <span class="fu">nrow</span>(traits))</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">add_strategies</span>(p0, traits, <span class="at">birth_rate =</span> birth_rate)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  env <span class="ot">&lt;-</span> <span class="fu">make_tf24_env</span>(p0<span class="sc">$</span>max_patch_lifetime)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(optimise_schedule)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> <span class="fu">run</span>(p1, <span class="at">env =</span> env, <span class="at">refine_schedule =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>scenario<span class="sc">$</span>p</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> p1</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># gather outputs at each time step</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="fu">run</span>(result, <span class="at">env =</span> env, <span class="at">record =</span> <span class="st">"steps"</span>))</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="run-two-strategies-together" class="level3">
 <h3 class="anchored" data-anchor-id="run-two-strategies-together">Run two strategies together</h3>
 <p>Run a patch for two strategies. Here, we provide two LMA values, representing thin leaves (0.07) and thicker leaves (0.24). To run one species, supply a one-row trait matrix; <code>add_strategies()</code> requires at least one strategy before the patch can be simulated.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_mypatch</span>(<span class="at">traits=</span><span class="fu">trait_matrix</span>(<span class="fu">c</span>(<span class="fl">0.07</span>, <span class="fl">0.24</span>), <span class="fu">c</span>(<span class="st">"lma"</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_mypatch</span>(<span class="at">traits=</span><span class="fu">trait_matrix</span>(<span class="fu">c</span>(<span class="fl">0.07</span>, <span class="fl">0.24</span>), <span class="fu">c</span>(<span class="st">"lma"</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Because <code>run_mypatch()</code> calls <code>run_scm(..., collect = TRUE)</code>, its result is already organised for analysis. The <code>species</code> table has one row per node at each recorded step; <code>steps</code> and <code>env</code> describe patch time and environment.</p>
+<p>Because <code>run_mypatch()</code> returns <code>tidy()</code> of a run with <code>record = "steps"</code>, its result is already organised for analysis. The <code>species</code> table has one row per node at each recorded step; <code>steps</code> and <code>env</code> describe patch time and environment.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>results_tidy <span class="ot">&lt;-</span> results</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>results_tidy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>results_tidy <span class="ot">&lt;-</span> results</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>results_tidy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$steps
 # A tibble: 102 × 3
@@ -525,43 +507,43 @@ $n_spp
 [1] 2
 
 $species
-# A tibble: 10,506 × 25
+# A tibble: 10,506 × 33
    species   time  step patch_density  node density log_density height mortality
    &lt;chr&gt;    &lt;dbl&gt; &lt;int&gt;         &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
- 1 1         0        1         0.140     1    22.3        3.10 0.0351  0.000699
- 2 1         1e-5     2         0.140     1    22.3        3.10 0.0351  0.000699
- 3 1         1e-5     2         0.140     2    22.3        3.10 0.0351  0.000699
- 4 1         2e-5     3         0.140     1    22.3        3.10 0.0351  0.000699
- 5 1         2e-5     3         0.140     2    22.3        3.10 0.0351  0.000699
- 6 1         2e-5     3         0.140     3    22.3        3.10 0.0351  0.000699
- 7 1         3e-5     4         0.140     1    22.3        3.10 0.0351  0.000699
- 8 1         3e-5     4         0.140     2    22.3        3.10 0.0351  0.000699
- 9 1         3e-5     4         0.140     3    22.3        3.10 0.0351  0.000699
-10 1         3e-5     4         0.140     4    22.3        3.10 0.0351  0.000699
+ 1 1         0        1         0.140     1    21.4        3.07 0.0351  0.000646
+ 2 1         1e-5     2         0.140     1    21.4        3.07 0.0351  0.000646
+ 3 1         1e-5     2         0.140     2    21.4        3.07 0.0351  0.000646
+ 4 1         2e-5     3         0.140     1    21.4        3.07 0.0351  0.000647
+ 5 1         2e-5     3         0.140     2    21.4        3.07 0.0351  0.000646
+ 6 1         2e-5     3         0.140     3    21.4        3.07 0.0351  0.000646
+ 7 1         3e-5     4         0.140     1    21.4        3.06 0.0351  0.000647
+ 8 1         3e-5     4         0.140     2    21.4        3.06 0.0351  0.000646
+ 9 1         3e-5     4         0.140     3    21.4        3.06 0.0351  0.000646
+10 1         3e-5     4         0.140     4    21.4        3.07 0.0351  0.000646
 # ℹ 10,496 more rows
-# ℹ 16 more variables: fecundity &lt;dbl&gt;, area_heartwood &lt;dbl&gt;,
-#   mass_heartwood &lt;dbl&gt;, storage &lt;dbl&gt;,
+# ℹ 24 more variables: fecundity &lt;dbl&gt;, area_heartwood &lt;dbl&gt;,
+#   mass_heartwood &lt;dbl&gt;, storage &lt;dbl&gt;, log_area_leaf_departure &lt;dbl&gt;,
+#   log_area_sapwood_departure &lt;dbl&gt;, leaf_marginal_return_tracked &lt;dbl&gt;,
 #   offspring_produced_survival_weighted &lt;dbl&gt;, competition_effect &lt;dbl&gt;,
 #   height_inverse &lt;dbl&gt;, net_mass_production_dt &lt;dbl&gt;, root_mass &lt;dbl&gt;,
-#   opt_psi_stem &lt;dbl&gt;, opt_root_psi &lt;dbl&gt;, transpiration &lt;dbl&gt;, E_up_ &lt;dbl&gt;,
-#   profit &lt;dbl&gt;, stom_cond_CO2 &lt;dbl&gt;, assimilation &lt;dbl&gt;
+#   opt_psi_leaf &lt;dbl&gt;, opt_root_psi &lt;dbl&gt;, transpiration &lt;dbl&gt;, E_up_ &lt;dbl&gt;, …
 
 $env
 $env$light_availability
-# A tibble: 5,482 × 5
-    time  step patch_density  height light_availability
-   &lt;dbl&gt; &lt;int&gt;         &lt;dbl&gt;   &lt;dbl&gt;              &lt;dbl&gt;
- 1     0     1         0.140 0                        1
- 2     0     1         0.140 0.00110                  1
- 3     0     1         0.140 0.00219                  1
- 4     0     1         0.140 0.00329                  1
- 5     0     1         0.140 0.00438                  1
- 6     0     1         0.140 0.00548                  1
- 7     0     1         0.140 0.00658                  1
- 8     0     1         0.140 0.00767                  1
- 9     0     1         0.140 0.00877                  1
-10     0     1         0.140 0.00986                  1
-# ℹ 5,472 more rows
+# A tibble: 6,630 × 6
+    time  step patch_density   height light_availability slope
+   &lt;dbl&gt; &lt;int&gt;         &lt;dbl&gt;    &lt;dbl&gt;              &lt;dbl&gt; &lt;dbl&gt;
+ 1     0     1         0.140 0                         1     0
+ 2     0     1         0.140 0.000548                  1     0
+ 3     0     1         0.140 0.00110                   1     0
+ 4     0     1         0.140 0.00164                   1     0
+ 5     0     1         0.140 0.00219                   1     0
+ 6     0     1         0.140 0.00274                   1     0
+ 7     0     1         0.140 0.00329                   1     0
+ 8     0     1         0.140 0.00384                   1     0
+ 9     0     1         0.140 0.00438                   1     0
+10     0     1         0.140 0.00493                   1     0
+# ℹ 6,620 more rows
 
 $env$soil_moist
 # A tibble: 1,530 × 4
@@ -595,8 +577,24 @@ $env$soil_depth
 10     0     1         0.140        1  
 # ℹ 1,520 more rows
 
+$env$soil_layer_width
+# A tibble: 1,530 × 4
+    time  step patch_density soil_layer_width
+   &lt;dbl&gt; &lt;int&gt;         &lt;dbl&gt;            &lt;dbl&gt;
+ 1     0     1         0.140              0.1
+ 2     0     1         0.140              0.1
+ 3     0     1         0.140              0.1
+ 4     0     1         0.140              0.1
+ 5     0     1         0.140              0.1
+ 6     0     1         0.140              0.1
+ 7     0     1         0.140              0.1
+ 8     0     1         0.140              0.1
+ 9     0     1         0.140              0.1
+10     0     1         0.140              0.1
+# ℹ 1,520 more rows
+
 $env$soil_moist_cumulative_flux
-# A tibble: 102 × 7
+# A tibble: 102 × 8
         time  step patch_density sum_rainfall sum_infiltration  sum_drainage
        &lt;dbl&gt; &lt;int&gt;         &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;         &lt;dbl&gt;
  1 0             1         0.140    0               0          0            
@@ -610,14 +608,14 @@ $env$soil_moist_cumulative_flux
  9 0.00008       9         0.140    0.0000800       0.0000798  0.0000000606 
 10 0.0000953    10         0.140    0.0000953       0.0000950  0.0000000722 
 # ℹ 92 more rows
-# ℹ 1 more variable: sum_resource_depletion &lt;dbl&gt;
+# ℹ 2 more variables: sum_resource_depletion &lt;dbl&gt;, sum_pulse_runoff &lt;dbl&gt;
 
 
 $offspring_production
-[1] 8.908685e+00 6.607032e-22
+[1] 4.189674e+01 2.379994e-21
 
 $net_reproduction_ratios
-[1] 8.908685e-01 6.607032e-23
+[1] 4.189674e+00 2.379994e-22
 
 $p
 $patch_area
@@ -626,11 +624,23 @@ $patch_area
 $n_patches
 [1] 1
 
-$patch_type
-[1] "meta-population"
+$fitness_weighting
+[1] "patch_age"
 
 $max_patch_lifetime
 [1] 25
+
+$fitness_window_start
+[1] 0
+
+$fitness_window_end
+[1] 0
+
+$fitness_window_weight_x
+numeric(0)
+
+$fitness_window_weight_y
+numeric(0)
 
 $strategies
 $strategies[[1]]
@@ -662,6 +672,9 @@ $a_l2
 $a_r1
 [1] 0.07
 
+$a_cr1
+[1] 0
+
 $a_b1
 [1] 0.17
 
@@ -673,6 +686,9 @@ $r_b
 
 $r_r
 [1] 217
+
+$r_cr
+[1] 6.598684
 
 $r_l
 [1] 640.9011
@@ -695,11 +711,8 @@ $k_s
 $k_r
 [1] 1
 
-$a_p1
-[1] 151.1778
-
-$a_p2
-[1] 0.2047162
+$k_cr
+[1] 0.2
 
 $a_f3
 [1] 0.000114
@@ -734,41 +747,62 @@ $a_st2
 $a_st3
 [1] 0.8
 
+$storage_relaxation_offset
+[1] 0.01917808
+
+$a_pl0
+[1] 0
+
+$a_pl1
+[1] 0
+
+$a_pl2
+[1] 0.2
+
+$a_pl3
+[1] 0.05
+
+$a_pl4
+[1] 3
+
+$a_sw
+[1] 0
+
 $k_I
 [1] 0.5
 
 $vcmax_25
 [1] 96
 
-$p_50
+$stem_P50
 [1] 2.888726
 
 $K_s
-[1] 1
+[1] 0.3357738
 
-$c
+$stem_c
 [1] 2.04
 
-$b
+$stem_b
 [1] 3.457268
 
 $psi_crit
 [1] 5.91988
 
-$beta1
-[1] 20000
-
-$beta2
+$TF24_beta2
 [1] 1.5
 
-$g1_TF24
+$TF24_cost_scale
 [1] 7.5
+
+$TF24_floor_lambda_o
+[1] 0
 
 $jmax_25
 [1] 157.44
 
-$a
-[1] 0.3
+$phi_J
+[1] 0.3529412
 
 $curv_fact_elec_trans
 [1] 0.7
@@ -776,28 +810,55 @@ $curv_fact_elec_trans
 $curv_fact_colim
 [1] 0.99
 
-$var_sapwood_volume_cost
-[1] 1
-
-$nmass_l
-[1] 0.02392789
-
-$nmass_s
-[1] 0.00198
-
-$nmass_b
-[1] 0.0034
-
-$nmass_r
-[1] 0.00335
-
-$dmass_dN
-[1] 0
+$R_d_25
+[1] 1.44
 
 $root_depth_shape_eta
 [1] 0.2
 
+$root_c
+[1] 2.680147
+
+$root_P50
+[1] 3.4
+
+$root_b
+[1] 3.898245
+
+$root_psi_crit
+[1] 5.870283
+
+$rooting_depth_max
+[1] 1.5
+
+$D_c
+[1] 0.2
+
+$theta_c
+[1] 0
+
+$L_tip
+[1] 0.02
+
 $recruitment_decay
+[1] 0
+
+$use_energy_balance
+[1] 0
+
+$d
+[1] 0.05
+
+$alpha_PAR
+[1] 0.85
+
+$alpha_NIR
+[1] 0.2
+
+$L_crown
+[1] 2
+
+$g_min
 [1] 0
 
 attr(,"class")
@@ -834,6 +895,12 @@ $node_gradient_richardson
 $node_gradient_richardson_depth
 [1] 4
 
+$node_density_coordinate
+[1] "auto"
+
+$absorb_epsilon
+[1] 0
+
 $ode_step_size_initial
 [1] 1e-06
 
@@ -844,16 +911,25 @@ $ode_step_size_max
 [1] 5
 
 $ode_tol_rel
-[1] 1e-04
+[1] 1e-05
 
 $ode_tol_abs
-[1] 1e-04
+[1] 1e-05
 
 $ode_a_y
 [1] 1
 
 $ode_a_dydt
 [1] 0
+
+$ode_soil_substep
+[1] FALSE
+
+$ode_soil_substep_tol
+[1] 1e-09
+
+$ode_tol_scale_soil
+[1] 1
 
 $fixed_time_step
 [1] 0
@@ -867,14 +943,14 @@ $schedule_eps
 $schedule_verbose
 [1] FALSE
 
-$save_RK45_cache
-[1] FALSE
+$gradient_curvature_floor
+[1] 0.001
 
 $GSS_tol_abs
 [1] 0.001
 
 $vulnerability_curve_ncontrol
-[1] 100
+[1] 800
 
 $ci_abs_tol
 [1] 0.001
@@ -898,7 +974,7 @@ $is_variable_birth_rate
 [1] FALSE
 
 attr(,"class")
-[1] "TF24_Strategy"
+[1] "TF24_Model"
 
 $strategies[[2]]
 $pars
@@ -929,6 +1005,9 @@ $a_l2
 $a_r1
 [1] 0.07
 
+$a_cr1
+[1] 0
+
 $a_b1
 [1] 0.17
 
@@ -940,6 +1019,9 @@ $r_b
 
 $r_r
 [1] 217
+
+$r_cr
+[1] 6.598684
 
 $r_l
 [1] 320.8045
@@ -962,11 +1044,8 @@ $k_s
 $k_r
 [1] 1
 
-$a_p1
-[1] 151.1778
-
-$a_p2
-[1] 0.2047162
+$k_cr
+[1] 0.2
 
 $a_f3
 [1] 0.000114
@@ -1001,41 +1080,62 @@ $a_st2
 $a_st3
 [1] 0.8
 
+$storage_relaxation_offset
+[1] 0.01917808
+
+$a_pl0
+[1] 0
+
+$a_pl1
+[1] 0
+
+$a_pl2
+[1] 0.2
+
+$a_pl3
+[1] 0.05
+
+$a_pl4
+[1] 3
+
+$a_sw
+[1] 0
+
 $k_I
 [1] 0.5
 
 $vcmax_25
 [1] 96
 
-$p_50
+$stem_P50
 [1] 2.888726
 
 $K_s
-[1] 1
+[1] 0.3357738
 
-$c
+$stem_c
 [1] 2.04
 
-$b
+$stem_b
 [1] 3.457268
 
 $psi_crit
 [1] 5.91988
 
-$beta1
-[1] 20000
-
-$beta2
+$TF24_beta2
 [1] 1.5
 
-$g1_TF24
+$TF24_cost_scale
 [1] 7.5
+
+$TF24_floor_lambda_o
+[1] 0
 
 $jmax_25
 [1] 157.44
 
-$a
-[1] 0.3
+$phi_J
+[1] 0.3529412
 
 $curv_fact_elec_trans
 [1] 0.7
@@ -1043,28 +1143,55 @@ $curv_fact_elec_trans
 $curv_fact_colim
 [1] 0.99
 
-$var_sapwood_volume_cost
-[1] 1
-
-$nmass_l
-[1] 0.01335397
-
-$nmass_s
-[1] 0.00198
-
-$nmass_b
-[1] 0.0034
-
-$nmass_r
-[1] 0.00335
-
-$dmass_dN
-[1] 0
+$R_d_25
+[1] 1.44
 
 $root_depth_shape_eta
 [1] 0.2
 
+$root_c
+[1] 2.680147
+
+$root_P50
+[1] 3.4
+
+$root_b
+[1] 3.898245
+
+$root_psi_crit
+[1] 5.870283
+
+$rooting_depth_max
+[1] 1.5
+
+$D_c
+[1] 0.2
+
+$theta_c
+[1] 0
+
+$L_tip
+[1] 0.02
+
 $recruitment_decay
+[1] 0
+
+$use_energy_balance
+[1] 0
+
+$d
+[1] 0.05
+
+$alpha_PAR
+[1] 0.85
+
+$alpha_NIR
+[1] 0.2
+
+$L_crown
+[1] 2
+
+$g_min
 [1] 0
 
 attr(,"class")
@@ -1101,6 +1228,12 @@ $node_gradient_richardson
 $node_gradient_richardson_depth
 [1] 4
 
+$node_density_coordinate
+[1] "auto"
+
+$absorb_epsilon
+[1] 0
+
 $ode_step_size_initial
 [1] 1e-06
 
@@ -1111,16 +1244,25 @@ $ode_step_size_max
 [1] 5
 
 $ode_tol_rel
-[1] 1e-04
+[1] 1e-05
 
 $ode_tol_abs
-[1] 1e-04
+[1] 1e-05
 
 $ode_a_y
 [1] 1
 
 $ode_a_dydt
 [1] 0
+
+$ode_soil_substep
+[1] FALSE
+
+$ode_soil_substep_tol
+[1] 1e-09
+
+$ode_tol_scale_soil
+[1] 1
 
 $fixed_time_step
 [1] 0
@@ -1134,14 +1276,14 @@ $schedule_eps
 $schedule_verbose
 [1] FALSE
 
-$save_RK45_cache
-[1] FALSE
+$gradient_curvature_floor
+[1] 0.001
 
 $GSS_tol_abs
 [1] 0.001
 
 $vulnerability_curve_ncontrol
-[1] 100
+[1] 800
 
 $ci_abs_tol
 [1] 0.001
@@ -1165,7 +1307,7 @@ $is_variable_birth_rate
 [1] FALSE
 
 attr(,"class")
-[1] "TF24_Strategy"
+[1] "TF24_Model"
 
 
 $strategy_default
@@ -1197,6 +1339,9 @@ $a_l2
 $a_r1
 [1] 0.07
 
+$a_cr1
+[1] 0
+
 $a_b1
 [1] 0.17
 
@@ -1208,6 +1353,9 @@ $r_b
 
 $r_r
 [1] 217
+
+$r_cr
+[1] 6.598684
 
 $r_l
 [1] 198.4545
@@ -1230,11 +1378,8 @@ $k_s
 $k_r
 [1] 1
 
-$a_p1
-[1] 151.1778
-
-$a_p2
-[1] 0.2047162
+$k_cr
+[1] 0.2
 
 $a_f3
 [1] 0.000114
@@ -1269,41 +1414,62 @@ $a_st2
 $a_st3
 [1] 0.8
 
+$storage_relaxation_offset
+[1] 0.01917808
+
+$a_pl0
+[1] 0
+
+$a_pl1
+[1] 0
+
+$a_pl2
+[1] 0.2
+
+$a_pl3
+[1] 0.05
+
+$a_pl4
+[1] 3
+
+$a_sw
+[1] 0
+
 $k_I
 [1] 0.5
 
 $vcmax_25
 [1] 96
 
-$p_50
-[1] 1.85
+$stem_P50
+[1] 2.888726
 
 $K_s
-[1] 1
+[1] 0.3357738
 
-$c
-[1] 1.089985
+$stem_c
+[1] 2.04
 
-$b
-[1] 2.589437
+$stem_b
+[1] 3.457268
 
 $psi_crit
-[1] 7.085493
+[1] 5.91988
 
-$beta1
-[1] 20000
-
-$beta2
+$TF24_beta2
 [1] 1.5
 
-$g1_TF24
+$TF24_cost_scale
 [1] 7.5
+
+$TF24_floor_lambda_o
+[1] 0
 
 $jmax_25
 [1] 157.44
 
-$a
-[1] 0.3
+$phi_J
+[1] 0.3529412
 
 $curv_fact_elec_trans
 [1] 0.7
@@ -1311,28 +1477,55 @@ $curv_fact_elec_trans
 $curv_fact_colim
 [1] 0.99
 
-$var_sapwood_volume_cost
-[1] 1
-
-$nmass_l
-[1] 0.013
-
-$nmass_s
-[1] 0.00198
-
-$nmass_b
-[1] 0.0034
-
-$nmass_r
-[1] 0.00335
-
-$dmass_dN
-[1] 0
+$R_d_25
+[1] 1.44
 
 $root_depth_shape_eta
 [1] 0.2
 
+$root_c
+[1] 2.680147
+
+$root_P50
+[1] 3.4
+
+$root_b
+[1] 3.898245
+
+$root_psi_crit
+[1] 5.870283
+
+$rooting_depth_max
+[1] 1.5
+
+$D_c
+[1] 0.2
+
+$theta_c
+[1] 0
+
+$L_tip
+[1] 0.02
+
 $recruitment_decay
+[1] 0
+
+$use_energy_balance
+[1] 0
+
+$d
+[1] 0.05
+
+$alpha_PAR
+[1] 0.85
+
+$alpha_NIR
+[1] 0.2
+
+$L_crown
+[1] 2
+
+$g_min
 [1] 0
 
 attr(,"class")
@@ -1369,6 +1562,12 @@ $node_gradient_richardson
 $node_gradient_richardson_depth
 [1] 4
 
+$node_density_coordinate
+[1] "auto"
+
+$absorb_epsilon
+[1] 0
+
 $ode_step_size_initial
 [1] 1e-06
 
@@ -1379,16 +1578,25 @@ $ode_step_size_max
 [1] 5
 
 $ode_tol_rel
-[1] 1e-04
+[1] 1e-05
 
 $ode_tol_abs
-[1] 1e-04
+[1] 1e-05
 
 $ode_a_y
 [1] 1
 
 $ode_a_dydt
 [1] 0
+
+$ode_soil_substep
+[1] FALSE
+
+$ode_soil_substep_tol
+[1] 1e-09
+
+$ode_tol_scale_soil
+[1] 1
 
 $fixed_time_step
 [1] 0
@@ -1402,14 +1610,14 @@ $schedule_eps
 $schedule_verbose
 [1] FALSE
 
-$save_RK45_cache
-[1] FALSE
+$gradient_curvature_floor
+[1] 0.001
 
 $GSS_tol_abs
 [1] 0.001
 
 $vulnerability_curve_ncontrol
-[1] 100
+[1] 800
 
 $ci_abs_tol
 [1] 0.001
@@ -1433,7 +1641,7 @@ $is_variable_birth_rate
 [1] FALSE
 
 attr(,"class")
-[1] "TF24_Strategy"
+[1] "TF24_Model"
 
 $node_schedule_times_default
   [1] 0.000000e+00 1.000000e-05 2.000000e-05 3.000000e-05 4.000000e-05
@@ -1509,6 +1717,15 @@ $node_schedule_times[[2]]
 $ode_times
 numeric(0)
 
+$ode_step_sizes
+numeric(0)
+
+$ode_soil_input_slopes
+list()
+
+$ode_soil_substep_ends
+list()
+
 $initial_state
 numeric(0)
 
@@ -1527,15 +1744,907 @@ numeric(0)
 $initial_time
 [1] 0
 
+$hyperpar
+function (m, s, filter = TRUE) 
+{
+    lma &lt;- trait_values(m, s, "lma")
+    rho &lt;- trait_values(m, s, "rho")
+    omega &lt;- trait_values(m, s, "omega")
+    K_s &lt;- trait_values(m, s, "K_s")
+    vcmax_25 &lt;- trait_values(m, s, "vcmax_25")
+    jmax_25 &lt;- trait_values(m, s, "jmax_25")
+    econ &lt;- economic_tradeoffs(lma, rho, omega, co)
+    TF24_cost_scale &lt;- co$B_hks1 * (rho/co$rho_0)^(-co$B_hks2)
+    if (any(K_s &lt;= 0, na.rm = TRUE)) {
+        stop("K_s must be &gt; 0 for stem_P50 derivation", call. = FALSE)
+    }
+    stem_P50 &lt;- 10^(co$B_Hv1 + co$B_Hv2 * log10(K_s))
+    stem_c &lt;- co$B_c1 * exp(-co$B_c2 * stem_P50)
+    stem_b &lt;- stem_P50/((-log(1 - 50/100))^(1/stem_c))
+    psi_crit &lt;- stem_b * (log(1/0.05))^(1/stem_c)
+    narea_ls &lt;- (co$a_lf1 + co$B_lf1 * lma * 1000)/1000
+    narea_lp &lt;- (co$B_lf2 * vcmax_25 + co$B_lf3 * jmax_25)/1000
+    nmass_ls &lt;- narea_ls/lma
+    nmass_lp &lt;- narea_lp/lma
+    r_l &lt;- co$B_lf4 * nmass_ls + co$B_lf5 * nmass_lp
+    extra &lt;- cbind(k_l = econ$k_l, d_I = econ$d_I, TF24_cost_scale = TF24_cost_scale, 
+        k_s = econ$k_s, r_s = econ$r_s, r_b = econ$r_b, a_f3 = econ$a_f3, 
+        r_l = r_l, stem_c = stem_c, stem_P50 = stem_P50, stem_b = stem_b, 
+        psi_crit = psi_crit)
+    append_derived(m, extra, s, filter)
+}
+&lt;bytecode: 0x94ee179d8&gt;
+&lt;environment: 0x94fdfcb30&gt;
+attr(,"model")
+[1] "TF24"
+attr(,"coefficients")
+attr(,"coefficients")$lma_0
+[1] 0.1978791
+
+attr(,"coefficients")$B_kl1
+[1] 0.4565855
+
+attr(,"coefficients")$B_kl2
+[1] 1.71
+
+attr(,"coefficients")$rho_0
+[1] 608
+
+attr(,"coefficients")$B_dI1
+[1] 0.01
+
+attr(,"coefficients")$B_dI2
+[1] 0
+
+attr(,"coefficients")$B_hks1
+[1] 7.5
+
+attr(,"coefficients")$B_hks2
+[1] 0
+
+attr(,"coefficients")$B_ks1
+[1] 0.2
+
+attr(,"coefficients")$B_ks2
+[1] 0
+
+attr(,"coefficients")$B_rs1
+[1] 4012
+
+attr(,"coefficients")$B_rb1
+[1] 8024
+
+attr(,"coefficients")$B_f1
+[1] 3
+
+attr(,"coefficients")$a_lf1
+[1] 0.535
+
+attr(,"coefficients")$B_lf1
+[1] 0.009
+
+attr(,"coefficients")$B_lf2
+[1] 0.004
+
+attr(,"coefficients")$B_lf3
+[1] 8e-04
+
+attr(,"coefficients")$B_lf4
+[1] 21000
+
+attr(,"coefficients")$B_lf5
+[1] 40000
+
+attr(,"coefficients")$B_Hv1
+[1] 0.3659157
+
+attr(,"coefficients")$B_Hv2
+[1] -0.2
+
+attr(,"coefficients")$B_c1
+[1] 2.04
+
+attr(,"coefficients")$B_c2
+[1] 0
+
+attr(,"traits")
+[1] "lma"      "rho"      "omega"    "K_s"      "vcmax_25" "jmax_25" 
+
 attr(,"class")
-[1] "Parameters&lt;TF24,TF24_Env&gt;" "Parameters"               </code></pre>
+[1] "Parameters&lt;TF24,TF24_Env&gt;" "Parameters"               
+
+$events
+$time
+  [1] 0.000000e+00 0.000000e+00 1.000000e-05 1.000000e-05 2.000000e-05
+  [6] 2.000000e-05 3.000000e-05 3.000000e-05 4.000000e-05 4.000000e-05
+ [11] 5.000000e-05 5.000000e-05 6.000000e-05 6.000000e-05 7.000000e-05
+ [16] 7.000000e-05 8.000000e-05 8.000000e-05 9.525879e-05 9.525879e-05
+ [21] 1.105176e-04 1.105176e-04 1.257764e-04 1.257764e-04 1.410352e-04
+ [26] 1.410352e-04 1.562939e-04 1.562939e-04 1.868115e-04 1.868115e-04
+ [31] 2.173291e-04 2.173291e-04 2.478467e-04 2.478467e-04 2.783643e-04
+ [36] 2.783643e-04 3.088818e-04 3.088818e-04 3.699170e-04 3.699170e-04
+ [41] 4.309521e-04 4.309521e-04 4.919873e-04 4.919873e-04 5.530225e-04
+ [46] 5.530225e-04 6.140576e-04 6.140576e-04 7.361279e-04 7.361279e-04
+ [51] 8.581982e-04 8.581982e-04 9.802686e-04 9.802686e-04 1.102339e-03
+ [56] 1.102339e-03 1.224409e-03 1.224409e-03 1.468550e-03 1.468550e-03
+ [61] 1.712690e-03 1.712690e-03 1.956831e-03 1.956831e-03 2.200972e-03
+ [66] 2.200972e-03 2.445112e-03 2.445112e-03 2.933394e-03 2.933394e-03
+ [71] 3.421675e-03 3.421675e-03 3.909956e-03 3.909956e-03 4.398237e-03
+ [76] 4.398237e-03 4.886519e-03 4.886519e-03 5.863081e-03 5.863081e-03
+ [81] 6.839644e-03 6.839644e-03 7.816206e-03 7.816206e-03 8.792769e-03
+ [86] 8.792769e-03 9.769331e-03 9.769331e-03 1.172246e-02 1.172246e-02
+ [91] 1.367558e-02 1.367558e-02 1.562871e-02 1.562871e-02 1.758183e-02
+ [96] 1.758183e-02 1.953496e-02 1.953496e-02 2.344121e-02 2.344121e-02
+[101] 2.734746e-02 2.734746e-02 3.125371e-02 3.125371e-02 3.515996e-02
+[106] 3.515996e-02 3.906621e-02 3.906621e-02 4.687871e-02 4.687871e-02
+[111] 5.469121e-02 5.469121e-02 6.250371e-02 6.250371e-02 7.031621e-02
+[116] 7.031621e-02 7.812871e-02 7.812871e-02 9.375371e-02 9.375371e-02
+[121] 1.093787e-01 1.093787e-01 1.250037e-01 1.250037e-01 1.406287e-01
+[126] 1.406287e-01 1.562537e-01 1.562537e-01 1.875037e-01 1.875037e-01
+[131] 2.187537e-01 2.187537e-01 2.500037e-01 2.500037e-01 2.812537e-01
+[136] 2.812537e-01 3.125037e-01 3.125037e-01 3.750037e-01 3.750037e-01
+[141] 4.375037e-01 4.375037e-01 5.000037e-01 5.000037e-01 5.625037e-01
+[146] 5.625037e-01 6.250037e-01 6.250037e-01 7.500037e-01 7.500037e-01
+[151] 8.750037e-01 8.750037e-01 1.000004e+00 1.000004e+00 1.125004e+00
+[156] 1.125004e+00 1.250004e+00 1.250004e+00 1.500004e+00 1.500004e+00
+[161] 1.750004e+00 1.750004e+00 2.000004e+00 2.000004e+00 2.250004e+00
+[166] 2.250004e+00 2.500004e+00 2.500004e+00 3.000004e+00 3.000004e+00
+[171] 3.500004e+00 3.500004e+00 4.000004e+00 4.000004e+00 4.500004e+00
+[176] 4.500004e+00 5.000004e+00 5.000004e+00 6.000004e+00 6.000004e+00
+[181] 7.000004e+00 7.000004e+00 8.000004e+00 8.000004e+00 9.000004e+00
+[186] 9.000004e+00 1.000000e+01 1.000000e+01 1.200000e+01 1.200000e+01
+[191] 1.400000e+01 1.400000e+01 1.600000e+01 1.600000e+01 1.800000e+01
+[196] 1.800000e+01 2.000000e+01 2.000000e+01 2.200000e+01 2.200000e+01
+[201] 2.400000e+01 2.400000e+01
+
+$type
+  [1] "node_introduction" "node_introduction" "node_introduction"
+  [4] "node_introduction" "node_introduction" "node_introduction"
+  [7] "node_introduction" "node_introduction" "node_introduction"
+ [10] "node_introduction" "node_introduction" "node_introduction"
+ [13] "node_introduction" "node_introduction" "node_introduction"
+ [16] "node_introduction" "node_introduction" "node_introduction"
+ [19] "node_introduction" "node_introduction" "node_introduction"
+ [22] "node_introduction" "node_introduction" "node_introduction"
+ [25] "node_introduction" "node_introduction" "node_introduction"
+ [28] "node_introduction" "node_introduction" "node_introduction"
+ [31] "node_introduction" "node_introduction" "node_introduction"
+ [34] "node_introduction" "node_introduction" "node_introduction"
+ [37] "node_introduction" "node_introduction" "node_introduction"
+ [40] "node_introduction" "node_introduction" "node_introduction"
+ [43] "node_introduction" "node_introduction" "node_introduction"
+ [46] "node_introduction" "node_introduction" "node_introduction"
+ [49] "node_introduction" "node_introduction" "node_introduction"
+ [52] "node_introduction" "node_introduction" "node_introduction"
+ [55] "node_introduction" "node_introduction" "node_introduction"
+ [58] "node_introduction" "node_introduction" "node_introduction"
+ [61] "node_introduction" "node_introduction" "node_introduction"
+ [64] "node_introduction" "node_introduction" "node_introduction"
+ [67] "node_introduction" "node_introduction" "node_introduction"
+ [70] "node_introduction" "node_introduction" "node_introduction"
+ [73] "node_introduction" "node_introduction" "node_introduction"
+ [76] "node_introduction" "node_introduction" "node_introduction"
+ [79] "node_introduction" "node_introduction" "node_introduction"
+ [82] "node_introduction" "node_introduction" "node_introduction"
+ [85] "node_introduction" "node_introduction" "node_introduction"
+ [88] "node_introduction" "node_introduction" "node_introduction"
+ [91] "node_introduction" "node_introduction" "node_introduction"
+ [94] "node_introduction" "node_introduction" "node_introduction"
+ [97] "node_introduction" "node_introduction" "node_introduction"
+[100] "node_introduction" "node_introduction" "node_introduction"
+[103] "node_introduction" "node_introduction" "node_introduction"
+[106] "node_introduction" "node_introduction" "node_introduction"
+[109] "node_introduction" "node_introduction" "node_introduction"
+[112] "node_introduction" "node_introduction" "node_introduction"
+[115] "node_introduction" "node_introduction" "node_introduction"
+[118] "node_introduction" "node_introduction" "node_introduction"
+[121] "node_introduction" "node_introduction" "node_introduction"
+[124] "node_introduction" "node_introduction" "node_introduction"
+[127] "node_introduction" "node_introduction" "node_introduction"
+[130] "node_introduction" "node_introduction" "node_introduction"
+[133] "node_introduction" "node_introduction" "node_introduction"
+[136] "node_introduction" "node_introduction" "node_introduction"
+[139] "node_introduction" "node_introduction" "node_introduction"
+[142] "node_introduction" "node_introduction" "node_introduction"
+[145] "node_introduction" "node_introduction" "node_introduction"
+[148] "node_introduction" "node_introduction" "node_introduction"
+[151] "node_introduction" "node_introduction" "node_introduction"
+[154] "node_introduction" "node_introduction" "node_introduction"
+[157] "node_introduction" "node_introduction" "node_introduction"
+[160] "node_introduction" "node_introduction" "node_introduction"
+[163] "node_introduction" "node_introduction" "node_introduction"
+[166] "node_introduction" "node_introduction" "node_introduction"
+[169] "node_introduction" "node_introduction" "node_introduction"
+[172] "node_introduction" "node_introduction" "node_introduction"
+[175] "node_introduction" "node_introduction" "node_introduction"
+[178] "node_introduction" "node_introduction" "node_introduction"
+[181] "node_introduction" "node_introduction" "node_introduction"
+[184] "node_introduction" "node_introduction" "node_introduction"
+[187] "node_introduction" "node_introduction" "node_introduction"
+[190] "node_introduction" "node_introduction" "node_introduction"
+[193] "node_introduction" "node_introduction" "node_introduction"
+[196] "node_introduction" "node_introduction" "node_introduction"
+[199] "node_introduction" "node_introduction" "node_introduction"
+[202] "node_introduction"
+
+$target
+  [1] "species" "species" "species" "species" "species" "species" "species"
+  [8] "species" "species" "species" "species" "species" "species" "species"
+ [15] "species" "species" "species" "species" "species" "species" "species"
+ [22] "species" "species" "species" "species" "species" "species" "species"
+ [29] "species" "species" "species" "species" "species" "species" "species"
+ [36] "species" "species" "species" "species" "species" "species" "species"
+ [43] "species" "species" "species" "species" "species" "species" "species"
+ [50] "species" "species" "species" "species" "species" "species" "species"
+ [57] "species" "species" "species" "species" "species" "species" "species"
+ [64] "species" "species" "species" "species" "species" "species" "species"
+ [71] "species" "species" "species" "species" "species" "species" "species"
+ [78] "species" "species" "species" "species" "species" "species" "species"
+ [85] "species" "species" "species" "species" "species" "species" "species"
+ [92] "species" "species" "species" "species" "species" "species" "species"
+ [99] "species" "species" "species" "species" "species" "species" "species"
+[106] "species" "species" "species" "species" "species" "species" "species"
+[113] "species" "species" "species" "species" "species" "species" "species"
+[120] "species" "species" "species" "species" "species" "species" "species"
+[127] "species" "species" "species" "species" "species" "species" "species"
+[134] "species" "species" "species" "species" "species" "species" "species"
+[141] "species" "species" "species" "species" "species" "species" "species"
+[148] "species" "species" "species" "species" "species" "species" "species"
+[155] "species" "species" "species" "species" "species" "species" "species"
+[162] "species" "species" "species" "species" "species" "species" "species"
+[169] "species" "species" "species" "species" "species" "species" "species"
+[176] "species" "species" "species" "species" "species" "species" "species"
+[183] "species" "species" "species" "species" "species" "species" "species"
+[190] "species" "species" "species" "species" "species" "species" "species"
+[197] "species" "species" "species" "species" "species" "species"
+
+$target_index
+  [1] 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1
+ [38] 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2
+ [75] 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1
+[112] 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2
+[149] 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1
+[186] 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2
+
+$params
+$params[[1]]
+numeric(0)
+
+$params[[2]]
+numeric(0)
+
+$params[[3]]
+numeric(0)
+
+$params[[4]]
+numeric(0)
+
+$params[[5]]
+numeric(0)
+
+$params[[6]]
+numeric(0)
+
+$params[[7]]
+numeric(0)
+
+$params[[8]]
+numeric(0)
+
+$params[[9]]
+numeric(0)
+
+$params[[10]]
+numeric(0)
+
+$params[[11]]
+numeric(0)
+
+$params[[12]]
+numeric(0)
+
+$params[[13]]
+numeric(0)
+
+$params[[14]]
+numeric(0)
+
+$params[[15]]
+numeric(0)
+
+$params[[16]]
+numeric(0)
+
+$params[[17]]
+numeric(0)
+
+$params[[18]]
+numeric(0)
+
+$params[[19]]
+numeric(0)
+
+$params[[20]]
+numeric(0)
+
+$params[[21]]
+numeric(0)
+
+$params[[22]]
+numeric(0)
+
+$params[[23]]
+numeric(0)
+
+$params[[24]]
+numeric(0)
+
+$params[[25]]
+numeric(0)
+
+$params[[26]]
+numeric(0)
+
+$params[[27]]
+numeric(0)
+
+$params[[28]]
+numeric(0)
+
+$params[[29]]
+numeric(0)
+
+$params[[30]]
+numeric(0)
+
+$params[[31]]
+numeric(0)
+
+$params[[32]]
+numeric(0)
+
+$params[[33]]
+numeric(0)
+
+$params[[34]]
+numeric(0)
+
+$params[[35]]
+numeric(0)
+
+$params[[36]]
+numeric(0)
+
+$params[[37]]
+numeric(0)
+
+$params[[38]]
+numeric(0)
+
+$params[[39]]
+numeric(0)
+
+$params[[40]]
+numeric(0)
+
+$params[[41]]
+numeric(0)
+
+$params[[42]]
+numeric(0)
+
+$params[[43]]
+numeric(0)
+
+$params[[44]]
+numeric(0)
+
+$params[[45]]
+numeric(0)
+
+$params[[46]]
+numeric(0)
+
+$params[[47]]
+numeric(0)
+
+$params[[48]]
+numeric(0)
+
+$params[[49]]
+numeric(0)
+
+$params[[50]]
+numeric(0)
+
+$params[[51]]
+numeric(0)
+
+$params[[52]]
+numeric(0)
+
+$params[[53]]
+numeric(0)
+
+$params[[54]]
+numeric(0)
+
+$params[[55]]
+numeric(0)
+
+$params[[56]]
+numeric(0)
+
+$params[[57]]
+numeric(0)
+
+$params[[58]]
+numeric(0)
+
+$params[[59]]
+numeric(0)
+
+$params[[60]]
+numeric(0)
+
+$params[[61]]
+numeric(0)
+
+$params[[62]]
+numeric(0)
+
+$params[[63]]
+numeric(0)
+
+$params[[64]]
+numeric(0)
+
+$params[[65]]
+numeric(0)
+
+$params[[66]]
+numeric(0)
+
+$params[[67]]
+numeric(0)
+
+$params[[68]]
+numeric(0)
+
+$params[[69]]
+numeric(0)
+
+$params[[70]]
+numeric(0)
+
+$params[[71]]
+numeric(0)
+
+$params[[72]]
+numeric(0)
+
+$params[[73]]
+numeric(0)
+
+$params[[74]]
+numeric(0)
+
+$params[[75]]
+numeric(0)
+
+$params[[76]]
+numeric(0)
+
+$params[[77]]
+numeric(0)
+
+$params[[78]]
+numeric(0)
+
+$params[[79]]
+numeric(0)
+
+$params[[80]]
+numeric(0)
+
+$params[[81]]
+numeric(0)
+
+$params[[82]]
+numeric(0)
+
+$params[[83]]
+numeric(0)
+
+$params[[84]]
+numeric(0)
+
+$params[[85]]
+numeric(0)
+
+$params[[86]]
+numeric(0)
+
+$params[[87]]
+numeric(0)
+
+$params[[88]]
+numeric(0)
+
+$params[[89]]
+numeric(0)
+
+$params[[90]]
+numeric(0)
+
+$params[[91]]
+numeric(0)
+
+$params[[92]]
+numeric(0)
+
+$params[[93]]
+numeric(0)
+
+$params[[94]]
+numeric(0)
+
+$params[[95]]
+numeric(0)
+
+$params[[96]]
+numeric(0)
+
+$params[[97]]
+numeric(0)
+
+$params[[98]]
+numeric(0)
+
+$params[[99]]
+numeric(0)
+
+$params[[100]]
+numeric(0)
+
+$params[[101]]
+numeric(0)
+
+$params[[102]]
+numeric(0)
+
+$params[[103]]
+numeric(0)
+
+$params[[104]]
+numeric(0)
+
+$params[[105]]
+numeric(0)
+
+$params[[106]]
+numeric(0)
+
+$params[[107]]
+numeric(0)
+
+$params[[108]]
+numeric(0)
+
+$params[[109]]
+numeric(0)
+
+$params[[110]]
+numeric(0)
+
+$params[[111]]
+numeric(0)
+
+$params[[112]]
+numeric(0)
+
+$params[[113]]
+numeric(0)
+
+$params[[114]]
+numeric(0)
+
+$params[[115]]
+numeric(0)
+
+$params[[116]]
+numeric(0)
+
+$params[[117]]
+numeric(0)
+
+$params[[118]]
+numeric(0)
+
+$params[[119]]
+numeric(0)
+
+$params[[120]]
+numeric(0)
+
+$params[[121]]
+numeric(0)
+
+$params[[122]]
+numeric(0)
+
+$params[[123]]
+numeric(0)
+
+$params[[124]]
+numeric(0)
+
+$params[[125]]
+numeric(0)
+
+$params[[126]]
+numeric(0)
+
+$params[[127]]
+numeric(0)
+
+$params[[128]]
+numeric(0)
+
+$params[[129]]
+numeric(0)
+
+$params[[130]]
+numeric(0)
+
+$params[[131]]
+numeric(0)
+
+$params[[132]]
+numeric(0)
+
+$params[[133]]
+numeric(0)
+
+$params[[134]]
+numeric(0)
+
+$params[[135]]
+numeric(0)
+
+$params[[136]]
+numeric(0)
+
+$params[[137]]
+numeric(0)
+
+$params[[138]]
+numeric(0)
+
+$params[[139]]
+numeric(0)
+
+$params[[140]]
+numeric(0)
+
+$params[[141]]
+numeric(0)
+
+$params[[142]]
+numeric(0)
+
+$params[[143]]
+numeric(0)
+
+$params[[144]]
+numeric(0)
+
+$params[[145]]
+numeric(0)
+
+$params[[146]]
+numeric(0)
+
+$params[[147]]
+numeric(0)
+
+$params[[148]]
+numeric(0)
+
+$params[[149]]
+numeric(0)
+
+$params[[150]]
+numeric(0)
+
+$params[[151]]
+numeric(0)
+
+$params[[152]]
+numeric(0)
+
+$params[[153]]
+numeric(0)
+
+$params[[154]]
+numeric(0)
+
+$params[[155]]
+numeric(0)
+
+$params[[156]]
+numeric(0)
+
+$params[[157]]
+numeric(0)
+
+$params[[158]]
+numeric(0)
+
+$params[[159]]
+numeric(0)
+
+$params[[160]]
+numeric(0)
+
+$params[[161]]
+numeric(0)
+
+$params[[162]]
+numeric(0)
+
+$params[[163]]
+numeric(0)
+
+$params[[164]]
+numeric(0)
+
+$params[[165]]
+numeric(0)
+
+$params[[166]]
+numeric(0)
+
+$params[[167]]
+numeric(0)
+
+$params[[168]]
+numeric(0)
+
+$params[[169]]
+numeric(0)
+
+$params[[170]]
+numeric(0)
+
+$params[[171]]
+numeric(0)
+
+$params[[172]]
+numeric(0)
+
+$params[[173]]
+numeric(0)
+
+$params[[174]]
+numeric(0)
+
+$params[[175]]
+numeric(0)
+
+$params[[176]]
+numeric(0)
+
+$params[[177]]
+numeric(0)
+
+$params[[178]]
+numeric(0)
+
+$params[[179]]
+numeric(0)
+
+$params[[180]]
+numeric(0)
+
+$params[[181]]
+numeric(0)
+
+$params[[182]]
+numeric(0)
+
+$params[[183]]
+numeric(0)
+
+$params[[184]]
+numeric(0)
+
+$params[[185]]
+numeric(0)
+
+$params[[186]]
+numeric(0)
+
+$params[[187]]
+numeric(0)
+
+$params[[188]]
+numeric(0)
+
+$params[[189]]
+numeric(0)
+
+$params[[190]]
+numeric(0)
+
+$params[[191]]
+numeric(0)
+
+$params[[192]]
+numeric(0)
+
+$params[[193]]
+numeric(0)
+
+$params[[194]]
+numeric(0)
+
+$params[[195]]
+numeric(0)
+
+$params[[196]]
+numeric(0)
+
+$params[[197]]
+numeric(0)
+
+$params[[198]]
+numeric(0)
+
+$params[[199]]
+numeric(0)
+
+$params[[200]]
+numeric(0)
+
+$params[[201]]
+numeric(0)
+
+$params[[202]]
+numeric(0)
+
+
+attr(,"class")
+[1] "Events"
+
+$event_log
+$time
+numeric(0)
+
+$type
+character(0)
+
+$target
+character(0)
+
+$target_index
+numeric(0)
+
+$requested
+list()
+
+$applied
+list()
+
+attr(,"class")
+[1] "EventLog"</code></pre>
 </div>
 </div>
 <p>Each line in the size-distribution plot follows one node through time. New nodes enter at times chosen by the node schedule, so a recorded step is not the same as one year. Line transparency represents node density: darker trajectories contribute more individuals to the patch.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>results_tidy<span class="sc">$</span>species <span class="sc">%&gt;%</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_size_distribution</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>results_tidy<span class="sc">$</span>species <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_size_distribution</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1550,38 +2659,38 @@ attr(,"class")
 <h2 class="anchored" data-anchor-id="calculate-patch-totals-for-each-strategy">Calculate patch totals for each strategy</h2>
 <p>Integration turns a size distribution into one patch-level value per strategy and time. For example, integrating node density over height gives the total number of individuals per square metre:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>data_species_tot <span class="ot">&lt;-</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  results_tidy<span class="sc">$</span>species <span class="sc">%&gt;%</span> <span class="fu">integrate_over_size_distribution</span>()</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>data_species_tot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>data_species_tot <span class="ot">&lt;-</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  results_tidy<span class="sc">$</span>species <span class="sc">%&gt;%</span> <span class="fu">integrate_over_size_distribution</span>()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>data_species_tot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 202 × 25
+<pre><code># A tibble: 202 × 33
     step    time patch_density species   density min_height log_density   height
    &lt;int&gt;   &lt;dbl&gt;         &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;
- 1     2 0.00001         0.140 1       0.0000999     0.0351    0.000310  3.51e-6
- 2     2 0.00001         0.140 2       0.0000999     0.0239    0.000435  2.39e-6
- 3     3 0.00002         0.140 1       0.000200      0.0351    0.000620  7.01e-6
- 4     3 0.00002         0.140 2       0.000200      0.0239    0.000870  4.77e-6
- 5     4 0.00003         0.140 1       0.000300      0.0351    0.000931  1.05e-5
- 6     4 0.00003         0.140 2       0.000300      0.0239    0.00131   7.16e-6
- 7     5 0.00004         0.140 1       0.000400      0.0351    0.00124   1.40e-5
- 8     5 0.00004         0.140 2       0.000400      0.0239    0.00174   9.55e-6
- 9     6 0.00005         0.140 1       0.000500      0.0351    0.00155   1.75e-5
-10     6 0.00005         0.140 2       0.000500      0.0239    0.00218   1.19e-5
+ 1     2 0.00001         0.140 1       0.0000999     0.0351    0.000306  3.51e-6
+ 2     2 0.00001         0.140 2       0.0000999     0.0239    0.000431  2.39e-6
+ 3     3 0.00002         0.140 1       0.000200      0.0351    0.000613  7.01e-6
+ 4     3 0.00002         0.140 2       0.000200      0.0239    0.000862  4.77e-6
+ 5     4 0.00003         0.140 1       0.000300      0.0351    0.000919  1.05e-5
+ 6     4 0.00003         0.140 2       0.000300      0.0239    0.00129   7.16e-6
+ 7     5 0.00004         0.140 1       0.000400      0.0351    0.00123   1.40e-5
+ 8     5 0.00004         0.140 2       0.000400      0.0239    0.00172   9.55e-6
+ 9     6 0.00005         0.140 1       0.000500      0.0351    0.00153   1.75e-5
+10     6 0.00005         0.140 2       0.000500      0.0239    0.00215   1.19e-5
 # ℹ 192 more rows
-# ℹ 17 more variables: mortality &lt;dbl&gt;, fecundity &lt;dbl&gt;, area_heartwood &lt;dbl&gt;,
-#   mass_heartwood &lt;dbl&gt;, storage &lt;dbl&gt;,
+# ℹ 25 more variables: mortality &lt;dbl&gt;, fecundity &lt;dbl&gt;, area_heartwood &lt;dbl&gt;,
+#   mass_heartwood &lt;dbl&gt;, storage &lt;dbl&gt;, log_area_leaf_departure &lt;dbl&gt;,
+#   log_area_sapwood_departure &lt;dbl&gt;, leaf_marginal_return_tracked &lt;dbl&gt;,
 #   offspring_produced_survival_weighted &lt;dbl&gt;, competition_effect &lt;dbl&gt;,
 #   height_inverse &lt;dbl&gt;, net_mass_production_dt &lt;dbl&gt;, root_mass &lt;dbl&gt;,
-#   opt_psi_stem &lt;dbl&gt;, opt_root_psi &lt;dbl&gt;, transpiration &lt;dbl&gt;, E_up_ &lt;dbl&gt;,
-#   profit &lt;dbl&gt;, stom_cond_CO2 &lt;dbl&gt;, assimilation &lt;dbl&gt;</code></pre>
+#   opt_psi_leaf &lt;dbl&gt;, opt_root_psi &lt;dbl&gt;, transpiration &lt;dbl&gt;, E_up_ &lt;dbl&gt;, …</code></pre>
 </div>
 </div>
 <p>Plotting that total shows how stem density changes as the patch develops:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>data_species_tot <span class="sc">%&gt;%</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time, density, <span class="at">colour=</span>species)) <span class="sc">+</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>data_species_tot <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time, density, <span class="at">colour=</span>species)) <span class="sc">+</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1592,41 +2701,41 @@ attr(,"class")
 </div>
 <p><code>expand_state()</code> derives additional quantities, including leaf area and tissue mass, from the states returned by the solver:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>results_tidy_expand <span class="ot">&lt;-</span> results_tidy <span class="sc">%&gt;%</span> <span class="fu">expand_state</span>()</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>results_tidy_expand<span class="sc">$</span>species</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>results_tidy_expand <span class="ot">&lt;-</span> results_tidy <span class="sc">%&gt;%</span> <span class="fu">expand_state</span>()</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>results_tidy_expand<span class="sc">$</span>species</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 10,506 × 37
+<pre><code># A tibble: 10,506 × 46
    species   time  step patch_density  node density log_density height mortality
    &lt;chr&gt;    &lt;dbl&gt; &lt;int&gt;         &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
- 1 1         0        1         0.140     1    22.3        3.10 0.0351  0.000699
- 2 1         1e-5     2         0.140     1    22.3        3.10 0.0351  0.000699
- 3 1         1e-5     2         0.140     2    22.3        3.10 0.0351  0.000699
- 4 1         2e-5     3         0.140     1    22.3        3.10 0.0351  0.000699
- 5 1         2e-5     3         0.140     2    22.3        3.10 0.0351  0.000699
- 6 1         2e-5     3         0.140     3    22.3        3.10 0.0351  0.000699
- 7 1         3e-5     4         0.140     1    22.3        3.10 0.0351  0.000699
- 8 1         3e-5     4         0.140     2    22.3        3.10 0.0351  0.000699
- 9 1         3e-5     4         0.140     3    22.3        3.10 0.0351  0.000699
-10 1         3e-5     4         0.140     4    22.3        3.10 0.0351  0.000699
+ 1 1         0        1         0.140     1    21.4        3.07 0.0351  0.000646
+ 2 1         1e-5     2         0.140     1    21.4        3.07 0.0351  0.000646
+ 3 1         1e-5     2         0.140     2    21.4        3.07 0.0351  0.000646
+ 4 1         2e-5     3         0.140     1    21.4        3.07 0.0351  0.000647
+ 5 1         2e-5     3         0.140     2    21.4        3.07 0.0351  0.000646
+ 6 1         2e-5     3         0.140     3    21.4        3.07 0.0351  0.000646
+ 7 1         3e-5     4         0.140     1    21.4        3.06 0.0351  0.000647
+ 8 1         3e-5     4         0.140     2    21.4        3.06 0.0351  0.000646
+ 9 1         3e-5     4         0.140     3    21.4        3.06 0.0351  0.000646
+10 1         3e-5     4         0.140     4    21.4        3.07 0.0351  0.000646
 # ℹ 10,496 more rows
-# ℹ 28 more variables: fecundity &lt;dbl&gt;, area_heartwood &lt;dbl&gt;,
-#   mass_heartwood &lt;dbl&gt;, storage &lt;dbl&gt;,
+# ℹ 37 more variables: fecundity &lt;dbl&gt;, area_heartwood &lt;dbl&gt;,
+#   mass_heartwood &lt;dbl&gt;, storage &lt;dbl&gt;, log_area_leaf_departure &lt;dbl&gt;,
+#   log_area_sapwood_departure &lt;dbl&gt;, leaf_marginal_return_tracked &lt;dbl&gt;,
 #   offspring_produced_survival_weighted &lt;dbl&gt;, competition_effect &lt;dbl&gt;,
 #   height_inverse &lt;dbl&gt;, net_mass_production_dt &lt;dbl&gt;, root_mass &lt;dbl&gt;,
-#   opt_psi_stem &lt;dbl&gt;, opt_root_psi &lt;dbl&gt;, transpiration &lt;dbl&gt;, E_up_ &lt;dbl&gt;,
-#   profit &lt;dbl&gt;, stom_cond_CO2 &lt;dbl&gt;, assimilation &lt;dbl&gt;, area_leaf &lt;dbl&gt;, …</code></pre>
+#   opt_psi_leaf &lt;dbl&gt;, opt_root_psi &lt;dbl&gt;, transpiration &lt;dbl&gt;, E_up_ &lt;dbl&gt;, …</code></pre>
 </div>
 </div>
 <p>To obtain total leaf area, the helper weights individual leaf area by node density and integrates over height at each time:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>data_species_tot <span class="ot">&lt;-</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  results_tidy_expand<span class="sc">$</span>species <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">integrate_over_size_distribution</span>()</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>data_species_tot <span class="sc">%&gt;%</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time, area_leaf, <span class="at">colour =</span> species)) <span class="sc">+</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>data_species_tot <span class="ot">&lt;-</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  results_tidy_expand<span class="sc">$</span>species <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">integrate_over_size_distribution</span>()</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>data_species_tot <span class="sc">%&gt;%</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time, area_leaf, <span class="at">colour =</span> species)) <span class="sc">+</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1638,26 +2747,26 @@ attr(,"class")
 <p>In this run, the thin-leaved strategy initially deploys more total leaf area but is later overtaken by the thicker-leaved strategy.</p>
 <p>The expanded totals also show how above-ground biomass is divided among leaf, bark, sapwood, and heartwood through time:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"mass_heartwood"</span>, <span class="st">"mass_sapwood"</span>, <span class="st">"mass_bark"</span>, <span class="st">"mass_leaf"</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>data_long <span class="ot">&lt;-</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  data_species_tot <span class="sc">%&gt;%</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time,species, <span class="fu">one_of</span>(v)) <span class="sc">%&gt;%</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">starts_with</span>(<span class="st">"mass"</span>), <span class="at">names_to =</span> <span class="st">"tissue"</span>)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>data_long<span class="sc">$</span>tissue <span class="ot">&lt;-</span> <span class="fu">factor</span>(data_long<span class="sc">$</span>tissue, <span class="at">levels =</span> v)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>species_names <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">species =</span> <span class="fu">unique</span>(data_long<span class="sc">$</span>species),</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                      <span class="at">species_name =</span> <span class="fu">c</span>(<span class="st">"Species_1"</span>,<span class="st">"Species_2"</span>))</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>data_long <span class="sc">%&gt;%</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(species_names) <span class="sc">%&gt;%</span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time, value, <span class="at">fill=</span>tissue)) <span class="sc">+</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>() <span class="sc">+</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Patch age (yr)"</span>, <span class="at">y =</span> <span class="st">"Above ground mass (kg/m2)"</span>) <span class="sc">+</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>)) <span class="sc">+</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>species_name)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"mass_heartwood"</span>, <span class="st">"mass_sapwood"</span>, <span class="st">"mass_bark"</span>, <span class="st">"mass_leaf"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>data_long <span class="ot">&lt;-</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  data_species_tot <span class="sc">%&gt;%</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time,species, <span class="fu">one_of</span>(v)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">starts_with</span>(<span class="st">"mass"</span>), <span class="at">names_to =</span> <span class="st">"tissue"</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>data_long<span class="sc">$</span>tissue <span class="ot">&lt;-</span> <span class="fu">factor</span>(data_long<span class="sc">$</span>tissue, <span class="at">levels =</span> v)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>species_names <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">species =</span> <span class="fu">unique</span>(data_long<span class="sc">$</span>species),</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>                      <span class="at">species_name =</span> <span class="fu">c</span>(<span class="st">"Species_1"</span>,<span class="st">"Species_2"</span>))</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>data_long <span class="sc">%&gt;%</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(species_names) <span class="sc">%&gt;%</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time, value, <span class="at">fill=</span>tissue)) <span class="sc">+</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>() <span class="sc">+</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Patch age (yr)"</span>, <span class="at">y =</span> <span class="st">"Above ground mass (kg/m2)"</span>) <span class="sc">+</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>)) <span class="sc">+</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>species_name)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1671,59 +2780,59 @@ attr(,"class")
 <h2 class="anchored" data-anchor-id="interpolate-to-specific-times">Interpolate to specific times</h2>
 <p>The node-introduction schedule sets the times at which new <a href="../theory/implementation/characteristic-method.html">characteristics</a> enter the simulation. It can optionally be refined by the <a href="../theory/implementation/node-spacing.html">node-spacing algorithm</a>. The recorded steps therefore may not fall at the exact times we want to query. <code>interpolate_to_times()</code> estimates the node states at 1, 5, and 10 years from the existing run:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>tidy_species_data <span class="ot">&lt;-</span> results_tidy<span class="sc">$</span>species</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>tidy_species_new <span class="ot">&lt;-</span> <span class="fu">interpolate_to_times</span>(tidy_species_data, times)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>tidy_species_data <span class="ot">&lt;-</span> results_tidy<span class="sc">$</span>species</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>tidy_species_new <span class="ot">&lt;-</span> <span class="fu">interpolate_to_times</span>(tidy_species_data, times)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The returned rows contain the state variables at those requested times:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>tidy_species_new <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>tidy_species_new <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 472 × 24
+<pre><code># A tibble: 514 × 32
    species  node  time patch_density density log_density height mortality
    &lt;chr&gt;   &lt;int&gt; &lt;dbl&gt;         &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
- 1 1           1     1        0.138    3.57        1.27    2.78    0.0112
- 2 1           1     5        0.0953   0.404      -0.907   9.49    0.0546
- 3 1           1    10        0.0298   0.211      -1.55   15.3     0.797 
- 4 1           2     1        0.138    3.57        1.27    2.78    0.0112
- 5 1           2     5        0.0953   0.404      -0.907   9.48    0.0546
- 6 1           2    10        0.0298   0.212      -1.55   15.3     0.798 
- 7 1           3     1        0.138    3.57        1.27    2.78    0.0112
- 8 1           3     5        0.0953   0.404      -0.906   9.48    0.0546
- 9 1           3    10        0.0298   0.210      -1.56   15.3     0.800 
-10 1           4     1        0.138    3.57        1.27    2.78    0.0112
-# ℹ 462 more rows
-# ℹ 16 more variables: fecundity &lt;dbl&gt;, area_heartwood &lt;dbl&gt;,
-#   mass_heartwood &lt;dbl&gt;, storage &lt;dbl&gt;,
+ 1 1           1     1        0.138    1.44        0.366   3.18    0.0121
+ 2 1           1     5        0.0953   0.413      -0.884   8.30    0.0981
+ 3 1           1    10        0.0298   0.110      -2.20   14.2     0.299 
+ 4 1           2     1        0.138    1.44        0.366   3.18    0.0121
+ 5 1           2     5        0.0953   0.413      -0.884   8.30    0.0982
+ 6 1           2    10        0.0298   0.110      -2.20   14.2     0.299 
+ 7 1           3     1        0.138    1.44        0.366   3.18    0.0121
+ 8 1           3     5        0.0953   0.413      -0.885   8.30    0.0982
+ 9 1           3    10        0.0298   0.110      -2.21   14.2     0.299 
+10 1           4     1        0.138    1.44        0.365   3.18    0.0121
+# ℹ 504 more rows
+# ℹ 24 more variables: fecundity &lt;dbl&gt;, area_heartwood &lt;dbl&gt;,
+#   mass_heartwood &lt;dbl&gt;, storage &lt;dbl&gt;, log_area_leaf_departure &lt;dbl&gt;,
+#   log_area_sapwood_departure &lt;dbl&gt;, leaf_marginal_return_tracked &lt;dbl&gt;,
 #   offspring_produced_survival_weighted &lt;dbl&gt;, competition_effect &lt;dbl&gt;,
 #   height_inverse &lt;dbl&gt;, net_mass_production_dt &lt;dbl&gt;, root_mass &lt;dbl&gt;,
-#   opt_psi_stem &lt;dbl&gt;, opt_root_psi &lt;dbl&gt;, transpiration &lt;dbl&gt;, E_up_ &lt;dbl&gt;,
-#   profit &lt;dbl&gt;, stom_cond_CO2 &lt;dbl&gt;, assimilation &lt;dbl&gt;</code></pre>
+#   opt_psi_leaf &lt;dbl&gt;, opt_root_psi &lt;dbl&gt;, transpiration &lt;dbl&gt;, E_up_ &lt;dbl&gt;, …</code></pre>
 </div>
 </div>
 <p>To check the interpolation, combine the new rows with the recorded trajectories. The red points lie on the original curves, showing agreement at the requested times:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>data_combined <span class="ot">&lt;-</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  tidy_species_data <span class="sc">%&gt;%</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(tidy_species_new) <span class="sc">%&gt;%</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(species, node, time) <span class="sc">%&gt;%</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(node <span class="sc">%in%</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">101</span>, <span class="at">by=</span><span class="dv">20</span>))</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>data_combined_long <span class="ot">&lt;-</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  data_combined  <span class="sc">%&gt;%</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(node, time, step, density, height, species) <span class="sc">%&gt;%</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"density"</span>, <span class="st">"height"</span>))</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>data_combined_long <span class="sc">%&gt;%</span></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time, value, <span class="at">group=</span>node,<span class="at">colour=</span>node)) <span class="sc">+</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> data_combined_long <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">is.na</span>(step)), <span class="at">col=</span><span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">20</span>)) <span class="sc">+</span></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(name<span class="sc">~</span>species, <span class="at">scales=</span><span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>data_combined <span class="ot">&lt;-</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  tidy_species_data <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(tidy_species_new) <span class="sc">%&gt;%</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(species, node, time) <span class="sc">%&gt;%</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(node <span class="sc">%in%</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">101</span>, <span class="at">by=</span><span class="dv">20</span>))</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>data_combined_long <span class="ot">&lt;-</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  data_combined  <span class="sc">%&gt;%</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(node, time, step, density, height, species) <span class="sc">%&gt;%</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"density"</span>, <span class="st">"height"</span>))</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>data_combined_long <span class="sc">%&gt;%</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time, value, <span class="at">group=</span>node,<span class="at">colour=</span>node)) <span class="sc">+</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> data_combined_long <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">is.na</span>(step)), <span class="at">col=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">20</span>)) <span class="sc">+</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(name<span class="sc">~</span>species, <span class="at">scales=</span><span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1737,59 +2846,59 @@ attr(,"class")
 <h2 class="anchored" data-anchor-id="interpolate-to-specific-heights">Interpolate to specific heights</h2>
 <p>The complementary question is: what was the state at a particular height? <code>interpolate_to_heights()</code> estimates values across nodes at each recorded time:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>heights <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>tidy_species_data <span class="ot">&lt;-</span> results_tidy<span class="sc">$</span>species</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>tidy_species_new <span class="ot">&lt;-</span> <span class="fu">interpolate_to_heights</span>(tidy_species_data, heights)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>heights <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>tidy_species_data <span class="ot">&lt;-</span> results_tidy<span class="sc">$</span>species</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>tidy_species_new <span class="ot">&lt;-</span> <span class="fu">interpolate_to_heights</span>(tidy_species_data, heights)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>These rows contain estimates at heights of 1, 5, and 10 metres:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>tidy_species_new <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>tidy_species_new <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 209 × 24
+<pre><code># A tibble: 278 × 32
    species      time  step patch_density density log_density height mortality
    &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;         &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
- 1 1       0             1         0.140    22.3        3.10 0.0351  0.000699
- 2 1       0.00001       2         0.140    22.3        3.10 0.0351  0.000699
- 3 1       0.00002       3         0.140    22.3        3.10 0.0351  0.000699
- 4 1       0.00003       4         0.140    22.3        3.10 0.0351  0.000699
- 5 1       0.00004       5         0.140    22.3        3.10 0.0351  0.000699
- 6 1       0.00005       6         0.140    22.3        3.10 0.0351  0.000700
- 7 1       0.00006       7         0.140    22.3        3.10 0.0351  0.000700
- 8 1       0.00007       8         0.140    22.3        3.10 0.0351  0.000700
- 9 1       0.00008       9         0.140    22.3        3.10 0.0351  0.000700
-10 1       0.0000953    10         0.140    22.3        3.10 0.0351  0.000700
-# ℹ 199 more rows
-# ℹ 16 more variables: fecundity &lt;dbl&gt;, area_heartwood &lt;dbl&gt;,
-#   mass_heartwood &lt;dbl&gt;, storage &lt;dbl&gt;,
+ 1 1       0             1         0.140    21.4        3.07 0.0351  0.000646
+ 2 1       0.00001       2         0.140    21.4        3.07 0.0351  0.000646
+ 3 1       0.00002       3         0.140    21.4        3.07 0.0351  0.000647
+ 4 1       0.00003       4         0.140    21.4        3.06 0.0351  0.000647
+ 5 1       0.00004       5         0.140    21.4        3.06 0.0351  0.000647
+ 6 1       0.00005       6         0.140    21.4        3.06 0.0351  0.000647
+ 7 1       0.00006       7         0.140    21.4        3.06 0.0351  0.000647
+ 8 1       0.00007       8         0.140    21.4        3.06 0.0351  0.000647
+ 9 1       0.00008       9         0.140    21.4        3.06 0.0351  0.000647
+10 1       0.0000953    10         0.140    21.4        3.06 0.0351  0.000647
+# ℹ 268 more rows
+# ℹ 24 more variables: fecundity &lt;dbl&gt;, area_heartwood &lt;dbl&gt;,
+#   mass_heartwood &lt;dbl&gt;, storage &lt;dbl&gt;, log_area_leaf_departure &lt;dbl&gt;,
+#   log_area_sapwood_departure &lt;dbl&gt;, leaf_marginal_return_tracked &lt;dbl&gt;,
 #   offspring_produced_survival_weighted &lt;dbl&gt;, competition_effect &lt;dbl&gt;,
 #   height_inverse &lt;dbl&gt;, net_mass_production_dt &lt;dbl&gt;, root_mass &lt;dbl&gt;,
-#   opt_psi_stem &lt;dbl&gt;, opt_root_psi &lt;dbl&gt;, transpiration &lt;dbl&gt;, E_up_ &lt;dbl&gt;,
-#   profit &lt;dbl&gt;, stom_cond_CO2 &lt;dbl&gt;, assimilation &lt;dbl&gt;</code></pre>
+#   opt_psi_leaf &lt;dbl&gt;, opt_root_psi &lt;dbl&gt;, transpiration &lt;dbl&gt;, E_up_ &lt;dbl&gt;, …</code></pre>
 </div>
 </div>
 <p>Again, plotting the estimates as red points against the recorded profiles makes the interpolation easy to assess:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>data_combined <span class="ot">&lt;-</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  tidy_species_data <span class="sc">%&gt;%</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(tidy_species_new) <span class="sc">%&gt;%</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(species, time, height) <span class="sc">%&gt;%</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(step <span class="sc">%in%</span> <span class="fu">unique</span>(<span class="fu">round</span>(<span class="fu">seq</span>(<span class="fu">min</span>(step, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">max</span>(step, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">length.out =</span> <span class="dv">2</span>))))</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>data_combined_long <span class="ot">&lt;-</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  data_combined  <span class="sc">%&gt;%</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(node, time, step, height, density, mortality, area_heartwood, species) <span class="sc">%&gt;%</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"density"</span>, <span class="st">"mortality"</span>, <span class="st">"area_heartwood"</span>))</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>data_combined_long <span class="sc">%&gt;%</span></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(node)) <span class="sc">%&gt;%</span></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(height, value, <span class="at">group=</span>step, <span class="at">colour=</span>step)) <span class="sc">+</span></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> data_combined_long <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">is.na</span>(node)), <span class="fu">aes</span>(<span class="at">x=</span>height, <span class="at">y=</span>value), <span class="at">col=</span><span class="st">"red"</span>)<span class="sc">+</span></span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(name<span class="sc">~</span>species, <span class="at">scales=</span><span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>data_combined <span class="ot">&lt;-</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  tidy_species_data <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(tidy_species_new) <span class="sc">%&gt;%</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(species, time, height) <span class="sc">%&gt;%</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(step <span class="sc">%in%</span> <span class="fu">unique</span>(<span class="fu">round</span>(<span class="fu">seq</span>(<span class="fu">min</span>(step, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">max</span>(step, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">length.out =</span> <span class="dv">2</span>))))</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>data_combined_long <span class="ot">&lt;-</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  data_combined  <span class="sc">%&gt;%</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(node, time, step, height, density, mortality, area_heartwood, species) <span class="sc">%&gt;%</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"density"</span>, <span class="st">"mortality"</span>, <span class="st">"area_heartwood"</span>))</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>data_combined_long <span class="sc">%&gt;%</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(node)) <span class="sc">%&gt;%</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(height, value, <span class="at">group=</span>step, <span class="at">colour=</span>step)) <span class="sc">+</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> data_combined_long <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">is.na</span>(node)), <span class="fu">aes</span>(<span class="at">x=</span>height, <span class="at">y=</span>value), <span class="at">col=</span><span class="st">"red"</span>)<span class="sc">+</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(name<span class="sc">~</span>species, <span class="at">scales=</span><span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1881,7 +2990,8 @@ attr(,"class")
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -1890,8 +3000,69 @@ attr(,"class")
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -1905,6 +3076,7 @@ attr(,"class")
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -2067,44 +3239,54 @@ attr(,"class")
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -2203,7 +3385,10 @@ attr(,"class")
     }
   });
   </script>
-<nav class="page-navigation">
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
   <div class="nav-page nav-page-previous">
       <a href="../guides/calibration.html" class="pagination-link" aria-label="Calibration">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Calibration</span>

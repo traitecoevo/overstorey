@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,13 +74,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../guides/initialising-a-patch.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e30b0f8ea5685d2ef6f683bb78d13b16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -116,11 +117,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="../assets/extras.css">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
@@ -131,8 +132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <span class="navbar-title">Overstorey</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -181,15 +181,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </a>
 </div>
+            <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guides/patch-dynamics.html">Running the model</a></li><li class="breadcrumb-item"><a href="../guides/strategies.html">Strategies &amp; traits</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guides/patch-dynamics.html">Running the model</a></li><li class="breadcrumb-item"><a href="../guides/strategies.html">Strategies &amp; traits</a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -197,7 +198,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -208,13 +209,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Getting started</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Getting started</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/install.html" class="sidebar-item-text sidebar-link">
@@ -231,13 +229,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Running the model</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Running the model</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/patch-dynamics.html" class="sidebar-item-text sidebar-link">
@@ -272,13 +267,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Worked examples</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">Worked examples</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/example-analysis.html" class="sidebar-item-text sidebar-link">
@@ -301,13 +293,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
- <span class="menu-text">Scaling up</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">Scaling up</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/running-in-parallel.html" class="sidebar-item-text sidebar-link">
@@ -318,13 +307,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
- <span class="menu-text">TF24 in depth</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">TF24 in depth</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guides/tf24-hydraulics-and-acclimation.html" class="sidebar-item-text sidebar-link">
@@ -345,7 +331,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
@@ -356,9 +342,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/guides/strategies.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guides/patch-dynamics.html">Running the model</a></li><li class="breadcrumb-item"><a href="../guides/strategies.html">Strategies &amp; traits</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guides/patch-dynamics.html">Running the model</a></li><li class="breadcrumb-item"><a href="../guides/strategies.html">Strategies &amp; traits</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Strategies &amp; traits</h1>
 </div>
@@ -388,7 +374,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="inspect-or-directly-change-a-strategy">Inspect or directly change a strategy</h2>
 <p>Start with the default FF16 strategy. Printing its names shows that the object contains biological parameters, numerical controls, recruitment settings, and other model information:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">FF16_Strategy</span>()</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">FF16_Model</span>()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(s)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "pars"                   "control"                "collect_all_auxiliary" 
@@ -403,18 +389,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
      1.978791e-01      6.080000e+02      1.659587e+01      3.800000e-05 
               eta             theta              a_l1              a_l2 
      1.200000e+01      2.141786e-04      5.440000e+00      3.060000e-01 
-             a_r1              a_b1               r_s               r_b 
-     7.000000e-02      1.700000e-01      6.598684e+00      1.319737e+01 
-              r_r               r_l               a_y             a_bio 
-     2.170000e+02      1.984545e+02      7.000000e-01      2.450000e-02 
-              k_l               k_b               k_s               k_r 
-     4.565855e-01      2.000000e-01      2.000000e-01      1.000000e+00 
-             a_p1              a_p2              a_f3              a_f1 
-     1.511778e+02      2.047162e-01      1.140000e-04      1.000000e+00 
-             a_f2               S_D              a_d0               d_I 
-     5.000000e+01      2.500000e-01      1.000000e-01      1.000000e-02 
-            a_dG1             a_dG2               k_I recruitment_decay 
-     5.500000e+00      2.000000e+01      5.000000e-01      0.000000e+00 </code></pre>
+             a_r1             a_cr1              a_b1               r_s 
+     7.000000e-02      0.000000e+00      1.700000e-01      6.598684e+00 
+              r_b               r_r              r_cr               r_l 
+     1.319737e+01      2.170000e+02      6.598684e+00      1.984545e+02 
+              a_y             a_bio               k_l               k_b 
+     7.000000e-01      2.450000e-02      4.565855e-01      2.000000e-01 
+              k_s               k_r              k_cr              a_p1 
+     2.000000e-01      1.000000e+00      2.000000e-01      1.511778e+02 
+             a_p2              a_f3              a_f1              a_f2 
+     2.047162e-01      1.140000e-04      1.000000e+00      5.000000e+01 
+              S_D              a_d0               d_I             a_dG1 
+     2.500000e-01      1.000000e-01      1.000000e-02      5.500000e+00 
+            a_dG2               k_I recruitment_decay 
+     2.000000e+01      5.000000e-01      0.000000e+00 </code></pre>
 </div>
 </div>
 <p>For a controlled experiment, you can change one value directly. Here we double leaf mass per unit leaf area (<code>lma</code>):</p>
@@ -433,107 +421,104 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="create-strategies-from-traits" class="level2">
 <h2 class="anchored" data-anchor-id="create-strategies-from-traits">Create strategies from traits</h2>
-<p><code>plant</code> represents these links with a <strong>hyperparameterisation</strong>: an R function that translates a small set of input traits into a consistent set of model parameters. FF16 uses <code>FF16_hyperpar()</code>:</p>
+<p><code>plant</code> represents these links with a <strong>hyperparameterisation</strong>: an R function that translates a small set of input traits into a consistent set of model parameters. The <code>fieldtrial</code> package supplies the recommended trade-offs; <code>plant</code> applies none unless they are attached. <code>fieldtrial::tradeoffs()</code> builds the function for a model:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>FF16_hyperpar</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>hp <span class="ot">&lt;-</span> fieldtrial<span class="sc">::</span><span class="fu">tradeoffs</span>(<span class="st">"FF16"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>hp</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>function (m, s, filter = TRUE) 
 {
-    with_default &lt;- function(name, default_value = s$pars[[name]]) {
-        rep_len(if (name %in% colnames(m)) 
-            m[, name]
-        else default_value, nrow(m))
-    }
-    lma &lt;- with_default("lma")
-    rho &lt;- with_default("rho")
-    omega &lt;- with_default("omega")
-    narea &lt;- with_default("narea", narea)
+    lma &lt;- trait_values(m, s, "lma")
+    rho &lt;- trait_values(m, s, "rho")
+    omega &lt;- trait_values(m, s, "omega")
+    narea &lt;- trait_values(m, s, "narea", co$narea)
+    econ &lt;- economic_tradeoffs(lma, rho, omega, co)
     k_I &lt;- s$pars$k_I
-    k_l &lt;- B_kl1 * (lma/lma_0)^(-B_kl2)
-    d_I &lt;- B_dI1 * (rho/rho_0)^(-B_dI2)
-    k_s &lt;- B_ks1 * (rho/rho_0)^(-B_ks2)
-    r_s &lt;- B_rs1/rho
-    r_b &lt;- B_rb1/rho
-    a_f3 &lt;- B_f1 * omega
-    assimilation_rectangular_hyperbolae &lt;- function(I, Amax, 
-        theta, QY) {
-        x &lt;- QY * I + Amax
-        (x - sqrt(x^2 - 4 * theta * QY * I * Amax))/(2 * theta)
-    }
-    approximate_annual_assimilation &lt;- function(narea, latitude) {
-        E &lt;- seq(0, 1, by = 0.02)
-        D &lt;- seq(0, 365/2, length.out = 10000)
-        I &lt;- PAR_given_solar_angle(solar_angle(D, latitude = abs(latitude)))
-        Amax &lt;- B_lf1 * (narea/narea_0)^B_lf5
-        theta &lt;- B_lf2
-        QY &lt;- B_lf3
-        AA &lt;- NA * E
-        for (i in seq_len(length(E))) {
-            AA[i] &lt;- 2 * trapezium(D, assimilation_rectangular_hyperbolae(k_I * 
-                I * E[i], Amax, theta, QY))
-        }
-        if (all(diff(AA) &lt; 1e-08)) {
-            ret &lt;- c(dplyr::last(AA), 0)
-            names(ret) &lt;- c("p1", "p2")
-        }
-        else {
-            fit &lt;- nls(AA ~ p1 * E/(p2 + E), data.frame(E = E, 
-                AA = AA), start = list(p1 = 100, p2 = 0.2))
-            ret &lt;- coef(fit)
-        }
-        ret
-    }
     a_p1 &lt;- a_p2 &lt;- 0 * narea
     if (length(narea) &gt; 0) {
         i &lt;- match(narea, unique(narea))
-        y &lt;- vapply(unique(narea), approximate_annual_assimilation, 
-            numeric(2), latitude)
+        y &lt;- vapply(unique(narea), ff16_annual_assimilation_curve, 
+            numeric(2), co = co, k_I = k_I)
         a_p1 &lt;- y["p1", i]
         a_p2 &lt;- y["p2", i]
     }
-    r_l &lt;- B_lf4 * narea/lma
-    extra &lt;- cbind(k_l, d_I, k_s, r_s, r_b, a_f3, a_p1, a_p2, 
-        r_l)
-    overlap &lt;- intersect(colnames(m), colnames(extra))
-    if (length(overlap) &gt; 0L) {
-        stop("Attempt to overwrite generated parameters: ", paste(overlap, 
-            collapse = ", "))
-    }
-    if (any(is.infinite(extra))) {
-        stop("Attempt to use infinite value in derived parameters: ", 
-            paste(colnames(extra)[is.infinite(extra)], collapse = ", "))
-    }
-    if (filter) {
-        if (nrow(extra) == 0L) {
-            extra &lt;- NULL
-        }
-        else {
-            pos &lt;- diff(apply(extra, 2, range)) == 0
-            if (any(pos)) {
-                eps &lt;- sqrt(.Machine$double.eps)
-                x1 &lt;- extra[1, pos]
-                x2 &lt;- unlist(s$pars[names(x1)])
-                drop &lt;- abs(x1 - x2) &lt; eps &amp; abs(1 - x1/x2) &lt; 
-                  eps
-                if (any(drop)) {
-                  keep &lt;- setdiff(colnames(extra), names(drop)[drop])
-                  extra &lt;- extra[, keep, drop = FALSE]
-                }
-            }
-        }
-    }
-    if (!is.null(extra)) {
-        m &lt;- cbind(m, extra)
-    }
-    m
+    r_l &lt;- co$B_lf4 * narea/lma
+    extra &lt;- cbind(k_l = econ$k_l, d_I = econ$d_I, k_s = econ$k_s, 
+        r_s = econ$r_s, r_b = econ$r_b, a_f3 = econ$a_f3, a_p1 = a_p1, 
+        a_p2 = a_p2, r_l = r_l)
+    append_derived(m, extra, s, filter)
 }
-&lt;bytecode: 0x139ff9c08&gt;
-&lt;environment: 0x139ff14e8&gt;</code></pre>
+&lt;bytecode: 0xcb1d48510&gt;
+&lt;environment: 0xcb1d4cb30&gt;
+attr(,"input_traits")
+[1] "narea"
+attr(,"model")
+[1] "FF16"
+attr(,"coefficients")
+attr(,"coefficients")$lma_0
+[1] 0.1978791
+
+attr(,"coefficients")$B_kl1
+[1] 0.4565855
+
+attr(,"coefficients")$B_kl2
+[1] 1.71
+
+attr(,"coefficients")$rho_0
+[1] 608
+
+attr(,"coefficients")$B_dI1
+[1] 0.01
+
+attr(,"coefficients")$B_dI2
+[1] 0
+
+attr(,"coefficients")$B_ks1
+[1] 0.2
+
+attr(,"coefficients")$B_ks2
+[1] 0
+
+attr(,"coefficients")$B_rs1
+[1] 4012
+
+attr(,"coefficients")$B_rb1
+[1] 8024
+
+attr(,"coefficients")$B_f1
+[1] 3
+
+attr(,"coefficients")$narea
+[1] 0.00187
+
+attr(,"coefficients")$narea_0
+[1] 0.00187
+
+attr(,"coefficients")$B_lf1
+[1] 0.8273474
+
+attr(,"coefficients")$B_lf2
+[1] 0.5
+
+attr(,"coefficients")$B_lf3
+[1] 0.04
+
+attr(,"coefficients")$B_lf4
+[1] 21000
+
+attr(,"coefficients")$B_lf5
+[1] 1
+
+attr(,"coefficients")$latitude
+[1] 0
+
+attr(,"traits")
+[1] "lma"   "rho"   "omega" "narea"</code></pre>
 </div>
 </div>
 <p>You will rarely call this function directly. Looking at its output is useful, however, because it makes the parameter links explicit. Supplying LMA updates leaf turnover (<code>k_l</code>) and leaf respiration per mass (<code>r_l</code>). The output also includes photosynthesis per leaf area (<code>a_p1</code>), which is derived from leaf nitrogen per area (<code>narea</code>) rather than LMA itself.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">FF16_hyperpar</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.1</span>, <span class="st">"lma"</span>), s)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hp</span>(<span class="fu">trait_matrix</span>(<span class="fl">0.1</span>, <span class="st">"lma"</span>), s)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   lma      k_l     a_p1   r_l
 p1 0.1 1.466783 151.1778 392.7</code></pre>
@@ -560,46 +545,55 @@ p1 0.1 1.466783 151.1778 392.7</code></pre>
 [2,] 500.0</code></pre>
 </div>
 </div>
-<p>The preferred workflow uses <code>generate_strategy()</code> or <code>add_strategies()</code>. Both start from a <code>Parameters</code> object, which collects the settings needed for a patch run and stores the default strategy from which new strategies are built:</p>
+<p>The preferred workflow uses <code>generate_strategy()</code> or <code>add_strategies()</code>. Both start from a <code>Parameters</code> object, which collects the settings needed for a patch run and stores the default strategy from which new strategies are built. Attach the trade-offs to it as <code>p$hyperpar</code>:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">FF16_Parameters</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">base_parameters</span>(<span class="st">"FF16"</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>p<span class="sc">$</span>hyperpar <span class="ot">&lt;-</span> fieldtrial<span class="sc">::</span><span class="fu">tradeoffs</span>(<span class="st">"FF16"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Its top-level names show the main groups of settings:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(p)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "patch_area"                  "n_patches"                  
- [3] "patch_type"                  "max_patch_lifetime"         
- [5] "strategies"                  "strategy_default"           
- [7] "node_schedule_times_default" "node_schedule_times"        
- [9] "ode_times"                   "initial_state"              
-[11] "n_initial_cohorts"           "initial_node_times"         
-[13] "initial_patch_density"       "initial_pr_patch_survival"  
-[15] "initial_time"               </code></pre>
+ [3] "fitness_weighting"           "max_patch_lifetime"         
+ [5] "fitness_window_start"        "fitness_window_end"         
+ [7] "fitness_window_weight_x"     "fitness_window_weight_y"    
+ [9] "strategies"                  "strategy_default"           
+[11] "node_schedule_times_default" "node_schedule_times"        
+[13] "ode_times"                   "ode_step_sizes"             
+[15] "ode_soil_input_slopes"       "ode_soil_substep_ends"      
+[17] "initial_state"               "n_initial_cohorts"          
+[19] "initial_node_times"          "initial_patch_density"      
+[21] "initial_pr_patch_survival"   "initial_time"               
+[23] "hyperpar"                   </code></pre>
 </div>
 </div>
-<p><code>param_hyperpar()</code> retrieves the linking function associated with the model:</p>
+<p>A <code>Parameters</code> object carries its linking function in <code>p$hyperpar</code>, which <code>param_hyperpar()</code> retrieves. Without one attached, <code>plant</code> applies no trade-offs, so trait values are written straight to the parameters of the same name:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">param_hyperpar</span>(p), FF16_hyperpar)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is.null</span>(p<span class="sc">$</span>hyperpar)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is.null</span>(<span class="fu">base_parameters</span>(<span class="st">"FF16"</span>)<span class="sc">$</span>hyperpar)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
 </div>
 <p>The <code>strategy_default</code> member is the template copied when new strategies are generated. Physiological parameters, including the light extinction coefficient <code>k_I</code>, live under its <code>pars</code> element:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(p<span class="sc">$</span>strategy_default)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(p<span class="sc">$</span>strategy_default)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "FF16_Strategy"</code></pre>
+<pre><code>[1] "FF16_Model"</code></pre>
 </div>
 </div>
 <p>Generating a strategy copies that template, sets LMA, and updates the linked parameters:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">generate_strategy</span>(p, <span class="fu">trait_matrix</span>(<span class="fl">0.1</span>, <span class="st">"lma"</span>), <span class="at">birth_rate =</span> <span class="dv">1</span>)[[<span class="dv">1</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">generate_strategy</span>(p, <span class="fu">trait_matrix</span>(<span class="fl">0.1</span>, <span class="st">"lma"</span>), <span class="at">birth_rate =</span> <span class="dv">1</span>)[[<span class="dv">1</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The same function can generate several strategies at once. Each row of the trait matrix becomes one strategy, so the birth-rate vector also has one value per row:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>lma <span class="ot">&lt;-</span> <span class="fu">trait_matrix</span>(<span class="fu">seq</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="at">length.out=</span><span class="dv">5</span>), <span class="st">"lma"</span>)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">FF16_hyperpar</span>(<span class="fu">trait_matrix</span>(lma, <span class="st">"lma"</span>), s)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>lma <span class="ot">&lt;-</span> <span class="fu">trait_matrix</span>(<span class="fu">seq</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="at">length.out=</span><span class="dv">5</span>), <span class="st">"lma"</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hp</span>(<span class="fu">trait_matrix</span>(lma, <span class="st">"lma"</span>), s)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     lma        k_l     r_l
 [1,] 0.1 1.46678341 392.700
@@ -608,27 +602,27 @@ p1 0.1 1.466783 151.1778 392.7</code></pre>
 [4,] 0.4 0.13703875  98.175
 [5,] 0.5 0.09356799  78.540</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ss <span class="ot">&lt;-</span> <span class="fu">generate_strategy</span>(p, lma, <span class="at">birth_rate =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(ss)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>ss <span class="ot">&lt;-</span> <span class="fu">generate_strategy</span>(p, lma, <span class="at">birth_rate =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(ss)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 5</code></pre>
 </div>
 </div>
 <p>Standard R functions can compare the resulting parameter values:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>lma)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>lma)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.1 0.2 0.3 0.4 0.5</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>k_l)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>k_l)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1.46678341 0.44833712 0.22412414 0.13703875 0.09356799</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>a_p1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>a_p1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 151.1778 151.1778 151.1778 151.1778 151.1778</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>r_l)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(ss, <span class="cf">function</span>(x) x<span class="sc">$</span>pars<span class="sc">$</span>r_l)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 392.700 196.350 130.900  98.175  78.540</code></pre>
 </div>
@@ -638,7 +632,7 @@ p1 0.1 1.466783 151.1778 392.7</code></pre>
 <h2 class="anchored" data-anchor-id="choose-numerical-accuracy">Choose numerical accuracy</h2>
 <p>Strategies describe plants; <code>Control</code> settings describe how the numerical solver runs. The controls include time-step, error-tolerance, and node-schedule settings, and may be numeric or logical:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Control</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Control</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$function_integration_rule
 [1] 21
@@ -670,6 +664,12 @@ $node_gradient_richardson
 $node_gradient_richardson_depth
 [1] 4
 
+$node_density_coordinate
+[1] "auto"
+
+$absorb_epsilon
+[1] 0
+
 $ode_step_size_initial
 [1] 1e-06
 
@@ -680,16 +680,25 @@ $ode_step_size_max
 [1] 5
 
 $ode_tol_rel
-[1] 1e-04
+[1] 1e-05
 
 $ode_tol_abs
-[1] 1e-04
+[1] 1e-05
 
 $ode_a_y
 [1] 1
 
 $ode_a_dydt
 [1] 0
+
+$ode_soil_substep
+[1] FALSE
+
+$ode_soil_substep_tol
+[1] 1e-09
+
+$ode_tol_scale_soil
+[1] 1
 
 $fixed_time_step
 [1] 0
@@ -703,14 +712,14 @@ $schedule_eps
 $schedule_verbose
 [1] FALSE
 
-$save_RK45_cache
-[1] FALSE
+$gradient_curvature_floor
+[1] 0.001
 
 $GSS_tol_abs
 [1] 0.001
 
 $vulnerability_curve_ncontrol
-[1] 100
+[1] 800
 
 $ci_abs_tol
 [1] 0.001
@@ -724,17 +733,17 @@ attr(,"class")
 </div>
 <p>The <code>Control()</code> defaults are appropriate for routine exploration; <code>control()</code> is a lowercase alias for the same constructor. Use <code>control_accurate()</code> when a final result needs tighter numerical tolerances, accepting the additional run time. The <a href="../theory/implementation/ode-stepping.html">ODE stepping</a> and <a href="../theory/implementation/node-spacing.html">node-spacing</a> pages explain these trade-offs. The following comparison shows which defaults change:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>ctrl_accurate <span class="ot">&lt;-</span> <span class="fu">control_accurate</span>()</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>ctrl_accurate[<span class="fu">unlist</span>(<span class="fu">control</span>()) <span class="sc">!=</span> <span class="fu">unlist</span>(ctrl_accurate)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>ctrl_accurate <span class="ot">&lt;-</span> <span class="fu">control_accurate</span>()</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>ctrl_accurate[<span class="fu">unlist</span>(<span class="fu">control</span>()) <span class="sc">!=</span> <span class="fu">unlist</span>(ctrl_accurate)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$ode_step_size_max
 [1] 0.1
 
 $ode_tol_rel
-[1] 1e-06
+[1] 1e-07
 
 $ode_tol_abs
-[1] 1e-06
+[1] 1e-07
 
 $schedule_eps
 [1] 0.001</code></pre>
@@ -823,7 +832,8 @@ $schedule_eps
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -832,8 +842,69 @@ $schedule_eps
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -847,6 +918,7 @@ $schedule_eps
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -1009,44 +1081,54 @@ $schedule_eps
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -1145,7 +1227,10 @@ $schedule_eps
     }
   });
   </script>
-<nav class="page-navigation">
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
   <div class="nav-page nav-page-previous">
       <a href="../guides/initialising-a-patch.html" class="pagination-link" aria-label="Initialising a patch">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Initialising a patch</span>

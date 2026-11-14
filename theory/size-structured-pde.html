@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -59,13 +59,14 @@ div.csl-indent {
 <link href="../theory/from-primer-to-pde.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e30b0f8ea5685d2ef6f683bb78d13b16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -130,11 +131,11 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/extras.css">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
@@ -145,8 +146,7 @@ window.Quarto = {
     <span class="navbar-title">Overstorey</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -195,15 +195,16 @@ window.Quarto = {
   </div>
 </a>
 </div>
+            <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">1. Foundations</a></li><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">The size-structured PDE</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">1. Foundations</a></li><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">The size-structured PDE</a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -211,7 +212,7 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -222,13 +223,10 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">1. Foundations</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">1. Foundations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/overview.html" class="sidebar-item-text sidebar-link">
@@ -257,13 +255,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">2. Models and physiology</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">2. Models and physiology</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/models/index.html" class="sidebar-item-text sidebar-link">
@@ -304,13 +299,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">3. Adaptive dynamics</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">3. Adaptive dynamics</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
@@ -375,13 +367,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
- <span class="menu-text">4. Implementation</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">4. Implementation</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
@@ -416,13 +405,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
- <span class="menu-text">5. Prediction and reproducibility</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">5. Prediction and reproducibility</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/models/scientific-versioning.html" class="sidebar-item-text sidebar-link">
@@ -437,7 +423,7 @@ window.Quarto = {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
@@ -460,9 +446,9 @@ window.Quarto = {
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/theory/size-structured-pde.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">1. Foundations</a></li><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">The size-structured PDE</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/overview.html">1. Foundations</a></li><li class="breadcrumb-item"><a href="../theory/size-structured-pde.html">The size-structured PDE</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">The size-structured PDE</h1>
 </div>
@@ -716,59 +702,72 @@ Table&nbsp;1: Variable names and definitions in the demographic model of the <co
 <h3 class="anchored" data-anchor-id="sec-individual-plants">Individual plants</h3>
 <p>We first follow one plant. Its traits are <span class="math inline">\(x\)</span>, its size is represented by height <span class="math inline">\(H\)</span>, and <span class="math inline">\(a\)</span> is the current age of the patch in which it grows. The plant germinated earlier, when the patch was age <span class="math inline">\(a_0\)</span>, at an initial height <span class="math inline">\(H_0(x)\)</span>.</p>
 <p>The light environment <span class="math inline">\(E\)</span> is a vertical profile through the patch rather than a single number. Because that profile changes as the patch develops, we write it as <span class="math inline">\(E_a\)</span>. The functions <span class="math inline">\(g(x, H, E_a)\)</span>, <span class="math inline">\(f(x, H, E_a)\)</span>, and <span class="math inline">\(d(x, H, E_a)\)</span> are respectively the plant’s instantaneous growth, fecundity, and mortality rates.</p>
-<p>Height at patch age <span class="math inline">\(a\)</span> is initial height plus all growth accumulated since germination: <span id="eq-size"><span class="math display">\[
+<p>Height at patch age <span class="math inline">\(a\)</span> is initial height plus all growth accumulated since germination:</p>
+<p><span id="eq-size"><span class="math display">\[
 H(x, a_0, a) = H_0(x) + \int_{a_0}^{a} g(x, H(x, a_0, a^\prime), E_{a^\prime}) \, {\rm d}a^\prime
 \tag{1}\]</span></span></p>
-<p>Survival has two parts: the probability of surviving germination, followed by survival against the mortality hazard accumulated as the plant grows: <span id="eq-survivalindividual"><span class="math display">\[
+<p>Survival has two parts: the probability of surviving germination, followed by survival against the mortality hazard accumulated as the plant grows:</p>
+<p><span id="eq-survivalindividual"><span class="math display">\[
 S_{\rm I} (x, a_0, a) = S_{\rm G} (x, H_0, E_{{\rm a}0}) \, \exp\left(- \int_{a_0}^{a} d(x, H(x, a_0, a^\prime), E_{a^\prime}) \, {\rm d} a^\prime \right)
 \tag{2}\]</span></span></p>
-<p>Here <span class="math inline">\(S_{\rm G} (x, H_0, E_{{\rm a}0})\)</span> is the probability that a seed germinates successfully. Finally, cumulative seed output adds fecundity over time, but discounts seed production by the probability that the plant is still alive: <span id="eq-tilder1"><span class="math display">\[
-\tilde{R}(x, a_0, a) = \int_{a_0}^{a} f(x, H(x, a_0, a^\prime), E_{a^\prime}) \, S_{\rm I} (x, a_0, a^\prime) \, {\rm d} a^\prime
+<p>Here <span class="math inline">\(S_{\rm G} (x, H_0, E_{{\rm a}0})\)</span> is the probability that a seed germinates successfully. Finally, cumulative seed output adds fecundity over time, but discounts seed production by the probability that the plant is still alive and that its patch has not been disturbed since it arrived:</p>
+<p><span id="eq-tilder1"><span class="math display">\[
+\tilde{R}(x, a_0, a) = \int_{a_0}^{a} f(x, H(x, a_0, a^\prime), E_{a^\prime}) \, S_{\rm I} (x, a_0, a^\prime) \, S_{\rm P} (a_0, a^\prime) \, {\rm d} a^\prime
 \tag{3}\]</span></span></p>
+<p>The patch-survival probability <span class="math inline">\(S_{\rm P} (a_0, a^\prime)\)</span> is defined below, in <a href="#eq-survivalpatch" class="quarto-xref">Equation&nbsp;9</a>. <span class="math inline">\(\tilde{R}\)</span> counts seeds as they are produced, before any are lost in dispersal.</p>
 <p>Thus Eqs. <a href="#eq-size" class="quarto-xref">1</a>–<a href="#eq-tilder1" class="quarto-xref">3</a> are three running totals along the same life history: accumulated growth, accumulated mortality risk, and accumulated reproduction. Their notation allows every rate to change non-linearly with traits, plant size, light, and patch age.</p>
 </section>
 <section id="sec-patches-of-competing-plants" class="level3">
 <h3 class="anchored" data-anchor-id="sec-patches-of-competing-plants">Patches of competing plants</h3>
 <p>We now move from one plant to a patch. At patch age <span class="math inline">\(a\)</span>, <span class="math inline">\(N(H | x, a)\)</span> is the size-density distribution of plants with traits <span class="math inline">\(x\)</span> and height <span class="math inline">\(H\)</span>. It is a density with respect to height: integrating it over a height interval gives the abundance of plants in that interval. A finite patch can instead be represented by discrete individuals, but for a sufficiently large patch the model treats <span class="math inline">\(N\)</span> as a continuous function.</p>
 <p>Each plant still follows Eqs. <a href="#eq-size" class="quarto-xref">1</a>–<a href="#eq-tilder1" class="quarto-xref">3</a>, but two feedbacks now matter. Existing plants alter the shared light profile <span class="math inline">\(E_a\)</span>, and new seedlings continually enter at the lower end of the size distribution.</p>
-<p>For the FF16 and TF24 canopy-light formulation, plants interact by shading one another. TF24’s physiological rates also respond to the soil-water state. Following standard biophysical principles, we let the canopy openness <span class="math inline">\(E_a(z)\)</span> at height <span class="math inline">\(z\)</span> in a patch of age <span class="math inline">\(a\)</span> decline exponentially with the total amount of leaf area above <span class="math inline">\(z\)</span>, <span id="eq-light"><span class="math display">\[
-E_a(z) = \exp \left(-k_{\rm I} \sum_{i = 1}^{K} \int_{0}^{\infty} A_{\rm l}(H) \, Q(z, H) \, N(H | x_i, a) \, {\rm d}H \right),
-\tag{4}\]</span></span> where <span class="math inline">\(A_{\rm l}(H)\)</span> is the total leaf area of a plant with height <span class="math inline">\(H\)</span>, <span class="math inline">\(Q(z, H)\)</span> is the fraction of this leaf area situated above height <span class="math inline">\(z\)</span> for plants of height <span class="math inline">\(H\)</span>, <span class="math inline">\(k_{\rm I}\)</span> is the light extinction coefficient, and <span class="math inline">\(K\)</span> is the number of species in the metacommunity.</p>
-<p>Read <a href="#eq-light" class="quarto-xref">Equation&nbsp;4</a> from the inside out. For species <span class="math inline">\(i\)</span>, the integral totals leaf area above <span class="math inline">\(z\)</span> across all plant heights; the sum then combines the <span class="math inline">\(K\)</span> species. Multiplying by <span class="math inline">\(k_{\rm I}\)</span> converts leaf area into optical depth, and the exponential converts optical depth into the fraction of light that remains. The result is a single patch light profile that every plant both contributes to and experiences.</p>
-<p>Assuming patches are sufficiently large, the dynamics of <span class="math inline">\(N\)</span> can be modelled deterministically via the following partial differential equation (PDE) <span class="citation" data-cites="Kohyama-1993 Deroos-1997 Moorcroft-2001">(<a href="#ref-Kohyama-1993" role="doc-biblioref">Kohyama, 1993</a>; <a href="#ref-Deroos-1997" role="doc-biblioref">De Roos et al., 1997</a>; <a href="#ref-Moorcroft-2001" role="doc-biblioref">Moorcroft et al., 2001</a>)</span>, <span id="eq-pde"><span class="math display">\[
-\frac{\partial}{\partial a} N(H | x, a) = - d(x, H, E_a) \, N(H | x, a) - \frac{\partial}{\partial H} \left[g(x, H, E_a) \, N(H | x, a)\right].
-\tag{5}\]</span></span> See <a href="#sec-derivation-size-structured" class="quarto-xref">Section&nbsp;3.2</a> for the derivation of this PDE.</p>
+<p>For the FF16 and TF24 canopy-light formulation, plants interact by shading one another. TF24’s physiological rates also respond to the soil-water state. Following standard biophysical principles, we let the canopy openness <span class="math inline">\(E_a(z)\)</span> at height <span class="math inline">\(z\)</span> in a patch of age <span class="math inline">\(a\)</span> decline exponentially with the total amount of leaf area above <span class="math inline">\(z\)</span>,</p>
+<p><span id="eq-light"><span class="math display">\[
+E_a(z) = \exp \left(-\frac{k_{\rm I}}{A_{\rm P}} \sum_{i = 1}^{K} \int_{0}^{\infty} A_{\rm l}(H) \, Q(z, H) \, N(H | x_i, a) \, {\rm d}H \right)
+\tag{4}\]</span></span></p>
+<p>where <span class="math inline">\(A_{\rm l}(H)\)</span> is the total leaf area of a plant with height <span class="math inline">\(H\)</span>, <span class="math inline">\(Q(z, H)\)</span> is the fraction of this leaf area situated above height <span class="math inline">\(z\)</span> for plants of height <span class="math inline">\(H\)</span>, <span class="math inline">\(k_{\rm I}\)</span> is the light extinction coefficient, <span class="math inline">\(A_{\rm P}\)</span> is the ground area of the patch (1 by default), and <span class="math inline">\(K\)</span> is the number of species in the metacommunity.</p>
+<p>Read <a href="#eq-light" class="quarto-xref">Equation&nbsp;4</a> from the inside out. For species <span class="math inline">\(i\)</span>, the integral totals leaf area above <span class="math inline">\(z\)</span> across all plant heights; the sum then combines the <span class="math inline">\(K\)</span> species. Dividing by <span class="math inline">\(A_{\rm P}\)</span> turns that total into leaf area per unit ground area, multiplying by <span class="math inline">\(k_{\rm I}\)</span> converts it into optical depth, and the exponential converts optical depth into the fraction of light that remains. The result is a single patch light profile that every plant both contributes to and experiences.</p>
+<p>Assuming patches are sufficiently large, the dynamics of <span class="math inline">\(N\)</span> can be modelled deterministically via the following partial differential equation (PDE) <span class="citation" data-cites="Kohyama-1993 Deroos-1997 Moorcroft-2001">(<a href="#ref-Kohyama-1993" role="doc-biblioref">Kohyama, 1993</a>; <a href="#ref-Deroos-1997" role="doc-biblioref">De Roos et al., 1997</a>; <a href="#ref-Moorcroft-2001" role="doc-biblioref">Moorcroft et al., 2001</a>)</span>,</p>
+<p><span id="eq-pde"><span class="math display">\[
+\frac{\partial}{\partial a} N(H | x, a) = - d(x, H, E_a) \, N(H | x, a) - \frac{\partial}{\partial H} \left[g(x, H, E_a) \, N(H | x, a)\right]
+\tag{5}\]</span></span></p>
+<p>See <a href="#sec-derivation-size-structured" class="quarto-xref">Section&nbsp;3.2</a> for the derivation of this PDE.</p>
 <p>The two terms on the right-hand side are a population ledger. The first removes plants through mortality. The second describes the flow of plants along the height axis as they grow: plants leave one height interval and enter the next. It is written as the derivative of the flux <span class="math inline">\(gN\)</span>, so changes in both growth rate and density are handled together.</p>
-<p><a href="#eq-pde" class="quarto-xref">Equation&nbsp;5</a> also needs two boundary conditions. The first supplies recruits at the smallest height <span class="math inline">\(H_0(x)\)</span>. It links the flux of seedlings entering the size-density distribution to the rate <span class="math inline">\(Y_{x}\)</span> at which seeds arrive in the patch, <span id="eq-bc1"><span class="math display">\[
+<p><code>plant</code> never solves <a href="#eq-pde" class="quarto-xref">Equation&nbsp;5</a> on a grid of heights. It integrates it along characteristics, the paths plants follow as they grow (see <a href="../theory/implementation/characteristic-method.html">The characteristic method</a>). Carrying the density in height needs growth to depend on size and light alone, so a model whose own state feeds back into growth, such as TF24, carries the density per unit birth date instead and converts it to height (<a href="#sec-converting-density" class="quarto-xref">Section&nbsp;3.3</a>) only to report it.</p>
+<p><a href="#eq-pde" class="quarto-xref">Equation&nbsp;5</a> also needs two boundary conditions. The first supplies recruits at the smallest height <span class="math inline">\(H_0(x)\)</span>. It links the flux of seedlings entering the size-density distribution to the rate <span class="math inline">\(Y_{x}(a_0)\)</span> at which seeds arrive in the patch when it is age <span class="math inline">\(a_0\)</span>,</p>
+<p><span id="eq-bc1"><span class="math display">\[
 N(H_0 | x, a_0) = \left\{
-\begin{array}{ll} \frac{Y_{x} \, S_{\rm G} (x, H_0, E_{{\rm a}0}) }{ g(x, H_0, E_{{\rm a}0}) } &amp; \textrm{if } g(x, H_0, E_{{\rm a}0}) &gt; 0 \\
+\begin{array}{ll} \frac{Y_{x}(a_0) \, S_{\rm G} (x, H_0, E_{{\rm a}0}) }{ g(x, H_0, E_{{\rm a}0}) } &amp; \textrm{if } g(x, H_0, E_{{\rm a}0}) &gt; 0 \\
 0 &amp; \textrm{otherwise.}
 \end{array} \right.
-\tag{6}\]</span></span> The function <span class="math inline">\(S_{\rm G} (x, H_0, E_{{\rm a}0})\)</span> denotes survival through germination and must be chosen such that <span class="math inline">\(S_{\rm G} (x, H_0, E_{{\rm a}0}) / g(x, H_0, E_{{\rm a}0}) \rightarrow 0\)</span> as <span class="math inline">\(g(x, H_0, E_{{\rm a}0}) \rightarrow 0\)</span>, to ensure a smooth decline in initial density as conditions deteriorate <span class="citation" data-cites="Falster-2011">(<a href="#ref-Falster-2011" role="doc-biblioref">Falster et al., 2011</a>)</span>.</p>
+\tag{6}\]</span></span></p>
+<p>By default the arrival rate is constant, <span class="math inline">\(Y_x(a_0) = Y_x\)</span>, but <code>plant</code> allows it to vary with <span class="math inline">\(a_0\)</span>. The function <span class="math inline">\(S_{\rm G} (x, H_0, E_{{\rm a}0})\)</span> denotes survival through germination and must be chosen such that <span class="math inline">\(S_{\rm G} (x, H_0, E_{{\rm a}0}) / g(x, H_0, E_{{\rm a}0}) \rightarrow 0\)</span> as <span class="math inline">\(g(x, H_0, E_{{\rm a}0}) \rightarrow 0\)</span>, to ensure a smooth decline in initial density as conditions deteriorate <span class="citation" data-cites="Falster-2011">(<a href="#ref-Falster-2011" role="doc-biblioref">Falster et al., 2011</a>)</span>.</p>
 <p>The division by <span class="math inline">\(g\)</span> converts a flux of successful recruits per unit time into a density per unit height. The special case for <span class="math inline">\(g \leq 0\)</span> prevents seedlings from accumulating at the boundary when conditions do not allow them to grow into the size distribution.</p>
-<p>The second boundary condition specifies the state of a patch immediately after disturbance, at <span class="math inline">\(a = 0\)</span>. Throughout, we consider situations starting with an empty patch, <span id="eq-bc2"><span class="math display">\[
-N\left(H|x,0\right) = 0,
-\tag{7}\]</span></span> although non–zero distributions could alternatively be specified <span class="citation" data-cites="Kohyama-1993 Moorcroft-2001">(e.g. <a href="#ref-Kohyama-1993" role="doc-biblioref">Kohyama, 1993</a>; <a href="#ref-Moorcroft-2001" role="doc-biblioref">Moorcroft et al., 2001</a>)</span>.</p>
+<p>The second boundary condition specifies the state of a patch immediately after disturbance, at <span class="math inline">\(a = 0\)</span>. Throughout, we consider situations starting with an empty patch,</p>
+<p><span id="eq-bc2"><span class="math display">\[
+N\left(H|x,0\right) = 0
+\tag{7}\]</span></span></p>
+<p>although non–zero distributions could alternatively be specified <span class="citation" data-cites="Kohyama-1993 Moorcroft-2001">(e.g. <a href="#ref-Kohyama-1993" role="doc-biblioref">Kohyama, 1993</a>; <a href="#ref-Moorcroft-2001" role="doc-biblioref">Moorcroft et al., 2001</a>)</span>. The empty patch is <code>plant</code>’s default; a non-empty <code>initial_state</code> in its parameters starts the patch from that stand instead, for example to resume a run.</p>
 </section>
 <section id="sec-age-structured-distribution" class="level3">
 <h3 class="anchored" data-anchor-id="sec-age-structured-distribution">Age structure of patches</h3>
 <p>We now zoom out from one patch to a landscape containing patches of many ages. Here <span class="math inline">\(a\)</span> is time since the last disturbance, and <span class="math inline">\(P(a)\)</span> is the frequency-density of patches of age <span class="math inline">\(a\)</span>. Integrating <span class="math inline">\(P(a)\)</span> over an age range gives the fraction of landscape in that range. The function <span class="math inline">\(d_{\rm P}(a)\)</span> is the instantaneous disturbance rate, or hazard, for a patch of age <span class="math inline">\(a\)</span>.</p>
-<p>We first focus on an equilibrium patch-age distribution. See <a href="#sec-derivation-age-structured" class="quarto-xref">Section&nbsp;3.1</a> for the time-dependent derivation. At equilibrium, patches flow steadily toward older ages and leave each age class when disturbed <span class="citation" data-cites="Mckendrick-1926 Vonfoerster-1959">(<a href="#ref-Mckendrick-1926" role="doc-biblioref">McKendrick, 1926</a>; <a href="#ref-Vonfoerster-1959" role="doc-biblioref">Foerster, 1959</a>)</span>: <span id="eq-agepde"><span class="math display">\[
-\frac{{\rm d}}{{\rm d} a} P(a) = - d_{\rm P}(a) \, P(a) ,
-\tag{8}\]</span></span> with the boundary condition <span id="eq-agepd2"><span class="math display">\[
-P(0) = \int_0^\infty d_{\rm P}(a) \, P(a) \, {\rm d} a.
-\tag{9}\]</span></span></p>
+<p>We first focus on an equilibrium patch-age distribution. See <a href="#sec-derivation-age-structured" class="quarto-xref">Section&nbsp;3.1</a> for the time-dependent derivation. At equilibrium, patches flow steadily toward older ages and leave each age class when disturbed <span class="citation" data-cites="Mckendrick-1926 Vonfoerster-1959">(<a href="#ref-Mckendrick-1926" role="doc-biblioref">McKendrick, 1926</a>; <a href="#ref-Vonfoerster-1959" role="doc-biblioref">Foerster, 1959</a>)</span>. The second equation below is the boundary condition:</p>
+<p><span id="eq-agepde"><span class="math display">\[
+\frac{{\rm d}}{{\rm d} a} P(a) = - d_{\rm P}(a) \, P(a), \qquad P(0) = \int_0^\infty d_{\rm P}(a) \, P(a) \, {\rm d} a
+\tag{8}\]</span></span></p>
 <p>The boundary condition says that the flow of newly disturbed, age-zero patches must equal the total disturbance flow out of all older ages.</p>
-<p>The probability that a patch remains undisturbed from patch age <span class="math inline">\(a_0\)</span> to patch age <span class="math inline">\(a\)</span> is then given by <span id="eq-survivalpatch"><span class="math display">\[
-S_{\rm P} (a_0, a) = \exp\left( - \int_{a_0}^{a} d_{\rm P}(a^\prime) \, {\rm d} a^\prime \right).
-\tag{10}\]</span></span></p>
+<p>The probability that a patch remains undisturbed from patch age <span class="math inline">\(a_0\)</span> to patch age <span class="math inline">\(a\)</span> is then given by</p>
+<p><span id="eq-survivalpatch"><span class="math display">\[
+S_{\rm P} (a_0, a) = \exp\left( - \int_{a_0}^{a} d_{\rm P}(a^\prime) \, {\rm d} a^\prime \right)
+\tag{9}\]</span></span></p>
 <p>This has the same survival form as the individual-plant equation: cumulative hazard appears inside a negative exponential. The difference is that the event is patch disturbance rather than plant death.</p>
-<p>These equations lead to an equilibrium distribution of patch ages, <span id="eq-agepde3"><span class="math display">\[
-P(a) = P(0) S_{\rm P} (0, a),
-\tag{11}\]</span></span> where <span id="eq-agepde4"><span class="math display">\[
-P(0) = \frac1{\int_0^\infty S_{\rm P} (0, a) {\rm d}a}
-\tag{12}\]</span></span> is the average disturbance frequency of a patch and, at the same time, the frequency-density of patches of age <span class="math inline">\(0\)</span>.</p>
-<p>In plain language, the abundance of patches of age <span class="math inline">\(a\)</span> equals the rate at which new patches are created, <span class="math inline">\(P(0)\)</span>, multiplied by the chance that a patch survives undisturbed to age <span class="math inline">\(a\)</span>. The normalising expression in <a href="#eq-agepde4" class="quarto-xref">Equation&nbsp;12</a> makes the total area under <span class="math inline">\(P(a)\)</span> equal to one.</p>
+<p>These equations lead to an equilibrium distribution of patch ages,</p>
+<p><span id="eq-agepde4"><span class="math display">\[
+P(a) = P(0) S_{\rm P} (0, a), \qquad P(0) = \frac1{\int_0^\infty S_{\rm P} (0, a) {\rm d}a}
+\tag{10}\]</span></span></p>
+<p>where <span class="math inline">\(P(0)\)</span> is the average disturbance frequency of a patch and, at the same time, the frequency-density of patches of age <span class="math inline">\(0\)</span>.</p>
+<p>In plain language, the abundance of patches of age <span class="math inline">\(a\)</span> equals the rate at which new patches are created, <span class="math inline">\(P(0)\)</span>, multiplied by the chance that a patch survives undisturbed to age <span class="math inline">\(a\)</span>. The normalising expression for <span class="math inline">\(P(0)\)</span> in <a href="#eq-agepde4" class="quarto-xref">Equation&nbsp;10</a> makes the total area under <span class="math inline">\(P(a)\)</span> equal to one.</p>
 <p>The default approach in <code>plant</code> is to assume that <span class="math inline">\(d_{\rm P}(a)\)</span> increases linearly with patch age, which leads to a Weibull distribution for <span class="math inline">\(P\)</span>, specified by a single parameter <span class="math inline">\(\bar{a}\)</span> measuring the mean interval between disturbances (see <a href="#sec-weibull-distribution" class="quarto-xref">Section&nbsp;3.1.2</a> for details).</p>
 </section>
 <section id="sec-trait-size-patch-structured" class="level3">
@@ -779,36 +778,39 @@ P(0) = \frac1{\int_0^\infty S_{\rm P} (0, a) {\rm d}a}
 <li>plants compete within a patch, while competition between neighbouring patches is negligible; and</li>
 <li>dispersal connects the patches strongly enough that the same seed pool can recolonise them.</li>
 </ul>
-<p>With one species this is a metapopulation; with several it is a metacommunity. Eqs. <a href="#eq-pde" class="quarto-xref">5</a>–<a href="#eq-agepde4" class="quarto-xref">12</a> describe its demographic dynamics.</p>
-<p>The disperser pool links the patch and landscape scales. For each strategy <span class="math inline">\(x\)</span>, its landscape-wide seed rain <span class="math inline">\(Y_x\)</span> is the rate at which viable seeds are produced across all patches, <span id="eq-seed-rain"><span class="math display">\[
-Y_x  = \int_0^{\infty} \int_0^{\infty} P(a) \, S_{\rm D} \, f(x, H, E_a) \, N(H | x, a) \, {\rm d} H \, {\rm d} a,
-\tag{13}\]</span></span> where <span class="math inline">\(S_{\rm D}\)</span> is the survival probability of seeds during dispersal.</p>
-<p>Again, read the double integral from the inside out. At a given patch age <span class="math inline">\(a\)</span>, the inner integral adds fecundity over every plant height, weighted by plant density. The outer integral averages that patch output across patch ages, weighted by how common each age is. <span class="math inline">\(S_{\rm D}\)</span> retains only seeds that survive dispersal.</p>
+<p>With one species this is a metapopulation; with several it is a metacommunity. Eqs. <a href="#eq-pde" class="quarto-xref">5</a>–<a href="#eq-agepde4" class="quarto-xref">10</a> describe its demographic dynamics.</p>
+<p>The disperser pool links the patch and landscape scales. For each strategy <span class="math inline">\(x\)</span>, its landscape-wide seed rain <span class="math inline">\(Y_x^{\rm out}\)</span> is the rate at which viable seeds are produced across all patches. <code>plant</code> adds it up by the patch age <span class="math inline">\(a_0\)</span> at which each seed arrived,</p>
+<p><span id="eq-seed-rain"><span class="math display">\[
+Y_x^{\rm out} = \int_0^{a_{\rm max}} Y_x(a_0) \, P(a_0) \, S_{\rm D} \, \tilde{R}(x, a_0, a_{\rm max}) \, {\rm d} a_0
+\tag{11}\]</span></span></p>
+<p>where <span class="math inline">\(S_{\rm D}\)</span> is the survival probability of seeds during dispersal and <span class="math inline">\(a_{\rm max}\)</span> is the patch age at which a run ends.</p>
+<p>Again, read the integral from the inside out. Seeds arrive in patches of age <span class="math inline">\(a_0\)</span> at rate <span class="math inline">\(Y_x(a_0)\)</span>, and patches of that age have frequency-density <span class="math inline">\(P(a_0)\)</span>. Each seed that arrives goes on to produce <span class="math inline">\(\tilde{R}(x, a_0, a_{\rm max})\)</span> seeds over its life (<a href="#eq-tilder1" class="quarto-xref">Equation&nbsp;3</a>), and <span class="math inline">\(S_{\rm D}\)</span> retains only those that survive dispersal. The same total can be written over plant heights and patch ages instead, <span class="math inline">\(\int_0^{\infty} \int_0^{\infty} P(a) \, S_{\rm D} \, f(x, H, E_a) \, N(H | x, a) \, {\rm d} H \, {\rm d} a\)</span>: at a given patch age the inner integral adds fecundity over every plant height, weighted by plant density, and the outer integral averages that patch output across patch ages, weighted by how common each age is. The two forms agree, since the plants in a height interval <span class="math inline">\({\rm d}H\)</span> are the survivors of the seeds that arrived over the matching interval of arrival ages <span class="math inline">\({\rm d}a_0\)</span>, <span class="math inline">\(N \, {\rm d}H = Y_x(a_0) \, S_{\rm I} \, {\rm d}a_0\)</span>, and <span class="math inline">\(P(a) = P(a_0) \, S_{\rm P}(a_0, a)\)</span>. <code>plant</code> stops at <span class="math inline">\(a_{\rm max}\)</span> rather than at infinity.</p>
 <p>At metacommunity equilibrium, the seed-arrival rate <span class="math inline">\(Y_x\)</span> is constant. If every disturbance also leaves the same empty initial state, all patches then follow the same developmental trajectory. Their only difference is how long ago they were disturbed. This is why one patch trajectory, combined with the patch-age distribution, can represent the whole metacommunity.</p>
-<p>To model the temporal dynamics of an archetypal patch, we need a value for <span class="math inline">\(Y_x\)</span>. But that value is both an input to the patch through <a href="#eq-bc1" class="quarto-xref">Equation&nbsp;6</a> and an output of the metacommunity through <a href="#eq-seed-rain" class="quarto-xref">Equation&nbsp;13</a>. At demographic equilibrium, the two must match. The numerical challenge is therefore to solve Eqs. <a href="#eq-bc1" class="quarto-xref">6</a>–<a href="#eq-seed-rain" class="quarto-xref">13</a> simultaneously for all strategies <span class="math inline">\(x\)</span> in the metacommunity.</p>
+<p>To model the temporal dynamics of an archetypal patch, we need a value for <span class="math inline">\(Y_x\)</span>. But that value is both an input to the patch through <a href="#eq-bc1" class="quarto-xref">Equation&nbsp;6</a> and, as <span class="math inline">\(Y_x^{\rm out}\)</span>, an output of the metacommunity through <a href="#eq-seed-rain" class="quarto-xref">Equation&nbsp;11</a>. At demographic equilibrium, the two must match, <span class="math inline">\(Y_x^{\rm out} = Y_x\)</span>. The numerical challenge is therefore to solve Eqs. <a href="#eq-bc1" class="quarto-xref">6</a>–<a href="#eq-seed-rain" class="quarto-xref">11</a> simultaneously for all strategies <span class="math inline">\(x\)</span> in the metacommunity.</p>
 </section>
 <section id="sec-emergent-properties" class="level3">
 <h3 class="anchored" data-anchor-id="sec-emergent-properties">Emergent properties of metacommunities</h3>
 <p>Once <span class="math inline">\(N(H | x, a)\)</span> and <span class="math inline">\(P(a)\)</span> are known, stand- and landscape-level outputs are weighted integrals. A hat denotes an average over the entire metacommunity, while a bar below denotes an average across patch ages at a specified plant height.</p>
 <p>The average density of individuals with traits <span class="math inline">\(x\)</span> per unit ground area across the metacommunity is <span id="eq-nav"><span class="math display">\[
 \hat{N}(x) = \int_{0}^{\infty} \int_{0}^{\infty} P(a) \, N(H | x, a) \, {\rm d}a \, {\rm d}H,
-\tag{14}\]</span></span> and the average size-density of plants with height <span class="math inline">\(H\)</span> is <span id="eq-ndav"><span class="math display">\[
+\tag{12}\]</span></span> and the average size-density of plants with height <span class="math inline">\(H\)</span> is <span id="eq-ndav"><span class="math display">\[
 \bar{N}(x, H) = \int_{0}^{\infty}P(a) \, N(H | x, a) \, {\rm d}a.
-\tag{15}\]</span></span></p>
+\tag{13}\]</span></span></p>
 <p>Averages for other individual-level quantities use the same weighting. Denote by <span class="math inline">\(w(x, H, E_a)\)</span> a quantity of interest, either a demographic rate (growth, mortality) or a state (plant height, leaf area, light environment), the average of <span class="math inline">\(w\)</span> for plants with height <span class="math inline">\(H\)</span> and traits <span class="math inline">\(x\)</span> is <span id="eq-wav1"><span class="math display">\[
 \bar{w}(x, H) = \frac1{\bar{N}(x, H)}\int_{0}^{\infty}P(a) \, N(H | x, a) \, w(x, H, E_a) \, {\rm d}a.
-\tag{16}\]</span></span></p>
+\tag{14}\]</span></span></p>
 <p>The numerator adds <span class="math inline">\(w\)</span> across patch ages, weighted by the density of plants to which it applies; dividing by <span class="math inline">\(\bar{N}(x, H)\)</span> turns that total into an average for plants at height <span class="math inline">\(H\)</span>.</p>
 <p>The average of <span class="math inline">\(w\)</span> across all individuals of the species is <span id="eq-wav2"><span class="math display">\[
 \hat{w}(x) = \frac1{\hat{N}(x) }\int_{0}^{\infty} \int_{0}^{\infty}P(a) \, N(H | x, a) \, w(x, H, E_a) \, {\rm d}a \, {\rm d}H.
-\tag{17}\]</span></span></p>
+\tag{15}\]</span></span></p>
 <p>Here the same calculation also integrates over height and divides by the total metacommunity density <span class="math inline">\(\hat{N}(x)\)</span>.</p>
 <p>When calculating the average mortality rate, one must decide whether mortality due to patch disturbance is included. Non-disturbance mortality is obtained by setting <span class="math inline">\(w(x, H, E_a) = d(x, H, E_a)\)</span>, while the total mortality due to growth processes and disturbance is obtained by setting <span class="math inline">\(w(x, H, E_a) = d(x, H, E_a) + d_{\rm P}(a) S_{\rm P}(0, a).\)</span></p>
-<p>Sometimes the desired output is a total rather than a per-plant average. We can integrate over the size-density distribution to obtain an aggregate feature of the vegetation within a patch, <span id="eq-wa-a"><span class="math display">\[
-W(a) = \sum_{i = 1}^{N} \int_{0}^{\infty} N(H | x_i, a)\, w(x_i, H, E_a) \, {\rm d}H,
-\tag{18}\]</span></span> and across the entire metacommunity, <span id="eq-wa-b"><span class="math display">\[
+<p>Sometimes the desired output is a total rather than a per-plant average. We can integrate over the size-density distribution and sum over the <span class="math inline">\(K\)</span> species to obtain an aggregate feature of the vegetation within a patch,</p>
+<p><span id="eq-wa-a"><span class="math display">\[
+W(a) = \sum_{i = 1}^{K} \int_{0}^{\infty} N(H | x_i, a)\, w(x_i, H, E_a) \, {\rm d}H
+\tag{16}\]</span></span> and across the entire metacommunity, <span id="eq-wa-b"><span class="math display">\[
 \hat{W} = \int_{0}^{\infty} P(a) \, W(a) \, {\rm d}a.
-\tag{19}\]</span></span></p>
+\tag{17}\]</span></span></p>
 <p>For the analysis of invasion fitness and evolutionary endpoints that builds on these dynamics, see the <a href="../theory/adaptive-dynamics.html">adaptive dynamics</a> page.</p>
 </section>
 </section>
@@ -819,32 +821,34 @@ W(a) = \sum_{i = 1}^{N} \int_{0}^{\infty} N(H | x_i, a)\, w(x_i, H, E_a) \, {\rm
 <h3 class="anchored" data-anchor-id="sec-derivation-age-structured">Derivation of PDE describing age-structured dynamics</h3>
 <p>We now distinguish two clocks. Patch age <span class="math inline">\(a\)</span> is the time since a patch’s last disturbance, while calendar time <span class="math inline">\(t\)</span> describes change in the whole landscape. Let <span class="math inline">\(P(a, t)\)</span> be the frequency-density of patches of age <span class="math inline">\(a\)</span> at time <span class="math inline">\(t\)</span>, and let <span class="math inline">\(d_{\rm P}(a, t)\)</span> be their instantaneous disturbance rate. Its dynamics are given by <span id="eq-dp-a"><span class="math display">\[
 \frac{\partial}{\partial t} P(a, t) = -\frac{\partial}{\partial a} P(a, t)-d_{\rm P}(a, t) P(a, t),
-\tag{20}\]</span></span></p>
+\tag{18}\]</span></span></p>
 <p>The first term on the right moves undisturbed patches toward older ages. The second removes patches of age <span class="math inline">\(a\)</span> when disturbance resets them to age zero. Those resets supply the boundary condition <span id="eq-p0"><span class="math display">\[
 P(0, t) = \int^{\infty}_{0}d_{\rm P}(a, t) P(a, t) \, {\rm d}a.
-\tag{21}\]</span></span></p>
+\tag{19}\]</span></span></p>
 <p>The frequency-density of patches of age <span class="math inline">\(a &lt; a^{\prime}\)</span> is given by <span class="math inline">\(\int_{0}^{a^{\prime}}P(a, t) \, {\rm d}a\)</span>, with <span class="math inline">\(\int_{0}^{\infty} P(a, t) \, {\rm d}a = 1\)</span>. If <span class="math inline">\(\frac{\partial}{\partial t}d_{\rm P}(a, t) = 0\)</span>, then <span class="math inline">\(P(a)\)</span> will approach an equilibrium solution given by <span id="eq-pa"><span class="math display">\[
 P(a) = P(0) \, S_{\rm P}(0, a),
-\tag{22}\]</span></span> where <span id="eq-s-p"><span class="math display">\[
+\tag{20}\]</span></span> where <span id="eq-s-p"><span class="math display">\[
 S_{\rm P}(0, a) = \exp \left( - \int_{0}^{a} d_{\rm P}(a^\prime) \, {\rm d}a^\prime\right)
-\tag{23}\]</span></span> is the probability that a patch remains undisturbed for duration <span class="math inline">\(a\)</span>, and <span id="eq-p0-eq"><span class="math display">\[
+\tag{21}\]</span></span> is the probability that a patch remains undisturbed for duration <span class="math inline">\(a\)</span>, and <span id="eq-p0-eq"><span class="math display">\[
 P(0) = \frac1{ \int_{0}^{\infty}S_{\rm P}(0, a) \, {\rm d}a}
-\tag{24}\]</span></span> is the frequency-density of patches of age <span class="math inline">\(0\)</span>. The rate of disturbance for patches of age <span class="math inline">\(a\)</span> is given by <span class="math inline">\(\frac{\partial (1-S_{\rm P}(0, a))}{\partial a} = - \frac{\partial S_{\rm P}(0, a)}{\partial a}\)</span>, while the expected lifetime of patches is <span class="math inline">\(- \int_0^\infty a \frac{\partial}{\partial a} S_{\rm P}(0, a) \, {\rm d} a = \int_0^\infty S_{\rm P}(0, a) \, {\rm d} a = \frac1{P(0)}\)</span> (first step made using integration by parts).</p>
+\tag{22}\]</span></span> is the frequency-density of patches of age <span class="math inline">\(0\)</span>. The rate of disturbance for patches of age <span class="math inline">\(a\)</span> is given by <span class="math inline">\(\frac{\partial (1-S_{\rm P}(0, a))}{\partial a} = - \frac{\partial S_{\rm P}(0, a)}{\partial a}\)</span>, while the expected lifetime of patches is <span class="math inline">\(- \int_0^\infty a \frac{\partial}{\partial a} S_{\rm P}(0, a) \, {\rm d} a = \int_0^\infty S_{\rm P}(0, a) \, {\rm d} a = \frac1{P(0)}\)</span> (first step made using integration by parts).</p>
 <p>Thus <span class="math inline">\(1/P(0)\)</span> has two equivalent interpretations at equilibrium: it is the mean time between disturbances and the reciprocal of the rate at which age-zero patches appear.</p>
 <p>An equilibrium distribution of patch ages may be achieved under a variety of conditions, for example, if <span class="math inline">\(d_{\rm P}(a, t)\)</span> depends on patch age <span class="math inline">\(a\)</span> but not on time <span class="math inline">\(t\)</span>. The rate of disturbance may also depend on features of the vegetation in the patch, rather than on patch age directly, in which case an equilibrium distribution of patch ages can still arise, provided the vegetation is also assumed to be at equilibrium.</p>
 <section id="sec-exponential-distribution" class="level4">
 <h4 class="anchored" data-anchor-id="sec-exponential-distribution">Exponential distribution</h4>
 <p>If the rate <span class="math inline">\(d_{\rm P}\)</span> of patch disturbance is constant with respect to patch age, then the rates at which patches of age <span class="math inline">\(a\)</span> are disturbed follow an exponential distribution, <span class="math inline">\(-\partial S_{\rm P}(0, a)/ \partial a = d_{\rm P} \, \exp(-d_{\rm P} a)\)</span>. The distribution of patch ages is then given by <span id="eq-s-p0a1"><span class="math display">\[
 S_{\rm P}(0, a) = \exp\left(-d_{\rm P} a\right), \, P(0) = d_{\rm P}.
-\tag{25}\]</span></span></p>
+\tag{23}\]</span></span></p>
 <p>A constant hazard is memoryless: surviving to an old age does not change a patch’s instantaneous chance of disturbance.</p>
 </section>
 <section id="sec-weibull-distribution" class="level4">
 <h4 class="anchored" data-anchor-id="sec-weibull-distribution">Weibull distribution</h4>
-<p>If the rate of patch disturbance changes with patch age according to <span class="math inline">\(d_{\rm P}(a) = \lambda \psi a^{\psi-1}\)</span>, then the rates at which patches of age <span class="math inline">\(a\)</span> are disturbed follow a Weibull distribution, <span class="math inline">\(-\partial S_{\rm P}(0, a)/ \partial a = \lambda \psi a^{\psi -1}e^{-\lambda a^\psi}\)</span>. <span class="math inline">\(\psi&gt;1\)</span> implies that the probability of disturbance increases with patch age, while <span class="math inline">\(\psi&lt;1\)</span> implies that it decreases with patch age. For <span class="math inline">\(\psi = 1\)</span>, we obtain the exponential distribution, a special case of the Weibull distribution. The Weibull distribution results in the following distribution of patch ages, <span id="eq-s-p0a2"><span class="math display">\[
-S_{\rm P}(0, a) = \exp(-\lambda a^\psi), \, P(0) = \frac{\psi \lambda^{\frac1{\psi}}}{\Gamma\left(\frac1{\psi}\right)},
-\tag{26}\]</span></span> where <span class="math inline">\(\Gamma(x) = \int_{0}^{\infty}e^{-t}t^{x-1} \, dt\)</span> is the gamma function. We can also specify this distribution by the mean disturbance interval <span class="math inline">\(\bar{a} = \frac1{P(0)}\)</span>. From this, we can calculate the relevant value for <span class="math inline">\(\lambda = \left(\frac{\Gamma\left(\frac1{\psi}\right)}{\psi \bar{a}}\right)^{\psi}\)</span>.</p>
-<p>The default in <code>plant</code> is to assume <span class="math inline">\(\psi=2\)</span>, such that <span class="math inline">\(d_{\rm P}\)</span> increases as a linear function of patch age. The distribution of patch ages is then specified by a single parameter, <span class="math inline">\(\bar{a}\)</span>.</p>
+<p>If the rate of patch disturbance changes with patch age according to <span class="math inline">\(d_{\rm P}(a) = \lambda \psi a^{\psi-1}\)</span>, then the rates at which patches of age <span class="math inline">\(a\)</span> are disturbed follow a Weibull distribution, <span class="math inline">\(-\partial S_{\rm P}(0, a)/ \partial a = \lambda \psi a^{\psi -1}e^{-\lambda a^\psi}\)</span>. <span class="math inline">\(\psi&gt;1\)</span> implies that the probability of disturbance increases with patch age, while <span class="math inline">\(\psi&lt;1\)</span> implies that it decreases with patch age. For <span class="math inline">\(\psi = 1\)</span>, we obtain the exponential distribution, a special case of the Weibull distribution. In summary, the Weibull hazard results in the following distribution of patch ages,</p>
+<p><span id="eq-s-p0a2"><span class="math display">\[
+d_{\rm P}(a) = \lambda \psi a^{\psi-1}, \qquad S_{\rm P}(0, a) = \exp(-\lambda a^\psi), \qquad P(0) = \frac{\psi \lambda^{\frac1{\psi}}}{\Gamma\left(\frac1{\psi}\right)}
+\tag{24}\]</span></span></p>
+<p>where <span class="math inline">\(\Gamma(x) = \int_{0}^{\infty}e^{-t}t^{x-1} \, dt\)</span> is the gamma function. We can also specify this distribution by the mean disturbance interval <span class="math inline">\(\bar{a} = \frac1{P(0)}\)</span>. From this, we can calculate the relevant value for <span class="math inline">\(\lambda = \left(\frac{\Gamma\left(\frac1{\psi}\right)}{\psi \bar{a}}\right)^{\psi}\)</span>.</p>
+<p>The default in <code>plant</code> is to assume <span class="math inline">\(\psi=2\)</span>, such that <span class="math inline">\(d_{\rm P}\)</span> increases as a linear function of patch age. The distribution of patch ages is then specified by a single parameter, <span class="math inline">\(\bar{a}\)</span>. <code>plant</code> sets that parameter indirectly: it takes the patch age <span class="math inline">\(a_{\rm max}\)</span> (<code>max_patch_lifetime</code>) by which all but a small fraction <span class="math inline">\(\epsilon\)</span> of patches have been disturbed, <span class="math inline">\(S_{\rm P}(0, a_{\rm max}) = \epsilon\)</span>, and derives <span class="math inline">\(\bar{a}\)</span> from it. The same <span class="math inline">\(a_{\rm max}\)</span> is the age at which a run ends.</p>
 <p>The shape parameter <span class="math inline">\(\psi\)</span> controls how disturbance risk changes with age; <span class="math inline">\(\lambda\)</span> then sets the time scale. Fixing <span class="math inline">\(\psi=2\)</span> leaves only the mean disturbance interval to specify.</p>
 </section>
 </section>
@@ -853,36 +857,36 @@ S_{\rm P}(0, a) = \exp(-\lambda a^\psi), \, P(0) = \frac{\psi \lambda^{\frac1{\p
 <p>The size-structured PDE is a conservation equation: change inside a thin height slice equals plants growing in, minus plants growing out, minus deaths. We now write that ledger explicitly, following <span class="citation" data-cites="Deroos-1997">De Roos et al. (<a href="#ref-Deroos-1997" role="doc-biblioref">1997</a>)</span>. To keep the notation readable, this subsection suppresses the dependence on traits <span class="math inline">\(x\)</span>.</p>
 <p>Assuming that all rates are constant within a thin interval <span class="math inline">\(\Delta H\)</span>, the total number of individuals within the interval spanned by <span class="math inline">\([H - 0.5\Delta H, H + 0.5\Delta H)\)</span> is <span class="math inline">\(N(H, a)\Delta H\)</span>. The flux of individuals in and out of this size interval can be expressed as <span id="eq-flux-1"><span class="math display">\[
 \begin{array}{ll} &amp;g(H - 0.5 \Delta H, a) \, N(H - 0.5 \Delta H, a) - g(H + 0.5 \Delta H, a) \, N(H + 0.5 \Delta H, a) \\ &amp; - d (H, a) \, N(H, a)\Delta H\\ \end{array}.
-\tag{27}\]</span></span> The first two terms describe the flux in and out of the considered size interval through growth, while the last term describes losses through mortality. The change in the density of individuals within this size interval during a time step <span class="math inline">\(\Delta a\)</span> is thus <span id="eq-flux-2"><span class="math display">\[
+\tag{25}\]</span></span> The first two terms describe the flux in and out of the considered size interval through growth, while the last term describes losses through mortality. The change in the density of individuals within this size interval during a time step <span class="math inline">\(\Delta a\)</span> is thus <span id="eq-flux-2"><span class="math display">\[
 \begin{array}{ll} N(H, a + \Delta a)\Delta H - N(H, a)\Delta H = &amp;g(H - 0.5 \Delta H, a) \, N(H - 0.5 \Delta H, a)\Delta a \\ &amp; - g(H + 0.5 \Delta H, a) \, N(H + 0.5 \Delta H, a)\Delta a\\&amp; - d (H, a) \, N(H, a)\Delta H\Delta a.
 \end{array}
-\tag{28}\]</span></span> By rearranging, we obtain <span id="eq-flux-3"><span class="math display">\[
+\tag{26}\]</span></span> By rearranging, we obtain <span id="eq-flux-3"><span class="math display">\[
 \begin{array}{ll}
 \frac{N(H, a + \Delta a) - N(H, a)}{\Delta a} = &amp; - d (H, a) \, N(H, a) \\
 &amp; - \frac{g(H + 0.5 \Delta H, a) \, N(H + 0.5 \Delta H, a) - g(H - 0.5 \Delta H, a) \, N(H - 0.5 \Delta H, a)}{\Delta H}.
 \end{array}
-\tag{29}\]</span></span> The left-hand side above corresponds to the derivative of <span class="math inline">\(N\)</span> as <span class="math inline">\(\Delta a\to 0\)</span>. For thin slices, <span class="math inline">\(\Delta H \to 0\)</span>, this yields <span id="eq-pde-app"><span class="math display">\[
+\tag{27}\]</span></span> The left-hand side above corresponds to the derivative of <span class="math inline">\(N\)</span> as <span class="math inline">\(\Delta a\to 0\)</span>. For thin slices, <span class="math inline">\(\Delta H \to 0\)</span>, this yields <span id="eq-pde-app"><span class="math display">\[
 \frac{\partial}{\partial a} N(H, a) = - d (H, a) \, N(H, a) - \frac{\partial}{\partial H} (g(H, a) \, N(H, a)).
-\tag{30}\]</span></span></p>
+\tag{28}\]</span></span></p>
 <p>This is the same PDE used in the main text: mortality removes density locally, while the derivative of <span class="math inline">\(gN\)</span> moves density through height space.</p>
 <p>To complete the model, this PDE must be supplemented with boundary conditions that specify the density at the lower end of heights for all <span class="math inline">\(a\)</span>, as well as the initial distribution <span class="math inline">\(N(H,0)\)</span>. The former is derived by integrating the PDE with respect to <span class="math inline">\(H\)</span> over the interval <span class="math inline">\((H_{0}, H_{\infty} )\)</span>, yielding <span id="eq-partial-a"><span class="math display">\[
 \frac{\partial}{\partial a} \int _{H_{0} }^{H_{\infty}}N(H, a) \, {\rm d} H = g(H_{0} , a) \, N(H_{0} , a) - g(H_{\infty}, a) \, N(H_{\infty}, a) - \int _{H_{0} }^{H_{\infty}}d (H, a) \, N(H, a) \, {\rm d} H.
-\tag{31}\]</span></span> The left-hand side above is the rate of change of the total density of individuals in the population. On the right, the first two terms are fluxes through the lower and upper size boundaries, and the integral is the total death rate. We assume that <span class="math inline">\(N(H_{\infty}, a) = 0\)</span>. The incoming flux <span class="math inline">\(g(H_{0} , a) \, N(H_{0} , a)\)</span> must therefore equal the population’s total birth rate <span class="math inline">\(B\)</span>, yielding the boundary condition <span id="eq-g0"><span class="math display">\[
+\tag{29}\]</span></span> The left-hand side above is the rate of change of the total density of individuals in the population. On the right, the first two terms are fluxes through the lower and upper size boundaries, and the integral is the total death rate. We assume that <span class="math inline">\(N(H_{\infty}, a) = 0\)</span>. The incoming flux <span class="math inline">\(g(H_{0} , a) \, N(H_{0} , a)\)</span> must therefore equal the population’s total birth rate <span class="math inline">\(B\)</span>, yielding the boundary condition <span id="eq-g0"><span class="math display">\[
 g(H_{0} , a) \, N(H_{0} , a) = B.
-\tag{32}\]</span></span></p>
+\tag{30}\]</span></span></p>
 </section>
 <section id="sec-converting-density" class="level3">
 <h3 class="anchored" data-anchor-id="sec-converting-density">Converting density from one size unit to another</h3>
 <p>The numerical value of a density depends on the unit along its horizontal axis. For example, a density per kilogram is not numerically identical to a density per metre, even when both describe the same plants. What must stay unchanged is the number of individuals represented by a corresponding interval.</p>
 <p>Suppose size-density is expressed using size <span class="math inline">\(M\)</span>, but we want to express it using size <span class="math inline">\(H\)</span>. We require a one-to-one conversion <span class="math inline">\(H = \hat{H}(M)\)</span>. Equality of abundance over matching intervals then requires the following: <span id="eq-n-conversion"><span class="math display">\[
 \int_{M_1}^{M_2} N(M | x, a) \, {\rm d}M = \int_{\hat{H}(M_1)}^{\hat{H}(M_2)} N^\prime(H | x, a) \, {\rm d}H .
-\tag{33}\]</span></span> For very small size intervals, this equation is equivalent to <span id="eq-n-conversion2"><span class="math display">\[
+\tag{31}\]</span></span> For very small size intervals, this equation is equivalent to <span id="eq-n-conversion2"><span class="math display">\[
 \left(M_2 - M_1 \right) \, N(M_1 | x, a) = \left( \hat{H}(M_2) - \hat{H}(M_1)\right) \, N^\prime(\hat{H}(M_1) | x, a).
-\tag{34}\]</span></span> Rearranging gives <span id="eq-n-conversion3"><span class="math display">\[
+\tag{32}\]</span></span> Rearranging gives <span id="eq-n-conversion3"><span class="math display">\[
 N^\prime(\hat{H}(M_1) | x, a) = N(M_1 | x, a) \, \frac{M_2 - M_1}{\hat{H}(M_2) - \hat{H}(M_1)}.
-\tag{35}\]</span></span> Noting that the second term on the right-hand side is simply the definition of <span class="math inline">\(\frac{{\rm d} M}{{\rm d} H}\)</span> evaluated at <span class="math inline">\(M_1\)</span>, we have <span id="eq-n-conversion4"><span class="math display">\[
+\tag{33}\]</span></span> Noting that the second term on the right-hand side is simply the definition of <span class="math inline">\(\frac{{\rm d} M}{{\rm d} H}\)</span> evaluated at <span class="math inline">\(M_1\)</span>, we have <span id="eq-n-conversion4"><span class="math display">\[
 N^\prime(H | x, a) = N(M | x, a) \, \frac{{\rm d} M}{{\rm d} H}.
-\tag{36}\]</span></span></p>
+\tag{34}\]</span></span></p>
 <p>The derivative <span class="math inline">\(\mathrm{d}M/\mathrm{d}H\)</span> is the Jacobian of the change of variables. It stretches or compresses the density exactly enough that integrating it still returns the same number of plants.</p>
 
 
@@ -991,7 +995,8 @@ Moorcroft, P. R., Hurtt, G. C., &amp; Pacala, S. W. (2001). A method for scaling
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -1000,8 +1005,69 @@ Moorcroft, P. R., Hurtt, G. C., &amp; Pacala, S. W. (2001). A method for scaling
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -1015,6 +1081,7 @@ Moorcroft, P. R., Hurtt, G. C., &amp; Pacala, S. W. (2001). A method for scaling
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -1177,44 +1244,54 @@ Moorcroft, P. R., Hurtt, G. C., &amp; Pacala, S. W. (2001). A method for scaling
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -1313,7 +1390,10 @@ Moorcroft, P. R., Hurtt, G. C., &amp; Pacala, S. W. (2001). A method for scaling
     }
   });
   </script>
-<nav class="page-navigation">
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
   <div class="nav-page nav-page-previous">
       <a href="../theory/from-primer-to-pde.html" class="pagination-link" aria-label="The maths, worked through">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The maths, worked through</span>

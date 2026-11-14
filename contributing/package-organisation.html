@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -70,17 +70,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../contributing/implementing-a-strategy.html" rel="next">
+<link href="../contributing/implementing-a-model.html" rel="next">
 <link href="../contributing/how-we-work.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e30b0f8ea5685d2ef6f683bb78d13b16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -116,11 +117,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="../assets/extras.css">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
@@ -131,8 +132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <span class="navbar-title">Overstorey</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -181,15 +181,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </a>
 </div>
+            <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../contributing/how-we-work.html">Contributing</a></li><li class="breadcrumb-item"><a href="../contributing/package-organisation.html">Package organisation</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../contributing/how-we-work.html">Contributing</a></li><li class="breadcrumb-item"><a href="../contributing/package-organisation.html">Package organisation</a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -197,7 +198,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -208,13 +209,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Contributing</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Contributing</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../contributing/how-we-work.html" class="sidebar-item-text sidebar-link">
@@ -229,8 +227,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contributing/implementing-a-strategy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Implementing a new strategy</span></a>
+  <a href="../contributing/implementing-a-model.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Implementing a new model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -247,7 +245,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
@@ -266,15 +264,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#templating" id="toc-templating" class="nav-link" data-scroll-target="#templating">Templating</a></li>
   <li><a href="#classes-and-their-functions" id="toc-classes-and-their-functions" class="nav-link" data-scroll-target="#classes-and-their-functions">Classes and their functions</a></li>
-  <li><a href="#strategies" id="toc-strategies" class="nav-link" data-scroll-target="#strategies">Strategies</a></li>
+  <li><a href="#models" id="toc-models" class="nav-link" data-scroll-target="#models">Models</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/contributing/package-organisation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../contributing/how-we-work.html">Contributing</a></li><li class="breadcrumb-item"><a href="../contributing/package-organisation.html">Package organisation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../contributing/how-we-work.html">Contributing</a></li><li class="breadcrumb-item"><a href="../contributing/package-organisation.html">Package organisation</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Package organisation</h1>
 </div>
@@ -307,17 +305,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── RcppR6_functions.yml  <span class="co"># Used by RCppR6 to generate the interface for Rcpp (C++ function)</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── include</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   ├── plant.h <span class="co"># THE main header file for package - sources other headers</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   ├── plant   <span class="co"># header (.h) files for different components, many including implementation</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   └── tk      <span class="co"># simple cubic spline interpolation library</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── reference_plant_ff16 <span class="co"># Reference plant physiology ff16</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── docs            <span class="co"># Tables of variables for models</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   └── scripts         <span class="co"># Tools used in package management</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> man                     <span class="co"># R Documentation files (*.Rd)</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> R                           <span class="co"># R functions</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> scripts             <span class="co"># R scripts</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> src                     <span class="co"># C++ files with implementation where not included in headers</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> tests               <span class="co"># Tests</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> vignettes           <span class="co"># Vignettes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   └── plant   <span class="co"># header (.h) files for different components, many including implementation</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── reference_plant_ff16 <span class="co"># Reference plant physiology ff16</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── docs            <span class="co"># Tables of variables for models</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   └── scripts         <span class="co"># Tools used in package management</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> man                     <span class="co"># R Documentation files (*.Rd)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> R                           <span class="co"># R functions</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> scripts             <span class="co"># R scripts</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> src                     <span class="co"># C++ files with implementation where not included in headers</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> tests               <span class="co"># Tests</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> vignettes           <span class="co"># Vignettes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -451,7 +448,7 @@ Note
 <h3 class="anchored" data-anchor-id="classes-and-their-functions">Classes and their functions</h3>
 <p>The main c++ header files (i.e.&nbsp;*.h) are stored within the directory <code>inst/include/plant/</code>. In many cases, the implementations is written directly into the header files. Otherwise, the corresponding source file (i.e.&nbsp;*.cpp) is stored within the folder <code>src</code>.</p>
 <p>The role of these different files is as follows.</p>
-<p>strategies: ff16_strategy.h</p>
+<p>models: models/ff16_model.h</p>
 <p>plant.h</p>
 <p>node.h</p>
 <p>species.h</p>
@@ -460,7 +457,7 @@ Note
 <p>Helpers:</p>
 <ul>
 <li>parameters.h</li>
-<li>node_schedule.h</li>
+<li>schedule.h</li>
 <li>control.h</li>
 <li>disturbance.h</li>
 <li>environment.h</li>
@@ -469,49 +466,35 @@ Note
 <p>stochastic_patch_runner.h stochastic_patch.h stochastic_species.h stochastic_utils.h</p>
 <section id="utilities" class="level4">
 <h4 class="anchored" data-anchor-id="utilities">Utilities</h4>
-<p>adaptive_interpolator.h gradient.h interpolator.h lorenz.h ode_control.h ode_interface.h ode_r.h ode_runner.h ode_solver.h ode_step.h qag_internals.h qag.h qk_rules.h qk.h</p>
+<p>gradient.h qag_internals.h qag.h qk_rules.h qk.h</p>
+<p>The ODE solver, interpolators and splines come from the <a href="https://github.com/traitecoevo/odelia">odelia</a> package.</p>
 <p>RcppR6_post.hpp RcppR6_pre.hpp RcppR6_support.hpp uniroot.h util_post_rcpp.h util.h</p>
 </section>
 </section>
-<section id="strategies" class="level3">
-<h3 class="anchored" data-anchor-id="strategies">Strategies</h3>
-<p>The foundation of the <code>plant</code> package are sub-models for an individual species’ physiological strategy. The <code>FF16</code> strategy is the default strategy. However, the plant package has been written to enable new physiological strategies to be added, and then use the same machinery for modelling size-structured population dynamics, we do this by using templating in c++ (see <a href="#templating">Templating</a>).</p>
-<p>Adding a new physiological strategy requires some changes to be made throughout the code and then the code recompiled. To achieve this, you’ll need to download the package code from Github (new strategies cannot be added using an installed R package) and follow the instructions below. For a fuller walkthrough of the biology and structure of a strategy, see <a href="../contributing/implementing-a-strategy.html">implementing a strategy</a>.</p>
-<p>As a naming convention, strategies are named using two initials r (eg. the first two authors) followed by a year, e.g.&nbsp;<code>FF16</code>. A single letter suffix can be added to indicate a minor modification of an existing strategy.</p>
-<section id="installing-new-strategies" class="level4">
-<h4 class="anchored" data-anchor-id="installing-new-strategies">Installing new strategies</h4>
-<p>Let’s assume you want to add a new strategy called <code>XX99</code>. To add this strategy, the following changes are required. First, some new files need to be created:</p>
+<section id="models" class="level3">
+<h3 class="anchored" data-anchor-id="models">Models</h3>
+<p>The foundation of the <code>plant</code> package are sub-models for an individual species’ physiology, which <code>plant</code> calls models. The <code>FF16</code> model is the default model. However, the plant package has been written to enable new models to be added, and then use the same machinery for modelling size-structured population dynamics, we do this by using templating in c++ (see <a href="#templating">Templating</a>).</p>
+<p>Adding a new model requires some changes to be made throughout the code and then the code recompiled. To achieve this, you’ll need to download the package code from Github (new models cannot be added using an installed R package) and follow the instructions below. For a fuller walkthrough of the biology and structure of a model, see <a href="../contributing/implementing-a-model.html">implementing a model</a>.</p>
+<p>As a naming convention, models are named using two initials (eg. the first two authors) followed by a year, e.g.&nbsp;<code>FF16</code>. A single letter suffix can be added to indicate a variant of an existing model, e.g.&nbsp;<code>TF24t</code>.</p>
+<section id="adding-a-new-model" class="level4">
+<h4 class="anchored" data-anchor-id="adding-a-new-model">Adding a new model</h4>
+<p>Let’s assume you want to add a new model called <code>XX99</code>. <code>plant</code> has no generator for a new model: every templated binding and every R dispatch table names each model by hand, and the checklist of what to change is the <code>plant-new-model</code> skill in <code>plant</code>’s <code>.claude/skills/</code>. Most new models are a variant of an existing model, written as a subclass of it (as <code>TF24f</code>, <code>TF24t</code> and <code>TF24w</code> are of <code>TF24</code>). The main new files are:</p>
 <ul>
-<li><code>inst/include/plant/XX99_strategy.h</code> (C++ header file, describing strategy)</li>
-<li><code>src/XX99_strategy.cpp</code> (C++ source file, describing strategy)</li>
-<li><code>R/XX99.R</code> (R wrapper functions for the new strategy, plus hyperparameter function)</li>
-<li><code>tests/testthat/test-strategy-XX99.R</code> (Tests of the new strategy)</li>
+<li><code>inst/include/plant/models/xx99_model.h</code> (C++ header describing the model, with its methods defined inline)</li>
+<li><code>src/xx99_node.cpp</code> (the schedule exports for the new model’s <code>Parameters</code>)</li>
+<li><code>R/xx99.R</code> (R constructors for the new model’s individual and parameters, and its <code>expand_state</code> function)</li>
+<li><code>tests/testthat/test-model-xx99.R</code> (Tests of the new model)</li>
 </ul>
-<p>In addition, the following files must be modified to include appropriate details for the new strategy (use the examples for <code>FF16</code> as a guide):</p>
+<p>In addition, files such as <code>inst/RcppR6_classes.yml</code>, <code>inst/include/plant.h</code>, <code>R/strategy_support.R</code>, <code>R/default_parameters.R</code> and <code>tests/testthat/helper-plant.R</code> must name the new model; the skill lists every one.</p>
+<p>Before trying to add a new model, make sure your project is at a state where you are happy to go back to if you decide to, ie: do this in a new branch or fork. There is no easy way to undo the changes so you will have to do <code>git reset --hard HEAD</code> if you want to go back. You will still have to delete the new and untracked files listed above.</p>
+<p>Then run <code>make RcppR6</code> (rather than RcppR6 directly, because the target re-adds guards a bare regeneration drops), <code>make roxygen</code> and <code>make test</code> to regenerate the interface and run the test suite with your new model.</p>
+<p>If that works you can then modify <code>inst/include/plant/models/xx99_model.h</code> to reflect any changes in biology you desire for the new model. If you make changes to your new model’s parameters you will have to update the files:</p>
 <ul>
-<li><code>inst/include/RccpR6_classes.yml</code></li>
-<li><code>inst/include/plant.h</code></li>
-<li><code>src/plant_plus.cpp</code></li>
-<li><code>src/individual_tools.cpp</code></li>
-<li><code>tests/testthat/helper-plant.R</code></li>
-<li><code>R/scm_support.R</code> (Currently uses the FF16 hyperpar and make_hyperpar)</li>
-</ul>
-<p>Rather than making the above modifications by hand, you can use the scaffolder found in <code>inst/scripts/new_strategy_scaffolder.R</code> to create a suitable template. The scaffolder is set up to add code at appropriate points.</p>
-<p>Before trying to install a new strategy, make sure your project is at a state where you are happy to go back to if you decide to, ie: do this in a new branch or fork. There is no easy way to undo the changes so you will have to do <code>git reset --hard HEAD</code> if you want to go back. You will still have to delete the new and untracked files listed above.</p>
-<p>To install a new strategy using the scaffolder, run the following code from an R session at the project root:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'inst/scripts/new_strategy_scaffolder.R'</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">create_strategy_scaffold</span>(<span class="st">"XX99"</span>, <span class="st">"FF16"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>where <code>XX99</code> is the name of your new strategy and <code>FF16</code> is the strategy that you want to copy from. If run without <code>FF16</code>, the scaffolder copies from the <code>FF16</code> strategy by default.</p>
-<p>This will create the code-base for a new template. Then run <code>make clean; make; make test</code> to recompile and run the test suite with your new strategy template.</p>
-<p>If that works you can then modify the files <code>src/XX99_strategy.cpp</code> and <code>inst/include/plant/XX99_strategy.h</code> to reflect any changes in biology you desire for the new strategy. If you make changes to your new strategies parameters you will have to update the files:</p>
-<ul>
-<li><code>inst/include/RccpR6_classes.yml</code> - see top-level section under the new strategy name, describing your parameters.</li>
-<li><code>tests/testthat/test-strategy-XX99.R</code> with suitable tests for your new strategy.</li>
+<li><code>inst/RcppR6_classes.yml</code> - see top-level section under the new model’s name, describing your parameters.</li>
+<li><code>tests/testthat/test-model-xx99.R</code> with suitable tests for your new model.</li>
 </ul>
 <p>Then recompile and test as above.</p>
-<p>After the project compiles, you will notices even more files that have changed, for example in files like <code>NAMESPACE</code>, <code>R/RcppExports.R</code> etc. These files are auto-generated and therefore modifications are triggered from files listed above.  </p>
+<p>After the project compiles, you will notices even more files that have changed, for example in files like <code>NAMESPACE</code>, <code>R/RcppExports.R</code> etc. These files are auto-generated and therefore modifications are triggered from files listed above.</p>
 
 
 </section>
@@ -597,7 +580,8 @@ Note
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -606,8 +590,69 @@ Note
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -621,6 +666,7 @@ Note
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -783,44 +829,54 @@ Note
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -919,15 +975,18 @@ Note
     }
   });
   </script>
-<nav class="page-navigation">
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
   <div class="nav-page nav-page-previous">
       <a href="../contributing/how-we-work.html" class="pagination-link" aria-label="How we work">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">How we work</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../contributing/implementing-a-strategy.html" class="pagination-link" aria-label="Implementing a new strategy">
-        <span class="nav-page-text">Implementing a new strategy</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../contributing/implementing-a-model.html" class="pagination-link" aria-label="Implementing a new model">
+        <span class="nav-page-text">Implementing a new model</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

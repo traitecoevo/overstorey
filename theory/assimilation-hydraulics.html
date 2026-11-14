@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,13 +74,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../theory/models/ff16.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e30b0f8ea5685d2ef6f683bb78d13b16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -145,11 +146,11 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/extras.css">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
@@ -160,8 +161,7 @@ window.Quarto = {
     <span class="navbar-title">Overstorey</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -210,15 +210,16 @@ window.Quarto = {
   </div>
 </a>
 </div>
+            <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -226,7 +227,7 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -237,13 +238,10 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
- <span class="menu-text">1. Foundations</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">1. Foundations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/overview.html" class="sidebar-item-text sidebar-link">
@@ -272,13 +270,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">2. Models and physiology</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">2. Models and physiology</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/models/index.html" class="sidebar-item-text sidebar-link">
@@ -319,13 +314,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">3. Adaptive dynamics</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">3. Adaptive dynamics</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
@@ -390,13 +382,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
- <span class="menu-text">4. Implementation</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">4. Implementation</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
@@ -431,13 +420,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
- <span class="menu-text">5. Prediction and reproducibility</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">5. Prediction and reproducibility</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/models/scientific-versioning.html" class="sidebar-item-text sidebar-link">
@@ -452,13 +438,13 @@ window.Quarto = {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
   <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
   <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#profitmax" id="toc-profitmax" class="nav-link" data-scroll-target="#profitmax">Profitmax</a></li>
+  <li><a href="#profit-maximisation" id="toc-profit-maximisation" class="nav-link" data-scroll-target="#profit-maximisation">Profit maximisation</a></li>
   <li><a href="#revenue" id="toc-revenue" class="nav-link" data-scroll-target="#revenue">Revenue</a></li>
   <li><a href="#cost" id="toc-cost" class="nav-link" data-scroll-target="#cost">Cost</a></li>
   <li><a href="#profit" id="toc-profit" class="nav-link" data-scroll-target="#profit">Profit</a></li>
@@ -470,9 +456,9 @@ window.Quarto = {
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/theory/assimilation-hydraulics.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Assimilation &amp; hydraulics</h1>
 </div>
@@ -521,17 +507,17 @@ window.Quarto = {
 <p>Several parameters are especially important for the leaf calculation:</p>
 <ul>
 <li><code>vcmax_25</code>: the maximum rate of carboxylation at 25 °C (<span class="math inline">\(\mu mol~m^{-2}~s^{-1}\)</span>)</li>
-<li><code>p_50</code>: the leaf water potential (<span class="math inline">\(\psi_l\)</span>) at which 50% of conductivity is lost</li>
-<li><code>K_s</code>: the maximum hydraulic conductivity (<span class="math inline">\(kg~m^{-2}~s^{-1}~MPa^{-1})\)</span></li>
-<li><code>c</code>: the shape parameter for the hydraulic vulnerability curve (unitless)</li>
-<li><code>b</code>: the sensitivity parameter for the hydraulic vulnerability curve (-MPa)</li>
-<li><code>psi_crit</code>: the critical <span class="math inline">\(\psi_l\)</span> at which 95% of conductivity is lost (-MPa)</li>
+<li><code>stem_P50</code>: the stem water potential, <span class="math inline">\(P_{50}\)</span>, at which 50% of conductivity is lost (MPa)</li>
+<li><code>stem_c</code>: the shape parameter of the stem’s vulnerability curve, <span class="math inline">\(c\)</span> (unitless)</li>
+<li><code>K_s</code>: the sapwood-specific conductivity of the terminal stem segment, <span class="math inline">\(K_{\rm s}\)</span> (<span class="math inline">\(kg~m^{-1}~s^{-1}~MPa^{-1}\)</span>)</li>
+<li><code>TF24_cost_scale</code>: the carbon cost of losing all conductance, <span class="math inline">\(\gamma\)</span> (<span class="math inline">\(\mu mol~m^{-2}~s^{-1}\)</span>)</li>
+<li><code>TF24_beta2</code>: the exponent of that cost, <span class="math inline">\(\beta\)</span> (unitless)</li>
 </ul>
-<p>Together with the other TF24 traits and parameters, these values determine how the <code>Leaf</code> submodel responds to its environment. The implementation lives in <code>leaf_model.cpp</code>; the sections below explain the calculation conceptually.</p>
+<p>The scale of the vulnerability curve, <span class="math inline">\(b\)</span> (<code>stem_b</code>), and the critical potential at which 95% of conductivity is lost, <span class="math inline">\(\psi_\mathrm{crit}\)</span> (<code>psi_crit</code>), are derived from <code>stem_P50</code> and <code>stem_c</code>; setting either does not change the curve. Water potentials are positive magnitudes throughout. Together with the other TF24 traits and parameters, these values determine how the <code>Leaf</code> submodel responds to its environment. The leaf is the <code>phylloptim</code> package’s: <code>plant</code> reaches it through <code>leaf_model.h</code>, which makes <code>plant::Leaf</code> an alias of <code>phylloptim::Leaf</code>. The sections below explain the calculation conceptually.</p>
 </section>
-<section id="profitmax" class="level2">
-<h2 class="anchored" data-anchor-id="profitmax">Profitmax</h2>
-<p>Plants vary the aperture of their stomata in response to conditions such as soil moisture and atmospheric dryness. Several theoretical frameworks can be used to represent that response. TF24 uses the <code>profitmax</code> model, which assumes that the chosen operating point is the one that maximises profit, <span class="math inline">\(P~(\mu mol~m^{-2}~s^{-1})\)</span>.</p>
+<section id="profit-maximisation" class="level2">
+<h2 class="anchored" data-anchor-id="profit-maximisation">Profit maximisation</h2>
+<p>Plants vary the aperture of their stomata in response to conditions such as soil moisture and atmospheric dryness. Several theoretical frameworks can be used to represent that response. TF24 uses a profit-maximisation model, which assumes that the chosen operating point is the one that maximises profit, <span class="math inline">\(J~(\mu mol~m^{-2}~s^{-1})\)</span>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -542,106 +528,109 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The <code>Leaf</code> submodel also carries an implementation of the Medlyn <em>et al.</em> (2011) stomatal-conductance model — an empirical <span class="math inline">\(g_1\)</span> formulation (<code>medlyn_model_gs</code>, with settable <code>g0</code>/<code>g1</code> and a soil-moisture stress factor <span class="math inline">\(\beta\)</span> derived from the wilting point and field capacity). It is <strong>not</strong> on the default <code>TF24</code> compute path, which optimises <span class="math inline">\(\psi_l\)</span> directly via <code>profitmax</code>. It exists as a comparison/exploration tool, so treat any Medlyn-style <span class="math inline">\(g_1\)</span> behaviour as opt-in, not the model’s default stomatal response.</p>
+<p>The <code>Leaf</code> submodel also carries an implementation of the Medlyn <em>et al.</em> (2011) stomatal-conductance model — an empirical <span class="math inline">\(g_1\)</span> formulation (<code>medlyn_model_gs</code>, with settable <code>g0</code>/<code>g1</code> and a soil-moisture stress factor <span class="math inline">\(\beta\)</span> derived from the wilting point and field capacity). It is <strong>not</strong> on the default <code>TF24</code> compute path, which maximises profit. It exists as a comparison/exploration tool, so treat any Medlyn-style <span class="math inline">\(g_1\)</span> behaviour as opt-in, not the model’s default stomatal response.</p>
 </div>
 </div>
-<p>Profit is the difference between photosynthetic revenue, <span class="math inline">\(A~(\mu mol~m^{-2}~s^{-1})\)</span>, and hydraulic cost, <span class="math inline">\(C~(\mu mol~m^{-2}~s^{-1})\)</span>:</p>
+<p>Profit is the difference between photosynthetic revenue, <span class="math inline">\(A~(\mu mol~m^{-2}~s^{-1})\)</span>, and hydraulic cost, <span class="math inline">\(C~(\mu mol~m^{-2}~s^{-1})\)</span>, at a candidate water potential <span class="math inline">\(\psi\)</span>:</p>
 <p><span id="eq-profit"><span class="math display">\[
-P~(\psi_l) = A~(\psi_l) - C~(\psi_l).
+J = h(A) - C(\psi_\mathrm{leaf}, \psi_\mathrm{up}), \quad h(A) = A \text{ for a difference curve};
+\qquad \psi_\mathrm{leaf} = \mathrm{clamp}_{[\psi_w,\,\psi_\mathrm{crit}]}(\psi) \ \text{(leaf route)}, \qquad
+\psi_r = \mathrm{clamp}_{[\psi_a,\,\psi_b]}(\psi) \ \text{(collar route)}
 \tag{1}\]</span></span></p>
+<p>For TF24 the benefit link <span class="math inline">\(h\)</span> is the identity, so profit is simply <span class="math inline">\(A - C\)</span>; phylloptim’s other cost curves use other links. The cost reads two potentials: the leaf xylem potential, <span class="math inline">\(\psi_\mathrm{leaf}\)</span>, and the potential upstream of the stem, <span class="math inline">\(\psi_\mathrm{up}\)</span>.</p>
 <p>Later code and figures label photosynthetic revenue as <span class="math inline">\(R\)</span> and hydraulic cost as <span class="math inline">\(H\)</span>. These are the same two quantities denoted by <span class="math inline">\(A\)</span> and <span class="math inline">\(C\)</span> in <a href="#eq-profit" class="quarto-xref">Equation&nbsp;1</a>; only the labels change.</p>
-<p><span class="math inline">\(\psi_l~(-MPa)\)</span> is the water potential of the canopy xylem. In this page’s notation, water stress is expressed as the magnitude of a negative potential: a larger value means a more negative physical water potential. Changing <span class="math inline">\(\psi_l\)</span> changes how much water the hydraulic pathway can supply and therefore the stomatal conductance that can be supported.</p>
-<p>Both <span class="math inline">\(A\)</span> and <span class="math inline">\(C\)</span> are therefore functions of <span class="math inline">\(\psi_l\)</span>. The model evaluates their difference over the feasible range of <span class="math inline">\(\psi_l\)</span> and finds the value that gives the largest <span class="math inline">\(P\)</span>.</p>
+<p><span class="math inline">\(\psi_\mathrm{leaf}~(-MPa)\)</span> is the water potential of the canopy xylem. In this page’s notation, water stress is expressed as the magnitude of a negative potential: a larger value means a more negative physical water potential. Changing <span class="math inline">\(\psi_\mathrm{leaf}\)</span> changes how much water the hydraulic pathway can supply and therefore the stomatal conductance that can be supported.</p>
+<p>The search for the best operating point can run over either of two potentials, which phylloptim calls routes. On the <em>leaf route</em>, the candidate is the leaf potential itself, the stem draws directly on the soil (<span class="math inline">\(\psi_\mathrm{up} = \psi_\mathrm{soil}\)</span>), and the search is held between the wet bound <span class="math inline">\(\psi_w\)</span>, where the stomata are shut, and the critical potential <span class="math inline">\(\psi_\mathrm{crit}\)</span>. On the <em>collar route</em>, which TF24 uses with its layered soil, the candidate is the root-collar potential <span class="math inline">\(\psi_r\)</span>, which is also the stem’s upstream potential. <span class="math inline">\(\psi_\mathrm{leaf}\)</span> then follows from it by continuity of flow, and the search is held inside the feasible interval of collar potentials, <span class="math inline">\([\psi_a, \psi_b]\)</span>.</p>
+<p>Both <span class="math inline">\(A\)</span> and <span class="math inline">\(C\)</span> are therefore functions of the candidate potential. The model evaluates their difference over the feasible range and finds the value that gives the largest <span class="math inline">\(J\)</span>.</p>
 <p>We begin with the revenue side of the calculation.</p>
 </section>
 <section id="revenue" class="level2">
 <h2 class="anchored" data-anchor-id="revenue">Revenue</h2>
-<p>Revenue in <code>profitmax</code> is the photosynthetic carbon assimilation rate <span class="math inline">\(A~(\mu mol~m^{-2}~s^{-1})\)</span> supported at a given stomatal conductance. At this stage, it is the carbon gain before the hydraulic cost is subtracted.</p>
-<p>Stomata connect the carbon and water calculations. Fick’s first law describes the flux of <span class="math inline">\(CO_2\)</span> down the concentration gradient from the atmosphere, <span class="math inline">\(C_a~(Pa)\)</span>, to the intercellular spaces in the leaf, <span class="math inline">\(C_i~(Pa)\)</span>:</p>
+<p>Revenue is the photosynthetic carbon assimilation rate <span class="math inline">\(A~(\mu mol~m^{-2}~s^{-1})\)</span> supported at a given stomatal conductance. At this stage, it is the carbon gain before the hydraulic cost is subtracted.</p>
+<p>Stomata connect the carbon and water calculations. Fick’s first law describes the flux of <span class="math inline">\(CO_2\)</span> down the concentration gradient from the atmosphere, <span class="math inline">\(c_a~(Pa)\)</span>, to the intercellular spaces in the leaf, <span class="math inline">\(c_i~(Pa)\)</span>: the supply is <span class="math inline">\(g_c (c_a - c_i) / P\)</span>, where <span class="math inline">\(P~(kPa)\)</span> is atmospheric pressure and <span class="math inline">\(g_c\)</span> is the conductance to <span class="math inline">\(CO_2\)</span>. Assimilation also depends on <span class="math inline">\(c_i\)</span> through leaf biochemistry, so <span class="math inline">\(c_i\)</span> cannot be read off Fick’s law alone. The model finds the <span class="math inline">\(c_i\)</span> at which the diffusive supply of carbon dioxide and its biochemical use agree, as the root of</p>
 <p><span id="eq-assim-ci"><span class="math display">\[
-A~(C_i) = \frac{g_c(\psi_{l})(C_a - C_i)}{P_{atm}}.
+g(c_i) = 10^{-6}\, A(c_i) - \frac{g_c\,(c_a - c_i)}{10^{3}\, P} = 0, \qquad
+c_i \in [\Gamma^* c_P,\; c_a] \ \text{if } A(c_a) \ge 0, \quad
+c_i \in \big[c_a,\; c_a + 2|A(c_a)|\,10^{-6}\, 10^{3} P / g_c\big] \ \text{otherwise}
 \tag{2}\]</span></span></p>
-<p>Here, <span class="math inline">\(P_{atm}~(kPa)\)</span> is atmospheric pressure and <span class="math inline">\(g_c\)</span> is stomatal conductance to <span class="math inline">\(CO_2\)</span>. Water vapour and carbon dioxide diffuse at different rates, so conductance to <span class="math inline">\(CO_2\)</span> is calculated from conductance to water, <span class="math inline">\(g_w\)</span>, as</p>
+<p>The factors <span class="math inline">\(10^{-6}\)</span> and <span class="math inline">\(10^{3}\)</span> put the assimilation, in <span class="math inline">\(\mu mol\)</span>, and the supply, with <span class="math inline">\(P\)</span> in kPa, in the same units. The root is bracketed between the compensation point and <span class="math inline">\(c_a\)</span> when the leaf assimilates at <span class="math inline">\(c_a\)</span>, and above <span class="math inline">\(c_a\)</span> when the leaf is a net source of <span class="math inline">\(CO_2\)</span>, which its conductance then carries out of the leaf.</p>
+<p>Water vapour and carbon dioxide diffuse at different rates, so the conductance to water, <span class="math inline">\(g_{s,\mathrm{H_2O}}\)</span>, is a fixed multiple of the conductance to <span class="math inline">\(CO_2\)</span>:</p>
 <p><span id="eq-gc"><span class="math display">\[
-g_c(\psi_{l}) = \frac{g_w(\psi_{l})}{1.6},
+g_{s,\mathrm{H_2O}} = 1.67\, \hat g_c
 \tag{3}\]</span></span></p>
-<p>where the factor 1.6 accounts for the difference in diffusivity between <span class="math inline">\(H_2O\)</span> and <span class="math inline">\(CO_2\)</span> at the stomatal boundary.</p>
-<p>For any candidate <span class="math inline">\(\psi_l\)</span>, the hydraulic calculation supplies a value of <span class="math inline">\(g_w\)</span>, and therefore of <span class="math inline">\(g_c\)</span>. The remaining unknown is <span class="math inline">\(C_i\)</span>. This cannot be read directly from <a href="#eq-assim-ci" class="quarto-xref">Equation&nbsp;2</a> because assimilation also depends on <span class="math inline">\(C_i\)</span> through leaf biochemistry. The model must find a value of <span class="math inline">\(C_i\)</span> at which the diffusive supply of carbon dioxide and its biochemical use agree.</p>
-<p>The biochemical side uses the photosynthesis model of Farquhar et al.&nbsp;(1980). It calculates a Rubisco-limited rate, <span class="math inline">\(A_c~(umol~m^{-2}~s^{-1})\)</span>, and an electron-transport-limited rate, <span class="math inline">\(A_j~(umol~m^{-2}~s^{-1})\)</span>. Net assimilation follows the more limiting process, with a smooth transition between them.</p>
-<p>The electron-transport-limited rate depends on both light availability and <span class="math inline">\(C_i\)</span>:</p>
+<p>The factor 1.67 is the ratio of the diffusivities of <span class="math inline">\(H_2O\)</span> and <span class="math inline">\(CO_2\)</span> at the stomatal boundary (1.6 in much of the stomatal literature, and settable in the code). <span class="math inline">\(\hat g_c\)</span> is the total conductance from leaf to air; with the leaf energy balance off, as in TF24 by default, it is <span class="math inline">\(g_c\)</span> itself.</p>
+<p>For any candidate potential, the hydraulic calculation supplies a transpiration rate and therefore, through <a href="#eq-e-demand" class="quarto-xref">Equation&nbsp;9</a> below, a value of <span class="math inline">\(g_c\)</span>. The remaining unknown is <span class="math inline">\(c_i\)</span>, which <a href="#eq-assim-ci" class="quarto-xref">Equation&nbsp;2</a> settles once the biochemistry is known.</p>
+<p>The biochemical side uses the photosynthesis model of Farquhar et al.&nbsp;(1980). It calculates a Rubisco-limited rate, <span class="math inline">\(W_c~(\mu mol~m^{-2}~s^{-1})\)</span>, and an electron-transport-limited rate, <span class="math inline">\(W_j~(\mu mol~m^{-2}~s^{-1})\)</span>. Net assimilation follows the more limiting process, with a smooth transition between them.</p>
+<p>The electron-transport-limited rate depends on both light availability and <span class="math inline">\(c_i\)</span>:</p>
 <p><span id="eq-aj"><span class="math display">\[
-A_j=\frac{J(C_i-\Gamma^*)}{4(C_i+2\Gamma^*)},
+W_j = \frac{J}{4}\,\frac{c_i - \Gamma^* c_P}{c_i + 2\,\Gamma^* c_P},
 \tag{4}\]</span></span></p>
-<p>where <span class="math inline">\(\Gamma^*~(Pa)\)</span> is the <span class="math inline">\(CO_2\)</span> compensation point. The electron transport rate <span class="math inline">\(J~(umol~m^{-2}~s^{-1})\)</span> carries the effect of irradiance into the calculation:</p>
+<p>where <span class="math inline">\(\Gamma^*~(\mu mol~mol^{-1})\)</span> is the <span class="math inline">\(CO_2\)</span> compensation point and <span class="math inline">\(c_P = 10^{-3} P\)</span> converts it to Pa. The electron transport rate <span class="math inline">\(J~(\mu mol~m^{-2}~s^{-1})\)</span> carries the effect of irradiance into the calculation:</p>
 <p><span id="eq-j"><span class="math display">\[
-J=\frac{aQ+J_{max}-\sqrt{(aQ+J_{max})^2-4caQJ_{max}}}{2c},
+J = \frac{I + J_{max} - \sqrt{(I + J_{max})^2 - 4\,\theta_J\, I\, J_{max}}}{2\,\theta_J}, \qquad I = \phi_J\, \alpha_\mathrm{PAR}\, Q
 \tag{5}\]</span></span></p>
-<p>where <span class="math inline">\(a~(mol~photon~mol^{-1}~electron)\)</span> is the effective quantum yield of electron transport, <span class="math inline">\(Q~(umol~m^{-2}~s^{-1})\)</span> is photosynthetic photon flux density (PPFD), <span class="math inline">\(c\)</span> is the unitless curvature of the light-response curve, and <span class="math inline">\(J_{max}~(umol~m^{-2}~s^{-1})\)</span> is the maximum electron transport rate.</p>
+<p>where <span class="math inline">\(I\)</span> is the photon flux the leaf puts to use: the photosynthetic photon flux density (PPFD), <span class="math inline">\(Q~(\mu mol~m^{-2}~s^{-1})\)</span>, times the leaf’s absorptance, <span class="math inline">\(\alpha_\mathrm{PAR}\)</span>, and the quantum yield of electron transport, <span class="math inline">\(\phi_J~(mol~electron~mol^{-1}~photon)\)</span>. <span class="math inline">\(\theta_J\)</span> is the unitless curvature of the light-response curve, and <span class="math inline">\(J_{max}~(\mu mol~m^{-2}~s^{-1})\)</span> is the maximum electron transport rate.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Two different curvature parameters use the symbol <span class="math inline">\(c\)</span>
+<span class="screen-reader-only">Note</span>Two different parameters use the symbol <span class="math inline">\(\theta\)</span>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The light-response equation above and the hydraulic vulnerability equation below both use <span class="math inline">\(c\)</span>, but they refer to different parameters. In the code, the light-response curvature is <code>curv_fact_elec_trans</code>, while the vulnerability curve uses <code>c</code>.</p>
+<p>The curvature of the co-limitation below is <span class="math inline">\(\theta\)</span> (<code>curv_fact_colim</code>), while the light-response curvature above is <span class="math inline">\(\theta_J\)</span> (<code>curv_fact_elec_trans</code>). The Huber value in the cost section is also written <span class="math inline">\(\theta\)</span>, in <code>plant</code>’s notation; the two are unrelated.</p>
 </div>
 </div>
-<p>The Rubisco-limited rate is</p>
+<p>The Rubisco-limited rate, and the net assimilation that combines the two rates, are</p>
 <p><span id="eq-ac"><span class="math display">\[
-A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
+W_c = \frac{V_{cmax}\,(c_i - \Gamma^* c_P)}{c_i + K_m}, \qquad
+W_j = \frac{J}{4}\,\frac{c_i - \Gamma^* c_P}{c_i + 2\,\Gamma^* c_P}, \qquad
+A = \frac{W_c + W_j - \sqrt{(W_c + W_j)^2 - 4\,\theta\, W_c W_j}}{2\,\theta} - R_d
 \tag{6}\]</span></span></p>
-<p>where <span class="math inline">\(K_m~(Pa)\)</span> is the effective Michaelis–Menten constant. <span class="math inline">\(V_{c,max}\)</span>, <span class="math inline">\(\Gamma^*\)</span>, and <span class="math inline">\(K_m\)</span> are all temperature-dependent variables.</p>
-<p>The next example compares <span class="math inline">\(A_c\)</span> and <span class="math inline">\(A_j\)</span> across a range of <span class="math inline">\(C_i\)</span> values.</p>
+<p>where <span class="math inline">\(V_{cmax}~(\mu mol~m^{-2}~s^{-1})\)</span> is the maximum rate of carboxylation, <span class="math inline">\(K_m~(Pa)\)</span> is the effective Michaelis–Menten constant, and <span class="math inline">\(W_j\)</span> is <a href="#eq-aj" class="quarto-xref">Equation&nbsp;4</a>. Net assimilation <span class="math inline">\(A\)</span> is the smaller root of a quadratic in the two rates, with curvature <span class="math inline">\(\theta\)</span>, less dark respiration, <span class="math inline">\(R_d\)</span>. <span class="math inline">\(V_{cmax}\)</span>, <span class="math inline">\(J_{max}\)</span>, <span class="math inline">\(\Gamma^*\)</span>, <span class="math inline">\(K_m\)</span> and <span class="math inline">\(R_d\)</span> are all temperature-dependent.</p>
+<p>The next example compares the two rates, labelled <code>A_c</code> and <code>A_j</code> in the code, across a range of <span class="math inline">\(c_i\)</span> values.</p>
 <p>The calculation needs both fixed strategy parameters and environmental or plant-state values that can change through time. We first create a <code>Leaf</code> object to hold the fixed parameters. Unlike an <code>Individual</code> or a patch, this object represents the physiology of a unit of leaf area rather than a whole plant or population.</p>
-<p>The following executable example uses the <code>Leaf()</code> interface in <code>plant</code> 2.0.0.9002. The constructor now makes the root-hydraulics and numerical-control inputs explicit; <code>hk_s</code> is not a <code>Leaf()</code> argument in this API.</p>
+<p>The following executable example uses <code>plant</code>’s <code>Leaf()</code> interface, whose arguments carry the names <code>phylloptim</code> gives them. Each vulnerability curve is given by its P50 and shape, and the root resistances are not <code>Leaf()</code> arguments: they reach the leaf with the conditions below.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sw <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcmax_25 =</span> <span class="dv">96</span>,                 <span class="co">#  umol m^-2 s^-1</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">c =</span> <span class="fl">2.680147</span>,                  <span class="co"># unitless</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">b =</span> <span class="fl">3.898245</span>,                  <span class="co"># -MPa</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">psi_crit =</span> <span class="fl">5.870283</span>,           <span class="co"># -MPa</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_c =</span> <span class="fl">2.680147</span>,             <span class="co"># unitless</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_b =</span> <span class="fl">3.898245</span>,             <span class="co"># -MPa</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_psi_crit =</span> <span class="fl">5.870283</span>,      <span class="co"># -MPa</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta2 =</span> <span class="fl">1.5</span>,                   <span class="co"># exponent for effect of hydraulic risk  (unitless)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">jmax_25 =</span> <span class="fl">157.44</span>,              <span class="co">#  maximum electron transport rate umol m^-2 s^-1</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">a =</span> <span class="fl">0.30</span>,                      <span class="co"># quantum yield of photosynthetic electron transport  (mol mol^-1)</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_elec_trans =</span> <span class="fl">0.7</span>,    <span class="co"># curvature factor for the light response curve  (unitless)</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_colim =</span> <span class="fl">0.99</span>,        <span class="co"># curvature factor for the colimited photosythnthesis equatiom</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">GSS_tol_abs =</span> <span class="fl">1e-3</span>,            <span class="co">#  ???</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">vulnerability_curve_ncontrol =</span> <span class="dv">100</span>,  <span class="co"># ????</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_abs_tol =</span> <span class="fl">1e-3</span>,             <span class="co"># ???</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_niter =</span> <span class="dv">1000</span>,</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">g1_TF24 =</span> <span class="fl">7.5</span>,                <span class="co"># cost parameter for TF24 profit model umol m^-2 s^-1</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_R_H =</span> <span class="fl">3.4e2</span>,             <span class="co">#proportionality constant between minimum horizontal (intraleyer) root hydraulic resistance and C_r^-1 in [MPa * s * (mol C) / (mol H2O)]</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_R_V =</span> <span class="fl">9.4e3</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>leaf <span class="ot">&lt;-</span> <span class="fu">Leaf</span>(</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcmax_25 =</span> sw<span class="sc">$</span>vcmax_25,</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">c =</span> sw<span class="sc">$</span>c,</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">b =</span> sw<span class="sc">$</span>b,</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">psi_crit =</span> sw<span class="sc">$</span>psi_crit,</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_c =</span> sw<span class="sc">$</span>root_c,</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_b =</span> sw<span class="sc">$</span>root_b,</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_psi_crit =</span> sw<span class="sc">$</span>root_psi_crit,</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta2 =</span> sw<span class="sc">$</span>beta2,</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">jmax_25 =</span> sw<span class="sc">$</span>jmax_25,</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">a =</span> sw<span class="sc">$</span>a,</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_elec_trans =</span> sw<span class="sc">$</span>curv_fact_elec_trans,</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_colim =</span> sw<span class="sc">$</span>curv_fact_colim,</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">GSS_tol_abs =</span> sw<span class="sc">$</span>GSS_tol_abs,</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">vulnerability_curve_ncontrol =</span> sw<span class="sc">$</span>vulnerability_curve_ncontrol,</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_abs_tol =</span> sw<span class="sc">$</span>ci_abs_tol,</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_niter =</span> sw<span class="sc">$</span>ci_niter,</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">g1_TF24 =</span> sw<span class="sc">$</span>g1_TF24,</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_R_H =</span> sw<span class="sc">$</span>beta_R_H,</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_R_V =</span> sw<span class="sc">$</span>beta_R_V</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">stem_c =</span> <span class="fl">2.680147</span>,             <span class="co"># unitless</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">stem_P50 =</span> <span class="fl">3.898245</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">^</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fl">2.680147</span>),  <span class="co"># MPa (Weibull scale 3.898245)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_c =</span> <span class="fl">2.680147</span>,             <span class="co"># unitless</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_P50 =</span> <span class="fl">3.898245</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">^</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fl">2.680147</span>),  <span class="co"># MPa (Weibull scale 3.898245)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">TF24_beta2 =</span> <span class="fl">1.5</span>,              <span class="co"># exponent for effect of hydraulic risk  (unitless)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">jmax_25 =</span> <span class="fl">157.44</span>,              <span class="co">#  maximum electron transport rate umol m^-2 s^-1</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">phi_J =</span> <span class="fl">0.30</span> <span class="sc">/</span> <span class="fl">0.85</span>,           <span class="co"># quantum yield of electron transport per absorbed photon (mol mol^-1)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_elec_trans =</span> <span class="fl">0.7</span>,    <span class="co"># curvature factor for the light response curve  (unitless)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_colim =</span> <span class="fl">0.99</span>,        <span class="co"># curvature factor for the colimited photosythnthesis equatiom</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">GSS_tol_abs =</span> <span class="fl">1e-3</span>,            <span class="co">#  ???</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">vulnerability_curve_ncontrol =</span> <span class="dv">100</span>,  <span class="co"># ????</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_abs_tol =</span> <span class="fl">1e-3</span>,             <span class="co"># ???</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_niter =</span> <span class="dv">1000</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">TF24_cost_scale =</span> <span class="fl">7.5</span>,        <span class="co"># cost parameter for TF24 profit model umol m^-2 s^-1</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_R_H =</span> <span class="fl">3.4e2</span>,             <span class="co">#proportionality constant between minimum horizontal (intraleyer) root hydraulic resistance and C_r^-1 in [MPa * s * (mol C) / (mol H2O)]</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_R_V =</span> <span class="fl">9.4e3</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>leaf <span class="ot">&lt;-</span> <span class="fu">Leaf</span>(</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcmax_25 =</span> sw<span class="sc">$</span>vcmax_25,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">stem_c =</span> sw<span class="sc">$</span>stem_c,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">stem_P50 =</span> sw<span class="sc">$</span>stem_P50,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_c =</span> sw<span class="sc">$</span>root_c,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">root_P50 =</span> sw<span class="sc">$</span>root_P50,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">TF24_beta2 =</span> sw<span class="sc">$</span>TF24_beta2,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">jmax_25 =</span> sw<span class="sc">$</span>jmax_25,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">phi_J =</span> sw<span class="sc">$</span>phi_J,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_elec_trans =</span> sw<span class="sc">$</span>curv_fact_elec_trans,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">curv_fact_colim =</span> sw<span class="sc">$</span>curv_fact_colim,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">GSS_tol_abs =</span> sw<span class="sc">$</span>GSS_tol_abs,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">vulnerability_curve_ncontrol =</span> sw<span class="sc">$</span>vulnerability_curve_ncontrol,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_abs_tol =</span> sw<span class="sc">$</span>ci_abs_tol,</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_niter =</span> sw<span class="sc">$</span>ci_niter,</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">TF24_cost_scale =</span> sw<span class="sc">$</span>TF24_cost_scale</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Next, <code>set_physiology</code> supplies the conditions at one point in time. These include the light and atmospheric environment, soil water, and size-dependent properties of the plant. Unlike the fixed parameters passed to <code>Leaf()</code>, these values can change as an individual grows and its environment changes. Here they are held constant so that the leaf-level relationships can be viewed in isolation.</p>
 <div class="cell">
@@ -653,20 +642,21 @@ A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  leaf_specific_conductance_max <span class="ot">=</span> <span class="fl">4.8e-05</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  atm_vpd <span class="ot">=</span> <span class="dv">2</span> </span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  ca <span class="ot">=</span> <span class="dv">40</span> </span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  sapwood_volume_per_leaf_area <span class="ot">=</span> <span class="fl">1.8e-04</span> </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  rho <span class="ot">=</span> <span class="dv">608</span> </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  a_bio <span class="ot">=</span> <span class="fl">0.0245</span> </span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  leaf_temp_ <span class="ot">=</span> <span class="dv">25</span> </span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  atm_o2_kpa_ <span class="ot">=</span> <span class="dv">21</span> </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  atm_kpa_ <span class="ot">=</span> <span class="fl">101.3</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">set_physiology</span>(<span class="at">area_leaf =</span> area_leaf_, <span class="at">mass_root_prop =</span> mass_root_prop_, <span class="at">rho =</span> <span class="dv">608</span>, <span class="at">a_bio =</span> <span class="fl">0.0245</span>, <span class="at">PPFD =</span> PPFD, <span class="at">psi_soil =</span> psi_soil, <span class="at">soil_depth =</span> soil_depth, <span class="at">leaf_specific_conductance_max =</span> leaf_specific_conductance_max, <span class="at">atm_vpd =</span> atm_vpd, <span class="at">ca =</span> ca, <span class="at">sapwood_volume_per_leaf_area =</span> sapwood_volume_per_leaf_area, <span class="at">leaf_temp =</span> leaf_temp_, <span class="at">atm_o2_kpa =</span> atm_o2_kpa_, <span class="at">atm_kpa =</span> atm_kpa_)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  leaf_temp_ <span class="ot">=</span> <span class="dv">25</span> </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  atm_o2_kpa_ <span class="ot">=</span> <span class="dv">21</span> </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  atm_kpa_ <span class="ot">=</span> <span class="fl">101.3</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>root_network <span class="ot">&lt;-</span> phylloptim<span class="sc">::</span><span class="fu">root_network_from_carbon</span>(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  mass_root_prop_ <span class="sc">/</span> area_leaf_, <span class="at">soil_depth =</span> soil_depth,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_R_H =</span> sw<span class="sc">$</span>beta_R_H, <span class="at">beta_R_V =</span> sw<span class="sc">$</span>beta_R_V)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">set_physiology</span>(<span class="at">root_network =</span> root_network, <span class="at">PPFD =</span> PPFD, <span class="at">psi_soil =</span> psi_soil, <span class="at">soil_depth =</span> soil_depth, <span class="at">leaf_specific_conductance_max =</span> leaf_specific_conductance_max, <span class="at">atm_vpd =</span> atm_vpd, <span class="at">ca =</span> ca, <span class="at">leaf_temp =</span> leaf_temp_, <span class="at">atm_o2_kpa =</span> atm_o2_kpa_, <span class="at">atm_kpa =</span> atm_kpa_)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>We now evaluate the biochemical rates over a sequence of <span class="math inline">\(C_i\)</span> values.</p>
+<p>We now evaluate the biochemical rates over a sequence of <span class="math inline">\(c_i\)</span> values.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>C_i <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">40</span>,<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The <code>Leaf</code> object uses similar names for calculation methods and stored results. For example, <code>leaf$assim_electron_limited</code> is a function that takes <span class="math inline">\(C_i\)</span> as an input, whereas <code>leaf$assim_electron_limited_</code> stores a calculated result. The first plot calls the functions directly.</p>
+<p>The <code>Leaf</code> object uses similar names for calculation methods and stored results. For example, <code>leaf$assim_electron_limited</code> is a function that takes <span class="math inline">\(c_i\)</span> as an input, whereas <code>leaf$assim_electron_limited_</code> stores a calculated result. The first plot calls the functions directly.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">C_i =</span> C_i) <span class="sc">%&gt;%</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">A_j =</span> <span class="fu">map_dbl</span>(C_i, leaf<span class="sc">$</span>assim_electron_limited),</span>
@@ -678,12 +668,12 @@ A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>Both potential rates increase with <span class="math inline">\(C_i\)</span>, but they do not increase at the same rate. Which process is most limiting can therefore change across the range of <span class="math inline">\(C_i\)</span>. The model combines them with a smooth co-limitation function (see the paper for details).</p>
+<p>Both potential rates increase with <span class="math inline">\(c_i\)</span>, but they do not increase at the same rate. Which process is most limiting can therefore change across the range of <span class="math inline">\(c_i\)</span>. The model combines them with the smooth co-limitation in <a href="#eq-ac" class="quarto-xref">Equation&nbsp;6</a>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">C_i =</span> C_i) <span class="sc">%&gt;%</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">A_j =</span> <span class="fu">map_dbl</span>(C_i, leaf<span class="sc">$</span>assim_electron_limited),</span>
@@ -697,7 +687,7 @@ A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -706,12 +696,12 @@ A_c=\frac{V_{c,max}(C_i-\Gamma*)}{C_i + K_m},
 </section>
 <section id="cost" class="level2">
 <h2 class="anchored" data-anchor-id="cost">Cost</h2>
-<p>Photosynthesis requires a continuous supply of water from the soil to the canopy. Water moves along a potential gradient, so the leaf xylem must be at a more negative physical water potential than the soil. In the positive-magnitude notation used here, this means that <span class="math inline">\(\psi_l\)</span> must be larger than <span class="math inline">\(\psi_s\)</span>.</p>
-<p>Making that gradient steeper can supply more water, but it also reduces the conductance of the xylem pathway as embolism risk increases. The formulation developed on this page represents the hydraulic pathway with the following vulnerability curve:</p>
+<p>Photosynthesis requires a continuous supply of water from the soil to the canopy. Water moves along a potential gradient, so the leaf xylem must be at a more negative physical water potential than the soil. In the positive-magnitude notation used here, this means that <span class="math inline">\(\psi_\mathrm{leaf}\)</span> must be larger than the potential upstream of it.</p>
+<p>Making that gradient steeper can supply more water, but it also reduces the conductance of the xylem pathway as embolism risk increases. The fraction of the stem’s maximum conductance that remains at a potential <span class="math inline">\(\psi\)</span> follows a Weibull vulnerability curve:</p>
 <p><span id="eq-vuln-curve"><span class="math display">\[
-k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
+f(\psi) = \exp\!\big[-(\psi/b)^{c}\big] = 2^{-(\psi/P_{50})^{c}}
 \tag{7}\]</span></span></p>
-<p>The example below plots this decline using the parameter values defined above.</p>
+<p>The stem’s conductance at <span class="math inline">\(\psi\)</span> is therefore <span class="math inline">\(k_{max} f(\psi)\)</span>. The example below plots this decline using the parameter values defined above.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">psi_stem =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">100</span>)) <span class="sc">%&gt;%</span></span>
@@ -727,24 +717,28 @@ k_l = k_{l,max}e^{-{(\frac{\psi_l}{b})}^c}.
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p><span class="math inline">\(b~(MPa)\)</span> controls the sensitivity of the curve and <span class="math inline">\(c\)</span> controls its shape. The value of <span class="math inline">\(b\)</span> is calculated as</p>
-<p><span class="math display">\[b = \frac{p_{50}}{-log(1-\frac{50}{100}^{\frac{1}{c}})},\]</span></p>
-<p>where <span class="math inline">\(p_{50}\)</span> is the <span class="math inline">\(\psi_l\)</span> at which 50% of hydraulic conductance is lost. If two points on a hydraulic vulnerability curve are known, they can be used to calculate <span class="math inline">\(c\)</span>. Here, an empirical value for <span class="math inline">\(c\)</span> is obtained from AusTraits.</p>
-<p><span class="math inline">\(p_{50}\)</span> is in turn calculated from an empirical relationship with the hydraulic conductivity of the xylem pathway. In this relationship, more conductive stems lose conductivity at a less negative water potential (Liu et al.&nbsp;2019):</p>
-<p><span class="math display">\[p_{50} = 1.73\frac{K_s}{2}^{-0.72}\]</span></p>
-<p><span class="math inline">\(k_{l,max}\)</span> is the maximum hydraulic conductance at <span class="math inline">\(\psi_l = 0\)</span>:</p>
-<p><span class="math display">\[k_{l,max} = \frac{K_s\theta}{h\eta_c},\]</span></p>
-<p>Here, <span class="math inline">\(\theta~(m^2~sapwood~m^{-2}~leaf~area)\)</span> is the Huber value, <span class="math inline">\(h\)</span> is plant height, and <span class="math inline">\(\eta_c~(unitless)[0,1]\)</span> describes the average relative position of leaves within the canopy. The <a href="../theory/models/tf24.html">TF24 strategy</a> provides more context for these quantities. <span class="math inline">\(K_s\)</span>, <span class="math inline">\(\theta\)</span>, and <span class="math inline">\(c\)</span> parameterise the hydraulic relationships, while the TF24 hyper-parameterisation handles the remaining parameter links. Plant height is a dynamic state, so <span class="math inline">\(k_{l,max}\)</span> can change as the plant grows.</p>
-<p>For a given soil water potential and candidate leaf water potential, the water that the pathway can supply per unit leaf area is the integral of conductance across that potential interval:</p>
+<p><span class="math inline">\(b~(MPa)\)</span> controls the sensitivity of the curve and <span class="math inline">\(c\)</span> controls its shape. The code takes the pair <span class="math inline">\((P_{50}, c)\)</span> and derives <span class="math inline">\(b\)</span> from it, for the stem and, with the roots’ own pair, for the roots:</p>
+<p><span class="math display">\[
+b = \frac{P_{50}}{(\ln 2)^{1/c}}, \qquad b_r = \frac{P_{50,r}}{(\ln 2)^{1/c_r}}
+\]</span></p>
+<p>where <span class="math inline">\(P_{50}\)</span> is the potential at which 50% of hydraulic conductance is lost. <span class="math inline">\(P_{50}\)</span> and <span class="math inline">\(c\)</span> are traits of the strategy. A trade-off function can set them from other traits: the <code>fieldtrial</code> package supplies the recommended trade-offs, and <code>plant</code> applies none unless they are attached. Those trade-offs tie both to the sapwood conductivity, so that more conductive stems lose conductivity at a less negative water potential: <span class="math inline">\(P_{50} = 10^{B_{Hv1} + B_{Hv2} \log_{10} K_{\rm s}}\)</span> and <span class="math inline">\(c = B_{c1} e^{-B_{c2} P_{50}}\)</span>. At its defaults <span class="math inline">\(B_{c2} = 0\)</span>, so <span class="math inline">\(c\)</span> does not vary with <span class="math inline">\(P_{50}\)</span>.</p>
+<p><span class="math inline">\(k_{max}\)</span> is the stem’s maximum conductance per unit leaf area, at <span class="math inline">\(\psi = 0\)</span>. <code>plant</code> computes it and hands it to the leaf:</p>
+<p><span class="math display">\[
+k_{\max} = \frac{K_{\rm s} \, \theta \, e^{\delta_{\rm s}}}{L_{\rm eff}}
+\]</span></p>
+<p>Here, <span class="math inline">\(K_{\rm s}\)</span> is the sapwood-specific conductivity of the terminal segment, <span class="math inline">\(\theta~(m^2~sapwood~m^{-2}~leaf~area)\)</span> is the Huber value, and <span class="math inline">\(e^{\delta_{\rm s}}\)</span> scales it to the Huber value the plant carries, which departs from <span class="math inline">\(\theta\)</span> when its canopy has thinned. <span class="math inline">\(L_{\rm eff}\)</span> is the stem’s effective hydraulic path length. It runs from the stem base to the mean height of leaf area, <span class="math inline">\(\eta_c H\)</span>, where <span class="math inline">\(H\)</span> is plant height and <span class="math inline">\(\eta_c~(unitless)[0,1]\)</span> describes the average relative position of leaves within the canopy. Because conduits widen towards the base, <span class="math inline">\(L_{\rm eff}\)</span> is much shorter than <span class="math inline">\(\eta_c H\)</span> in a tall plant; it equals <span class="math inline">\(\eta_c H\)</span> only with no widening and no terminal segment. The <a href="../theory/models/tf24.html">TF24 strategy</a> provides more context for these quantities. <span class="math inline">\(K_{\rm s}\)</span>, <span class="math inline">\(\theta\)</span>, and <span class="math inline">\(c\)</span> parameterise the hydraulic relationships, while the TF24 hyper-parameterisation handles the remaining parameter links. Plant height is a dynamic state, so <span class="math inline">\(k_{max}\)</span> can change as the plant grows.</p>
+<p>For a given upstream potential and candidate leaf water potential, the water that the stem can supply per unit leaf area is the integral of conductance across that potential interval:</p>
 <p><span id="eq-e-supply"><span class="math display">\[
-E_{supply} = \int^{\psi_l}_{\psi_s}k_l(\psi)\delta\psi
+E(\psi_\mathrm{leaf}; \psi_\mathrm{up}) = k_{max}\big[\tilde F(\psi_\mathrm{leaf}) - \tilde F(\psi_\mathrm{up})\big]
+\;\approx\; k_{max}\!\int_{\psi_\mathrm{up}}^{\psi_\mathrm{leaf}} f(u)\,du, \qquad
+E = k_{max}\big[\tilde Q(\psi_\mathrm{up}) - \tilde Q(\psi_\mathrm{leaf})\big],\ \tilde Q = F(\infty) - \tilde F \ \text{ where } \psi_\mathrm{up} \text{ is in the tail}
 \tag{8}\]</span></span></p>
-<p>Graphically, <span class="math inline">\(E_{supply}\)</span> is the area under the conductance curve between the soil water potential, <span class="math inline">\(\psi_s~(-MPa)\)</span>, and the leaf xylem water potential, <span class="math inline">\(\psi_l~(-MPa)\)</span>.</p>
+<p>The code evaluates the integral through <span class="math inline">\(\tilde F\)</span>, a tabulated cumulative integral of the vulnerability curve. Where the upstream potential is far out in the curve’s tail, it takes the difference of the area still left, <span class="math inline">\(\tilde Q\)</span>, which keeps digits a plain difference would lose. Graphically, <span class="math inline">\(E\)</span> is the area under the conductance curve between the upstream potential, <span class="math inline">\(\psi_\mathrm{up}~(-MPa)\)</span>, and the leaf xylem water potential, <span class="math inline">\(\psi_\mathrm{leaf}~(-MPa)\)</span>. On the leaf route, <span class="math inline">\(\psi_\mathrm{up}\)</span> is the soil water potential; on TF24’s collar route, it is the root-collar potential, which the <a href="../theory/soil-water.html#sec-plant-coupling">soil water page</a> connects to the soil layers.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>data <span class="sc">%&gt;%</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> psi_stem, <span class="at">y =</span> conductance)) <span class="sc">+</span></span>
@@ -758,12 +752,12 @@ E_{supply} = \int^{\psi_l}_{\psi_s}k_l(\psi)\delta\psi
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>Holding <span class="math inline">\(\psi_s\)</span> fixed, the next plot shows how <span class="math inline">\(E_{supply}\)</span> changes as <span class="math inline">\(\psi_l\)</span> becomes more negative. Supply initially rises as the potential gradient increases, but the rise tapers because conductance is simultaneously being lost along the vulnerability curve. Increasing hydraulic strain therefore produces progressively smaller gains in water supply.</p>
+<p>Holding the upstream potential fixed, the next plot shows how <span class="math inline">\(E\)</span> changes as <span class="math inline">\(\psi_\mathrm{leaf}\)</span> becomes more negative. Supply initially rises as the potential gradient increases, but the rise tapers because conductance is simultaneously being lost along the vulnerability curve. Increasing hydraulic strain therefore produces progressively smaller gains in water supply.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>data <span class="sc">%&gt;%</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">E_supply =</span> <span class="fu">map2_dbl</span>(psi_stem, psi_soil, leaf<span class="sc">$</span>transpiration_full_integration)) <span class="sc">%&gt;%</span></span>
@@ -774,30 +768,29 @@ E_{supply} = \int^{\psi_l}_{\psi_s}k_l(\psi)\delta\psi
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>The feasible range ends at a critical value, <span class="math inline">\(\psi_{crit}\)</span>, beyond which the xylem is assumed to fail catastrophically. Here, <span class="math inline">\(\psi_{crit}\)</span> is the <span class="math inline">\(\psi_l\)</span> at which 95% of conductance has been lost.</p>
+<p>The critical potential, <span class="math inline">\(\psi_\mathrm{crit}\)</span>, is the <span class="math inline">\(\psi_\mathrm{leaf}\)</span> at which 95% of conductance has been lost. It ends the search on the leaf route. On the collar route, TF24’s search may run past it, to the end of the stem’s vulnerability curve.</p>
 <p>The revenue calculation requires stomatal conductance, while the hydraulic calculation gives water supply. The two are joined by requiring water supplied through the plant to equal water lost from the leaf:</p>
 <p><span class="math display">\[E_{supply} = E_{demand}\]</span></p>
-<p>Atmospheric demand is</p>
-<p><span class="math display">\[
-E_{demand} = \frac{g_sD}{P_{atm}},
-\]</span> {#eq-e-demand}</p>
-<p>where <span class="math inline">\(D~(kPa)\)</span> is atmospheric vapour pressure deficit and <span class="math inline">\(g_s\)</span> is stomatal conductance. The model uses atmospheric VPD rather than leaf-to-atmosphere VPD; the latter would also depend on differences between leaf and air temperature.</p>
-<p>For a fixed <span class="math inline">\(D\)</span>, increasing <span class="math inline">\(g_s\)</span> increases <span class="math inline">\(E_{demand}\)</span>. Meeting that demand requires a more negative leaf water potential, which causes further loss of hydraulic conductance. This closes the central loop: opening stomata can raise carbon assimilation, but doing so also raises water demand and hydraulic risk.</p>
-<p>To compare that risk directly with carbon revenue, the model expresses hydraulic cost, <span class="math inline">\(H~(\psi_l)\)</span>, in the same units as assimilation: <span id="eq-hydraulic-cost"><span class="math display">\[
-H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
+<p>Atmospheric demand follows Fick’s law for water vapour: transpiration is the conductance to water times the vapour pressure deficit, over atmospheric pressure. The code uses the law the other way round. Given the supply <span class="math inline">\(E\)</span> at a candidate potential, it reads off the conductance to <span class="math inline">\(CO_2\)</span> that would carry it:</p>
+<p><span id="eq-e-demand"><span class="math display">\[
+g_c = \frac{P\, (E - r^*) / M_w}{D_\mathrm{leaf}\; \times 1.67} + \rho\, g_\min(T_\mathrm{leaf})
 \tag{9}\]</span></span></p>
-<p>Here, <span class="math inline">\(z~(m^3~sapwood~m^{-2}~leaf~area)\)</span> is sapwood volume per leaf area, <span class="math inline">\(b_1(\mu mol~m^{-2}~s^{-1})\)</span> converts conductivity loss to a carbon cost, and <span class="math inline">\(b_2~(unitless)\)</span> controls the shape of the cost curve. The term in parentheses is the proportion of conductivity lost at <span class="math inline">\(\psi_l\)</span>, so <span class="math inline">\(H=0\)</span> when <span class="math inline">\(\psi_l = 0\)</span> and increases as conductivity is lost.</p>
-<p><span class="math inline">\(z\)</span> depends on plant size and the Huber value, and represents the volume of sapwood supplying each unit of leaf area:</p>
-<p><span class="math display">\[z = \frac{\theta*h}{\eta_c}\]</span></p>
+<p>Here <span class="math inline">\(E\)</span> is in kg m<span class="math inline">\(^{-2}\)</span> s<span class="math inline">\(^{-1}\)</span> and <span class="math inline">\(M_w\)</span> converts it to moles, <span class="math inline">\(D_\mathrm{leaf}~(kPa)\)</span> is the vapour pressure deficit at the leaf, and 1.67 is the diffusivity ratio of <a href="#eq-gc" class="quarto-xref">Equation&nbsp;3</a>. With the leaf energy balance off, as in TF24 by default, the leaf is at air temperature and <span class="math inline">\(D_\mathrm{leaf}\)</span> is the atmospheric deficit. The terms in <span class="math inline">\(r^*\)</span> and <span class="math inline">\(g_\min\)</span> belong to the residual (cuticular) conductance: <span class="math inline">\(r^*\)</span> is the water the cuticle loses, which passes through no stomata, and <span class="math inline">\(\rho\,g_\min\)</span> is the cuticle’s own conductance to <span class="math inline">\(CO_2\)</span>. TF24’s default <span class="math inline">\(g_\min\)</span> is zero, which removes both.</p>
+<p>For a fixed deficit, a larger conductance needs a larger <span class="math inline">\(E\)</span>. Supplying it requires a more negative leaf water potential, which causes further loss of hydraulic conductance. This closes the central loop: opening stomata can raise carbon assimilation, but doing so also raises water demand and hydraulic risk.</p>
+<p>To compare that risk directly with carbon revenue, the model expresses hydraulic cost in the same units as assimilation:</p>
+<p><span id="eq-hydraulic-cost"><span class="math display">\[
+C_\mathrm{TF24}(\psi) = \gamma\,\big[1 - f(\psi)\big]^{\beta}, \qquad f(\psi) = \exp\!\big[-(\psi/b)^{c}\big]
+\tag{10}\]</span></span></p>
+<p>Here, <span class="math inline">\(\gamma~(\mu mol~m^{-2}~s^{-1})\)</span> is the carbon cost of losing all conductance, per unit leaf area whatever the plant’s size, and <span class="math inline">\(\beta~(unitless)\)</span> controls the shape of the cost curve. The term in brackets is the proportion of conductivity lost at <span class="math inline">\(\psi\)</span>, so the cost is zero when <span class="math inline">\(\psi = 0\)</span> and increases as conductivity is lost. TF24 seats phylloptim’s <code>TF24_floor</code> cost curve, which adds a price on water, <span class="math inline">\(\lambda_o E\)</span>, to this cost; at TF24’s default <span class="math inline">\(\lambda_o = 0\)</span> it is this cost exactly. Only the hydraulic cost is carbon the plant spends: growth is billed the assimilation less this cost, and the price changes only the aperture chosen.</p>
 </section>
 <section id="profit" class="level2">
 <h2 class="anchored" data-anchor-id="profit">Profit</h2>
-<p>We can now put the two sides together. For each candidate <span class="math inline">\(\psi_l\)</span>, the model calculates photosynthetic revenue and hydraulic cost, then subtracts the second from the first. Revenue tends to benefit from the additional stomatal opening supported by a steeper water-potential gradient, while hydraulic cost rises as conductivity is lost. Their difference therefore has a maximum within the feasible range.</p>
+<p>We can now put the two sides together. For each candidate potential, the model calculates photosynthetic revenue and hydraulic cost, then subtracts the second from the first. Revenue tends to benefit from the additional stomatal opening supported by a steeper water-potential gradient, while hydraulic cost rises as conductivity is lost. Their difference therefore has a maximum within the feasible range.</p>
 <p>The first example calculates the revenue, cost, and profit curves step by step.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(psi_stem) {</span>
@@ -823,7 +816,7 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -848,7 +841,7 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="assimilation-hydraulics_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -856,8 +849,8 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
 </section>
 <section id="optimising-profit" class="level2">
 <h2 class="anchored" data-anchor-id="optimising-profit">Optimising profit</h2>
-<p>The leaf submodel ultimately needs two outputs under the current environmental conditions and plant state: carbon assimilation and water use per unit leaf area. Obtaining them requires finding the <span class="math inline">\(\psi_l\)</span> that maximises <span class="math inline">\(P\)</span> in <a href="#eq-profit" class="quarto-xref">Equation&nbsp;1</a>. Once that operating point is known, the corresponding transpiration <span class="math inline">\(E\)</span> can also be passed to the soil-water calculation.</p>
-<p>TF24 uses a golden-section search. The search starts with a lower and upper bound and repeatedly narrows the interval containing the maximum until that interval is smaller than a chosen tolerance. Here, the quantity being varied is <span class="math inline">\(\psi_l\)</span>. Its bounds are <span class="math inline">\(\psi_s\)</span> and <span class="math inline">\(\psi_{crit}\)</span>: the leaf cannot be less negative than the soil that supplies it, and it is not allowed to pass the critical loss-of-conductivity threshold.</p>
+<p>The leaf submodel ultimately needs two outputs under the current environmental conditions and plant state: carbon assimilation and water use per unit leaf area. Obtaining them requires finding the potential that maximises <span class="math inline">\(J\)</span> in <a href="#eq-profit" class="quarto-xref">Equation&nbsp;1</a>. Once that operating point is known, the corresponding transpiration <span class="math inline">\(E\)</span> can also be passed to the soil-water calculation.</p>
+<p>TF24 uses a golden-section search. The search starts with a lower and upper bound and repeatedly narrows the interval containing the maximum until that interval is smaller than a chosen tolerance. Here, the quantity being varied is <span class="math inline">\(\psi_\mathrm{leaf}\)</span>, on the leaf route. Its bounds are <span class="math inline">\(\psi_\mathrm{soil}\)</span> and <span class="math inline">\(\psi_\mathrm{crit}\)</span>: the leaf cannot be less negative than the soil that supplies it, and it is not allowed to pass the critical loss-of-conductivity threshold.</p>
 <p>The following code first demonstrates the search manually. It evaluates profit at two interior points, discards the part of the interval that cannot contain the maximum, and repeats.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#golden ratio</span></span>
@@ -872,7 +865,7 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>bound_a <span class="ot">=</span> leaf<span class="sc">$</span>psi_soil_;</span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#set upper boundary to psi_crit</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>bound_b <span class="ot">=</span> sw<span class="sc">$</span>psi_crit;</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>bound_b <span class="ot">=</span> leaf<span class="sc">$</span>psi_crit;</span>
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#tolerance value</span></span>
 <span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>delta_crit <span class="ot">=</span> <span class="fl">0.01</span>;</span>
@@ -896,40 +889,41 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
 <span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>      }</span>
 <span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>(<span class="at">opt_psi_stem =</span> ((bound_b <span class="sc">+</span> bound_a) <span class="sc">/</span> <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>(<span class="at">opt_psi_leaf =</span> ((bound_b <span class="sc">+</span> bound_a) <span class="sc">/</span> <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2.895207</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(<span class="at">profit =</span> leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(opt_psi_stem, psi_soil))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(<span class="at">profit =</span> leaf<span class="sc">$</span><span class="fu">profit_psi_stem_TF</span>(opt_psi_leaf, psi_soil))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 15.77304</code></pre>
+<pre><code>[1] 15.77428</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>(<span class="at">transpiration =</span> leaf<span class="sc">$</span>transpiration_)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 7.629592e-05</code></pre>
+<pre><code>[1] 7.629591e-05</code></pre>
 </div>
 </div>
 <section id="validation-against-the-compiled-implementation" class="level3">
 <h3 class="anchored" data-anchor-id="validation-against-the-compiled-implementation">Validation against the compiled implementation</h3>
 <p>The final chunk calls the corresponding built-in TF24 <code>Leaf</code> optimisation. Its purpose is to check that the compiled implementation returns the same optimum, profit, and transpiration as the manual search.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">optimise_psi_stem_TF</span>()</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>profit_</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">set_model</span>(<span class="st">"TF24"</span>, <span class="st">"leaf"</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span><span class="fu">optimise</span>()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>profit_</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 15.77304</code></pre>
+<pre><code>[1] 15.77428</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>leaf<span class="sc">$</span>transpiration_</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 7.62673e-05</code></pre>
+<pre><code>[1] 7.626747e-05</code></pre>
 </div>
 </div>
 <p>The complete calculation can therefore be read as a short sequence:</p>
 <ol type="1">
-<li>choose a candidate leaf xylem water potential <span class="math inline">\(\psi_l\)</span>;</li>
+<li>choose a candidate leaf xylem water potential <span class="math inline">\(\psi_\mathrm{leaf}\)</span>;</li>
 <li>calculate the water supply and the stomatal conductance it can support;</li>
-<li>solve for <span class="math inline">\(C_i\)</span> and calculate photosynthetic assimilation;</li>
+<li>solve for <span class="math inline">\(c_i\)</span> and calculate photosynthetic assimilation;</li>
 <li>calculate the hydraulic cost associated with lost conductivity;</li>
-<li>subtract cost from assimilation and search for the <span class="math inline">\(\psi_l\)</span> with the highest profit.</li>
+<li>subtract cost from assimilation and search for the <span class="math inline">\(\psi_\mathrm{leaf}\)</span> with the highest profit.</li>
 </ol>
 <p>TF24 repeats this calculation as plant size and environmental conditions change. The resulting assimilation contributes to the whole-plant carbon balance, while transpiration feeds back on the soil-water state described in <a href="../theory/soil-water.html">Soil water &amp; root uptake</a>.</p>
 
@@ -1016,7 +1010,8 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -1025,8 +1020,69 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -1040,6 +1096,7 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -1202,44 +1259,54 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -1338,7 +1405,10 @@ H(\psi_l) = b_1z(1-e^{-{(\frac{\psi_l}{b})}^c})^{b_2}.
     }
   });
   </script>
-<nav class="page-navigation">
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
   <div class="nav-page nav-page-previous">
       <a href="../theory/models/ff16.html" class="pagination-link" aria-label="FF16">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">FF16</span>

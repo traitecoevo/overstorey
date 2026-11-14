@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -59,13 +59,14 @@ div.csl-indent {
 <link href="../../theory/assimilation-hydraulics.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-e30b0f8ea5685d2ef6f683bb78d13b16.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -130,11 +131,11 @@ window.Quarto = {
 <link rel="stylesheet" href="../../assets/extras.css">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../../index.html" class="navbar-brand navbar-brand-logo">
@@ -145,8 +146,7 @@ window.Quarto = {
     <span class="navbar-title">Overstorey</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -195,15 +195,16 @@ window.Quarto = {
   </div>
 </a>
 </div>
+            <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../../theory/models/tf24.html">TF24</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../../theory/models/tf24.html">TF24</a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -211,7 +212,7 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -222,13 +223,10 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
- <span class="menu-text">1. Foundations</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">1. Foundations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
@@ -257,13 +255,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">2. Models and physiology</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">2. Models and physiology</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../theory/models/index.html" class="sidebar-item-text sidebar-link">
@@ -304,13 +299,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">3. Adaptive dynamics</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">3. Adaptive dynamics</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
@@ -375,13 +367,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
- <span class="menu-text">4. Implementation</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">4. Implementation</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
@@ -416,13 +405,10 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
- <span class="menu-text">5. Prediction and reproducibility</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">5. Prediction and reproducibility</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../theory/models/scientific-versioning.html" class="sidebar-item-text sidebar-link">
@@ -437,7 +423,7 @@ window.Quarto = {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
@@ -459,9 +445,9 @@ window.Quarto = {
 <div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/theory/models/tf24.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../../theory/models/tf24.html">TF24</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../../theory/models/tf24.html">TF24</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">TF24</h1>
 </div>
@@ -543,12 +529,12 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td>Allocation / growth</td>
-<td>functional balance (shared)</td>
-<td>functional balance (shared)</td>
+<td>functional balance</td>
+<td>functional balance, paid from a storage pool, with flexible allometry: a plant can shed leaf area and change its Huber value away from what its height implies</td>
 </tr>
 </tbody>
 </table>
-<p>TF24 changes how the plant calculates carbon income at the leaf. The subsequent steps are inherited from FF16: assimilated carbon is allocated to height, diameter, and tissue pools, and these individual-level rates feed into the <a href="../../theory/size-structured-pde.html">size-structured PDE</a>.</p>
+<p>TF24 changes how the plant calculates carbon income at the leaf, and it adds a storage pool between that income and growth, and flexible allometry. The allocation that follows is FF16’s kind: carbon is allocated to height, diameter, and tissue pools, and these individual-level rates feed into the <a href="../../theory/size-structured-pde.html">size-structured PDE</a>.</p>
 </section>
 <section id="model-origin-and-scope" class="level2">
 <h2 class="anchored" data-anchor-id="model-origin-and-scope">Model origin and scope</h2>
@@ -574,16 +560,14 @@ window.Quarto = {
 <section id="from-carbon-gain-to-height-growth" class="level2">
 <h2 class="anchored" data-anchor-id="from-carbon-gain-to-height-growth">From carbon gain to height growth</h2>
 <p>TF24 does not treat photosynthesis as the final measure of plant performance. Carbon income is only the start of the growth calculation. A trait can increase photosynthesis while also making leaves, sapwood, bark, or roots more expensive to build and maintain.</p>
-<p>As in FF16, TF24 expresses height growth as a chain of four relationships:</p>
+<p>As in FF16, TF24 expresses height growth as a chain of relationships:</p>
 <p><span id="eq-tf24-height-growth"><span class="math display">\[
-\frac{dH}{dt}
-=
-\frac{dH}{dA_l}
-\frac{dA_l}{dM_a}
-\frac{dM_a}{dB}
-\frac{dB}{dt}.
+g(x, H, E_{a}) = \frac{{\rm d}H}{{\rm d}t} = \frac{{\rm d}H}{{\rm d}A_{\rm l}}
+\times \frac{{\rm d}A_{\rm l} }{{\rm d}M_{\rm a}}
+\times \frac{{\rm d}M_{\rm a}}{{\rm d}B}
+\times (1 - b) \, F
 \tag{1}\]</span></span></p>
-<p>Read from right to left, new biomass production (<span class="math inline">\(dB/dt\)</span>) is allocated to living tissue (<span class="math inline">\(dM_a/dB\)</span>); that investment supports additional leaf area (<span class="math inline">\(dA_l/dM_a\)</span>); and the plant’s allometry translates added leaf area into height growth (<span class="math inline">\(dH/dA_l\)</span>). This is the same kind of functional-balance logic used by FF16. The hydraulic leaf model changes the carbon income entering the right-hand side, while traits can also change the construction and maintenance terms further along the chain <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</p>
+<p>Read from right to left, the chain starts from the growth flux <span class="math inline">\(F\)</span>. This is the plant’s net biomass production, <span class="math inline">\({\rm d}B/{\rm d}t\)</span>, after it has passed through a storage pool, which releases it as reserves near capacity and withholds it as they empty. A share <span class="math inline">\(b\)</span> of that flux is spent rebuilding a thinned canopy, which buys leaf area but no height; <span class="math inline">\(b\)</span> is zero while the canopy is whole. The rest is allocated to living tissue (<span class="math inline">\({\rm d}M_{\rm a}/{\rm d}B\)</span>); that investment supports additional leaf area (<span class="math inline">\({\rm d}A_{\rm l}/{\rm d}M_{\rm a}\)</span>); and the plant’s allometry translates added leaf area into height growth (<span class="math inline">\({\rm d}H/{\rm d}A_{\rm l}\)</span>). The allometric derivatives are taken at <span class="math inline">\(A_{\rm l}^{*}(H)\)</span>, the leaf area the height implies, and height cannot fall. This is the same kind of functional-balance logic used by FF16, with one difference: FF16 grows from <span class="math inline">\({\rm d}B/{\rm d}t\)</span> itself and stops when it is not positive, whereas in TF24 the storage pool takes the shortfall. The hydraulic leaf model changes the carbon income entering <span class="math inline">\({\rm d}B/{\rm d}t\)</span>, while traits can also change the construction and maintenance terms further along the chain <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</p>
 <p>This complete chain matters because traits can affect more than carbon income. They can also change tissue construction, maintenance, turnover, and allometry. TF24 therefore evaluates their combined consequences for whole-plant growth; their effects cannot be inferred from photosynthesis or biomass production alone <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</p>
 </section>
 <section id="traits-that-connect-hydraulics-to-growth" class="level2">
@@ -591,8 +575,8 @@ window.Quarto = {
 <p>Towers et al.&nbsp;focused on four measurable traits that connect water transport to the wider carbon budget. In TF24, each trait can help one part of the plant’s carbon-water economy while imposing a cost elsewhere.</p>
 <ul>
 <li><strong>Leaf mass per area</strong>, <span class="math inline">\(\phi\)</span>, is the dry leaf mass needed to deploy a unit of leaf area. Higher values make each unit of leaf area more expensive to build, but the leaves turn over more slowly. Leaf respiration also changes with the nitrogen investment associated with this trait.</li>
-<li><strong>Huber value</strong>, <span class="math inline">\(\theta\)</span>, is the cross-sectional sapwood area supplying a unit of leaf area. More sapwood improves water supply, but the extra sapwood and bark must be built and maintained. A larger sapwood volume can also incur a larger absolute hydraulic repair cost.</li>
-<li><strong>Wood density</strong>, <span class="math inline">\(\rho\)</span>, is sapwood mass per unit volume. It makes a given volume of sapwood more expensive to construct. In the current default parameterisation, it does <strong>not</strong> change cavitation resistance: the density-to-<code>d_I</code>, density-to-<code>g1_TF24</code>, and density-to-<code>k_s</code> exponents are all zero. Those links can be enabled by changing their hyperparameters, but they are inactive by default.</li>
+<li><strong>Huber value</strong>, <span class="math inline">\(\theta\)</span>, is the cross-sectional sapwood area supplying a unit of leaf area. More sapwood improves water supply, but the extra sapwood and bark must be built and maintained. The hydraulic cost is charged per unit leaf area and does not grow with sapwood volume; a higher Huber value lowers it instead, by raising the stem’s conductance.</li>
+<li><strong>Wood density</strong>, <span class="math inline">\(\rho\)</span>, is sapwood mass per unit volume. It makes a given volume of sapwood more expensive to construct. In the current default parameterisation, it does <strong>not</strong> change cavitation resistance: the density-to-<code>d_I</code>, density-to-<code>TF24_cost_scale</code>, and density-to-<code>k_s</code> exponents are all zero. Those links can be enabled by changing their hyperparameters, but they are inactive by default.</li>
 <li><strong>Maximum sapwood-specific conductivity</strong>, <span class="math inline">\(K_{s,\max}\)</span>, describes how quickly a unit of sapwood can transport water at maximum conductivity. High conductivity improves water transport. In the current parameterisation it also determines <span class="math inline">\(p_{50}\)</span> and, through it, the vulnerability-curve parameters <span class="math inline">\(c\)</span>, <span class="math inline">\(b\)</span>, and <span class="math inline">\(\psi_{crit}\)</span>; this is the model’s hydraulic safety–efficiency trade-off.</li>
 </ul>
 <p>These are not four independent “good” or “bad” settings. For example, increasing Huber value improves water supply per unit leaf area but also diverts more biomass into supporting tissue. Whether that change improves height growth depends on plant size and on the current soil, light, carbon dioxide, and atmospheric conditions <span class="citation" data-cites="Towers-2024">(<a href="#ref-Towers-2024" role="doc-biblioref">Towers et al., 2024</a>)</span>.</p>
@@ -631,18 +615,14 @@ window.Quarto = {
 <section id="tf24f-acclimation-lag-instead-of-instantaneous-re-optimisation" class="level2">
 <h2 class="anchored" data-anchor-id="tf24f-acclimation-lag-instead-of-instantaneous-re-optimisation">TF24f: acclimation lag instead of instantaneous re-optimisation</h2>
 <p>TF24 assumes that stomata and hydraulics adjust immediately when conditions change. At every ODE step, the model solves the profit-maximisation problem again and places the plant directly at the new optimum. This quasi-steady-state assumption is useful, but it cannot represent a plant that is still adjusting to a change in its environment.</p>
-<p>TF24f introduces that adjustment time. It uses the same physiology as TF24: the same leaf model, xylem vulnerability curve, and soil-water coupling. The implementation subclasses <code>TF24_Strategy</code>, so the carbon-income and water-transport calculations described on <a href="../../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a> are inherited unchanged. The only difference is <em>how the plant moves towards the most profitable hydraulic operating point</em>.</p>
-<p>In TF24, a golden-section search over root-collar water potential is used at every step to find the <span class="math inline">\(\psi\)</span> that maximises the profit <span class="math inline">\(P(\psi_l)\)</span> defined on the <a href="../../theory/assimilation-hydraulics.html#eq-profit">assimilation &amp; hydraulics</a> page. TF24f instead adds a sixth ODE state, <code>opt_root_psi_state</code>, which records the plant’s current root-collar water potential. Gradient ascent then moves this state towards the profit-maximising value rather than allowing it to jump there immediately:</p>
+<p>TF24f introduces that adjustment time. It uses the same physiology as TF24: the same leaf model, xylem vulnerability curve, and soil-water coupling. The implementation subclasses <code>TF24_Model</code>, so the carbon-income and water-transport calculations described on <a href="../../theory/assimilation-hydraulics.html">Assimilation &amp; hydraulics</a> are inherited unchanged. The only difference is <em>how the plant moves towards the most profitable hydraulic operating point</em>.</p>
+<p>In TF24, the leaf is solved at every step for the root-collar water potential <span class="math inline">\(\psi_{\rm r}^{*}\)</span> that maximises the profit <span class="math inline">\(J\)</span> defined on the <a href="../../theory/assimilation-hydraulics.html#eq-profit">assimilation &amp; hydraulics</a> page. TF24f instead adds one ODE state, <code>opt_root_psi_state</code>, which records the plant’s current root-collar water potential, <span class="math inline">\(\psi_{\rm r}\)</span>. Gradient ascent then moves this state towards the profit-maximising value rather than allowing it to jump there immediately:</p>
 <p><span class="math display">\[
-\frac{d\psi}{dt} = k_{\text{acclim}} \cdot \frac{dP}{d\psi}
+\frac{{\rm d}\psi_{\rm r}}{{\rm d}t} = k_{\rm acclim} \, \frac{\partial J}{\partial \psi_{\rm r}}\bigg|_{\tilde\psi_{\rm r}}
 \]</span></p>
-<p>Here, <span class="math inline">\(k_{\text{acclim}}\)</span> controls how quickly the operating point changes, and <span class="math inline">\(dP/d\psi\)</span> indicates which direction increases profit. At each leaf-solve step, TF24f evaluates profit at the <em>current tracked</em> value of <span class="math inline">\(\psi\)</span>. It then passes the local gradient <span class="math inline">\(dP/d\psi\)</span> to the ODE system, which advances the state through time.</p>
+<p>Here, <span class="math inline">\(k_{\rm acclim}\)</span> controls how quickly the operating point changes, and <span class="math inline">\(\partial J/\partial \psi_{\rm r}\)</span> indicates which direction increases profit. The gradient is taken at <span class="math inline">\(\tilde\psi_{\rm r}\)</span>, the tracked state held inside the feasible interval of collar potentials, <span class="math inline">\([\psi_a, \psi_b]\)</span>, so a state that has drifted outside it is pulled back in. At each step TF24f evaluates the leaf at <span class="math inline">\(\tilde\psi_{\rm r}\)</span>, not at the optimum, and passes the gradient to the ODE system, which advances the state through time. The gradient is zero where phylloptim finds none: no flow, a stem that cannot carry what the soil delivers, or a failed point. Where the interval closes and the leaf shuts, the gradient is taken at the shut leaf’s own collar potential, so the rate then does not depend on the state.</p>
 <p>At establishment, the tracked state begins at the true optimum. There is therefore no artificial adjustment period at birth. A lag appears only after the environment changes and shifts the optimum away from the plant’s current operating point.</p>
-<p>The <code>use_ad_gradient</code> setting selects one of two ways to calculate the gradient:</p>
-<ul>
-<li><strong><code>use_ad_gradient = true</code></strong> (the default) uses the exact gradient <code>Leaf::dprofit_droot_collar_psi</code>. It combines forward-mode automatic differentiation of the photosynthesis and cost calculations, the implicit-function theorem at the <span class="math inline">\(\psi_l \to C_i\)</span> root-find, and analytic spline derivatives for the transport terms.</li>
-<li><strong><code>use_ad_gradient = false</code></strong> uses a finite-difference approximation. It steps <span class="math inline">\(\psi\)</span> by <code>psi_fd_step</code> (MPa) and compares the profit on either side.</li>
-</ul>
+<p>The gradient is exact: <code>Leaf::dprofit_droot_collar_psi</code> combines forward-mode automatic differentiation of the photosynthesis and cost calculations, the implicit-function theorem at the <span class="math inline">\(\psi_l \to C_i\)</span> root-find, and analytic spline derivatives for the transport terms.</p>
 <p>The parameter <code>k_acclim</code> controls the acclimation rate. Changing it produces a range of behaviours rather than one fixed alternative to TF24:</p>
 <table class="caption-top table">
 <colgroup>
@@ -698,7 +678,7 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td>Operating-point solve</td>
-<td>golden-section search for the profit optimum, every step</td>
+<td>the leaf solved for the profit-maximising collar potential, every step</td>
 <td>gradient-ascent relaxation toward the optimum, tracked as an ODE state</td>
 </tr>
 <tr class="even">
@@ -709,12 +689,12 @@ window.Quarto = {
 <tr class="odd">
 <td>Extra state</td>
 <td>—</td>
-<td><code>opt_root_psi_state</code> (6th ODE state)</td>
+<td><code>opt_root_psi_state</code> (appended after TF24’s states)</td>
 </tr>
 <tr class="even">
 <td>Gradient source</td>
 <td>not needed (search only evaluates profit)</td>
-<td><code>Leaf::dprofit_droot_collar_psi</code> (AD) or finite difference (<code>psi_fd_step</code>)</td>
+<td><code>Leaf::dprofit_droot_collar_psi</code> (exact, AD)</td>
 </tr>
 <tr class="odd">
 <td>Physiology, hydraulics, soil coupling</td>
@@ -819,7 +799,8 @@ Towers, I. R., O’Reilly-Nugent, A., Sabot, M. E. B., Vesk, P. A., &amp; Falste
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -828,8 +809,69 @@ Towers, I. R., O’Reilly-Nugent, A., Sabot, M. E. B., Vesk, P. A., &amp; Falste
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -843,6 +885,7 @@ Towers, I. R., O’Reilly-Nugent, A., Sabot, M. E. B., Vesk, P. A., &amp; Falste
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -1005,44 +1048,54 @@ Towers, I. R., O’Reilly-Nugent, A., Sabot, M. E. B., Vesk, P. A., &amp; Falste
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -1141,7 +1194,10 @@ Towers, I. R., O’Reilly-Nugent, A., Sabot, M. E. B., Vesk, P. A., &amp; Falste
     }
   });
   </script>
-<nav class="page-navigation">
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
   <div class="nav-page nav-page-previous">
       <a href="../../theory/assimilation-hydraulics.html" class="pagination-link" aria-label="Assimilation &amp; hydraulics">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Assimilation &amp; hydraulics</span>
