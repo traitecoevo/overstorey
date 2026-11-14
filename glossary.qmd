@@ -15,12 +15,11 @@ so. Each term has an anchor, so pages can link straight to it, for example
 ::: {.callout-note}
 ## Model and strategy
 
-`plant` is renaming its rule-set classes from *strategy* to *model*
-([plant#641](https://github.com/traitecoevo/plant/issues/641)). This glossary
-already uses the new vocabulary: a **model** is FF16, TF24, TF24f, or K93, and a
-**strategy** is one species' trait values. Until the rename lands, the code
-still calls the rule set a strategy, as in `FF16_Strategy`,
-`strategy_default()`, and `Individual$strategy`.
+`plant` calls its rule-set classes models, as in `FF16_Model`
+([plant#641](https://github.com/traitecoevo/plant/issues/641)). A **model** is
+FF16, TF24, TF24f, or K93, and a **strategy** is one species' trait values.
+`strategy_default` and `Individual$strategy` keep their names on purpose: each
+holds one species' strategy.
 :::
 
 ## Models, parameters, and traits
@@ -47,7 +46,9 @@ still calls the rule set a strategy, as in `FF16_Strategy`,
 [Hyperparameterisation]{#hyperparameterisation}
 :   An R function that turns a small set of traits into a consistent set of
     model parameters, encoding links between traits (for example, LMA also sets
-    leaf turnover). FF16's is `FF16_hyperpar()`.
+    leaf turnover). The `fieldtrial` package supplies the recommended
+    trade-offs, as `fieldtrial::tradeoffs("FF16")`; `plant` applies none unless
+    they are attached to a `Parameters` object as `p$hyperpar`.
 
 [Individual]{#individual}
 :   One plant, following a model with one strategy. Its state includes a size
@@ -83,15 +84,15 @@ still calls the rule set a strategy, as in `FF16_Strategy`,
 
 [Node-introduction schedule]{#node-introduction-schedule}
 :   The recruitment times at which the solver introduces new nodes.
-    `run_scm(..., refine_schedule = TRUE)` refines it adaptively, adding nodes
-    where removing one would make a population integral too inaccurate
-    (threshold `schedule_eps`); see [node
-    spacing](theory/implementation/node-spacing.qmd). Refining the schedule
-    improves numerical accuracy; it does not change birth rates.
+    `run(..., refine_schedule = TRUE)` refines it adaptively, adding nodes where
+    removing one would make a population integral too inaccurate (threshold
+    `schedule_eps`); see [node spacing](theory/implementation/node-spacing.qmd).
+    Refining the schedule improves numerical accuracy; it does not change birth
+    rates.
 
 [SCM]{#scm}
 :   The deterministic solver that integrates a patch's size distributions along
-    characteristics, run with `run_scm()`. `plant` also has a stochastic,
+    characteristics, run with `run()`. `plant` also has a stochastic,
     finite-population solver that tracks individuals.
 
 ## Patches and the landscape
@@ -145,7 +146,7 @@ still calls the rule set a strategy, as in `FF16_Strategy`,
     across patch ages.
 
 [Net reproduction ratio]{#net-reproduction-ratio}
-:   Offspring production per incoming seed. `run_scm()` reports it for each
+:   Offspring production per incoming seed. `run()` reports it for each
     strategy; a value of one means the strategy exactly replaces itself.
 
 [Demographic equilibrium]{#demographic-equilibrium}

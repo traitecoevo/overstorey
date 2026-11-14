@@ -2,6 +2,11 @@
 title: "FF16"
 ---
 
+```{r}
+#| include: false
+source(here::here("R/registry-display.R"))
+```
+
 ::: {.eyebrow}
 model
 :::
@@ -77,9 +82,13 @@ We begin with photosynthesis by a small patch of leaf. Let $x$ denote the
 plant's traits, $z$ a height within its crown, and $E(z)$ the light available at
 that height. The gross photosynthetic rate per unit leaf area is $p(x,E)$,
 which FF16 represents with a saturating light-response curve:
-$$
-p(x, E(z)) = \alpha_{{\rm p1}} \frac{ E(z)}{E(z) + \alpha_{{\rm p2}}},
-$$ {#eq-photosynthesis}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.leaf_photosynthesis", "eq-photosynthesis")
+```
+
 Here, $\alpha_{{\rm p1}}$ is the maximum annual photosynthetic rate, and
 $\alpha_{{\rm p2}}$ is the light level at which the leaf reaches half that
 maximum. Both parameters are derived from a more detailed leaf-level model.
@@ -87,12 +96,24 @@ maximum. Both parameters are derived from a more detailed leaf-level model.
 Leaves at different heights receive different amounts of light. To obtain a
 whole-plant average, the model weights the photosynthetic rate at each height
 by the fraction of the plant's leaf area found there:
-$$
-\bar{p}(x, H, E_{a}) = \int_0^H p(x, E_a(z)) \, q(z, H) \, {\rm d}z,
-$$ {#eq-photosynthesis-av}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.crown_photosynthesis", "eq-photosynthesis-av")
+```
+
 where $H$ is plant height and $q(z,H)$ describes the vertical distribution of
 leaf area (@eq-crown3). The result, $\bar p$, is the mean photosynthetic rate
-per unit leaf area across the whole crown.
+per unit leaf area across the whole crown. The code returns the whole-plant
+product $A_{\rm l} \, \bar p$, the photosynthesis term of @eq-dbdt below.
+
+This crown integral is the default shading model. The control setting
+`shading_model` can replace it. The mean-light model evaluates $p$ at the
+leaf-weighted mean light, $\int_0^H E_a(z) \, q(z, H) \, {\rm d}z$; the
+crown-centre, flat-top-box, flat-top-soft-box, and PPA models evaluate it at
+the crown centre, $p(x, E_a(\eta_{\rm c} H))$, and differ only in how they
+build the light profile.
 
 ### Mass production {#standard-model-for-mass-production}
 
@@ -101,18 +122,19 @@ accounting is much like a budget: total photosynthesis is the income, while
 maintenance respiration and tissue turnover are expenses
 [@Makela-1997; @Thornley-2000; @Falster-2011]. Their balance gives
 ${\rm d}B/{\rm d}t$:
-$$
-\underbrace{\strut \frac{{\rm d}B}{{\rm d}t}}_\textrm{net biomass production}
-= \underbrace{\strut \alpha_{\rm bio} }_\textrm{mass per C} \,
-\underbrace{\strut \alpha_{\rm y} }_\textrm{yield}
-\big( \underbrace{\strut A_{\rm l} \, \bar{p}}_\textrm{photosynthesis} -
-\underbrace{\strut \, \sum_{i = {\rm l}, {\rm b}, {\rm s}, {\rm r}}{M_i \, r_i}}_\textrm{respiration}\big)
-- \underbrace{\strut \sum_{i = {\rm l}, {\rm b}, {\rm s},  {\rm r}}{M_i \, k_i}}_\textrm{turnover}.
-$$ {#eq-dbdt}
-The tissue subscripts are $l$ for leaves, $b$ for bark, $s$ for sapwood, and
-$r$ for roots. For each tissue, $M_i$ is its mass, $r_i$ its maintenance
-respiration rate, and $k_i$ its turnover rate. The other terms make two
-conversions:
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.net_production", "eq-dbdt")
+```
+
+The tissue subscripts are $l$ for leaves, $b$ for bark, $s$ for sapwood, $r$
+for fine roots, and $cr$ for coarse roots. For each tissue, $M_i$ is its mass,
+$r_i$ its maintenance respiration rate, and $k_i$ its turnover rate. Coarse-root
+mass is a fixed fraction of sapwood mass ([Root mass](#root-mass)); at the
+default $\alpha_{\rm cr1} = 0$ they are absent, and the sums run over leaves,
+bark, sapwood, and fine roots alone. The other terms make two conversions:
 
 - $\alpha_{\rm y}$ is the fraction of assimilated carbon retained after growth
   respiration; and
@@ -122,7 +144,7 @@ Total photosynthesis equals the mean rate per unit leaf area, $\bar p$, times
 total leaf area, $A_{\rm l}$. Leaf area is related to leaf mass by
 $A_{\rm l}=M_{\rm l}/\phi$, where $\phi$ is leaf mass per area. The total living
 mass that the plant must support is
-$M_{\rm a}=M_{\rm l}+M_{\rm b}+M_{\rm s}+M_{\rm r}$.
+$M_{\rm a}=M_{\rm l}+M_{\rm b}+M_{\rm s}+M_{\rm r}+M_{\rm cr}$.
 
 ### Height growth {#height-growth-rate}
 
@@ -131,12 +153,12 @@ net biomass production into height growth. FF16 makes this conversion in three
 conceptual steps: production builds living tissue, living tissue supports leaf
 area, and leaf area is related to height. The chain rule combines these steps
 [@Falster-2011]:
-$$
-g(x, H, E_{a}) = \frac{{\rm d}H}{{\rm d}t} = \frac{{\rm d}H}{{\rm d}A_{\rm l}}
-\times \frac{{\rm d}A_{\rm l} }{{\rm d}M_{\rm a}}
-\times \frac{{\rm d}M_{\rm a}}{{\rm d}B}
-\times \frac{{\rm d}B}{{\rm d}t}.
-$$ {#eq-dhdt}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.height_growth", "eq-dhdt")
+```
 
 Read from right to left, the four factors ask:
 
@@ -146,27 +168,37 @@ Read from right to left, the four factors ask:
 3. How much additional leaf area can that living tissue support?
 4. How much taller does the plant become for that increase in leaf area?
 
+When net production is zero or negative, this product would be negative. The
+code instead sets the height growth rate to zero there, so a plant that runs
+a carbon deficit stops growing rather than shrinking. Seed production and
+heartwood formation are set to zero in the same way.
+
 The final factor, ${\rm d}H/{\rm d}A_{\rm l}$, captures plant architecture.
 Some species deploy relatively more leaf area, whereas others gain relatively
 more height from the same increase in leaf area.
 
 The term ${\rm d}A_{\rm l}/{\rm d}M_{\rm a}$ represents the marginal cost of
 deploying more leaf area. A plant must build not only the new leaves, but also
-the sapwood, bark, and roots needed to support them. The inverse of those
-combined construction costs is
-$$
-\frac{{\rm d}A_{\rm l}}{{\rm d}M_{\rm a}}
-= \bigg( \frac{{\rm d}M_{\rm l}}{{\rm d}A_{\rm l}} + \frac{{\rm d}M_{\rm s}}{{\rm d}A_{\rm l}} + \frac{{\rm d}M_{\rm b}}{{\rm d}A_{\rm l}} + \frac{{\rm d}M_{\rm r}}{{\rm d}A_{\rm l}}\bigg)^{-1}.
-$$ {#eq-daldmt}
+the sapwood, bark, fine roots, and coarse roots needed to support them. The
+inverse of those combined construction costs is
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.leaf_area_cost", "eq-daldmt")
+```
 
 The remaining conversion, ${\rm d}M_{\rm a}/{\rm d}B$, is the fraction of net
 biomass production allocated to growth rather than reproduction. FF16 assumes
 that young plants allocate nearly all production to growth, then shift more
 production towards reproduction as they approach their maturation height:
-$$
-\frac{{\rm d}M_{\rm a}}{{\rm d}B}(H) = 1 -
-\frac{\alpha_{{\rm f1}}} {1 + \exp\left(\alpha_{{\rm f2}} \left(1 - H / H_{\rm mat}\right)\right)},
-$$ {#eq-allocation}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.allocation", "eq-allocation")
+```
+
 Here, $\alpha_{{\rm f1}}$ is the maximum fraction allocated to reproduction
 (between 0 and 1), $\alpha_{{\rm f2}}$ controls how abruptly allocation changes,
 and $H_{\rm mat}$ sets the height around which the transition occurs
@@ -188,19 +220,29 @@ $$
 \frac{{\rm d}A_{\rm st}}{{\rm d}t} = \left(\frac{{\rm d}A_{\rm s}}{{\rm d}A_{\rm l}} + \frac{{\rm d}A_{\rm b}}{{\rm d}A_{\rm l}}\right) \times
 \frac{{\rm d}A_{\rm l}}{{\rm d}M_{\rm a}} \times \frac{{\rm d}M_{\rm a}}{{\rm d}B} \times \frac{{\rm d}B}{{\rm d}t} + \frac{{\rm d}A_{\rm h}}{{\rm d}t} .
 $$ {#eq-dast}
+Heartwood forms as sapwood turns over, so
+${\rm d}A_{\rm h}/{\rm d}t = k_{\rm s} \, A_{\rm s}$, and heartwood mass grows
+at $k_{\rm s} \, M_{\rm s}$. Like height growth, heartwood formation is zero
+whenever net production is at or below zero, although sapwood turnover is
+still charged in @eq-dbdt.
+
 Finally, the geometric relationship between stem area and diameter converts
 basal-area growth into diameter growth:
 $$
 \frac{{\rm d}D}{{\rm d}t} = \left(\pi \, A_{\rm st}\right)^{-0.5} \, \frac{{\rm d}A_{\rm st}}{{\rm d}t}.
 $$ {#eq-dDdt}
+The code carries heartwood area and mass as states, and evaluates stem area,
+$A_{\rm st} = A_{\rm b} + A_{\rm s} + A_{\rm h}$, and diameter,
+$D = (4 A_{\rm st} / \pi)^{0.5}$, directly; the rates above are their time
+derivatives.
 
 ## Functional-balance model for allocation {#a-functional-balance-model-for-allocation}
 
 The previous section used tissue masses and areas even though the population
 model tracks only plant height. FF16 connects these quantities through an
 allometric **functional-balance model**. Given a plant's height, the model
-infers how much leaf, sapwood, bark, and fine-root tissue it needs to maintain
-a workable plant architecture.
+infers how much leaf, sapwood, bark, fine-root, and coarse-root tissue it needs
+to maintain a workable plant architecture.
 
 This approach keeps the population model one-dimensional while still charging
 the plant for all the tissue needed to support new leaves. It also allows the
@@ -211,9 +253,13 @@ growth rates of individual tissues to be derived from height growth
 
 The first relationship links total leaf area to height. Following empirical
 allometry [@Falster-2011], FF16 uses a power law:
-$$
-H = \alpha_{{\rm l1}} \, \left(A_{\rm l} \, {\rm m^{-2}}\right)^{\alpha_{{\rm l2}}}.
-$$ {#eq-ha}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.leaf_area", "eq-ha")
+```
+
 The factor ${\rm m^{-2}}$ makes the quantity inside the power dimensionless, so
 the relationship is normalised at a leaf area of 1 m${^2}$.
 
@@ -236,31 +282,45 @@ $$ {#eq-crown1}
 The **pipe model** assumes that each unit of leaf area is supported by a fixed
 area, $\theta$, of sapwood [@Shinozaki-1964]. Basal sapwood area is therefore
 proportional to total leaf area:
-$$
-A_{\rm s} = \theta \, A_{\rm l}.
-$$ {#eq-crown2}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.sapwood_area", "eq-crown2")
+```
+
 FF16 applies this relationship both within an individual and across plants of
 different sizes. As a result, the fraction of a plant's leaves above height
 $z$, denoted $Q(z,H)$, is
 
-$$
-Q(z, H) = \left(1-\left(\frac{z}{H}\right)^\eta\right)^2.
-$$ {#eq-crown1b}
+```{r}
+#| echo: false
+#| output: asis
+registry_display("crown_profile", "eq-crown1b")
+```
 
-Differentiating this cumulative relationship gives $q(z,H)$, the density that
-describes how leaf area is distributed with height:
-$$
-q(z, H) = 2\frac{\eta}{H}\left(1-\left(\frac{z}{H}\right)^{\eta}\right) \left(\frac{z}{H}\right)^{\eta-1}.
-$$ {#eq-crown3}
+within the crown, and zero above it ($z > H$). Differentiating this cumulative
+relationship gives $q(z,H)$, the density that describes how leaf area is
+distributed with height:
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("crown_density", "eq-crown3")
+```
 
 ### Sapwood mass {#mass-of-sapwood}
 
 Sapwood mass depends on its cross-sectional area throughout the full height of
 the stem. Integrating $A_{{\rm s},z}$ over height and multiplying by wood
 density, $\rho$, gives
-$$
-M_{\rm s}  = \rho \int_0^H A_{{\rm s},z} \, {\rm d}z = \rho A_{\rm s} H \eta_{\rm c} ,
-$$ {#eq-ms1}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.sapwood_mass", "eq-ms1")
+```
+
 where $\eta_{\rm c} = 1 - \frac{2}{1 + \eta} + \frac{1}{1 + 2\eta}$ is a
 factor determined by crown shape [@Yokozawa-1995]. Substituting the pipe-model
 relationship from @eq-crown2 expresses sapwood mass directly in terms of leaf
@@ -273,51 +333,78 @@ $$ {#eq-ms2}
 
 FF16 treats bark and phloem with a relationship analogous to the pipe model.
 Their mass is a fixed fraction, $\alpha_{{\rm b1}}$, of sapwood mass:
-$$
-M_{\rm b} = \alpha_{{\rm b1}} M_{\rm s}.
-$$ {#eq-mb}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.bark_mass", "eq-mb")
+```
 
 ### Root mass {#root-mass}
 
-Root mass is also proportional to leaf area:
-$$
-M_{\rm r} = \alpha_{{\rm r1}} \, A_{\rm l}.
-$$ {#eq-mr}
+Fine-root mass is also proportional to leaf area:
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.root_mass", "eq-mr")
+```
+
 FF16 does not explicitly model nitrogen or water uptake. This relationship
 nevertheless ensures that building and maintaining roots contributes to the
 plant's carbon budget.
+
+FF16 also has coarse roots, which continue the sapwood below ground. Their mass
+is a fixed fraction of sapwood mass, $M_{\rm cr} = \alpha_{\rm cr1} M_{\rm s}$,
+and they are respired and turned over like the other tissues (@eq-dbdt). At the
+default $\alpha_{\rm cr1} = 0$ they are absent.
 
 ## Seed production {#seed-production}
 
 Once the plant begins reproducing, the fraction of production not allocated to
 growth is available for seeds. Dividing that reproductive production by the
 total cost per seed gives the seed-production rate, $f(x,H,E_a)$:
-$$
-f(x, H, E_{a}) = \frac{(1 - \frac{{\rm d}M_{\rm a}}{{\rm d}B}) \times \frac{{\rm d}B}{{\rm d}t}}{
-\omega + \alpha_{{\rm f3}}},
-$$ {#eq-fecundity}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.fecundity", "eq-fecundity")
+```
+
 Here, $\omega$ is seed mass and $\alpha_{{\rm f3}}$ is the additional cost of
 flowers, fruits, and dispersal structures associated with each seed. From
 @eq-allocation, ${\rm d}M_{\rm a}/{\rm d}B$ is the fraction allocated to growth,
-so $1-{\rm d}M_{\rm a}/{\rm d}B$ is the fraction allocated to reproduction.
+so $1-{\rm d}M_{\rm a}/{\rm d}B$ is the fraction allocated to reproduction. As
+with height growth, seed production is zero whenever net production is at or
+below zero, where this expression would be negative.
 
 ## Mortality {#mortality}
 
 FF16 represents mortality as a continuous hazard: the instantaneous risk of
 death at a particular size and in a particular environment. The total hazard
 has two parts [@Falster-2011; @Moorcroft-2001]:
-$$
-d(x, H, E_{a}) = d_{{\rm I}}(x, H) + d_{{\rm G}}(x, H, E_{a}).
-$$ {#eq-mortality}
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.mortality", "eq-mortality")
+```
+
 The growth-independent component, $d_{\rm I}$, is constant with respect to
 current plant performance, although it may vary among trait combinations. The
 growth-dependent component, $d_{\rm G}$, falls exponentially as net biomass
 production per unit leaf area increases:
-$$
-d_{{\rm G}}(x, H, E_{a}) = \alpha_{{\rm dG1}} \exp(-\alpha_{{\rm dG2}} X),
-$$ {#eq-mortality-gd}
-where $X=({\rm d}B/{\rm d}t)/A_{\rm l}$. Plants with little production relative
-to their leaf area therefore face a higher mortality hazard. The parameters
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.mortality_growth", "eq-mortality-gd")
+```
+
+where $X$ is net biomass production per unit leaf area. Plants with little
+production relative to their leaf area therefore face a higher mortality
+hazard. When production is negative, so is $X$, and the hazard rises above
+$\alpha_{{\rm dG1}}$. The parameters
 $\alpha_{{\rm dG1}}$ and $\alpha_{{\rm dG2}}$ allow the level and sensitivity of
 this response to differ among species.
 
@@ -326,16 +413,27 @@ $S_{\rm G}(x^\prime,H_0,E_{{\rm a}0})$, evaluated for a new plant of initial
 height $H_0$ in its initial environment $E_{{\rm a}0}$. For the demographic
 model to remain well behaved, the ratio
 $S_{\rm G}(x^\prime,H_0,E_{{\rm a}0})/g(x,H_0,E_{{\rm a}0})$ must approach zero
-as initial growth approaches zero. Following @Falster-2011, FF16 uses
-$$
-S_{\rm G} (x^\prime, H_0, E_{{\rm a}0}) = \frac1{1 + X^2},
-$$ {#eq-pi1}
-where $X = \alpha_{{\rm d0}} \frac{A_{\rm l}}{{\rm d}B / {\rm d}t}$ and
-$\alpha_{{\rm d0}}$ is a constant. Because $X$ is large when production per
-unit leaf area is small, establishment survival falls towards zero for plants
-with very poor initial production. This is consistent with the
-growth-dependent mortality rule in @eq-mortality-gd: both penalise poor carbon
-balance.
+as initial growth approaches zero. FF16 follows @Falster-2011, and adds a
+decline with the age of the patch the seed arrives in:
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("FF16.establishment", "eq-pi1")
+```
+
+where $\alpha_{{\rm d0}}$ is a constant, and $A_{\rm l}$ and
+${\rm d}B/{\rm d}t$ are those of the new plant at height $H_0$ in its initial
+light environment. Because $X$ is large when production per unit leaf area is
+small, establishment survival falls towards zero for plants with very poor
+initial production, and it is zero when initial production is at or below
+zero. This is consistent with the growth-dependent mortality rule in
+@eq-mortality-gd: both penalise poor carbon balance.
+
+The numerator reduces establishment in patches that are already old when the
+seed arrives: $a_0$ is the patch age at birth and $\kappa_{\rm G}$ the rate of
+decline. By default $\kappa_{\rm G} = 0$, so the numerator is 1 and the rule is
+that of @Falster-2011.
 
 ## Hyper-parameterisation of physiological model via traits {#traits}
 
@@ -350,10 +448,11 @@ leaf mass per area alters both the cost of constructing leaf area and the rate
 at which leaves turn over. Treating those effects independently could create a
 plant strategy that violates an assumed biological trade-off.
 
-To keep linked parameters consistent, `plant` **hyper-parameterises** FF16:
-trait values are passed through a set of relationships that update several
-physiological parameters together. Those relationships are described below.
-Their implementation is in the `make_FF16_hyperpar()` function.
+To keep linked parameters consistent, FF16 is **hyper-parameterised**: trait
+values are passed through a set of relationships that update several
+physiological parameters together. Those relationships are described below. The
+`fieldtrial` package supplies the recommended trade-offs, as
+`fieldtrial::tradeoffs("FF16")`; `plant` applies none unless they are attached.
 
 ### Leaf mass per unit area
 
@@ -461,15 +560,16 @@ retaining the effect of $\nu$ derived from the detailed annual calculation.
 
 The following tables collect the notation, allometric relationships, and
 parameter values used above. They are generated directly from the installed
-`plant` package so that the displayed defaults match the implementation.
+`plant` package, and the trade-off coefficients from `fieldtrial`, so that the
+displayed defaults match the implementation.
 
 ```{r}
 #| label: functions
 #| echo: false
 extract_strategy_parameter_values <- function(vars){
 
-  s <- c(FF16_Strategy(),
-         lapply(as.list(args(make_FF16_hyperpar)), eval))
+  s <- c(FF16_Model()$pars,
+         fieldtrial::tradeoff_coefficients("FF16"))
 
   out <- rep(NA_character_, length(vars))
 
@@ -518,7 +618,7 @@ system.file("docs/FF16", "FF16-eqns.csv", package = "plant") %>%
 x <- system.file("docs/FF16", "FF16-params-core.csv", package = "plant") %>%
   read.csv() %>% dplyr::as_tibble()
 
-x$Value <- extract_strategy_parameter_values(x$Symbol)
+x$Value <- extract_strategy_parameter_values(x$Code)
 knitr::kable(x,  align = "l")
 ```
 

@@ -112,7 +112,7 @@ an empty pool.
 ```{r}
 #| label: mortality-bounded
 #| fig-alt: "Storage-dependent mortality is bounded between ~0 and a_dG1 as reserves vary 0 to 1."
-p <- TF24_Strategy()$pars
+p <- TF24_Model()$pars
 tibble(r = seq(0, 1, length.out = 200)) |>
   mutate(mortality = p$d_I + p$a_dG1 * exp(-p$a_dG2 * r)) |>
   ggplot(aes(r, mortality)) +
@@ -155,13 +155,13 @@ fixed_env <- function(theta) {
 
 For transparency, this diagnostic uses a small manual Euler step rather than
 the production ODE solver. It follows three years in well-watered soil, a sharp
-drought from year 3 to 4.5, and then recovery. Use `run_scm()` for model runs;
+drought from year 3 to 4.5, and then recovery. Use `run()` for model runs;
 this loop is only a teaching probe.
 
 ```{r}
 #| label: drought-probe
 #| fig-alt: "Height growth pauses during drought while reserves deplete and mortality rises to a bounded level; growth resumes after reserves refill."
-s   <- TF24_Strategy()
+s   <- TF24_Model()
 wet <- fixed_env(0.30)
 dry <- fixed_env(0.08)
 
@@ -231,7 +231,7 @@ thresholds. The default is `0.10`.
 
 ```{r}
 #| label: params
-s <- TF24_Strategy()
+s <- TF24_Model()
 s$pars[c("a_st1", "a_st2", "a_st3")]
 ```
 
@@ -251,7 +251,7 @@ to illustrate how reserve buffering responds to a gradual environmental change.
 ```{r}
 #| label: drought-probe-smooth
 #| fig-alt: "Height growth pauses during drought while reserves deplete and mortality rises to a bounded level; growth resumes after reserves refill."
-s   <- TF24_Strategy()
+s   <- TF24_Model()
 wet <- fixed_env(0.30)
 dry <- fixed_env(0.08)
 

@@ -28,8 +28,9 @@ library(tidyr)
 library(ggplot2)
 
 base <- function(type) {
-  scm_base_parameters(type) |>
-    add_strategies(trait_matrix(0.0825, "lma"), birth_rate = 20)
+  p <- base_parameters(type)
+  p$hyperpar <- fieldtrial::tradeoffs(type)
+  add_strategies(p, trait_matrix(0.0825, "lma"), birth_rate = 20)
 }
 ```
 
@@ -49,11 +50,8 @@ acclimation lag remains.
 ::: {.callout-note}
 ## How the gradient is calculated
 
-By default, `plant` calculates the gradient exactly with automatic
-differentiation and the implicit-function theorem (`use_ad_gradient = TRUE`). A
-centred finite-difference calculation is available as a fallback. In R,
-`k_acclim` controls the gain, `use_ad_gradient` selects the method, and
-`psi_fd_step` matters only on the finite-difference path.
+`plant` calculates the gradient exactly with automatic differentiation and the
+implicit-function theorem. In R, `k_acclim` controls the gain.
 :::
 
 ## Run TF24 and TF24f side by side
@@ -63,14 +61,13 @@ For TF24f we use an illustrative gain of 2; the package default is 1.
 
 ```{r}
 #| label: run-both
-tf24  <- run_scm(base("TF24"),  collect = TRUE, refine_schedule = FALSE)
+tf24  <- tidy(run(base("TF24"), record = "steps"))
 
 p_f <- base("TF24f")
 s <- p_f$strategies[[1]]
 s$k_acclim <- 2
-s$use_ad_gradient <- TRUE
 p_f$strategies[[1]] <- s
-tf24f <- run_scm(p_f, collect = TRUE, refine_schedule = FALSE)
+tf24f <- tidy(run(p_f, record = "steps"))
 ```
 
 In this example, the two size structures remain very similar:
@@ -89,8 +86,8 @@ bind_rows(
 ```
 
 TF24f records the tracked potential in `opt_root_psi_state`. TF24 reports its
-newly optimised value as `opt_root_psi`, with the opposite sign convention in
-this output. Plotting them together reveals the acclimation lag: early in life,
+newly optimised value as `opt_root_psi`, in the same positive-magnitude
+convention. Plotting them together reveals the acclimation lag: early in life,
 the optimum moves faster than the finite-gain state can follow. The gap then
 narrows as growth slows.
 
@@ -99,7 +96,7 @@ narrows as growth slows.
 #| fig-alt: "Tracked collar potential closely follows TF24's per-step optimum."
 node1 <- function(d) d |> filter(node == 1) |> drop_na()
 bind_rows(
-  node1(tf24$species)  |> transmute(time, psi = -opt_root_psi,       model = "TF24 optimum"),
+  node1(tf24$species)  |> transmute(time, psi = opt_root_psi,       model = "TF24 optimum"),
   node1(tf24f$species) |> transmute(time, psi = opt_root_psi_state, model = "TF24f tracked")
 ) |>
   ggplot(aes(time, psi, colour = model)) +
@@ -118,10 +115,8 @@ A smaller `k` is easier to integrate but produces a longer acclimation lag.
 There is therefore no universal best value: compare TF24f against TF24 over the
 environmental range and time scale relevant to the analysis.
 
-The default automatic-differentiation path avoids a finite-difference step and
-its truncation error. If `use_ad_gradient = FALSE`, TF24f instead uses a centred
-finite difference controlled by `psi_fd_step`; that fallback should be treated
-as a numerical sensitivity setting and checked explicitly.
+The exact gradient avoids a finite-difference step and its truncation error,
+so the gain is the only setting to choose.
 
 ## A note on initialisation
 

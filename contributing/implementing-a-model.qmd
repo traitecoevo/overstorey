@@ -1,5 +1,5 @@
 ---
-title: "Implementing a new strategy"
+title: "Implementing a new model"
 subtitle: "Using Kohyama 1993 — the forest architecture model"
 ---
 ::: {.eyebrow}
@@ -7,7 +7,7 @@ for contributors
 :::
 
 This tutorial walks through adding a new physiological model to `plant` by
-implementing a new Strategy class in C++. It uses the
+implementing a new Model class in C++. It uses the
 [K93 (Kohyama 1993) model](../theory/models/k93.qmd) as a worked example. For
 an overview of how the C++ and R sides of the package fit together, see
 [package organisation](package-organisation.qmd).
@@ -25,12 +25,12 @@ for improvement.
 # Background
 
 `plant` is a generalised characteristic solver for models of size-structured
-competition and patch dynamics. Any `plant` model defines a strategy that
-implements a system of equations describing the change of one or more
-characteristics (state variables) of individuals. These individuals are
-aggregated as nodes of different ages that compete within a patch. Competition
-occurs through a shared environment, where individuals reduce the resources
-available within the patch and limit the growth of the surrounding community.
+competition and patch dynamics. Any `plant` model implements a system of
+equations describing the change of one or more characteristics (state
+variables) of individuals. These individuals are aggregated as nodes of
+different ages that compete within a patch. Competition occurs through a shared
+environment, where individuals reduce the resources available within the patch
+and limit the growth of the surrounding community.
 The `plant` solver steps these equations through time, integrating over a
 meta-population of patches and adaptively refining the rate at which nodes are
 introduced, to describe the expected development of patch dynamics.
@@ -39,7 +39,7 @@ Phew.
 
 `plant` has a lot of moving parts but, helpfully, most of these are general and
 will work for many (all? 🤞) size structured models. Implementing a new model
-typically involves only changing the Strategy and sometimes the Environment
+typically involves only changing the Model and sometimes the Environment
 classes, using existing models as a template. Below we describe the classes of
 `plant` that provide the basic building blocks, then implement a new model as an
 example.
@@ -54,7 +54,7 @@ same type.
 
 An important feature of (OO) is the 'inheritance' of classes. This allows us to
 implement our models as specialisations of a general case. For example, all
-bespoke `plant` models can (and will) inherit the general Strategy class. This
+bespoke `plant` models can (and will) inherit the general Model class. This
 provides the base set of properties and methods the solver requires without
 having to re-invent the wheel (and saving us a lot of repeated work).
 
@@ -83,19 +83,20 @@ Defines the attributes of groups of individuals
 #### Parameters
 Settings of species, patches and environment
 
-#### Strategy\*\*
+#### Model\*\*
 The processes that determine species' characteristics such as growth, death and
 reproduction, including competitive interactions.
 
-#### AdaptiveInterpolator
-Maps a gradient of environmental conditions onto a monotonic spline bounded
-between (0, 1) to simplify the calculation of competitive interactions.
+#### ResourceSpline
+Tabulates the environment (for example, light availability, between 0 and 1)
+against height on a fixed grid of knots, as a spline, to simplify the
+calculation of competitive interactions.
 
 #### SCM
 Solves for the trajectories of different nodes along all defined characteristics.
 
-\**When developing your own strategy, you'll likely only need to create a
-Strategy and an Environment*
+\**When developing your own model, you'll likely only need to create a Model
+and an Environment*
 
 ## R Interface
 
@@ -225,37 +226,37 @@ $$
 Dispersal and establishment are fixtures of the `plant` framework, but not used
 in the original formulation of Kohyama. We set them both to $1.0$.
 
-## Adding a new `plant` strategy
+## Adding a new `plant` model
 
 ### 0. Choose a name
 
-*"As a naming convention, strategies are named using two initials (eg. the first
-two authors) followed by a year, e.g. FF16. A single letter suffix can be added
-to indicate a minor modification of an existing strategy, e.g. FF16r"*
+Models are named using two initials (e.g. the first two authors) followed by a
+year, e.g. FF16. A single-letter suffix marks a variant of an existing model,
+e.g. TF24t.
 
-### 1. Use scaffolder to create template files
+### 1. Create the model's files
 
-```{r}
-#| eval: false
-source('inst/scripts/new_strategy_scaffolder.R')
-create_strategy_scaffold("K93", "FF16")
-```
+`plant` has no generator for a new model. The checklist is the `plant-new-model`
+skill in `plant`'s `.claude/skills/`, which lists every file a new model touches
+and every binding and R dispatch table that must name it. K93 is a model of its
+own rather than a variant, and the smallest complete one to read. Its biology
+lives in two headers:
 
-Three important files
+* `inst/include/plant/models/k93_model.h`
+* `inst/include/plant/models/k93_environment.h`
 
-* K93_strategy.h
-* K93_strategy.cpp
-* K93_environment.h
+The model's methods are defined `inline` in its header, below the class, so
+there is no separate `.cpp` file.
 
 ### 2. Add growth, mortality and reproduction
 
-In `K93_strategy.cpp` add:
+In `models/k93_model.h` add:
 
 ```{cpp}
 #| eval: false
 // [eqn 10] Growth
-double K93_Strategy::size_dt(double size,
-                             double cumulative_basal_area) const {
+inline double K93_Model::size_dt(double size,
+                                 double cumulative_basal_area) const {
 
   double growth = size * (b_0 - b_1 * log(size) - b_2 * cumulative_basal_area);
 
@@ -267,15 +268,15 @@ double K93_Strategy::size_dt(double size,
 }
 
 // [eqn 12] Reproduction
-double K93_Strategy::fecundity_dt(double size,
-                                  double cumulative_basal_area) const {
+inline double K93_Model::fecundity_dt(double size,
+                                      double cumulative_basal_area) const {
   double basal_area = size_to_basal_area(size);
   return d_0 * basal_area * exp(-d_1 * cumulative_basal_area);
 }
 
 // [eqn 11] Mortality
-double K93_Strategy::mortality_dt(double cumulative_basal_area,
-                                  double cumulative_mortality) const {
+inline double K93_Model::mortality_dt(double cumulative_basal_area,
+                                      double cumulative_mortality) const {
   // If mortality probability is 1 (latency = Inf) then the rate
   // calculations break.  Setting them to zero gives the correct
   // behaviour.
@@ -290,22 +291,22 @@ double K93_Strategy::mortality_dt(double cumulative_basal_area,
 
 ### 3. Map competition to environment
 
-In `K93_strategy.cpp`
+In `models/k93_model.h`
 
 ```{cpp}
 #| eval: false
-double K93_Strategy::size_to_basal_area(double size) const {
+inline double K93_Model::size_to_basal_area(double size) const {
   return M_PI / 4 * pow(size, 2);
 }
 
-double K93_Strategy::compute_competition(double z, double size) const {
+inline double K93_Model::compute_competition(double z, double size) const {
 
   // Competition only felt if plant bigger than target size z
   return size_to_basal_area(size) * Q(z, size);
  };
 ```
 
-This does a round-about-trip to `K93_environment.h`:
+This does a round-about-trip to `models/k93_environment.h`:
 
 ```{cpp}
 #| eval: false
@@ -329,7 +330,7 @@ largest competitive effect
 ```{cpp}
 #| eval: false
   // i.e. setting rates of ode vars from the state and updating aux vars
-  void K93_Strategy::compute_rates(const K93_Environment& environment, Internals& vars) {
+  inline void K93_Model::compute_rates(const K93_Environment& environment, Internals& vars) {
 
     double height = vars.state(HEIGHT_INDEX);
 
@@ -366,14 +367,14 @@ Then calculate impact on growth:
 
 C++ keeps track of method declarations in a header file.
 
-In `K93_strategy.h` the structure of our new class begins with:
+In `models/k93_model.h` the structure of our new class begins with:
 
 ```{cpp}
 #| eval: false
-class K93_Strategy: public Strategy<K93_Environment> {
+class K93_Model: public Model<K93_Environment> {
 public:
-  typedef std::shared_ptr<K93_Strategy> ptr;
-  K93_Strategy();
+  typedef std::shared_ptr<K93_Model> ptr;
+  K93_Model();
 
   ...
 
@@ -452,13 +453,13 @@ We have some nuisance parameters for dispersal, establishment and smoothing
   // Smoothing parameter
   double eta = 12;
 
-  double K93_Strategy::establishment_probability(const K93_Environment& environment){
+  double K93_Model::establishment_probability(const K93_Environment& environment){
     //TODO: may want to make this dependent on achieving positive growth rate
     return 1.0;
   }
 
   // Smoothing function for competition effect
-  double K93_Strategy::Q(double z, double size) const {
+  double K93_Model::Q(double z, double size) const {
     if (z > size) {
       return 0.0;
     }
@@ -468,11 +469,11 @@ We have some nuisance parameters for dispersal, establishment and smoothing
   }
 ```
 
-Finally, the K93_Strategy class ends with:
+Finally, the K93_Model class ends with:
 
 ```{cpp}
 #| eval: false
-  // Set constants within K93_Strategy
+  // Set constants within K93_Model
   void prepare_strategy();
 
   std::string name;
@@ -481,15 +482,16 @@ Finally, the K93_Strategy class ends with:
 
 and a pointer.
 
-### 6. Add to RcppR6.yml
+### 6. Add to RcppR6_classes.yml
 
-Section already added by scaffolder, need to adapt to method names.
+Add a block for the new class to `inst/RcppR6_classes.yml`, and add the new
+model and environment pair to every `templates:` list that names the existing
+models; the `plant-new-model` skill lists them.
 
 ```{yaml}
 #| eval: false
-# The following strategy was built from FF16r on Wed Aug 12 15:33:08 2020
-K93_Strategy:
-  name_cpp: "plant::K93_Strategy"
+K93_Model:
+  name_cpp: "plant::K93_Model"
   roxygen: |
     Strategy parameters that tune various aspects of the biological model.
     @title Strategy parameters
@@ -508,54 +510,35 @@ K93_Strategy:
     - control: "plant::Control"
 ```
 
-`K93_Environment` also created, but no changes needed.
+`K93_Environment` is a new environment, so it needs a block of its own too.
 
-### 7. Expose new strategy to R
+### 7. Expose the new model to R
 
-In `K93.R`
+In `R/k93.R`, add the R constructors for the individual and the parameters,
+and the model's `expand_state` function:
 
 ```{r}
 #| eval: false
-##' Hyperparameters for K93 physiological model
-##' @title Hyperparameters for K93 physiological model
-##' @export
-##' @rdname K93_hyperpar
-make_K93_hyperpar <- function(
-        b_0 = 0.059,    # Growth intercept year-1
-        b_1 = 0.012,    # Growth asymptote year-1.(ln cm)-1
-        b_2 = 0.00041,  # Growth suppression rate m2.cm-2.year-1
-        c_0 = 0.008,    # Mortality intercept year-1
-        c_1 = 0.00044,  # Mortality suppression rate m2.cm-2.year-1
-        d_0 = 0.00073,  # Recruitment rate (cm2.year-1)
-        d_1 = 0.044    # Recruitment suppression rate (m2.cm-2)
-  ) {
-  assert_scalar <- function(x, name=deparse(substitute(x))) {
-    if (length(x) != 1L) {
-      stop(sprintf("%s must be a scalar", name), call. = FALSE)
-    }
-  }
+K93_Individual <- function(s=K93_Model()) {
+  Individual("K93", "K93_Env")(s)
+}
 
-  assert_scalar(b_0)
-  assert_scalar(b_1)
-  assert_scalar(b_2)
-  assert_scalar(c_0)
-  assert_scalar(c_1)
-  assert_scalar(d_0)
-  assert_scalar(d_1)
+K93_Parameters <- function() {
+  Parameters("K93","K93_Env")()
+}
 
-  function(m, s, filter=TRUE) {
-    with_default <- function(name, default_value=s[[name]]) {
-      rep_len(if (name %in% colnames(m)) m[, name] else default_value,
-              nrow(m))
-    }
-
-    m
-  }
-
+K93_expand_state <- function(results) {
+  results
 }
 ```
 
-Add tests to `test-strategy-k93.R`
+Each `switch()` in `R/strategy_support.R` that has an arm per model needs one
+for K93. K93 has no trade-offs between its parameters, so its arm in
+`default_hyperpar()` (in `R/default_parameters.R`) is the identity. A model
+with trade-offs keeps a frozen testing copy of its trade-off function there;
+the recommended trade-off functions belong in the `fieldtrial` package.
+
+Add tests to `tests/testthat/test-model-k93.R`
 
 ### 8. Build and run
 
@@ -570,11 +553,10 @@ Then `devtools::load_all(".")`
 ```{r}
 #| eval: false
 # Patches of competing plants
-p0 <- scm_base_parameters("K93")
-p1 <- expand_parameters(trait_matrix(0.0825, "b_0"), p = p0)
-p1$seed_rain <- 20
+p0 <- base_parameters("K93")
+p1 <- add_strategies(p0, trait_matrix(0.0825, "b_0"), birth_rate = 20)
 
-data1 <- run_scm(p1, collect = TRUE)
+data1 <- tidy(run(p1, record = "steps"))
 
 matplot(data1$time, data1$species[[1]]["height", , ],
         lty=1, col=util_colour_set_opacity("black", 0.25), type="l",

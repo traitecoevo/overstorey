@@ -12,6 +12,11 @@ loop, and on the demographic quantities defined in
 [The size-structured PDE](size-structured-pde.qmd).
 :::
 
+```{r}
+#| include: false
+source(here::here("R/registry-display.R"))
+```
+
 ## The idea first
 
 Adaptive dynamics asks a simple question: if a new strategy appears at very low
@@ -62,33 +67,47 @@ interval $\mathrm{d}a$ is $P(a)\mathrm{d}a$.
 
 The mutant may therefore land in a young, open patch or an old, shaded one. Its
 overall reproduction ratio averages its return over all those possible arrival
-ages:
-$$
-R\left(x^\prime,x\right) = \int _0^{\infty} P\left(a\right) \, \tilde{R}\left(x^\prime, a, \infty \right) \, {\rm d}a ,
-$$ {#eq-invfit}
+ages $a_0$:
+
+```{r}
+#| echo: false
+#| output: asis
+registry_display("net_reproduction_ratio", "eq-invfit")
+```
 
 Here $\tilde{R}\left(x^\prime, a_0, a \right)$ is the expected number of
-dispersing offspring produced by one mutant seed that arrives when the patch is
-age $a_0$, counted up to patch age $a$ [@Gyllenberg-2001; @Metz-2001]. In
-@eq-invfit the endpoint is infinity, so the entire remaining lifetime of the
-patch is included.
+offspring produced by one mutant seed that arrives when the patch is age $a_0$,
+counted up to patch age $a$ [@Gyllenberg-2001; @Metz-2001], and $S_{\rm D}$ is
+the fraction of those offspring that survive dispersal. In theory both
+integrals run to infinity, so that the entire remaining lifetime of the patch
+is included.
+`plant` stops both integrals at $a_{\rm max}$, the patch age at which a run
+ends. By default $a_{\rm max}$ is the age by which all but a small fraction of
+patches have been disturbed (see the [Weibull
+distribution](size-structured-pde.qmd#sec-weibull-distribution)).
 
-That lifetime return is itself another integral:
-$$
-\tilde{R}(x^\prime, a_0, \infty) = \int_{a_0}^{\infty} S_{\rm D} \, f(x^\prime, H(x^\prime, a_0, a), E_{a}) \, S_{\rm I} (x^\prime, a_0, a) \, S_{\rm P} (a_0, a) \, {\rm d} a.
-$$ {#eq-tilder}
+That lifetime return is itself another integral. It is written here for a plant
+with traits $x$; the mutant's return is the same with $x = x^\prime$ and
+$a = a_{\rm max}$:
 
-The integrand is a product of four pieces:
+```{r}
+#| echo: false
+#| output: asis
+registry_display("lifetime_offspring", "eq-tilder")
+```
 
-- $f$ is the mutant's fecundity at its current height and light environment;
-- $S_{\rm I}$ is the probability that the mutant is still alive;
-- $S_{\rm P}$ is the probability that the patch has not yet been disturbed; and
-- $S_{\rm D}$ is the fraction of offspring that survive dispersal.
+The integrand is a product of three pieces:
+
+- $f$ is the plant's fecundity at its current height and light environment;
+- $S_{\rm I}$ is the probability that the plant is still alive; and
+- $S_{\rm P}$ is the probability that the patch has not yet been disturbed.
 
 The individual and patch survival probabilities are defined on the
-[size-structured PDE](size-structured-pde.qmd) page. Multiplying the four terms
-gives expected viable offspring production at patch age $a$; integrating from
-arrival age $a_0$ onward gives the seed's expected lifetime return.
+[size-structured PDE](size-structured-pde.qmd) page. Multiplying the three terms
+gives expected offspring production at patch age $a^\prime$; integrating from
+arrival age $a_0$ onward gives the seed's expected lifetime return. The
+fraction $S_{\rm D}$ that survives dispersal is applied once, to that total, in
+@eq-invfit.
 
 ### Reading the result
 

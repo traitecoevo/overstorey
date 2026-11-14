@@ -15,7 +15,7 @@ distribution and watch it evolve.
 
 This guide covers both. In each case, the starting state is attached to a
 `Parameters` object—the object that holds the strategies and settings for a
-run. When the patch is reset, an ordinary `run_scm(p)` reads that state without
+run. When the patch is reset, an ordinary `run(p)` reads that state without
 needing a special run argument.
 
 ```{r}
@@ -25,7 +25,8 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-p0 <- scm_base_parameters("FF16")
+p0 <- base_parameters("FF16")
+p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 p  <- add_strategies(p0, trait_matrix(0.0825, "lma"), birth_rate = 20)
 ```
 
@@ -36,7 +37,7 @@ export the state part-way through:
 
 ```{r}
 #| label: run-and-export
-scm <- plant:::SCM("FF16", "FF16_Env")(p, Environment("FF16"), Control())
+scm <- run(p, until = 0)$solver
 scm$collect <- TRUE
 scm$run()
 
@@ -51,13 +52,13 @@ age, the unused part of the node-introduction schedule, and per-node birth
 bookkeeping such as introduction time, initial patch density, and survival at
 birth.
 
-`set_initial_state()` writes that onto a `Parameters` object, and `run_scm()`
+`set_initial_state()` writes that onto a `Parameters` object, and `run()`
 resumes from it:
 
 ```{r}
 #| label: resume
 p_resumed <- set_initial_state(p, state)
-resumed   <- run_scm(p_resumed, collect = TRUE)
+resumed   <- run(p_resumed)
 ```
 
 The resumed run closely reproduces the original. The checkpointed state is
@@ -67,7 +68,7 @@ fitness agrees to a few parts in $10^5$ rather than bit-for-bit:
 
 ```{r}
 #| label: compare-fitness
-c(original = scm$net_reproduction_ratios,
+c(original = scm$patch$net_reproduction_ratios,
   resumed  = resumed$net_reproduction_ratios)
 ```
 
@@ -108,15 +109,15 @@ tibble(height = dist$heights, density = dist$densities) |>
   theme_classic()
 ```
 
-Seed a patch with it and run as usual. `run_scm(collect = TRUE)` returns the
-standard tidy output, so the seeded run drops straight into the usual plotting
-and aggregation helpers:
+Seed a patch with it and run as usual. `tidy()` of a run with `record = "steps"`
+returns the standard tidy output, so the seeded run drops straight into the
+usual plotting and aggregation helpers:
 
 ```{r}
 #| label: seed-and-run
 state0 <- make_initial_state(p, heights = dist$heights,
                              densities = dist$densities)
-seeded <- run_scm(set_initial_state(p, state0), collect = TRUE)
+seeded <- tidy(run(set_initial_state(p, state0), record = "steps"))
 ```
 
 ```{r}
@@ -161,8 +162,8 @@ densities <- c(1.0, 0.2, 0.05)
 
 panel <- lapply(densities, function(dn) {
   d <- ln_dist(mean_height = 6, density = dn)
-  r <- run_scm(set_initial_state(p, make_initial_state(p, d$heights, d$densities)),
-               collect = TRUE)
+  r <- tidy(run(set_initial_state(p, make_initial_state(p, d$heights, d$densities)),
+                record = "steps"))
   r$species |> drop_na() |>
     mutate(scenario = sprintf("initial density = %.2f /m2", dn))
 }) |> bind_rows()
@@ -185,7 +186,7 @@ strongly that production becomes negative and node densities become non-finite.
 #| error: true
 bad <- make_initial_state(p, heights = seq(8, 12, length.out = 20),
                           densities = rep(50, 20))
-run_scm(set_initial_state(p, bad))
+run(set_initial_state(p, bad))
 ```
 
 If this happens, begin with a compatible state from `export_patch_state()`, or

@@ -27,18 +27,14 @@ library(dplyr)
 library(ggplot2)
 ```
 
-```{r}
-#| label: console-logging
-plant_log_console()
-```
-
 We begin with one FF16 strategy and rapidly reduce recruitment after
 establishment, isolating the development of the initial cohort. Schedule
 refinement gives the fast early dynamics more resolution:
 
 ```{r}
 #| label: grow-stand
-p0 <- scm_base_parameters("FF16")
+p0 <- base_parameters("FF16")
+p0$hyperpar <- fieldtrial::tradeoffs("FF16")
 
 p0$strategy_default$pars$recruitment_decay <- 5
 # rapidly reduces later recruitment to isolate the first group of plants
@@ -51,10 +47,10 @@ lma_trait <- trait_matrix(0.1457419, "lma")
 
 p1 <- add_strategies(p0, lma_trait)
 
-stand_results <- run_scm(p1, ctrl = ctrl, refine_schedule = TRUE)$parameters
+stand_results <- run(p1, control = ctrl, refine_schedule = TRUE)$scenario$p
 # refines the node-introduction schedule where the estimated error is largest
 
-out <- run_scm(stand_results, ctrl = ctrl, collect = TRUE)
+out <- tidy(run(stand_results, control = ctrl, record = "steps"))
 # run the SCM model
 ```
 
