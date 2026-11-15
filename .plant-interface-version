@@ -6,7 +6,7 @@
 # not migrated.
 migrated_on: 2026-11-16
 plant_version: 2.0.0.9002
-plant_ref: 34aae163, plant#789's head (develop@52ff5349 plus a gd_point() fix; odelia 0.11.1 @v0.11.1, phylloptim 0.37.0 @64cbde2)
+plant_ref: develop@edeb632f, plant#789's merge (52ff5349 plus a gd_point() fix; odelia 0.11.1 @v0.11.1, phylloptim 0.37.0 @64cbde2)
 baseline_before_marker: develop@fc1ccc86
 applied_breaking_changes:
   - one-run-verb  # plant#779: run_scm(), grow_individual_to_*() -> run(); scm_base_parameters() -> base_parameters()
@@ -17,9 +17,9 @@ applied_breaking_changes:
 #
 # 2026-11-16: moved from develop@83a973ff for the five TF24 pages brought over
 # from plant's overstorey_staging/ (plant#596). Those pages were rendered at
-# 52ff5349 or 6facce35; those and 34aae163 differ only in an R guide helper and
+# 52ff5349 or 6facce35; those and the pin differ only in an R guide helper and
 # comments.
-# Re-pin to plant#789's merge commit. No breaking change between 83a973ff and
+# The merge commit edeb632f has 34aae163's tree. No breaking change between 83a973ff and
 # 52ff5349 reaches another page: the birth-date establishment change
 # (plant#788) changes make_initial_state() only on the birth-date coordinate,
 # and the one page that builds initial states (guides/initialising-a-patch.qmd)
