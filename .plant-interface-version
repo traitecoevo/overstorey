@@ -15,9 +15,10 @@ applied_breaking_changes:
 # Checked and not affected (no call sites): run_stochastic_collect() (plant#779);
 # the scenario gateway (plant#775).
 #
-# 2026-11-16: renv.lock moved to plant develop@52ff5349 (phylloptim 0.37.0
-# @64cbde2) for the five TF24 pages brought over from plant's
-# overstorey_staging/ (plant#596), which are rendered there. No breaking change
+# 2026-11-16: renv.lock moved to plant 6facce35, the head of plant#789
+# (develop@52ff5349 plus a fix to gd_point(); phylloptim 0.37.0 @64cbde2), for
+# the five TF24 pages brought over from plant's overstorey_staging/
+# (plant#596), which are rendered there. Re-pin to plant#789's merge commit. No breaking change
 # between 83a973ff and 52ff5349 reaches another page: the birth-date
 # establishment change (plant#788) moves TF24 results and changes
 # make_initial_state() only on the birth-date coordinate, and the one page that

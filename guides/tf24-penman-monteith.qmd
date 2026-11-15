@@ -90,11 +90,13 @@ ggplot(collar_curve_long, aes(root_psi, value, colour = model)) +
 
 Sweep Tair × PAR at a fixed VPD, solving the optimum with Fick and with PM, and
 compare leaf temperature, the optimum stem potential, stomatal conductance,
-transpiration, assimilation, and profit.
+transpiration, assimilation, and profit. The coolest air is 20 °C because a
+VPD of 2 kPa cannot occur below about 17.5 °C, where saturation vapour pressure
+falls under 2 kPa, and the leaf refuses a negative relative humidity.
 
 ```{r sweep}
 grid <- expand.grid(PAR = c(400, 900, 1500, 2000),
-                    Tair = c(15, 25, 33, 40),
+                    Tair = c(20, 25, 33, 40),
                     VPD = 2.0)
 sweep <- pm_solve_grid(grid) |> mutate(model = lab_pm(pm))
 
@@ -128,7 +130,7 @@ high-radiation corner — where the overheated leaf loses most of its carbon gai
 
 ```{r where}
 grid2 <- expand.grid(PAR = c(200, 500, 1000, 2000),
-                     Tair = c(15, 25, 35, 40), VPD = 2.0)
+                     Tair = c(20, 25, 35, 40), VPD = 2.0)
 both <- pm_solve_grid(grid2)
 wide <- both |>
   select(PAR, Tair, pm, A, Tleaf) |>

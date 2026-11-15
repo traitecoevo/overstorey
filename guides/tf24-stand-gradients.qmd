@@ -1,6 +1,6 @@
 ---
 title: "TF24: stand gradients from one reverse sweep"
-subtitle: "One sweep, forty-eight trade-offs: reading the iso-biomass surface"
+subtitle: "One sweep, every trade-off: reading the iso-biomass surface"
 format:
   html:
     code-fold: true
@@ -90,9 +90,9 @@ bars(raw, "Raw partial  |dy/dx|", "ranked by the size of the units", TRUE) +
     subtitle = "The left ordering is an artefact; only the right one is about the stand.")
 ```
 
-The two orderings disagree, and the left one is an artefact. `omega` and `theta`
-lead it by three orders of magnitude because they are small numbers, not because
-the stand cares about them. Everything below is in elasticities — percentage
+The two orderings disagree, and the left one is an artefact. `theta` leads it by
+more than two orders of magnitude, with `omega` second, because both are small
+numbers, not because the stand cares about them. Everything below is in elasticities — percentage
 change in the metric per percentage change in the parameter — which is
 dimensionless and therefore comparable across columns, and which is also the form
 a trait-database correlation is quoted in.
@@ -137,9 +137,9 @@ so compensating means moving one back.
 The columns above are **partial** derivatives: each holds all other parameters
 fixed. That is not what an ecologist means by "the LMA derivative", because
 `TF24_hyperpar` derives further parameters from the traits — `k_l` and `r_l`
-from `lma`; `d_I`, `g1_TF24`, `k_s`, `r_s`, `r_b` from `rho`; `a_f3`
-from `omega`; and `c`, `p_50`, `b`, `psi_crit` from `K_s`. Raising LMA in the
-field raises those with it.
+from `lma`; `r_s` and `r_b` from `rho`; `a_f3` from `omega`; `stem_P50` from
+`K_s`; and `r_l` also from `vcmax_25` and `jmax_25`. Raising LMA in the field
+raises those with it.
 
 The total derivative chains the gradient through that map. The Jacobian is taken
 by differencing `TF24_hyperpar` itself rather than restating its algebra, so
@@ -207,7 +207,6 @@ returns `NA` there rather than a large number that looks like an answer.
 check one is to take a second gradient at the moved point and see whether it
 still says the same thing.
 
-**Two limits are structurally zero here.** `psi_crit` and `root_psi_crit` carry
-no row while the leaf's operating point is away from the bound they set, and come
-alive the moment it sits on one. A zero in this table can mean "no effect" or
-"not currently binding", and those are different statements.
+**A missing column is not a zero effect.** `stem_b` and `psi_crit` have no
+column: they are derived from `stem_P50` and `stem_c`, and the model takes no
+gradient through them. Their effect arrives through `stem_P50` and `stem_c`.

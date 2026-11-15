@@ -356,6 +356,7 @@ The leaf moved into phylloptim (#591), so the layer was re-implemented on curren
 - **The `leaf_temp` driver keeps its name** and is read as air temperature on the energy-balance path; July renamed it `air_temp`.
 - **The `operating_leaf_temp` aux is gone**: TF24 reports `Tleaf`, and the running mean relaxes toward it.
 - **Deep-crown shading is refused**, and **no gradient** in plant carries the layer.
+
 ### October 2026: three states, the dynamics on the leaf {#sec-redesign}
 
 After the port, the layer was redesigned in phylloptim#162 and plant#694:
