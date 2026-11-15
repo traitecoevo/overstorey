@@ -16,7 +16,7 @@ This separation is useful: the population-level machinery stays the same,
 while the biological assumptions can change. Choosing a different strategy
 therefore changes the biology without changing the population framework.
 
-Four strategies are documented here:
+Five models are documented here:
 
 - **[FF16](ff16.qmd)** — the default trait-based model (Falster *et al.* 2016).
   It calculates growth using leaf photosynthesis and a functional-balance

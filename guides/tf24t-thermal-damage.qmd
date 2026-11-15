@@ -229,7 +229,7 @@ ggplot(viab5, aes(air_temp, pmax(log10(R0), -8), colour = scenario)) +
 
 The valid signal is the **persistence boundary** — the dotted crossings, not the curve heights, which still carry the density artifact and are drawn on a log scale only to expose the crossing.
 
-> **Reading these results.** Adding the thermal layer moves the persistence boundary from `r sprintf("%.1f", b5[["PM only (TF24)"]])` °C to `r sprintf("%.1f", b5[["PM + ATLS (TF24t)"]])` °C: lasting thermal damage is a net persistence penalty, as it was on the July code ([`notes/atls/results-2026-07/`](https://github.com/traitecoevo/plant/tree/52ff5349c5a01f384a4446e809fc48caf5840674/notes/atls/results-2026-07)). The size of the shift rests on the illustrative `k_mat` above and on the other open calibration items listed at the end of this page.
+> **Reading these results.** Adding the thermal layer moves the persistence boundary from `r sprintf("%.1f", b5[["PM only (TF24)"]])` °C to `r sprintf("%.1f", b5[["PM + ATLS (TF24t)"]])` °C: lasting thermal damage is a net persistence `r if (b5[["PM + ATLS (TF24t)"]] < b5[["PM only (TF24)"]]) "penalty, as it was" else "gain, where it was a penalty"` on the July code ([`notes/atls/results-2026-07/`](https://github.com/traitecoevo/plant/tree/52ff5349c5a01f384a4446e809fc48caf5840674/notes/atls/results-2026-07)). The size of the shift rests on the illustrative `k_mat` above and on the other open calibration items listed at the end of this page.
 
 ## 6. Which thermal strategy persists hottest? (SCM tournament)
 

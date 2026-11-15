@@ -136,13 +136,14 @@ so compensating means moving one back.
 
 The columns above are **partial** derivatives: each holds all other parameters
 fixed. That is not what an ecologist means by "the LMA derivative", because
-`TF24_hyperpar` derives further parameters from the traits — `k_l` and `r_l`
-from `lma`; `r_s` and `r_b` from `rho`; `a_f3` from `omega`; `stem_P50` from
-`K_s`; and `r_l` also from `vcmax_25` and `jmax_25`. Raising LMA in the field
-raises those with it.
+TF24's trade-offs (`default_hyperpar("TF24")`) derive further parameters from
+the traits — `k_l` and `r_l` from `lma`; `r_s` and `r_b` from `rho`; `a_f3`
+from `omega`; `stem_P50` from `K_s`; and `r_l` also from `vcmax_25` and
+`jmax_25`. Raising LMA in the field moves those with it: both `k_l` and `r_l`
+fall.
 
 The total derivative chains the gradient through that map. The Jacobian is taken
-by differencing `TF24_hyperpar` itself rather than restating its algebra, so
+by differencing the trade-offs themselves rather than restating their algebra, so
 there is one source of truth for the derived forms.
 
 ```{r chain}

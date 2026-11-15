@@ -263,7 +263,7 @@ tall plant assimilates *more* in total after shedding leaves.
 
 The effect is much milder than it was. Per-leaf assimilation falls only
 `r sprintf("%.2f", term("abar")[1] / term("abar")[3])`-fold between 5 m and 15 m,
-where it fell 46-fold before #617 replaced a stem resistance linear in height with
+where it fell 46-fold before plant#617 replaced a stem resistance linear in height with
 a path integral, so $\eta$ crossed 1 near 10 m then and does so above 20 m
 now.
 
@@ -331,7 +331,7 @@ differencing $\bar a$ directly is unusable. The $\eta$ column above is therefore
 recovered from the measured `dP/dA` through the exact decomposition — a valid
 measurement of $\eta$, but not an independent check of the criterion.
 
-**And the number it depends on moves with the hydraulics.** #617 (epic #615)
+**And the number it depends on moves with the hydraulics.** plant#617 (epic plant#615)
 replaced a stem resistance linear in height with a path integral over conduit
 widening and the Huber profile; with that and the model's changes since, the drop
 in per-leaf assimilation between 5 m and 15 m went from 46-fold to almost
@@ -398,7 +398,7 @@ which the soil-root network's supply matches the leaf's demand. A constraint, no
 an optimum. So $\partial\,\text{profit}/\partial(\text{collar}) \neq 0$ and the
 indirect term is real.
 
-**What it cost**, measured before #617. Holding the collar fixed under-reported the sensitivity by
+**What it cost**, measured before plant#617. Holding the collar fixed under-reported the sensitivity by
 15–19%, which put the controller's zero at 1.22x the pipe-model ratio where growth
 actually peaks at 1.28x. It was invisible in wet soil, where the scan grid was too
 coarse to resolve the gap. Re-solving properly matches a finite difference of the
@@ -474,7 +474,7 @@ pipe-model ratio is simply not where growth is maximised.
 
 ::: {.callout-note}
 ## Three things that had to be got right, and were not at first
-The figures in this box were measured before #617, when the errors were found.
+The figures in this box were measured before plant#617, when the errors were found.
 
 **Sapwood turnover is gated, so its derivative is not $k_s m_s$.** What the budget
 is charged is $f_s k_s m_s$ with $f_s \propto e^{-\psi/a_{pl2}}$ against
@@ -759,10 +759,15 @@ stands <- lapply(seq_len(nrow(stand_cfg)), function(i) lapply(c(0, 1), function(
   allometry_self_thinning(a, rain = stand_cfg$rain[i],
                           amplitude = stand_cfg$amplitude[i])))
 stand_cfg |>
-  mutate(`a_pl0 = 0` = signif(vapply(stands, function(x) x[[1]]$R0, 0), 4),
-         `a_pl0 = 1` = signif(vapply(stands, function(x) x[[2]]$R0, 0), 4),
-         ratio = signif(`a_pl0 = 1` / `a_pl0 = 0`, 3)) |>
-  knitr::kable()
+  mutate(r0_fixed = vapply(stands, function(x) x[[1]]$R0, 0),
+         r0_flex = vapply(stands, function(x) x[[2]]$R0, 0),
+         ratio = signif(r0_flex / r0_fixed, 3),
+         # Each column formatted on its own, so a dry stand's tiny R0 prints
+         # rather than rounding to the wet stand's decimal places.
+         `a_pl0 = 0` = formatC(r0_fixed, digits = 4, format = "g"),
+         `a_pl0 = 1` = formatC(r0_flex, digits = 4, format = "g")) |>
+  select(stand, rain, amplitude, `a_pl0 = 0`, `a_pl0 = 1`, ratio) |>
+  knitr::kable(align = "lrrrrr")
 ```
 
 Under constant rain the mechanism is close to neutral. **Under seasonal rain it
@@ -795,9 +800,9 @@ is open.
 
 ::: {.callout-note}
 ## Earlier versions of this table said something else, twice
-Before #617 it reported that shedding *lowered* offspring production by factors of
+Before plant#617 it reported that shedding *lowered* offspring production by factors of
 0.55 to 0.64 on seasonal stands, when resistance was linear in height and tall
-plants were penalised far more heavily. After #617 it read 0.92–1.00, close to
+plants were penalised far more heavily. After plant#617 it read 0.92–1.00, close to
 free. Neither stand was recorded beside its numbers, and the stands above are not
 those; under v13's brighter default light, and on these stands, seasonal rain
 makes the mechanism expensive again.
@@ -829,7 +834,7 @@ grow with height, which is why the tall row is worth showing, but even at 20 m
 most of the bill still follows the canopy.)
 
 **It is that thinning cannot reach balance, even though it now helps.** This is
-the argument that changed most with #617, and the earlier version of it was
+the argument that changed most with plant#617, and the earlier version of it was
 wrong. A 10 m plant at soil 0.13:
 
 ```{r thinning-per-area}
@@ -850,13 +855,13 @@ But the improvement saturates, reverses, and never reaches zero.
 
 ::: {.callout-warning}
 ## Retraction
-Before #617 this table read −3.81 at a full canopy and *worsened* monotonically to
+Before plant#617 this table read −3.81 at a full canopy and *worsened* monotonically to
 −4.68, and the argument was that "thinning cuts income just as fast" — that
 shrinking the canopy shrinks both sides of the budget together. **That is no
 longer true.** With resistance derived from stem anatomy the hydraulic benefit of
 carrying a whole stem over fewer leaves is real and substantial, and there is an
 interior optimum — near a tenth of full canopy when this was first measured after
-#617, and near two per cent under the brighter default light of v13.
+plant#617, and near two per cent under the brighter default light of v13.
 
 The conclusion survives the argument being replaced: a plant whose leaves cost
 more than they earn can now *narrow* the gap by having fewer leaves, but it still
@@ -941,7 +946,7 @@ resting point and drains completely.
 ::: {.callout-note}
 ## The gate itself was tested, and is not the problem
 Three gates have been run through the same drought. These were measured *before*
-#617 and have not been re-taken, so read the levels as historical — but the
+plant#617 and have not been re-taken, so read the levels as historical — but the
 comparison between them is what matters, and the ordering above is unchanged:
 
 | gate | fires when | survival gain |
@@ -1001,7 +1006,7 @@ removes such a plant is mortality, not the allometry, and a cohort model keeps
 carrying it meanwhile.
 
 Related, and worth watching: the rebuild rate grows as the canopy empties, which is
-the same fast-boundary shape that #609 identified for the storage pool. It has not
+the same fast-boundary shape that plant#609 identified for the storage pool. It has not
 caused a failure in any run so far.
 
 ## What is settled
@@ -1066,7 +1071,7 @@ prioritised.
 
 ::: {.callout-tip}
 ## These equations are checked, not just written down
-`tests/testthat/test-allometry-demo.R` reimplements this appendix in R — working
+plant's `tests/testthat/test-allometry-demo.R` reimplements this appendix in R — working
 from the prose rather than from the source — and compares it against what the C++
 computes, across 81 combinations of height, both departures and reserve level.
 They agree to 1e-10. So a divergence between this description and the model fails
@@ -1113,7 +1118,7 @@ Hydraulic supply per unit leaf area reads the Huber value the plant actually has
 
 $$k_{\max,\text{leaf}} = \frac{K_s\,\theta e^{\psi}}{L(h\,\eta_c)},$$
 
-where $L$ is the stem's effective path length (#617), which is $h\eta_c$ itself
+where $L$ is the stem's effective path length (plant#617), which is $h\eta_c$ itself
 when the anatomical profiles are switched off.
 
 which is the channel through which thinning improves supply to the leaves that
