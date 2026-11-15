@@ -33,6 +33,8 @@ Four strategies are documented here:
 - **[TF24f](tf24.qmd)** — uses the same physiology as TF24, but allows the
   plant's hydraulic operating point to adjust gradually when the environment
   changes. It is documented alongside TF24.
+- **[TF24t](tf24t-thermal-damage.qmd)** — TF24 with a leaf energy balance and
+  lasting heat damage, repair and acclimation on the leaf.
 
 If you are new to these models, start with FF16. It introduces the shared
 growth and allocation framework. TF24 then shows how explicit photosynthesis

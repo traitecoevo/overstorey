@@ -14,3 +14,13 @@ applied_breaking_changes:
   - fitness-weighting  # plant#781: patch_type -> fitness_weighting; no page set it
 # Checked and not affected (no call sites): run_stochastic_collect() (plant#779);
 # the scenario gateway (plant#775).
+#
+# 2026-11-16: renv.lock moved to plant develop@52ff5349 (phylloptim 0.37.0
+# @64cbde2) for the five TF24 pages brought over from plant's
+# overstorey_staging/ (plant#596), which are rendered there. No breaking change
+# between 83a973ff and 52ff5349 reaches another page: the birth-date
+# establishment change (plant#788) moves TF24 results and changes
+# make_initial_state() only on the birth-date coordinate, and the one page that
+# builds initial states (guides/initialising-a-patch.qmd) runs FF16 on height;
+# the a_pl0 range check (plant#786) has no call site outside the new pages.
+# Pages not re-rendered keep their 83a973ff freezes until their source changes.

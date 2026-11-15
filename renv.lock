@@ -2456,14 +2456,14 @@
     },
     "phylloptim": {
       "Package": "phylloptim",
-      "Version": "0.36.0",
+      "Version": "0.37.0",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "phylloptim",
-      "RemoteRef": "e2c9460210b2d71343ff2ed112a426de1d2617a7",
-      "RemoteSha": "e2c9460210b2d71343ff2ed112a426de1d2617a7"
+      "RemoteRef": "64cbde29136ed18da282639a2b9c84474e01307c",
+      "RemoteSha": "64cbde29136ed18da282639a2b9c84474e01307c"
     },
     "pillar": {
       "Package": "pillar",
@@ -2554,8 +2554,8 @@
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "plant",
-      "RemoteRef": "83a973ffe771e841de46cd5ecb1575b6f8f16f84",
-      "RemoteSha": "83a973ffe771e841de46cd5ecb1575b6f8f16f84"
+      "RemoteRef": "52ff5349c5a01f384a4446e809fc48caf5840674",
+      "RemoteSha": "52ff5349c5a01f384a4446e809fc48caf5840674"
     },
     "prettyunits": {
       "Package": "prettyunits",

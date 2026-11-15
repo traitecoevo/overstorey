@@ -1,31 +1,26 @@
 ---
-title: "A canopy that thins"
+title: "TF24: a canopy that thins"
 subtitle: "Flexible allometry in TF24 — what it does, and why it does not yet buy survival"
 format:
   html:
-    toc: true
-    toc-depth: 3
     code-fold: true
     fig-width: 9
     fig-height: 5
 ---
 
+::: {.eyebrow}
+guide
+:::
+
 ```{r setup, message=FALSE, warning=FALSE}
-# Staging demo: needs the in-tree dev build (#516), not necessarily the
-# installed `plant`.
-pkg_root <- if (file.exists("DESCRIPTION")) "." else ".."
-if (requireNamespace("pkgload", quietly = TRUE)) {
-  pkgload::load_all(pkg_root, quiet = TRUE)
-} else {
-  library(plant)
-}
+library(plant)
 library(ggplot2)
 library(patchwork)
 library(dplyr)
 library(tidyr)
 
-# Shared computation, kept out of this file so a test can exercise it: a chunk
-# that runs is not a chunk that is checked.
+# Shared computation, installed with plant so its tests can exercise it: a
+# chunk that runs is not a chunk that is checked.
 source(system.file("guide-helpers", "allometry_demo_helpers.R", package = "plant", mustWork = TRUE))
 
 theme_set(theme_bw(base_size = 12))

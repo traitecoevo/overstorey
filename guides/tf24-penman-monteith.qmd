@@ -1,30 +1,25 @@
 ---
-title: "TF24 leaf-level Penman-Monteith energy balance: Fick vs PM"
+title: "TF24: leaf energy balance, Fick vs Penman–Monteith"
 format:
   html:
-    toc: true
     code-fold: true
     fig-width: 9
     fig-height: 5
 ---
 
+::: {.eyebrow}
+guide
+:::
+
 ```{r setup, message=FALSE, warning=FALSE}
-# Staging demo: needs the in-tree dev build (PM, #523), not necessarily the
-# installed `plant`. Resolve the package root whether rendered from the repo root
-# or from overstorey_staging/.
-pkg_root <- if (file.exists("DESCRIPTION")) "." else ".."
-if (requireNamespace("pkgload", quietly = TRUE)) {
-  pkgload::load_all(pkg_root, quiet = TRUE)
-} else {
-  library(plant)
-}
+library(plant)
 library(ggplot2)
 library(patchwork)
 library(dplyr)
 library(tidyr)
 
-# Shared leaf-driving code (also exercised by tests/testthat/test-pm-leaf-demo.R,
-# so this demo cannot silently rot).
+# Shared leaf-driving code, installed with plant and exercised by its
+# tests/testthat/test-pm-leaf-demo.R, so this page cannot silently rot.
 source(system.file("guide-helpers", "pm_demo_helpers.R", package = "plant", mustWork = TRUE))
 
 theme_set(theme_bw(base_size = 12))
@@ -35,8 +30,8 @@ lab_pm <- function(pm) ifelse(pm, "Penman-Monteith", "Fick (Tleaf = Tair)")
 This document demonstrates the TF24 leaf submodel with the Penman-Monteith leaf
 energy balance (`use_energy_balance_`, issue #523) turned **on** vs the default
 **off** (Fick's law, `Tleaf = Tair`). It drives a single well-watered leaf across
-an environment grid; it is a work-in-progress staging document, not a built
-vignette. See `notes/penman-monteith/` for the plan and the Step 5 evaluation.
+an environment grid. The plan and the Step 5 evaluation are in plant's
+[`notes/penman-monteith/`](https://github.com/traitecoevo/plant/tree/52ff5349c5a01f384a4446e809fc48caf5840674/notes/penman-monteith).
 
 ## 1. Profit anatomy at a single hot environment
 
@@ -152,5 +147,6 @@ ggplot(wide, aes(factor(PAR), factor(Tair), fill = relA)) +
        subtitle = "VPD = 2 kPa; blue = PM raises A, red = PM lowers A, · = A≈0")
 ```
 
-See `notes/penman-monteith/step5-fick-vs-pm-evaluation.md` for the full factorial
-gate and verdict.
+See plant's
+[`notes/penman-monteith/step5-fick-vs-pm-evaluation.md`](https://github.com/traitecoevo/plant/blob/52ff5349c5a01f384a4446e809fc48caf5840674/notes/penman-monteith/step5-fick-vs-pm-evaluation.md)
+for the full factorial gate and verdict.

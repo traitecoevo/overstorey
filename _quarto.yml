@@ -95,6 +95,10 @@ website:
           contents:
             - guides/tf24-hydraulics-and-acclimation.qmd
             - guides/tf24-nsc-storage.qmd
+            - guides/tf24-penman-monteith.qmd
+            - guides/tf24-flexible-allometry.qmd
+            - guides/tf24t-thermal-damage.qmd
+            - guides/tf24-stand-gradients.qmd
     - title: "Theory"
       style: floating
       collapse-level: 1
@@ -112,6 +116,7 @@ website:
             - theory/models/ff16.qmd
             - theory/assimilation-hydraulics.qmd
             - theory/models/tf24.qmd
+            - theory/models/tf24t-thermal-damage.qmd
             - theory/soil-water.qmd
             - theory/models/k93.qmd
         - section: "3. Adaptive dynamics"

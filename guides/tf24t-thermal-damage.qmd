@@ -1,34 +1,26 @@
 ---
-title: "TF24t leaf-level thermal response (ATLS): damage, and four strategies"
+title: "TF24t: thermal damage and four strategies"
+subtitle: "The leaf-level thermal response (ATLS), from one leaf to a stand"
 format:
   html:
-    toc: true
     code-fold: true
     fig-width: 9
     fig-height: 5
 ---
 
+::: {.eyebrow}
+guide
+:::
+
 ```{r setup, message=FALSE, warning=FALSE}
-# Staging demo: needs the in-tree build (ATLS, #566; builds on PM, #523). Resolve
-# the package root whether rendered from the repo root or from
-# overstorey_staging/. Set ATLS_DEMO_PLANT=installed to render against the
-# installed plant instead of a pkgload::load_all() build, which compiles without
-# optimisation and makes the SCM sections far slower. The helpers sourced below
-# then come from that installed plant too, so reinstall after editing them.
-pkg_root <- if (file.exists("DESCRIPTION")) "." else ".."
-if (identical(Sys.getenv("ATLS_DEMO_PLANT"), "installed") ||
-    !requireNamespace("pkgload", quietly = TRUE)) {
-  library(plant)
-} else {
-  pkgload::load_all(pkg_root, quiet = TRUE)
-}
+library(plant)
 library(ggplot2)
 library(patchwork)
 library(dplyr)
 library(tidyr)
 
-# Shared driving code (also exercised by tests/testthat/test-atls-leaf-demo.R,
-# so this demo cannot silently rot).
+# Shared driving code, installed with plant and exercised by its
+# tests/testthat/test-atls-leaf-demo.R, so this page cannot silently rot.
 source(system.file("guide-helpers", "atls_demo_helpers.R", package = "plant", mustWork = TRUE))
 
 theme_set(theme_bw(base_size = 12))
@@ -36,11 +28,11 @@ theme_set(theme_bw(base_size = 12))
 strat_pal <- c("Generalist" = "#7570b3", "Tolerant" = "#d95f02",
                "Repairer" = "#1b9e77", "Acclimated" = "#e7298a")
 
-# File-based cache for the expensive SCM runs: computed once, reused on
-# re-render. Keyed on the cache name AND the deparsed call, so editing a chunk's
-# call invalidates that entry. A rebuilt model is NOT tracked: delete
-# overstorey_staging/cache/ to force a rerun after changing the model.
-cache_dir <- file.path(pkg_root, "overstorey_staging", "cache")
+# Cache for the expensive SCM runs within one render session. The page's
+# freeze is what persists results between renders; this only spares a rerun
+# when a chunk is re-executed interactively. Keyed on the cache name AND the
+# deparsed call, so editing a chunk's call invalidates that entry.
+cache_dir <- file.path(tempdir(), "tf24t-thermal-damage-cache")
 dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 cached_rds <- function(name, expr) {
   call_txt <- paste(deparse(substitute(expr)), collapse = " ")
@@ -57,7 +49,7 @@ cached_rds <- function(name, expr) {
 
 The **ATLS** layer (leaf thermal damage, repair and acclimation, issue #566) gives a TF24 leaf a lasting response to heat on top of the reversible peaked-Arrhenius capacity curve. The leaf area is split into three fractions: **functional** `F`, **impaired** `I` and **damaged** `D`, with `F = 1 − I − D`. Functional leaf is impaired at a rate `k_imp(T)` that a smooth **switch** turns on around its midpoint `impair_Tmid` (34.5 °C at the defaults, its own parameter, independent of the Jmax curve). Impaired leaf is repaired back to functional over about 4 days, or matures into damaged leaf, which clears only as the plant grows new leaf. Both capacities scale by `F`, so a cooled leaf does *not* rebound instantly.
 
-The layer and its dynamics live in phylloptim's `Leaf` behind `use_thermal_damage_`; the `TF24t` strategy turns it on, integrates the states on the plant, and dilutes damaged leaf with new growth. The equations are in `TF24t_leaf_ATLS_model.qmd`.
+The layer and its dynamics live in phylloptim's `Leaf` behind `use_thermal_damage_`; the `TF24t` strategy turns it on, integrates the states on the plant, and dilutes damaged leaf with new growth. The equations are in [TF24t: thermal damage](../theory/models/tf24t-thermal-damage.qmd).
 
 A thermal *strategy* is a point in a four-axis trait space, all plugging into the same physics:
 
@@ -68,7 +60,7 @@ A thermal *strategy* is a point in a four-axis trait space, all plugging into th
 | **Repair** | preventive `k_i`, restorative `k_rec` | impair more slowly or repair faster (and cut the lasting floor) |
 | **Avoidance** | transpirational cooling (energy balance) | lowers the operating leaf temperature, hence `k_imp` |
 
-This demo drives a single well-watered leaf, then a single-species stand. It is a work-in-progress staging document, not a built vignette. Its July design is [`notes/atls/implementation-plan.md`](https://github.com/traitecoevo/plant/blob/f406b6d864f5a68b97c5acc68f6bcf44fb05cda6/notes/atls/implementation-plan.md) and the port to phylloptim is [`notes/plan-atls-port.md`](https://github.com/traitecoevo/plant/blob/f406b6d864f5a68b97c5acc68f6bcf44fb05cda6/notes/plan-atls-port.md), both in the history since they retired; what still constrains the code is hazard 16 in `.claude/hazards.md`, and the open work is on #566.
+This guide drives a single well-watered leaf, then a single-species stand. Its July design is [`notes/atls/implementation-plan.md`](https://github.com/traitecoevo/plant/blob/f406b6d864f5a68b97c5acc68f6bcf44fb05cda6/notes/atls/implementation-plan.md) and the port to phylloptim is [`notes/plan-atls-port.md`](https://github.com/traitecoevo/plant/blob/f406b6d864f5a68b97c5acc68f6bcf44fb05cda6/notes/plan-atls-port.md), both in the history since they retired; what still constrains the code is hazard 16 in plant's [`.claude/hazards.md`](https://github.com/traitecoevo/plant/blob/52ff5349c5a01f384a4446e809fc48caf5840674/.claude/hazards.md), and the open work is on [plant#566](https://github.com/traitecoevo/plant/issues/566).
 
 ## 1. The impairment rate `k_imp(Tleaf)` and the impairment it drives
 
@@ -196,7 +188,7 @@ Everything above is a single isolated leaf. The demographic question is whether 
 
 The density-free measure is **viability**: when *rare*, does a resident more than replace itself? R0 is evaluated in the low-density limit (a small `birth_rate`). R0 ≥ 1 means the population grows from rare and persists. The warmest climate with R0 ≥ 1 is the **persistence boundary**, and *that* is comparable across strategies, because density effects vanish as density goes to zero. We read the boundary, never the R0 magnitude away from it.
 
-Each SCM run takes one to two minutes; the grid is cached to an `.rds` under `overstorey_staging/cache/` (delete that folder to force a rerun) and the runs are spread across cores.
+Each SCM run takes one to two minutes; the page's freeze keeps the results between renders, and the runs are spread across cores.
 
 ```{r scm-viability}
 # k_mat is a CALIBRATION TARGET. At its default (0.02/day) the permanent pool
@@ -235,7 +227,7 @@ ggplot(viab5, aes(air_temp, pmax(log10(R0), -8), colour = scenario)) +
 
 The valid signal is the **persistence boundary** — the dotted crossings, not the curve heights, which still carry the density artifact and are drawn on a log scale only to expose the crossing.
 
-> **Reading these results.** On the July code, ATLS moved the persistence boundary *cooler* than the energy balance alone: adding lasting thermal damage was a net persistence penalty (`notes/atls/results-2026-07/`). That reading has not been re-derived on the ported code, and on current code it cannot be read off this figure: with the energy balance on, this stand is far below replacement at every temperature in the range, with or without the thermal layer (TF24 with the balance on gives low-density R0 of 1e-8 at 15 °C and 1e-18 at 28 °C, against 56 at 25 °C with it off). No scenario crosses R0 = 1, so the table reports no boundary. The comparison needs re-setting — the baseline understood, or the climate range or traits moved — before it says anything about the thermal layer.
+> **Reading these results.** On the July code, ATLS moved the persistence boundary *cooler* than the energy balance alone: adding lasting thermal damage was a net persistence penalty ([`notes/atls/results-2026-07/`](https://github.com/traitecoevo/plant/tree/52ff5349c5a01f384a4446e809fc48caf5840674/notes/atls/results-2026-07)). That reading has not been re-derived on the ported code, and on current code it cannot be read off this figure: with the energy balance on, this stand is far below replacement at every temperature in the range, with or without the thermal layer (TF24 with the balance on gives low-density R0 of 1e-8 at 15 °C and 1e-18 at 28 °C, against 56 at 25 °C with it off). No scenario crosses R0 = 1, so the table reports no boundary. The comparison needs re-setting — the baseline understood, or the climate range or traits moved — before it says anything about the thermal layer.
 
 ## 6. Which thermal strategy persists hottest? (SCM tournament)
 
@@ -341,4 +333,4 @@ The running mean (green) tracks the operating leaf temperature (orange) with a l
 
 ## 8. Summary
 
-The impairment rate `k_imp(Tleaf)` is the single driver: strategies act by moving *where its switch turns on* (tolerance and acclimation shift the midpoint), *how fast functional leaf is impaired and how fast it is repaired* (preventive `k_i`, restorative `k_rec`), or *where the leaf actually operates* (avoidance). Impairment is a **memory**: the impaired and damaged fractions remove their share of both capacities and persist after cooling, and damaged leaf clears only as the plant grows new leaf. At the community scale the same layer sets a **persistence boundary**, the warmest climate at which a rare population still replaces itself. Its value on the ported code, and the strategy ranking, are to be re-derived; both rest on open calibration items, among them the leaf overheating, the switch midpoint and the `k_mat` maturation rate. See `notes/atls/gate-atls-vs-pm-evaluation.md` for the July materiality gate.
+The impairment rate `k_imp(Tleaf)` is the single driver: strategies act by moving *where its switch turns on* (tolerance and acclimation shift the midpoint), *how fast functional leaf is impaired and how fast it is repaired* (preventive `k_i`, restorative `k_rec`), or *where the leaf actually operates* (avoidance). Impairment is a **memory**: the impaired and damaged fractions remove their share of both capacities and persist after cooling, and damaged leaf clears only as the plant grows new leaf. At the community scale the same layer sets a **persistence boundary**, the warmest climate at which a rare population still replaces itself. Its value on the ported code, and the strategy ranking, are to be re-derived; both rest on open calibration items, among them the leaf overheating, the switch midpoint and the `k_mat` maturation rate. See plant's [`notes/atls/gate-atls-vs-pm-evaluation.md`](https://github.com/traitecoevo/plant/blob/52ff5349c5a01f384a4446e809fc48caf5840674/notes/atls/gate-atls-vs-pm-evaluation.md) for the July materiality gate.

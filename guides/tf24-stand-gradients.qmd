@@ -1,30 +1,26 @@
 ---
-title: "One sweep, forty-eight trade-offs: reading the iso-biomass surface"
+title: "TF24: stand gradients from one reverse sweep"
+subtitle: "One sweep, forty-eight trade-offs: reading the iso-biomass surface"
 format:
   html:
-    toc: true
     code-fold: true
     fig-width: 9
     fig-height: 5.5
 ---
 
+::: {.eyebrow}
+guide
+:::
+
 ```{r setup, message=FALSE, warning=FALSE}
-# Staging demo: needs the in-tree dev build, not necessarily the installed
-# `plant`. Resolves whether rendered from the repo root or overstorey_staging/.
-pkg_root <- if (file.exists("DESCRIPTION")) "." else ".."
-if (requireNamespace("pkgload", quietly = TRUE)) {
-  pkgload::load_all(pkg_root, quiet = TRUE)
-} else {
-  library(plant)
-}
+library(plant)
 library(odelia)
 library(ggplot2)
 library(patchwork)
 library(dplyr)
 library(tidyr)
 
-# Shared driving and interpretation code, smoke-tested by plant's
-# test-gradient-demo-helpers.R.
+# Shared driving and interpretation code, installed with plant.
 source(system.file("guide-helpers", "gradient_demo_helpers.R", package = "plant", mustWork = TRUE))
 
 theme_set(theme_bw(base_size = 12))
