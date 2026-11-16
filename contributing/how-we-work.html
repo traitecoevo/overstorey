@@ -254,7 +254,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="eyebrow">
 <p>for contributors</p>
 </div>
-<p>Every change to a plant-family package — <code>plant</code>, <code>odelia</code>, <code>regnans</code>, <code>phylloptim</code>, <code>logpile</code>, <code>phytofile</code>, <code>overstorey</code>, <code>standviz</code>, <code>floracle</code> — travels the same short loop: an <strong>issue</strong> says what we are doing and why, a <strong>feature branch</strong> does it, <strong>automated checks</strong> say whether it still builds and passes, a <strong>pull request</strong> gets read by a human, and a <strong>squash merge</strong> puts exactly one commit on the default branch.</p>
+<p>Every change to a plant-family package — <code>plant</code>, <code>odelia</code>, <code>regnans</code>, <code>phylloptim</code>, <code>fieldtrial</code>, <code>logpile</code>, <code>phytofile</code>, <code>overstorey</code>, <code>plantpress</code>, <code>floracle</code> — travels the same short loop: an <strong>issue</strong> says what we are doing and why, a <strong>feature branch</strong> does it, <strong>automated checks</strong> say whether it still builds and passes, a <strong>pull request</strong> gets read by a human, and a <strong>squash merge</strong> puts exactly one commit on the default branch.</p>
 <p>If you have worked in software, that will read as unremarkable — it is close to how most open-source projects operate. If you came to code the way most of us did, through a research question, with the code as a means to an end, it can look like a lot of ceremony for a one-line change. So it is worth saying plainly why it isn’t.</p>
 <p>Every step in the loop is an answer to a problem that does not exist when one person works on one script for one week, and becomes acute the moment that stops being true. A model that several people modify, that underpins published figures, and that has to still produce the same number in three years has a different characteristic failure from an analysis script. The failure is not that it crashes — it is that it quietly gives a <em>different</em> answer, and nobody can say when that started or which paper was affected. Most of the loop exists to make that question answerable:</p>
 <ul>
@@ -289,7 +289,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Each change then gets a <strong>short-lived feature branch</strong> off <code>develop</code>, which is merged back when it is done and deleted. We do not use Gitflow’s release or hotfix branches; those two branches plus feature branches is the whole of it.</p>
 <p><strong>Check the default branch before you branch — the family is not uniform.</strong> Only <code>plant</code> keeps the <code>master</code>/<code>develop</code> split; the rest are single-branch, and the one branch they have is variously called <code>master</code> or <code>main</code>. As currently configured:</p>
 <table class="caption-top table">
-<caption>Verified 2026-08-26 with <code>gh api repos/traitecoevo/&lt;repo&gt; --jq .default_branch</code>.</caption>
+<caption>Verified 2026-11-16 with <code>gh api repos/traitecoevo/&lt;repo&gt; --jq .default_branch</code>.</caption>
 <colgroup>
 <col style="width: 50%">
 <col style="width: 50%">
@@ -306,11 +306,11 @@ ul.task-list li input[type="checkbox"] {
 <td><code>develop</code></td>
 </tr>
 <tr class="even">
-<td><code>odelia</code>, <code>regnans</code>, <code>phylloptim</code>, <code>phytofile</code>, <code>overstorey</code>, <code>standviz</code></td>
+<td><code>odelia</code>, <code>regnans</code>, <code>phylloptim</code>, <code>phytofile</code>, <code>overstorey</code>, <code>plantpress</code></td>
 <td><code>master</code></td>
 </tr>
 <tr class="odd">
-<td><code>logpile</code>, <code>floracle</code>, <code>plant-meta</code></td>
+<td><code>fieldtrial</code>, <code>logpile</code>, <code>floracle</code>, <code>plant-meta</code></td>
 <td><code>main</code></td>
 </tr>
 </tbody>
