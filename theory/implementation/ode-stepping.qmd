@@ -88,8 +88,8 @@ the standalone `odelia` library, so it no longer lives under
 `inst/include/plant/`; `plant` includes it with
 `#include <odelia/ode_solver.hpp>` (see `solvers/patch_runner.h`). The class is
 parameterised by a template `System`, allowing any class that provides the
-required interface to be treated as an ODE system. This is the same broad C++ idea that allows a
-vector to hold a chosen data type.
+required interface to be treated as an ODE system. This is the same broad C++
+idea that allows a vector to hold a chosen data type.
 
 From odelia's `ode_solver.hpp`:
 
