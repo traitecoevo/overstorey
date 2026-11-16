@@ -24,3 +24,10 @@ applied_breaking_changes:
 # TF24 numbers on the pages re-rendered here. The C++ headers regrouped into
 # folders (plant#794) and merged source files (plant#797) have no NEWS entry;
 # the contributing pages that listed them are updated.
+# The five TF24 pages brought from plant's overstorey_staging/ (#47:
+# guides/tf24-flexible-allometry, tf24-penman-monteith, tf24-stand-gradients,
+# tf24t-thermal-damage; theory/models/tf24t-thermal-damage) keep freezes
+# rendered at plant develop@edeb632f (plant#789's merge), which already has
+# birth-date establishment (plant#788). Between it and the pin above, only
+# plant#798's seed-height tolerance can move their numbers, and only slightly;
+# they use no symbol renamed since. Re-render them at the pin when next edited.

@@ -53,3 +53,12 @@ patch is the smallest simulation in which plants compete with one another.
   instantaneous optimisation with a gradually acclimating hydraulic state.
 - [Non-structural carbohydrate storage](tf24-nsc-storage.qmd) — follow how
   carbon reserves buffer growth and mortality through changing conditions.
+- [Leaf energy balance](tf24-penman-monteith.qmd) — compare a leaf at air
+  temperature (Fick) with one whose temperature is set by its Penman–Monteith
+  energy balance.
+- [A canopy that thins](tf24-flexible-allometry.qmd) — flexible allometry: a
+  plant sheds leaf under drought or shade, and what that does and does not buy.
+- [Thermal damage and four strategies](tf24t-thermal-damage.qmd) — TF24t's
+  lasting heat damage, repair and acclimation, from one leaf to a stand.
+- [Stand gradients](tf24-stand-gradients.qmd) — one reverse sweep gives the
+  sensitivity of a stand to every trade-off parameter at once.
