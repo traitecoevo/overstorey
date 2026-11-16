@@ -8,7 +8,7 @@ toc: true
 for contributors
 :::
 
-Every change to a plant-family package — `plant`, `odelia`, `regnans`, `phylloptim`, `logpile`, `phytofile`, `overstorey`, `standviz`, `floracle` — travels the same short loop: an **issue** says what we are doing and why, a **feature branch** does it, **automated checks** say whether it still builds and passes, a **pull request** gets read by a human, and a **squash merge** puts exactly one commit on the default branch.
+Every change to a plant-family package — `plant`, `odelia`, `regnans`, `phylloptim`, `fieldtrial`, `logpile`, `phytofile`, `overstorey`, `plantpress`, `floracle` — travels the same short loop: an **issue** says what we are doing and why, a **feature branch** does it, **automated checks** say whether it still builds and passes, a **pull request** gets read by a human, and a **squash merge** puts exactly one commit on the default branch.
 
 If you have worked in software, that will read as unremarkable — it is close to how most open-source projects operate. If you came to code the way most of us did, through a research question, with the code as a means to an end, it can look like a lot of ceremony for a one-line change. So it is worth saying plainly why it isn't.
 
@@ -54,10 +54,10 @@ Each change then gets a **short-lived feature branch** off `develop`, which is m
 | Repo | Default branch |
 |---|---|
 | `plant` | `develop` |
-| `odelia`, `regnans`, `phylloptim`, `phytofile`, `overstorey`, `standviz` | `master` |
-| `logpile`, `floracle`, `plant-meta` | `main` |
+| `odelia`, `regnans`, `phylloptim`, `phytofile`, `overstorey`, `plantpress` | `master` |
+| `fieldtrial`, `logpile`, `floracle`, `plant-meta` | `main` |
 
-: Verified 2026-08-26 with `gh api repos/traitecoevo/<repo> --jq .default_branch`.
+: Verified 2026-11-16 with `gh api repos/traitecoevo/<repo> --jq .default_branch`.
 
 Nothing is committed straight to a default branch. Every change is a branch and a pull request, and the PR body carries `Closes #NNN` so the issue closes itself on merge and the commit points back at the reasoning.
 

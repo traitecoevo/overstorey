@@ -27,6 +27,7 @@ question for a production analysis.
 ```{r}
 #| label: load-libraries
 library(plant)
+library(plantpress)
 library(dplyr)
 library(tidyr)
 library(ggplot2)

@@ -2554,8 +2554,19 @@
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "plant",
-      "RemoteRef": "edeb632fcf1eb25221525e8f27bb7b0645ad90d0",
-      "RemoteSha": "edeb632fcf1eb25221525e8f27bb7b0645ad90d0"
+      "RemoteRef": "0c0e25380c91c30730141e1dc1b153fe17b48fcf",
+      "RemoteSha": "0c0e25380c91c30730141e1dc1b153fe17b48fcf"
+    },
+    "plantpress": {
+      "Package": "plantpress",
+      "Version": "0.1.0",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "traitecoevo",
+      "RemoteRepo": "plantpress",
+      "RemoteRef": "474600e81d6a0071935c5db6269c3123e8a083e2",
+      "RemoteSha": "474600e81d6a0071935c5db6269c3123e8a083e2"
     },
     "prettyunits": {
       "Package": "prettyunits",

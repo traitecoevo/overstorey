@@ -92,8 +92,9 @@ holds one species' strategy.
 
 [SCM]{#scm}
 :   The deterministic solver that integrates a patch's size distributions along
-    characteristics, run with `run()`. `plant` also has a stochastic,
-    finite-population solver that tracks individuals.
+    characteristics, run with `run()`; in `plant`'s code it is the class
+    `DeterministicPatchRunner`, a run's `$solver`. `plant` also has a
+    stochastic, finite-population solver that tracks individuals.
 
 ## Patches and the landscape
 

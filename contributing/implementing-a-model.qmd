@@ -92,8 +92,9 @@ Tabulates the environment (for example, light availability, between 0 and 1)
 against height on a fixed grid of knots, as a spline, to simplify the
 calculation of competitive interactions.
 
-#### SCM
-Solves for the trajectories of different nodes along all defined characteristics.
+#### DeterministicPatchRunner
+Solves for the trajectories of different nodes along all defined characteristics
+(the SCM).
 
 \**When developing your own model, you'll likely only need to create a Model
 and an Environment*
@@ -116,7 +117,8 @@ their R package.
 #### RcppR6
 
 An extension of Rcpp is the library RcppR6, which maps a specific R type, the R6
-class, to complex C++ objects like the `plant` SCM solver.
+class, to complex C++ objects like `plant`'s deterministic solver,
+`DeterministicPatchRunner`.
 
 R6 classes differ from normal R types (i.e. S3, S4) in that methods (functions)
 belong to objects of a given class, rather than existing as generic objects
@@ -136,7 +138,7 @@ p_new <- method(p_old)
 p$method()
 ```
 
-RcppR6 is a good match for `scm` objects which have many layers of properties and
+RcppR6 is a good match for solver objects which have many layers of properties and
 methods (see above), but also maintains a natural concept of state.
 
 The binding between RcppR6 and C++ is handled in a RcppR6_classes.yml file. Here
@@ -447,7 +449,7 @@ We have some nuisance parameters for dispersal, establishment and smoothing
 ```{cpp}
 #| eval: false
   // Probability of survival during dispersal
-  // required by scm.h
+  // read by species.h
   double S_D = 1.0;
 
   // Smoothing parameter
@@ -531,6 +533,10 @@ K93_expand_state <- function(results) {
   results
 }
 ```
+
+The simplest `expand_state` returns its input. K93's own, in `plant`, adds the
+columns its allometry derives from the size state: the stem's diameter and
+basal area.
 
 Each `switch()` in `R/strategy_support.R` that has an arm per model needs one
 for K93. K93 has no trade-offs between its parameters, so its arm in
