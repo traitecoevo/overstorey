@@ -118,7 +118,7 @@ static constexpr int scientific_version = 3;
 ```
 
 `TF24f` instead declares `approximation_revision`. The code in
-`src/strategy_version.cpp` combines this revision with the current `TF24`
+`src/model_exports.cpp` combines this revision with the current `TF24`
 version. The R functions read the result from the compiled code, so there is no
 second copy of the version number to keep in sync.
 
@@ -129,7 +129,7 @@ interface changes.
 
 When adding a new model, developers must add a `scientific_version` constant
 to its model header and a matching dispatch arm in
-`src/strategy_version.cpp`.
+`src/model_exports.cpp`.
 
 ## The drift guard
 

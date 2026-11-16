@@ -447,7 +447,7 @@ We have some nuisance parameters for dispersal, establishment and smoothing
 ```{cpp}
 #| eval: false
   // Probability of survival during dispersal
-  // required by scm.h
+  // read by species.h
   double S_D = 1.0;
 
   // Smoothing parameter
@@ -531,6 +531,10 @@ K93_expand_state <- function(results) {
   results
 }
 ```
+
+The simplest `expand_state` returns its input. K93's own, in `plant`, adds the
+columns its allometry derives from the size state: the stem's diameter and
+basal area.
 
 Each `switch()` in `R/strategy_support.R` that has an arm per model needs one
 for K93. K93 has no trade-offs between its parameters, so its arm in

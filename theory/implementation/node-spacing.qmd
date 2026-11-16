@@ -54,7 +54,8 @@ nodes. The test is deliberately conservative: it measures the error caused by
 error in the final, refined schedule will therefore usually be below the stated
 tolerance.
 
-This optional refinement now lives entirely in C++, inside the `SCM` solver.
+This optional refinement now lives entirely in C++, inside the deterministic
+solver, `DeterministicPatchRunner`.
 `run()` does not refine the schedule by default (`refine_schedule = FALSE`);
 request it from R with:
 
@@ -63,8 +64,9 @@ res <- run(p, refine_schedule = TRUE)
 p_refined <- res$scenario$p
 ```
 
-`run(p, refine_schedule = TRUE)` calls `SCM::refine_schedule()`, which runs the
-solver, collects the per-node integration error as the patch develops, splits
+`run(p, refine_schedule = TRUE)` calls
+`DeterministicPatchRunner::refine_schedule()`, which runs the solver, collects
+the per-node integration error as the patch develops, splits
 the flagged intervals, and repeats. The refined schedule and the ODE times of
 the final run are written back into the parameters the run returns
 (`res$scenario$p`), so the `Parameters` object remains self-describing. (Earlier
@@ -398,14 +400,14 @@ uses the larger error to decide where the schedule needs refinement:
 The `local_error_integration` function calculates the relative error for each
 integral. The solver samples competition error at every node introduction as
 the patch develops, then calculates offspring-production error at the end of
-the run. When error collection is enabled, `SCM::run()` accumulates both values
-internally. For each node, the larger value is held in the patch's
+the run. When error collection is enabled, the solver's `run()` accumulates both
+values internally. For each node, the larger value is held in the patch's
 `refinement_error_by_node`; this is the signal used for refinement:
 
 ```{r}
 #| label: combined-error
 #| fig-cap: "Combined per-node error; nodes above the schedule_eps threshold (red) are split."
-scm <- run(p)$solver         # SCM object
+scm <- run(p)$solver         # DeterministicPatchRunner object
 scm$collect_refinement_errors <- TRUE
 scm$run()                    # rerun, now accumulating the error signal
 
@@ -428,7 +430,7 @@ snapshot. Rows represent introduction steps and columns represent nodes:
 #| label: competition-error-matrix
 #| fig-cap: "Per-step competition (leaf-area) error matrix as the patch develops."
 competition_error_matrix <- function(p, env = NULL, ctrl = Control()) {
-  scm <- run(p, env, ctrl)$solver   # build + run, returns the SCM object
+  scm <- run(p, env, ctrl)$solver   # build + run, returns the solver
   scm$reset()                    # rewind so we can re-run while collecting
   scm$collect <- TRUE
   scm$run()
@@ -446,9 +448,9 @@ image(times_default, times_default, patch_error_lai,
       xlab="Patch age (years)", ylab="Introduction time (years)", las=1)
 ```
 
-`SCM::refine_schedule()` uses this combined error to add nodes only where they
-are needed, reducing both sources of integration error without applying a
-uniformly fine schedule everywhere.
+`DeterministicPatchRunner::refine_schedule()` uses this combined error to add
+nodes only where they are needed, reducing both sources of integration error
+without applying a uniformly fine schedule everywhere.
 
 ```{r}
 #| label: refine-schedule

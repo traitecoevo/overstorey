@@ -4,13 +4,23 @@
 # applied by hand before this marker existed (#44); the keys below are those
 # applied after it. Posts are pinned to the plant they were built with and are
 # not migrated.
-migrated_on: 2026-11-14
+migrated_on: 2026-11-16
 plant_version: 2.0.0.9002
-plant_ref: develop@83a973ff (2026-11-14; odelia 0.11.1 @v0.11.1, phylloptim 0.36.0 @e2c9460)
+plant_ref: develop@0c0e2538 (2026-11-16; odelia 0.11.1 @v0.11.1, phylloptim 0.37.0 @64cbde2, plantpress 0.1.0 @474600e)
 baseline_before_marker: develop@fc1ccc86
 applied_breaking_changes:
   - one-run-verb  # plant#779: run_scm(), grow_individual_to_*() -> run(); scm_base_parameters() -> base_parameters()
   - fitness-from-patch  # plant#781 (#460): an SCM's fitness and refinement errors read from scm$patch
   - fitness-weighting  # plant#781: patch_type -> fitness_weighting; no page set it
+  - deterministic-patch-runner  # plant#793: the class SCM -> DeterministicPatchRunner; pages naming the C++ class, scm.h or SCM:: now name it
+  - offspring-height-tol  # plant#798: offspring_production_tol -> offspring_height_tol, found by TOMS748; characteristic-method.qmd
+  - plotting-in-plantpress  # plant's plot_size_distribution() -> plantpress::plot_size_distribution(); four pages
 # Checked and not affected (no call sites): run_stochastic_collect() (plant#779);
-# the scenario gateway (plant#775).
+# the scenario gateway (plant#775); TF24_K_s_from_whole_stem() (plant#802); the
+# stochastic death checks (plant#790, #795); a_pl0 outside [0, 1] (plant#786).
+# Absorbed by re-rendering, no source change: tidy()'s $control, K93's
+# competition field and expand_state() columns, TF24's soil_psi (plant#800);
+# birth-date establishment (plant#788) and phylloptim 0.37.0 (plant#787) move
+# TF24 numbers on the pages re-rendered here. The C++ headers regrouped into
+# folders (plant#794) and merged source files (plant#797) have no NEWS entry;
+# the contributing pages that listed them are updated.
