@@ -75,10 +75,10 @@ this work in R via the `build_schedule()` and `run_scm_error()` functions; both
 have been removed in favour of the in-solver implementation.)
 
 Most users can use the supplied schedule. The examples below show readers who
-opt in to refinement how the solver chooses its nodes and how that choice affects
-numerical accuracy. Some examples inspect non-exported `plant` internals, which
-is why they use the `plant:::` prefix. Those interfaces are implementation
-details rather than part of the stable user API.
+opt in to refinement how the solver chooses its nodes and how that choice
+affects numerical accuracy. Some examples inspect non-exported `plant`
+internals, which is why they use the `plant:::` prefix. Those interfaces are
+implementation details rather than part of the stable user API.
 
 ## Node introduction times
 
@@ -401,10 +401,9 @@ uses the larger error to decide where the schedule needs refinement:
 The `local_error_integration` function calculates the relative error for each
 integral. The solver samples competition error at every node introduction as
 the patch develops, then calculates offspring-production error at the end of
-the run. When error collection is enabled,
-`DeterministicPatchRunner::run()` accumulates both values
-internally. For each node, the larger value is held in the patch's
-`refinement_error_by_node`; this is the signal used for refinement:
+the run. When error collection is enabled, `DeterministicPatchRunner::run()`
+accumulates both values internally. For each node, the larger value is held in
+the patch's `refinement_error_by_node`; this is the signal used for refinement:
 
 ```{r}
 #| label: combined-error
@@ -432,8 +431,8 @@ snapshot. Rows represent introduction steps and columns represent nodes:
 #| label: competition-error-matrix
 #| fig-cap: "Per-step competition (leaf-area) error matrix as the patch develops."
 competition_error_matrix <- function(p, env = NULL, ctrl = Control()) {
-  solver <- run(p, env, ctrl)$solver   # build + run, returns the runner
-  solver$reset()                       # rewind so we can re-run while collecting
+  solver <- run(p, env, ctrl)$solver  # build + run, returns the runner
+  solver$reset()                      # rewind to re-run while collecting
   solver$collect <- TRUE
   solver$run()
 

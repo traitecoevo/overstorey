@@ -105,8 +105,9 @@ public:
 ### Stepping an entire patch
 
 The model's main solver is `DeterministicPatchRunner` (in
-`solvers/deterministic_patch_runner.h`). It creates an ODE solver for the patch
-type and owns the patch instance containing the species and environment.
+`solvers/deterministic_patch_runner.h`). Through its base class `PatchRunner`
+(in `solvers/patch_runner.h`), it creates an ODE solver for the patch type and
+owns the patch instance containing the species and environment.
 
 ```cpp
 patch_type patch;                        # Instance of patch
@@ -136,8 +137,8 @@ The following function resizes the ODE system after a node is introduced.
 solver.set_state_from_system()
 ```
 
-For this arrangement to work, the patch class (see `patch.h`) supplies the
-essential functions required by the ODE system.
+For this arrangement to work, the patch class (see `community/patch.h`) supplies
+the essential functions required by the ODE system.
 
 ```cpp
 // * ODE interface
@@ -168,7 +169,7 @@ translate it back again.
 Because this is templated C++, `odelia::ode::Solver` can step any "system" that
 provides the required functions. As well as patches, it is used to run an
 individual plant in a given environment. The wrapper class
-`plant::tools::IndividualRunner` (in `individual_runner.h`) manages the
+`plant::tools::IndividualRunner` (in `solvers/individual_runner.h`) manages the
 ownership relationship between the solver and the object it steps.
 
 Like the patch system, `IndividualRunner` is templated on a strategy `T` and an

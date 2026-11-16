@@ -193,13 +193,6 @@ The headers are grouped into folders by role:
 
 The ODE solver, interpolators and splines come from the [odelia](https://github.com/traitecoevo/odelia) package.
 
-RcppR6_post.hpp
-RcppR6_pre.hpp
-RcppR6_support.hpp
-uniroot.h
-util_post_rcpp.h
-util.h
-
 ### Models
 
 The foundation of the `plant` package are sub-models for an individual species' physiology, which `plant` calls models. The `FF16` model is the default model. However, the plant package has been written to enable new models to be added, and then use the same machinery for modelling size-structured population dynamics, we do this by using templating in c++ (see [Templating](#templating)).
