@@ -12,7 +12,7 @@ applied_breaking_changes:
   - one-run-verb  # plant#779: run_scm(), grow_individual_to_*() -> run(); scm_base_parameters() -> base_parameters()
   - fitness-from-patch  # plant#781 (#460): an SCM's fitness and refinement errors read from scm$patch
   - fitness-weighting  # plant#781: patch_type -> fitness_weighting; no page set it
-  - deterministic-patch-runner  # plant#793: the class SCM -> DeterministicPatchRunner; pages naming the C++ class, scm.h or SCM:: now name it
+  - deterministic-patch-runner  # plant#793: the class SCM -> DeterministicPatchRunner, and run_plant_benchmarks()'s scm expression -> run; pages naming the C++ class, scm.h or SCM:: now name it ("the SCM", the method the glossary defines, stays)
   - offspring-height-tol  # plant#798: offspring_production_tol -> offspring_height_tol, found by TOMS748; characteristic-method.qmd
   - plotting-in-plantpress  # plant's plot_size_distribution() -> plantpress::plot_size_distribution(); four pages
 # Checked and not affected (no call sites): run_stochastic_collect() (plant#779);

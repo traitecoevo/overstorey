@@ -66,8 +66,8 @@ p_refined <- res$scenario$p
 
 `run(p, refine_schedule = TRUE)` calls
 `DeterministicPatchRunner::refine_schedule()`, which runs the solver, collects
-the per-node integration error as the patch develops, splits
-the flagged intervals, and repeats. The refined schedule and the ODE times of
+the per-node integration error as the patch develops, splits the flagged
+intervals, and repeats. The refined schedule and the ODE times of
 the final run are written back into the parameters the run returns
 (`res$scenario$p`), so the `Parameters` object remains self-describing. (Earlier
 versions of `plant` did this work in R via the `build_schedule()` and

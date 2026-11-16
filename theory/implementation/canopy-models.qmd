@@ -177,8 +177,8 @@ names(results) <- models
 Each run returns its full collected state (`record = "steps"`, read by
 `tidy()`): a tidy `species` table, with one row for every node at every step,
 and the light environment (`env$light_availability`). We label each `species`
-table with its shading model, then combine the tables so that `plant`'s tidy
-helpers can work across all four runs.
+table with its shading model, then combine the tables so that the tidy helpers
+and figures can work across all four runs.
 
 ```{r}
 #| label: bind-species

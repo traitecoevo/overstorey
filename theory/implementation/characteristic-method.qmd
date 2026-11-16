@@ -232,12 +232,12 @@ Calculating the canopy openness $E_a(z)$ at a given height $z$ in a patch of age
 $a$ requires that we integrate over the size-density distribution (the light
 equation on the [size-structured PDE](../size-structured-pde.qmd) page). This
 integration is performed using the trapezium rule,
-within the function `area_leaf_above` in
+within the function `Species::compute_competition` in
 [species.h](https://github.com/traitecoevo/plant/blob/develop/inst/include/plant/community/species.h).
 Node spacing is the main factor controlling the accuracy of this integration.
 The node introduction times determining the spacing of nodes are
 adaptively refined as described above. This implies that also the trapezium
-integration within the `area_leaf_above` function is adaptively refined via
+integration within `compute_competition` is adaptively refined via
 `DeterministicPatchRunner::refine_schedule()` (exposed in R as
 `run(p, refine_schedule = TRUE)`).
 See [node spacing](node-spacing.qmd) for detail.
@@ -266,8 +266,7 @@ absolute difference in these values is compared to the spline tolerance
 the light spline configured on the *environment* (e.g. `FF16_Environment`), not a
 field of the `Control` object. If the error is greater than this tolerance,
 the interval is bisected and the process repeated, up to
-`light_availability_spline_max_depth` (16 by default) levels (see
-odelia's
+`light_availability_spline_max_depth` (16 by default) levels (see odelia's
 [spline.hpp](https://github.com/traitecoevo/odelia/blob/master/inst/include/odelia/spline.hpp)
 for details).
 
