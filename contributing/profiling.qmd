@@ -15,9 +15,9 @@ The code is awkward to profile because the hot C++ is called from R. Traditional
 R profilers see almost nothing useful: they stop at the `.Call` boundary and
 cannot look into the compiled code. In a typical FF16 run, `Rprof` attributes
 roughly 97–99% of the time to a single native entry point
-(`DeterministicPatchRunner::run` or
-`DeterministicPatchRunner::refine_schedule`). The useful detail comes from a
-*native* sampler.
+(`DeterministicPatchRunner::run` or `DeterministicPatchRunner::refine_schedule`;
+`SCM::run` in profiles taken before plant renamed the class). The useful detail
+comes from a *native* sampler.
 
 # The approach
 

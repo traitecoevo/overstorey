@@ -105,9 +105,10 @@ public:
 ### Stepping an entire patch
 
 The model's main solver is `DeterministicPatchRunner` (in
-`solvers/deterministic_patch_runner.h`). Through its base class `PatchRunner`
-(in `solvers/patch_runner.h`), it creates an ODE solver for the patch type and
-owns the patch instance containing the species and environment.
+`solvers/deterministic_patch_runner.h`). Its base, `PatchRunner` (in
+`solvers/patch_runner.h`), which it shares with the stochastic solver, creates
+an ODE solver for the patch type and owns the patch instance containing the
+species and environment.
 
 ```cpp
 patch_type patch;                        # Instance of patch
@@ -137,27 +138,24 @@ The following function resizes the ODE system after a node is introduced.
 solver.set_state_from_system()
 ```
 
-For this arrangement to work, the patch class (see `community/patch.h`) supplies
-the essential functions required by the ODE system.
+For this arrangement to work, the patch supplies the essential functions
+required by the ODE system. They are defined in `PatchSystem` (see
+`community/patch_system.h`), the base the deterministic and stochastic patches
+share. In outline:
 
 ```cpp
 // * ODE interface
-// Caluclate size of ode system (number of equations).
+// Size of the ODE system (number of equations)
 size_t ode_size() const;
-// How many auxiallary variables are we tracking. These are being collected but
-// are not part of core ode system
-size_t aux_size() const;
 double ode_time() const;
 
-// Retrieve ode state from patch and save into the ode solver
-ode::iterator ode_state(ode::iterator it) const;
-// Retrieve ode rates from patch and save into the ode solver
-ode::iterator ode_rates(ode::iterator it) const;
-// Retrieve auxillary variables and save into the ode solver
-ode::iterator ode_aux(ode::iterator it) const;
+// Copy the patch's state into the solver's vector
+template <typename It> It ode_state(It it) const;
+// Copy the patch's rates into the solver's vector
+template <typename It> It ode_rates(It it);
 
-// Set state of patch, based on estimate of future state estimated by the solver
-ode::const_iterator set_ode_state(ode::const_iterator it, double time);
+// Set the patch's state from the solver's estimate of its future state
+template <typename It> It set_ode_state(It it, double time);
 ```
 
 The iterators are important here: they translate the state held in a complicated

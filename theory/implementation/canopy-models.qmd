@@ -143,6 +143,7 @@ choice has no per-call cost. `TF24` supports `"deep-crown"`, `"mean-light"`
 #| label: libraries
 #| message: false
 library(plant)
+library(plantpress)
 library(dplyr)
 library(ggplot2)
 library(patchwork)
@@ -176,8 +177,8 @@ names(results) <- models
 Each run returns its full collected state (`record = "steps"`, read by
 `tidy()`): a tidy `species` table, with one row for every node at every step,
 and the light environment (`env$light_availability`). We label each `species`
-table with its shading model, then combine the tables so that `plant`'s tidy
-helpers can work across all four runs.
+table with its shading model, then combine the tables so that the tidy helpers
+and figures can work across all four runs.
 
 ```{r}
 #| label: bind-species
@@ -201,9 +202,10 @@ its size distribution, leaf area index, and vertical light profile.
 
 The size distribution consists of node height trajectories. Each line follows a
 node introduced at a particular patch age; line opacity is scaled by node
-density, so sparse nodes appear faint. `plant`'s `plot_size_distribution()`
-builds this view directly from the tidy `species` table, and facets by `method`
-make the shading models easy to compare.
+density, so sparse nodes appear faint. `plot_size_distribution()`, from the
+[`plantpress`](https://github.com/traitecoevo/plantpress) package, builds this
+view directly from the tidy `species` table, and facets by `method` make the
+shading models easy to compare.
 
 ```{r}
 #| label: fig-sizedist

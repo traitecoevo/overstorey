@@ -21,6 +21,7 @@ needing a special run argument.
 ```{r}
 #| label: setup
 library(plant)
+library(plantpress)
 library(dplyr)
 library(tidyr)
 library(ggplot2)

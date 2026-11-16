@@ -180,16 +180,17 @@ Templating Resources:
 
 The main c++ header files (i.e. \*.h) are stored within the directory `inst/include/plant/`. In many cases, the implementations is written directly into the header files. Otherwise, the corresponding source file (i.e. \*.cpp) is stored within the folder `src`.
 
-The headers are grouped into folders by role:
+`inst/include/plant.h` includes them all. The headers are grouped in folders by role:
 
-- `numerics/` — quadrature (`qag.h`, `qk.h` and their rules), root-finding (`uniroot.h`), finite differences (`gradient.h`), the value-and-slope pair (`with_slope.h`) and the floating-point settings (`fp_contract.h`).
-- `models/` — the model interface (`model.h`), the environment base (`environment.h`), what the models share (crown shape, the light-profile spline, parameter tables, extrinsic drivers, the leaf and stem hydraulics), and every concrete model and its environment (`ff16_model.h`, `tf24_model.h`, ...).
-- `community/` — the size-structured layers, for both solvers: `individual.h`, `node.h`, `species.h` and `patch.h`, their stochastic counterparts (`stochastic_node.h`, `stochastic_species.h`, `stochastic_patch.h`), and the bases they share (`species_base.h`, `patch_system.h`).
-- `solvers/` — the runners (`deterministic_patch_runner.h`, `stochastic_patch_runner.h`, their shared base `patch_runner.h`, and `individual_runner.h`), the schedule and the events.
-- `disturbances/` — the patch-age regimes and the fitness window.
-- `gradients/` — the stand census and its reverse-mode helpers.
-
-`util.h`, `control.h` and `parameters.h` stay at the top of `inst/include/plant/`, beside the headers RcppR6 generates, and `inst/include/plant.h` includes them all.
+| Folder | Holds |
+|---|---|
+| `models/` | each model's physiology and environment (`ff16_model.h`, `ff16_environment.h`, `k93_model.h`, `tf24_model.h` and its variants), and what models share: canopy shape, extrinsic drivers, the resource spline |
+| `community/` | the individual (`individual.h`), the node, species and patch built from it, and their stochastic counterparts (`stochastic_node.h`, `stochastic_species.h`, `stochastic_patch.h`) |
+| `solvers/` | what runs a patch or an individual through time: `deterministic_patch_runner.h` (the deterministic solver, formerly `SCM`), `stochastic_patch_runner.h`, their shared base `patch_runner.h`, `individual_runner.h`, the node schedule (`schedule.h`, `schedule_utils.h`) and events (`events.h`) |
+| `disturbances/` | disturbance regimes and the fitness window |
+| `gradients/` | the census and the exact gradients of a stand |
+| `numerics/` | quadrature (`qag.h`, `qk.h` and their rules), root-finding (`uniroot.h`), and gradient helpers |
+| (top level) | `parameters.h`, `control.h`, `util.h`, and the RcppR6 support headers |
 
 The ODE solver, interpolators and splines come from the [odelia](https://github.com/traitecoevo/odelia) package.
 
@@ -206,7 +207,7 @@ As a naming convention, models are named using two initials (eg. the first two a
 Let's assume you want to add a new model called `XX99`. `plant` has no generator for a new model: every templated binding and every R dispatch table names each model by hand, and the checklist of what to change is the `plant-new-model` skill in `plant`'s `.claude/skills/`. Most new models are a variant of an existing model, written as a subclass of it (as `TF24f`, `TF24t` and `TF24w` are of `TF24`). The main new files are:
 
 * `inst/include/plant/models/xx99_model.h` (C++ header describing the model, with its methods defined inline)
-* `src/xx99_node.cpp` (the schedule exports for the new model's `Parameters`)
+* a block for the new model in `src/model_exports.cpp` (the schedule exports for its `Parameters`, and its arm of `strategy_scientific_version()`)
 * `R/xx99.R` (R constructors for the new model's individual and parameters, and its `expand_state` function)
 * `tests/testthat/test-model-xx99.R` (Tests of the new model)
 
