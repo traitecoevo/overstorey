@@ -23,6 +23,7 @@ models, and shows the parameter that controls tracking speed.
 ```{r}
 #| label: setup
 library(plant)
+library(plantpress)
 library(dplyr)
 library(tidyr)
 library(ggplot2)

@@ -14,8 +14,10 @@ profiling pass without being misled.
 The code is awkward to profile because the hot C++ is called from R. Traditional
 R profilers see almost nothing useful: they stop at the `.Call` boundary and
 cannot look into the compiled code. In a typical FF16 run, `Rprof` attributes
-roughly 97–99% of the time to a single native entry point (`SCM::run` or
-`SCM::refine_schedule`). The useful detail comes from a *native* sampler.
+roughly 97–99% of the time to a single native entry point
+(`DeterministicPatchRunner::run` or `DeterministicPatchRunner::refine_schedule`;
+`SCM::run` in profiles taken before plant renamed the class). The useful detail
+comes from a *native* sampler.
 
 # The approach
 
@@ -88,7 +90,7 @@ timestamped directory so runs are comparable.
 `run_plant_benchmarks()` in [`R/benchmark.R`](https://github.com/traitecoevo/plant/blob/develop/R/benchmark.R)
 defines the cases everything else builds on:
 
-- **`scm`** — `run()` on a one-species FF16 patch. Exercises the steady
+- **`run`** — `run()` on a one-species FF16 patch. Exercises the steady
   per-step solve.
 - **`build_schedule`** — `run(..., refine_schedule = TRUE)`. Exercises
   adaptive node-schedule refinement, which calls the assimilation quadrature far
@@ -98,7 +100,7 @@ Both run the same dominant native path, so an optimisation that helps one usuall
 helps the other:
 
 ```
-SCM::run → run_next → ode::Solver::step → derivs → Patch::compute_rates
+DeterministicPatchRunner::run → run_next → ode::Solver::step → derivs → Patch::compute_rates
   → Species::compute_rates → Node::compute_rates → growth_rate_gradient
   → Individual::growth_rate_given_height → FF16_Model::compute_rates
   → net_mass_production_dt → assimilation

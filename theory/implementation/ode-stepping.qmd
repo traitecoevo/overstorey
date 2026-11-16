@@ -86,10 +86,10 @@ built into the model, with some details ported from the
 The main interface is `odelia::ode::Solver`. It was extracted from `plant` into
 the standalone `odelia` library, so it no longer lives under
 `inst/include/plant/`; `plant` includes it with
-`#include <odelia/ode_solver.hpp>` (see `scm.h`). The class is parameterised by
-a template `System`, allowing any class that provides the required interface to
-be treated as an ODE system. This is the same broad C++ idea that allows a
-vector to hold a chosen data type.
+`#include <odelia/ode_solver.hpp>` (see `solvers/patch_runner.h`). The class is
+parameterised by a template `System`, allowing any class that provides the
+required interface to be treated as an ODE system. This is the same broad C++
+idea that allows a vector to hold a chosen data type.
 
 From odelia's `ode_solver.hpp`:
 
@@ -104,8 +104,11 @@ public:
 
 ### Stepping an entire patch
 
-The model's main solver is `SCM` (in `scm.h`). It creates an ODE solver for the
-patch type and owns the patch instance containing the species and environment.
+The model's main solver is `DeterministicPatchRunner` (in
+`solvers/deterministic_patch_runner.h`). Its base, `PatchRunner` (in
+`solvers/patch_runner.h`), which it shares with the stochastic solver, creates
+an ODE solver for the patch type and owns the patch instance containing the
+species and environment.
 
 ```cpp
 patch_type patch;                        # Instance of patch
@@ -135,27 +138,24 @@ The following function resizes the ODE system after a node is introduced.
 solver.set_state_from_system()
 ```
 
-For this arrangement to work, the patch class (see `patch.h`) supplies the
-essential functions required by the ODE system.
+For this arrangement to work, the patch supplies the essential functions
+required by the ODE system. They are defined in `PatchSystem` (see
+`community/patch_system.h`), the base the deterministic and stochastic patches
+share. In outline:
 
 ```cpp
 // * ODE interface
-// Caluclate size of ode system (number of equations).
+// Size of the ODE system (number of equations)
 size_t ode_size() const;
-// How many auxiallary variables are we tracking. These are being collected but
-// are not part of core ode system
-size_t aux_size() const;
 double ode_time() const;
 
-// Retrieve ode state from patch and save into the ode solver
-ode::iterator ode_state(ode::iterator it) const;
-// Retrieve ode rates from patch and save into the ode solver
-ode::iterator ode_rates(ode::iterator it) const;
-// Retrieve auxillary variables and save into the ode solver
-ode::iterator ode_aux(ode::iterator it) const;
+// Copy the patch's state into the solver's vector
+template <typename It> It ode_state(It it) const;
+// Copy the patch's rates into the solver's vector
+template <typename It> It ode_rates(It it);
 
-// Set state of patch, based on estimate of future state estimated by the solver
-ode::const_iterator set_ode_state(ode::const_iterator it, double time);
+// Set the patch's state from the solver's estimate of its future state
+template <typename It> It set_ode_state(It it, double time);
 ```
 
 The iterators are important here: they translate the state held in a complicated
@@ -167,7 +167,7 @@ translate it back again.
 Because this is templated C++, `odelia::ode::Solver` can step any "system" that
 provides the required functions. As well as patches, it is used to run an
 individual plant in a given environment. The wrapper class
-`plant::tools::IndividualRunner` (in `individual_runner.h`) manages the
+`plant::tools::IndividualRunner` (in `solvers/individual_runner.h`) manages the
 ownership relationship between the solver and the object it steps.
 
 Like the patch system, `IndividualRunner` is templated on a strategy `T` and an
