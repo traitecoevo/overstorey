@@ -38,13 +38,13 @@ export the state part-way through:
 
 ```{r}
 #| label: run-and-export
-scm <- run(p, until = 0)$solver
-scm$collect <- TRUE
-scm$run()
+solver <- run(p, until = 0)$solver
+solver$collect <- TRUE
+solver$run()
 
 # export the patch about half-way through the run
-k <- floor(length(scm$history) / 2)
-state <- export_patch_state(scm, step = k)
+k <- floor(length(solver$history) / 2)
+state <- export_patch_state(solver, step = k)
 ```
 
 `export_patch_state()` saves both the plants and the information the solver
@@ -69,7 +69,7 @@ fitness agrees to a few parts in $10^5$ rather than bit-for-bit:
 
 ```{r}
 #| label: compare-fitness
-c(original = scm$patch$net_reproduction_ratios,
+c(original = solver$patch$net_reproduction_ratios,
   resumed  = resumed$net_reproduction_ratios)
 ```
 
