@@ -12,5 +12,6 @@ applied_breaking_changes:
   - one-run-verb  # plant#779: run_scm(), grow_individual_to_*() -> run(); scm_base_parameters() -> base_parameters()
   - fitness-from-patch  # plant#781 (#460): an SCM's fitness and refinement errors read from scm$patch
   - fitness-weighting  # plant#781: patch_type -> fitness_weighting; no page set it
+  - deterministic-patch-runner  # plant#793: SCM -> DeterministicPatchRunner, scm argument -> x; plant#794 header folders. Prose and local names only; the pages' code runs on either side of the rename, so they stay rendered at plant_ref above
 # Checked and not affected (no call sites): run_stochastic_collect() (plant#779);
 # the scenario gateway (plant#775).

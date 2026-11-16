@@ -51,7 +51,7 @@ stand_results <- run(p1, control = ctrl, refine_schedule = TRUE)$scenario$p
 # refines the node-introduction schedule where the estimated error is largest
 
 out <- tidy(run(stand_results, control = ctrl, record = "steps"))
-# run the SCM model
+# run the deterministic solver
 ```
 
 

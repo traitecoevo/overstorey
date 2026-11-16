@@ -33,12 +33,13 @@ The rest of this page makes this precise.
 
 ## Background
 
-As explained on [The size-structured PDE](../size-structured-pde.qmd), the SCM
-replaces a continuous size distribution with discrete nodes. Integrals over the
-size distribution are therefore approximations, and their accuracy depends on
-how closely those nodes are spaced. An ordinary run uses its supplied schedule.
-You can opt in to adaptive refinement when you need a chosen accuracy without
-adding nodes that contribute little useful information.
+As explained on [The size-structured PDE](../size-structured-pde.qmd), the
+deterministic solver replaces a continuous size distribution with discrete
+nodes. Integrals over the size distribution are therefore approximations, and
+their accuracy depends on how closely those nodes are spaced. An ordinary run
+uses its supplied schedule. You can opt in to adaptive refinement when you need
+a chosen accuracy without adding nodes that contribute little useful
+information.
 
 The algorithm begins with a schedule of node introduction times. For each node,
 it asks a practical question: if this node were removed, would either of two
@@ -54,7 +55,8 @@ nodes. The test is deliberately conservative: it measures the error caused by
 error in the final, refined schedule will therefore usually be below the stated
 tolerance.
 
-This optional refinement now lives entirely in C++, inside the `SCM` solver.
+This optional refinement now lives entirely in C++, inside
+`DeterministicPatchRunner`.
 `run()` does not refine the schedule by default (`refine_schedule = FALSE`);
 request it from R with:
 
@@ -63,17 +65,17 @@ res <- run(p, refine_schedule = TRUE)
 p_refined <- res$scenario$p
 ```
 
-`run(p, refine_schedule = TRUE)` calls `SCM::refine_schedule()`, which runs the
-solver, collects the per-node integration error as the patch develops, splits
-the flagged intervals, and repeats. The refined schedule and the ODE times of
-the final run are written back into the parameters the run returns
-(`res$scenario$p`), so the `Parameters` object remains self-describing. (Earlier
-versions of `plant` did this work in R via the `build_schedule()` and
-`run_scm_error()` functions; both have been removed in favour of the in-solver
-implementation.)
+`run(p, refine_schedule = TRUE)` calls
+`DeterministicPatchRunner::refine_schedule()`, which runs the solver, collects
+the per-node integration error as the patch develops, splits the flagged
+intervals, and repeats. The refined schedule and the ODE times of the final run
+are written back into the parameters the run returns (`res$scenario$p`), so the
+`Parameters` object remains self-describing. (Earlier versions of `plant` did
+this work in R via the `build_schedule()` and `run_scm_error()` functions; both
+have been removed in favour of the in-solver implementation.)
 
 Most users can use the supplied schedule. The examples below show readers who
-opt in to refinement how the SCM chooses its nodes and how that choice affects
+opt in to refinement how the solver chooses its nodes and how that choice affects
 numerical accuracy. Some examples inspect non-exported `plant` internals, which
 is why they use the `plant:::` prefix. Those interfaces are implementation
 details rather than part of the stable user API.
@@ -255,8 +257,9 @@ the overall patch output on a logarithmic scale.
 
 The ODE accumulates lifetime offspring production separately for each node and
 exposes it through the species' `net_reproduction_ratio_by_node`. This value is
-the node's unweighted contribution. When the SCM calculates overall fitness, it
-also weights contributions by patch-age density and survival during dispersal.
+the node's unweighted contribution. When the solver calculates overall fitness,
+it also weights contributions by patch-age density and survival during
+dispersal.
 
 This chunk depends on `times_interpolated`, `top_5` and
 `offspring_production_differences` produced by the parallel chunks above, so it
@@ -386,7 +389,7 @@ offspring production.
 <!-- TODO(#481): find more general terms for 'leaf-area error' -->
 
 The exploratory comparisons above show why node placement matters. During a
-normal run, the SCM does not repeat all of those comparisons. Instead, it
+normal run, the solver does not repeat all of those comparisons. Instead, it
 monitors the accuracy of two integrals over the size-density distribution and
 uses the larger error to decide where the schedule needs refinement:
 
@@ -398,18 +401,19 @@ uses the larger error to decide where the schedule needs refinement:
 The `local_error_integration` function calculates the relative error for each
 integral. The solver samples competition error at every node introduction as
 the patch develops, then calculates offspring-production error at the end of
-the run. When error collection is enabled, `SCM::run()` accumulates both values
+the run. When error collection is enabled,
+`DeterministicPatchRunner::run()` accumulates both values
 internally. For each node, the larger value is held in the patch's
 `refinement_error_by_node`; this is the signal used for refinement:
 
 ```{r}
 #| label: combined-error
 #| fig-cap: "Combined per-node error; nodes above the schedule_eps threshold (red) are split."
-scm <- run(p)$solver         # SCM object
-scm$collect_refinement_errors <- TRUE
-scm$run()                    # rerun, now accumulating the error signal
+solver <- run(p)$solver      # a DeterministicPatchRunner
+solver$collect_refinement_errors <- TRUE
+solver$run()                 # rerun, now accumulating the error signal
 
-combined <- scm$patch$refinement_error_by_node[[1]]
+combined <- solver$patch$refinement_error_by_node[[1]]
 
 plot(times_default, combined, type = "h",
      xlab = "Introduction time (years)", ylab = "Combined per-node error", las = 1)
@@ -428,14 +432,14 @@ snapshot. Rows represent introduction steps and columns represent nodes:
 #| label: competition-error-matrix
 #| fig-cap: "Per-step competition (leaf-area) error matrix as the patch develops."
 competition_error_matrix <- function(p, env = NULL, ctrl = Control()) {
-  scm <- run(p, env, ctrl)$solver   # build + run, returns the SCM object
-  scm$reset()                    # rewind so we can re-run while collecting
-  scm$collect <- TRUE
-  scm$run()
+  solver <- run(p, env, ctrl)$solver   # build + run, returns the runner
+  solver$reset()                       # rewind so we can re-run while collecting
+  solver$collect <- TRUE
+  solver$run()
 
   ## history[[1]] is the initial (empty) patch; the rest are the state after
   ## each introduction. Recompute species 1's per-node competition error.
-  rows <- lapply(scm$history[-1], function(h)
+  rows <- lapply(solver$history[-1], function(h)
     h$species[[1]]$compute_competition_effect_by_nodes_error(h$compute_competition(0)))
   ncol <- max(lengths(rows))
   do.call(rbind, lapply(rows, function(r) c(r, rep(NA, ncol - length(r)))))
@@ -446,9 +450,9 @@ image(times_default, times_default, patch_error_lai,
       xlab="Patch age (years)", ylab="Introduction time (years)", las=1)
 ```
 
-`SCM::refine_schedule()` uses this combined error to add nodes only where they
-are needed, reducing both sources of integration error without applying a
-uniformly fine schedule everywhere.
+`DeterministicPatchRunner::refine_schedule()` uses this combined error to add
+nodes only where they are needed, reducing both sources of integration error
+without applying a uniformly fine schedule everywhere.
 
 ```{r}
 #| label: refine-schedule

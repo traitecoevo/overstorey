@@ -180,44 +180,16 @@ Templating Resources:
 
 The main c++ header files (i.e. \*.h) are stored within the directory `inst/include/plant/`. In many cases, the implementations is written directly into the header files. Otherwise, the corresponding source file (i.e. \*.cpp) is stored within the folder `src`.
 
-The role of these different files is as follows.
+The headers are grouped into folders by role:
 
-models: models/ff16_model.h
+- `numerics/` — quadrature (`qag.h`, `qk.h` and their rules), root-finding (`uniroot.h`), finite differences (`gradient.h`), the value-and-slope pair (`with_slope.h`) and the floating-point settings (`fp_contract.h`).
+- `models/` — the model interface (`model.h`), the environment base (`environment.h`), what the models share (crown shape, the light-profile spline, parameter tables, extrinsic drivers, the leaf and stem hydraulics), and every concrete model and its environment (`ff16_model.h`, `tf24_model.h`, ...).
+- `community/` — the size-structured layers, for both solvers: `individual.h`, `node.h`, `species.h` and `patch.h`, their stochastic counterparts (`stochastic_node.h`, `stochastic_species.h`, `stochastic_patch.h`), and the bases they share (`species_base.h`, `patch_system.h`).
+- `solvers/` — the runners (`deterministic_patch_runner.h`, `stochastic_patch_runner.h`, their shared base `patch_runner.h`, and `individual_runner.h`), the schedule and the events.
+- `disturbances/` — the patch-age regimes and the fitness window.
+- `gradients/` — the stand census and its reverse-mode helpers.
 
-plant.h
-
-node.h
-
-species.h
-
-patch.h
-
-SCM.h
-
-Helpers:
-
-- parameters.h
-- schedule.h
-- control.h
-- disturbance.h
-- environment.h
-
-plant_runner.h
-individual_tools.h
-scm_utils.h
-
-stochastic_patch_runner.h
-stochastic_patch.h
-stochastic_species.h
-stochastic_utils.h
-
-#### Utilities
-
-gradient.h
-qag_internals.h
-qag.h
-qk_rules.h
-qk.h
+`util.h`, `control.h` and `parameters.h` stay at the top of `inst/include/plant/`, beside the headers RcppR6 generates, and `inst/include/plant.h` includes them all.
 
 The ODE solver, interpolators and splines come from the [odelia](https://github.com/traitecoevo/odelia) package.
 

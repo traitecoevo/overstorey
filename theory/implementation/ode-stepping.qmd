@@ -86,10 +86,10 @@ built into the model, with some details ported from the
 The main interface is `odelia::ode::Solver`. It was extracted from `plant` into
 the standalone `odelia` library, so it no longer lives under
 `inst/include/plant/`; `plant` includes it with
-`#include <odelia/ode_solver.hpp>` (see `scm.h`). The class is parameterised by
-a template `System`, allowing any class that provides the required interface to
-be treated as an ODE system. This is the same broad C++ idea that allows a
-vector to hold a chosen data type.
+`#include <odelia/ode_solver.hpp>` (see `solvers/patch_runner.h`). The class is
+parameterised by a template `System`, allowing any class that provides the
+required interface to be treated as an ODE system. This is the same broad C++
+idea that allows a vector to hold a chosen data type.
 
 From odelia's `ode_solver.hpp`:
 
@@ -104,8 +104,9 @@ public:
 
 ### Stepping an entire patch
 
-The model's main solver is `SCM` (in `scm.h`). It creates an ODE solver for the
-patch type and owns the patch instance containing the species and environment.
+The model's main solver is `DeterministicPatchRunner` (in
+`solvers/deterministic_patch_runner.h`). It creates an ODE solver for the patch
+type and owns the patch instance containing the species and environment.
 
 ```cpp
 patch_type patch;                        # Instance of patch

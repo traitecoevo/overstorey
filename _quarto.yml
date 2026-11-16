@@ -12,8 +12,9 @@ project:
 # Only re-execute a .qmd when it (or its deps) change. Essential given
 # plant's run times. Commit _freeze/ so CI never re-runs everything.
 #
-# Do NOT enable knitr `cache: true` here. plant's objects (Parameters, SCM,
-# Environment, ...) are Rcpp/R6 wrappers around external C++ pointers, which do
+# Do NOT enable knitr `cache: true` here. plant's objects (Parameters,
+# DeterministicPatchRunner, Environment, ...) are Rcpp/R6 wrappers around
+# external C++ pointers, which do
 # not survive knitr's per-chunk serialize/lazy-load. A cached upstream object
 # reloads with a dangling pointer, so e.g. `run(p)` silently fails ("All
 # events completed"). File-level `freeze` already gives us the caching we need.

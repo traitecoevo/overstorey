@@ -90,10 +90,14 @@ holds one species' strategy.
     Refining the schedule improves numerical accuracy; it does not change birth
     rates.
 
-[SCM]{#scm}
+[DeterministicPatchRunner]{#deterministic-patch-runner}
 :   The deterministic solver that integrates a patch's size distributions along
     characteristics, run with `run()`. `plant` also has a stochastic,
-    finite-population solver that tracks individuals.
+    finite-population solver that tracks individuals, `StochasticPatchRunner`.
+
+[SCM]{#scm}
+:   The deterministic solver's name until November 2026, now
+    [DeterministicPatchRunner](#deterministic-patch-runner). Older posts use it.
 
 ## Patches and the landscape
 
@@ -253,8 +257,8 @@ holds one species' strategy.
 [Solver]{#solver}
 :   The code that drives a stepper across an interval, choosing each step size
     to keep the error within tolerance and stopping at the times requested.
-    `plant` uses `odelia::ode::Solver`; the SCM wraps it, introducing nodes and
-    updating the competitive environment between steps.
+    `plant` uses `odelia::ode::Solver`; each patch runner wraps it, introducing
+    nodes and updating the competitive environment between steps.
 
 [RK45]{#rk45}
 :   The Cash–Karp Runge–Kutta 4(5) stepper, `plant`'s default. It is explicit
