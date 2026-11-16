@@ -236,6 +236,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../theory/models/tf24t-thermal-damage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24t: thermal damage</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Soil water &amp; root uptake</span></a>
   </div>
@@ -401,12 +407,13 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <p>A <em>strategy</em> tells <code>plant</code> how an individual tree behaves. Given the tree’s size and environment, the strategy calculates its current rates of growth, seed production, and mortality. The <a href="../../theory/size-structured-pde.html">size-structured PDE</a> then uses those rates to describe how the population changes through time.</p>
 <p>This separation is useful: the population-level machinery stays the same, while the biological assumptions can change. Choosing a different strategy therefore changes the biology without changing the population framework.</p>
-<p>Four strategies are documented here:</p>
+<p>Five models are documented here:</p>
 <ul>
 <li><strong><a href="../../theory/models/ff16.html">FF16</a></strong> — the default trait-based model (Falster <em>et al.</em> 2016). It calculates growth using leaf photosynthesis and a functional-balance allocation scheme. Four traits—leaf mass per area (LMA), wood density, seed mass, and maximum height—are commonly used to configure linked parts of the strategy.</li>
 <li><strong><a href="../../theory/models/k93.html">K93</a></strong> — Kohyama’s 1993 model, where growth, fecundity, and mortality depend directly on stem diameter and stand basal area. It is a compact example of a strategy that does not model the underlying plant physiology.</li>
 <li><strong><a href="../../theory/models/tf24.html">TF24</a></strong> — builds on FF16 by adding explicit plant hydraulics and stomatal optimisation. The model chooses stomatal conductance to maximise carbon gain after accounting for the hydraulic cost of transpiration.</li>
 <li><strong><a href="../../theory/models/tf24.html">TF24f</a></strong> — uses the same physiology as TF24, but allows the plant’s hydraulic operating point to adjust gradually when the environment changes. It is documented alongside TF24.</li>
+<li><strong><a href="../../theory/models/tf24t-thermal-damage.html">TF24t</a></strong> — TF24 with a leaf energy balance and lasting heat damage, repair and acclimation on the leaf.</li>
 </ul>
 <p>If you are new to these models, start with FF16. It introduces the shared growth and allocation framework. TF24 then shows how explicit photosynthesis and hydraulics extend that framework, while K93 provides a useful contrast.</p>
 <p>When saving or comparing simulation results, also read <a href="../../theory/models/scientific-versioning.html">Scientific versioning of models</a>. It explains how to tell a change in the model’s science from a change only to the software.</p>

@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Overstorey – TF24t: thermal damage and four strategies</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../guides/tf24-stand-gradients.html" rel="next">
+<link href="../guides/tf24-flexible-allometry.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../assets/extras.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../assets/leaf-mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../assets/leaf-mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Overstorey</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../guides/index.html" aria-current="page"> 
+<span class="menu-text">Guides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../theory/index.html"> 
+<span class="menu-text">Theory</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts/index.html"> 
+<span class="menu-text">Adaptively</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts/reproductions.html"> 
+<span class="menu-text">Reproductions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../glossary.html"> 
+<span class="menu-text">Glossary</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://traitecoevo.github.io/plant/reference/" target="_blank"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../develop.html"> 
+<span class="menu-text">Pipeline</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant" target="_blank"> <i class="bi bi-github" role="img" aria-label="plant source on GitHub">
+</i> 
+<span class="menu-text">plant source</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+            <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guides/tf24-hydraulics-and-acclimation.html">TF24 in depth</a></li><li class="breadcrumb-item"><a href="../guides/tf24t-thermal-damage.html">TF24t: thermal damage and four strategies</a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Guides</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Getting started</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Install</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/first-individual.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Your first individual</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Running the model</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/patch-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patch dynamics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/initialising-a-patch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Initialising a patch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/strategies.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Strategies &amp; traits</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/extrinsic-drivers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extrinsic drivers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/calibration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Calibration</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">Worked examples</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/example-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Example analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/self-thinning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Self-thinning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/emergent-properties.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Emergent properties</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">Scaling up</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/running-in-parallel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Running sweeps in parallel</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">TF24 in depth</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-hydraulics-and-acclimation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: hydraulics, and a fast acclimating variant</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-nsc-storage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: carbohydrate storage, buffered growth and mortality</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-penman-monteith.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: leaf energy balance, Fick vs Penman–Monteith</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-flexible-allometry.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: a canopy that thins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24t-thermal-damage.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">TF24t: thermal damage and four strategies</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-stand-gradients.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: stand gradients from one reverse sweep</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-impairment-rate-k_imptleaf-and-the-impairment-it-drives" id="toc-the-impairment-rate-k_imptleaf-and-the-impairment-it-drives" class="nav-link active" data-scroll-target="#the-impairment-rate-k_imptleaf-and-the-impairment-it-drives">1. The impairment rate <code>k_imp(Tleaf)</code> and the impairment it drives</a></li>
+  <li><a href="#four-thermal-response-strategies-move-the-impairment-differently" id="toc-four-thermal-response-strategies-move-the-impairment-differently" class="nav-link" data-scroll-target="#four-thermal-response-strategies-move-the-impairment-differently">2. Four thermal-response strategies move the impairment differently</a></li>
+  <li><a href="#who-keeps-carbon-where-assimilation-across-a-heat-gradient" id="toc-who-keeps-carbon-where-assimilation-across-a-heat-gradient" class="nav-link" data-scroll-target="#who-keeps-carbon-where-assimilation-across-a-heat-gradient">3. Who keeps carbon where? Assimilation across a heat gradient</a></li>
+  <li><a href="#avoidance-transpirational-cooling-as-the-fourth-axis" id="toc-avoidance-transpirational-cooling-as-the-fourth-axis" class="nav-link" data-scroll-target="#avoidance-transpirational-cooling-as-the-fourth-axis">4. Avoidance: transpirational cooling as the fourth axis</a></li>
+  <li><a href="#from-one-leaf-to-a-community-persistence-under-warming-scm" id="toc-from-one-leaf-to-a-community-persistence-under-warming-scm" class="nav-link" data-scroll-target="#from-one-leaf-to-a-community-persistence-under-warming-scm">5. From one leaf to a community: persistence under warming (SCM)</a></li>
+  <li><a href="#which-thermal-strategy-persists-hottest-scm-tournament" id="toc-which-thermal-strategy-persists-hottest-scm-tournament" class="nav-link" data-scroll-target="#which-thermal-strategy-persists-hottest-scm-tournament">6. Which thermal strategy persists hottest? (SCM tournament)</a></li>
+  <li><a href="#memory-the-running-mean-leaf-temperature" id="toc-memory-the-running-mean-leaf-temperature" class="nav-link" data-scroll-target="#memory-the-running-mean-leaf-temperature">7. Memory: the running-mean leaf temperature</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">8. Summary</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/guides/tf24t-thermal-damage.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guides/tf24-hydraulics-and-acclimation.html">TF24 in depth</a></li><li class="breadcrumb-item"><a href="../guides/tf24t-thermal-damage.html">TF24t: thermal damage and four strategies</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">TF24t: thermal damage and four strategies</h1>
+<p class="subtitle lead">The leaf-level thermal response (ATLS), from one leaf to a stand</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="eyebrow">
+<p>guide</p>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plant)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Shared driving code, installed with plant and exercised by its</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># tests/testthat/test-atls-leaf-demo.R, so this page cannot silently rot.</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">system.file</span>(<span class="st">"guide-helpers"</span>, <span class="st">"atls_demo_helpers.R"</span>, <span class="at">package =</span> <span class="st">"plant"</span>, <span class="at">mustWork =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">12</span>))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># One colour per strategy archetype, reused across the document.</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>strat_pal <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Generalist"</span> <span class="ot">=</span> <span class="st">"#7570b3"</span>, <span class="st">"Tolerant"</span> <span class="ot">=</span> <span class="st">"#d95f02"</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>               <span class="st">"Repairer"</span> <span class="ot">=</span> <span class="st">"#1b9e77"</span>, <span class="st">"Acclimated"</span> <span class="ot">=</span> <span class="st">"#e7298a"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Cache for the expensive SCM runs within one render session. The page's</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># freeze is what persists results between renders; this only spares a rerun</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># when a chunk is re-executed interactively. Keyed on the cache name AND the</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># deparsed call, so editing a chunk's call invalidates that entry.</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>cache_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">"tf24t-thermal-damage-cache"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(cache_dir, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>cached_rds <span class="ot">&lt;-</span> <span class="cf">function</span>(name, expr) {</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  call_txt <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="fu">deparse</span>(<span class="fu">substitute</span>(expr)), <span class="at">collapse =</span> <span class="st">" "</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(cache_dir, <span class="fu">paste0</span>(name, <span class="st">".rds"</span>))</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">file.exists</span>(path)) {</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    hit <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(path)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">identical</span>(hit<span class="sc">$</span>call, call_txt)) <span class="fu">return</span>(hit<span class="sc">$</span>value)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  value <span class="ot">&lt;-</span> expr</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(<span class="fu">list</span>(<span class="at">call =</span> call_txt, <span class="at">value =</span> value), path)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  value</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The <strong>ATLS</strong> layer (leaf thermal damage, repair and acclimation, issue #566) gives a TF24 leaf a lasting response to heat on top of the reversible peaked-Arrhenius capacity curve. The leaf area is split into three fractions: <strong>functional</strong> <code>F</code>, <strong>impaired</strong> <code>I</code> and <strong>damaged</strong> <code>D</code>, with <code>F = 1 − I − D</code>. Functional leaf is impaired at a rate <code>k_imp(T)</code> that a smooth <strong>switch</strong> turns on around its midpoint <code>impair_Tmid</code> (34.5 °C at the defaults, its own parameter, independent of the Jmax curve). Impaired leaf is repaired back to functional over about 4 days, or matures into damaged leaf, which clears only as the plant grows new leaf. Both capacities scale by <code>F</code>, so a cooled leaf does <em>not</em> rebound instantly.</p>
+<p>The layer and its dynamics live in phylloptim’s <code>Leaf</code> behind <code>use_thermal_damage_</code>; the <code>TF24t</code> strategy turns it on, integrates the states on the plant, and dilutes damaged leaf with new growth. The equations are in <a href="../theory/models/tf24t-thermal-damage.html">TF24t: thermal damage</a>.</p>
+<p>A thermal <em>strategy</em> is a point in a four-axis trait space, all plugging into the same physics:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Axis</th>
+<th>Knob</th>
+<th>Moves</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Tolerance</strong> (constitutive)</td>
+<td><code>topt_offset</code></td>
+<td>shifts the capacity optimum <em>and</em> the impairment switch up together</td>
+</tr>
+<tr class="even">
+<td><strong>Acclimation</strong> (inducible)</td>
+<td><code>A</code> state</td>
+<td>the same shift, induced when the regime is hot</td>
+</tr>
+<tr class="odd">
+<td><strong>Repair</strong></td>
+<td>preventive <code>k_i</code>, restorative <code>k_rec</code></td>
+<td>impair more slowly or repair faster (and cut the lasting floor)</td>
+</tr>
+<tr class="even">
+<td><strong>Avoidance</strong></td>
+<td>transpirational cooling (energy balance)</td>
+<td>lowers the operating leaf temperature, hence <code>k_imp</code></td>
+</tr>
+</tbody>
+</table>
+<p>This guide drives a single well-watered leaf, then a single-species stand. Its July design is <a href="https://github.com/traitecoevo/plant/blob/f406b6d864f5a68b97c5acc68f6bcf44fb05cda6/notes/atls/implementation-plan.md"><code>notes/atls/implementation-plan.md</code></a> and the port to phylloptim is <a href="https://github.com/traitecoevo/plant/blob/f406b6d864f5a68b97c5acc68f6bcf44fb05cda6/notes/plan-atls-port.md"><code>notes/plan-atls-port.md</code></a>, both in the history since they retired; what still constrains the code is hazard 16 in plant’s <a href="https://github.com/traitecoevo/plant/blob/52ff5349c5a01f384a4446e809fc48caf5840674/.claude/hazards.md"><code>.claude/hazards.md</code></a>, and the open work is on <a href="https://github.com/traitecoevo/plant/issues/566">plant#566</a>.</p>
+<section id="the-impairment-rate-k_imptleaf-and-the-impairment-it-drives" class="level2">
+<h2 class="anchored" data-anchor-id="the-impairment-rate-k_imptleaf-and-the-impairment-it-drives">1. The impairment rate <code>k_imp(Tleaf)</code> and the impairment it drives</h2>
+<p>The generalist (default) leaf: the impairment rate sits near 0 when cold, passes through <strong>half of <code>k_i</code> at the switch midpoint ≈ 34.5 °C</strong> (<code>impair_Tmid</code>, marked), and saturates toward <code>k_i</code> when hot. Leaf temperature is <em>prescribed</em> here, so this is the pure mechanism with no optimiser in the loop.</p>
+<p>The right-hand panel shows the standing impaired fraction this rate would drive, <code>I* = k_imp / (k_imp + k_rec_eff + k_mat)</code> (with <code>D = 0</code>): the balance the <code>I</code> ODE relaxes toward at a held temperature. A fresh leaf loses no capacity instantly; impairment is a <em>memory</em> that fills over days, and each unit of <code>I</code> or <code>D</code> removes that share of <strong>both</strong> <code>vcmax</code> and <code>jmax</code>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Tleaf <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">20</span>, <span class="dv">50</span>, <span class="at">by =</span> <span class="fl">0.5</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>kimp_gen <span class="ot">&lt;-</span> <span class="fu">atls_k_imp_curve</span>(Tleaf, <span class="fu">atls_traits</span>())</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>I_gen    <span class="ot">&lt;-</span> <span class="fu">atls_I_star_curve</span>(Tleaf, <span class="fu">atls_traits</span>())</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>onset <span class="ot">&lt;-</span> <span class="fu">atls_traits</span>()<span class="sc">$</span>impair_Tmid   <span class="co"># about 34.5 deg C</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>p_kimp <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">data.frame</span>(Tleaf, <span class="at">k =</span> kimp_gen), <span class="fu">aes</span>(Tleaf, k)) <span class="sc">+</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">colour =</span> <span class="st">"#d95f02"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> onset, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">colour =</span> <span class="st">"grey50"</span>) <span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> onset <span class="sc">+</span> <span class="fl">0.4</span>, <span class="at">y =</span> <span class="fl">0.02</span>, <span class="at">label =</span> <span class="st">"impair_Tmid"</span>, <span class="at">hjust =</span> <span class="dv">0</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">size =</span> <span class="dv">3</span>, <span class="at">colour =</span> <span class="st">"grey40"</span>) <span class="sc">+</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"leaf temperature (°C)"</span>, <span class="at">y =</span> <span class="st">"k_imp (day⁻¹)"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Impairment rate k_imp(Tleaf)"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>p_I <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">data.frame</span>(Tleaf, <span class="at">I =</span> I_gen), <span class="fu">aes</span>(Tleaf, I)) <span class="sc">+</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">colour =</span> <span class="st">"#7570b3"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"leaf temperature (°C)"</span>, <span class="at">y =</span> <span class="st">"I* (quasi-steady)"</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Standing impaired fraction"</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>p_kimp <span class="sc">|</span> p_I</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tf24t-thermal-damage_files/figure-html/damage-curve-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="four-thermal-response-strategies-move-the-impairment-differently" class="level2">
+<h2 class="anchored" data-anchor-id="four-thermal-response-strategies-move-the-impairment-differently">2. Four thermal-response strategies move the impairment differently</h2>
+<p>Each archetype is a single-axis move off the generalist, shown as the standing impaired fraction <code>I*(Tleaf)</code>. <strong>Tolerance</strong> and <strong>acclimation</strong> shift the switch (and hence <code>I*</code>) to higher temperature; <strong>repair</strong> (higher <code>k_rec</code>, lower <code>k_i</code>) lowers <code>I*</code> at a given temperature. Avoidance is not a curve shift — it lowers the <em>operating</em> temperature, shown in §4.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>strategies <span class="ot">&lt;-</span> <span class="fu">atls_strategies</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>I_curves <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">lapply</span>(<span class="fu">names</span>(strategies), <span class="cf">function</span>(nm) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">strategy =</span> nm, <span class="at">Tleaf =</span> Tleaf,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">I =</span> <span class="fu">atls_I_star_curve</span>(Tleaf, strategies[[nm]]))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(I_curves, <span class="fu">aes</span>(Tleaf, I, <span class="at">colour =</span> strategy)) <span class="sc">+</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> strat_pal, <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"leaf temperature (°C)"</span>, <span class="at">y =</span> <span class="st">"I* (quasi-steady impaired fraction)"</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Standing impairment I*(Tleaf) by thermal strategy"</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Tolerant/Acclimated shift the switch right; Repairer lowers the whole curve"</span>) <span class="sc">+</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tf24t-thermal-damage_files/figure-html/strategy-curves-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="who-keeps-carbon-where-assimilation-across-a-heat-gradient" class="level2">
+<h2 class="anchored" data-anchor-id="who-keeps-carbon-where-assimilation-across-a-heat-gradient">3. Who keeps carbon where? Assimilation across a heat gradient</h2>
+<p>The payoff, on fresh leaves (<code>I = D = 0</code>, so the assimilation panel isolates the reversible-capacity effect). Tolerance and acclimation raise the capacity optimum (<code>topt_offset</code>, <code>A</code>), buying carbon at hot leaf temperatures; the standing-impairment panel shows where impairment <em>would</em> accrue over days.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>grad <span class="ot">&lt;-</span> <span class="fu">atls_solve_strategies</span>(<span class="fu">seq</span>(<span class="dv">24</span>, <span class="dv">48</span>, <span class="at">by =</span> <span class="dv">2</span>), strategies,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">PAR =</span> <span class="dv">1500</span>, <span class="at">VPD =</span> <span class="dv">2</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>p_grad_A <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(grad, <span class="fu">aes</span>(Tenv, A, <span class="at">colour =</span> strategy)) <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> strat_pal, <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"leaf temperature (°C)"</span>, <span class="at">y =</span> <span class="st">"assimilation (µmol C m⁻² s⁻¹)"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Carbon gain by strategy"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>p_grad_I <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(grad, <span class="fu">aes</span>(Tenv, I_star, <span class="at">colour =</span> strategy)) <span class="sc">+</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> strat_pal, <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"leaf temperature (°C)"</span>, <span class="at">y =</span> <span class="st">"I* at the operating point"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Standing impairment by strategy"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>(p_grad_I <span class="sc">|</span> p_grad_A) <span class="sc">+</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tf24t-thermal-damage_files/figure-html/strategy-assim-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="avoidance-transpirational-cooling-as-the-fourth-axis" class="level2">
+<h2 class="anchored" data-anchor-id="avoidance-transpirational-cooling-as-the-fourth-axis">4. Avoidance: transpirational cooling as the fourth axis</h2>
+<p>Avoidance is not a damage trait — it is the leaf keeping itself cooler than it would otherwise be by transpiring, through the Penman–Monteith energy balance (#523). A better-coupled leaf (smaller dimension <code>d</code>, higher conductance) runs closer to air temperature, so on a hot day it is impaired more slowly and carries less lasting damage. Both leaves here are the generalist; only the coupling differs.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>avoid_cfgs <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"poorly coupled (large leaf, low g)"</span> <span class="ot">=</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">atls_leaf_config</span>(<span class="at">d =</span> <span class="fl">0.10</span>, <span class="at">leaf_specific_conductance_max =</span> <span class="fl">2e-4</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"well coupled (small leaf, high g)"</span> <span class="ot">=</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">atls_leaf_config</span>(<span class="at">d =</span> <span class="fl">0.02</span>, <span class="at">leaf_specific_conductance_max =</span> <span class="fl">1e-3</span>))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>avoid <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">lapply</span>(<span class="fu">names</span>(avoid_cfgs), <span class="cf">function</span>(nm) {</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="fu">lapply</span>(<span class="fu">seq</span>(<span class="dv">24</span>, <span class="dv">40</span>, <span class="at">by =</span> <span class="fl">0.5</span>), <span class="cf">function</span>(Tair) {</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    r <span class="ot">&lt;-</span> <span class="fu">atls_solve_cell</span>(<span class="dv">1500</span>, Tair, <span class="dv">2</span>, <span class="fu">atls_traits</span>(), <span class="at">pm =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                         <span class="at">cfg =</span> avoid_cfgs[[nm]])</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">coupling =</span> nm, <span class="at">Tair =</span> Tair, <span class="at">Tleaf =</span> r<span class="sc">$</span>Tleaf,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">k_imp =</span> r<span class="sc">$</span>k_imp, <span class="at">A =</span> r<span class="sc">$</span>A)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  }))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>avoid_pal <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"poorly coupled (large leaf, low g)"</span> <span class="ot">=</span> <span class="st">"#b2182b"</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>               <span class="st">"well coupled (small leaf, high g)"</span> <span class="ot">=</span> <span class="st">"#2166ac"</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>p_av_T <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(avoid, <span class="fu">aes</span>(Tair, Tleaf, <span class="at">colour =</span> coupling)) <span class="sc">+</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dotted"</span>, <span class="at">colour =</span> <span class="st">"grey60"</span>) <span class="sc">+</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> avoid_pal, <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"air temperature (°C)"</span>, <span class="at">y =</span> <span class="st">"operating leaf temperature (°C)"</span>,</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Cooling by coupling"</span>, <span class="at">subtitle =</span> <span class="st">"dotted = Tleaf = Tair"</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>p_av_k <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(avoid, <span class="fu">aes</span>(Tair, k_imp, <span class="at">colour =</span> coupling)) <span class="sc">+</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> avoid_pal, <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"air temperature (°C)"</span>, <span class="at">y =</span> <span class="st">"k_imp at the operating point (day⁻¹)"</span>,</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"... lowers the impairment rate"</span>)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>(p_av_T <span class="sc">|</span> p_av_k) <span class="sc">+</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tf24t-thermal-damage_files/figure-html/avoidance-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>An isolated, poorly coupled leaf under high radiation runs far above the air — more than 20 °C above it across this sweep — so the <em>absolute</em> temperatures here are an upper bound; the <strong>contrast</strong> between couplings is the robust signal.</p>
+</blockquote>
+</section>
+<section id="from-one-leaf-to-a-community-persistence-under-warming-scm" class="level2">
+<h2 class="anchored" data-anchor-id="from-one-leaf-to-a-community-persistence-under-warming-scm">5. From one leaf to a community: persistence under warming (SCM)</h2>
+<p>Everything above is a single isolated leaf. The demographic question is whether the damage feedback changes whether a <em>population</em> persists. We run the size-structured community model (SCM) — a single-species patch under a constant climate, with the <code>leaf_temp</code> driver as the midday air temperature — across a warming gradient, TF24t against TF24 with the energy balance on.</p>
+<p><strong>How we measure fitness matters.</strong> The net reproduction ratio R0 at a <em>fixed</em> seed rain is <strong>not</strong> a valid cross-strategy comparison: it conflates per-capita productivity with density-dependent recruitment. A less fecund resident shades the patch less, so at a shared seed rain each of its seeds does <em>better</em>, inflating its R0 although it is the weaker plant.</p>
+<p>The density-free measure is <strong>viability</strong>: when <em>rare</em>, does a resident more than replace itself? R0 is evaluated in the low-density limit (a small <code>birth_rate</code>). R0 ≥ 1 means the population grows from rare and persists. The warmest climate with R0 ≥ 1 is the <strong>persistence boundary</strong>, and <em>that</em> is comparable across strategies, because density effects vanish as density goes to zero. We read the boundary, never the R0 magnitude away from it.</p>
+<p>Each SCM run takes one to two minutes; the page’s freeze keeps the results between renders, and the runs are spread across cores.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># k_mat is a CALIBRATION TARGET. At its default (0.02/day) the permanent pool</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ratchets -- maturation influx DAYS_PER_YEAR*k_mat ~ 7.3/yr against the only</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sink, leaf turnover k_l ~ 0.46/yr -- which makes TF24t inviable in every</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># climate. This section uses the balanced k_l/DAYS_PER_YEAR ~ 0.00125/day, the</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># value the July runs used, so it is illustrative.</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>atls_scm_kmat <span class="ot">&lt;-</span> <span class="fl">0.00125</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>scen5 <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"PM only (TF24)"</span>    <span class="ot">=</span> <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"TF24"</span>),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"PM + ATLS (TF24t)"</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"TF24t"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">mutate =</span> <span class="cf">function</span>(s) { s<span class="sc">$</span>k_mat <span class="ot">&lt;-</span> atls_scm_kmat; s }))</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># The cache name carries k_mat: the scenario list (hence k_mat) hides behind the</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># `scen5` symbol, so the call text alone would not see a change to it.</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>viab5  <span class="ot">&lt;-</span> <span class="fu">cached_rds</span>(<span class="fu">sprintf</span>(<span class="st">"scm-viability-k%.5g"</span>, atls_scm_kmat),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">atls_scm_viability</span>(<span class="fu">seq</span>(<span class="dv">23</span>, <span class="dv">31</span>, <span class="at">by =</span> <span class="dv">1</span>), scen5))</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>bound5 <span class="ot">&lt;-</span> <span class="fu">atls_persistence_boundary</span>(viab5)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(bound5, <span class="at">digits =</span> <span class="dv">1</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"scenario"</span>, <span class="st">"persistence °C"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">scenario</th>
+<th style="text-align: right;">persistence °C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">PM + ATLS (TF24t)</td>
+<td style="text-align: right;">24.7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PM only (TF24)</td>
+<td style="text-align: right;">25.9</td>
+</tr>
+</tbody>
+</table>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>b5 <span class="ot">&lt;-</span> <span class="fu">setNames</span>(bound5<span class="sc">$</span>boundary, bound5<span class="sc">$</span>scenario)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(viab5, <span class="fu">aes</span>(air_temp, <span class="fu">pmax</span>(<span class="fu">log10</span>(R0), <span class="sc">-</span><span class="dv">8</span>), <span class="at">colour =</span> scenario)) <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">colour =</span> <span class="st">"grey50"</span>) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">data =</span> bound5, <span class="fu">aes</span>(<span class="at">xintercept =</span> boundary, <span class="at">colour =</span> scenario),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dotted"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.8</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">23</span>, <span class="at">y =</span> <span class="fl">0.35</span>, <span class="at">label =</span> <span class="st">"persistence (R0 = 1)"</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">colour =</span> <span class="st">"grey40"</span>) <span class="sc">+</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"PM only (TF24)"</span>    <span class="ot">=</span> <span class="st">"#1b9e77"</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"PM + ATLS (TF24t)"</span> <span class="ot">=</span> <span class="st">"#d95f02"</span>), <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"midday climate temperature (°C)"</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="fu">expression</span>(log[<span class="dv">10</span>] <span class="sc">*</span> <span class="st">" R0 (low density)"</span>),</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Persistence boundary: warmest climate a rare population survives"</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"low-density R0; the R0 = 1 crossing (dotted) is the density-free boundary"</span>) <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tf24t-thermal-damage_files/figure-html/scm-viability-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The valid signal is the <strong>persistence boundary</strong> — the dotted crossings, not the curve heights, which still carry the density artifact and are drawn on a log scale only to expose the crossing.</p>
+<blockquote class="blockquote">
+<p><strong>Reading these results.</strong> Adding the thermal layer moves the persistence boundary from 25.9 °C to 24.7 °C: lasting thermal damage is a net persistence penalty, as it was on the July code (<a href="https://github.com/traitecoevo/plant/tree/52ff5349c5a01f384a4446e809fc48caf5840674/notes/atls/results-2026-07"><code>notes/atls/results-2026-07/</code></a>). The size of the shift rests on the illustrative <code>k_mat</code> above and on the other open calibration items listed at the end of this page.</p>
+</blockquote>
+</section>
+<section id="which-thermal-strategy-persists-hottest-scm-tournament" class="level2">
+<h2 class="anchored" data-anchor-id="which-thermal-strategy-persists-hottest-scm-tournament">6. Which thermal strategy persists hottest? (SCM tournament)</h2>
+<p>Same measure, now varying the <em>strategy</em> — each a heritable single-axis move off the generalist (tolerance = constitutive <code>topt_offset</code>; repair = higher restorative <code>k_rec</code> and lower preventive <code>k_i</code>; acclimator = faster acclimation kinetics). “Persists hottest” means the highest <strong>persistence boundary</strong>, not the R0 height at a shared seed rain.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Each strategy carries the balanced k_mat from section 5, so the ranking is not</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># swamped by the default permanent-damage ratchet.</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>scm_strats <span class="ot">&lt;-</span> <span class="fu">atls_scm_strategies</span>()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>scen6 <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">lapply</span>(<span class="fu">names</span>(scm_strats), <span class="cf">function</span>(nm) {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  base <span class="ot">&lt;-</span> scm_strats[[nm]]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"TF24t"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">mutate =</span> <span class="cf">function</span>(s) { s <span class="ot">&lt;-</span> <span class="fu">base</span>(s); s<span class="sc">$</span>k_mat <span class="ot">&lt;-</span> atls_scm_kmat; s })</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>}), <span class="fu">names</span>(scm_strats))</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>viab6  <span class="ot">&lt;-</span> <span class="fu">cached_rds</span>(<span class="fu">sprintf</span>(<span class="st">"scm-viability-strat-k%.5g"</span>, atls_scm_kmat),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">atls_scm_viability</span>(<span class="fu">seq</span>(<span class="dv">23</span>, <span class="dv">33</span>, <span class="at">by =</span> <span class="dv">1</span>), scen6))</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>bound6 <span class="ot">&lt;-</span> <span class="fu">atls_persistence_boundary</span>(viab6)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>bound6 <span class="ot">&lt;-</span> bound6[<span class="fu">order</span>(<span class="sc">-</span>bound6<span class="sc">$</span>boundary), ]</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(bound6, <span class="at">digits =</span> <span class="dv">1</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"strategy"</span>, <span class="st">"persistence °C"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">strategy</th>
+<th style="text-align: right;">persistence °C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Tolerant</td>
+<td style="text-align: right;">27.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Repairer</td>
+<td style="text-align: right;">26.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Acclimator</td>
+<td style="text-align: right;">25.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Generalist</td>
+<td style="text-align: right;">24.7</td>
+</tr>
+</tbody>
+</table>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>strat_pal6 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Generalist"</span> <span class="ot">=</span> <span class="st">"#7570b3"</span>, <span class="st">"Tolerant"</span> <span class="ot">=</span> <span class="st">"#d95f02"</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Repairer"</span> <span class="ot">=</span> <span class="st">"#1b9e77"</span>, <span class="st">"Acclimator"</span> <span class="ot">=</span> <span class="st">"#e7298a"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bound6, <span class="fu">aes</span>(<span class="fu">reorder</span>(scenario, boundary), boundary, <span class="at">fill =</span> scenario)) <span class="sc">+</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">"%.1f °C"</span>, boundary)), <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.15</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> strat_pal6, <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">y =</span> <span class="fu">max</span>(bound6<span class="sc">$</span>boundary, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"persistence boundary (warmest climate with R0 ≥ 1, °C)"</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Which thermal strategy persists hottest?"</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"warmest climate at which a rare TF24t resident still replaces itself"</span>) <span class="sc">+</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tf24t-thermal-damage_files/figure-html/scm-tournament-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Reading these results.</strong> The order here is <strong>tolerant &gt; repairer &gt; acclimator &gt; generalist</strong>. On the July code it was <strong>tolerant &gt; repairer &gt; acclimator &gt; generalist</strong>, and tolerance and repair persisted hotter although their low-density R0 at cool climates was <em>lower</em> than the generalist’s — the inversion that is why the ranking is by the R0 = 1 crossing.</p>
+</blockquote>
+</section>
+<section id="memory-the-running-mean-leaf-temperature" class="level2">
+<h2 class="anchored" data-anchor-id="memory-the-running-mean-leaf-temperature">7. Memory: the running-mean leaf temperature</h2>
+<p>The sections above read the <em>instantaneous</em> operating leaf temperature. TF24t also carries a diagnostic ODE state, <strong><code>mean_leaf_temp</code></strong>, an exponential moving average of the operating-point <code>Tleaf</code>:</p>
+<p><span class="math display">\[
+\frac{\mathrm{d}\,\overline{T_\ell}}{\mathrm{d}t}
+  = D\,k_{\overline{T}}\,\bigl(T_\ell - \overline{T_\ell}\bigr),
+\]</span></p>
+<p>where <code>T_ℓ</code> is the operating-point leaf temperature (TF24’s <code>Tleaf</code> aux), <code>k_mean_leaf_temp</code> is the memory decay rate (day⁻¹; <code>D = 365.25</code> puts it on the yearly clock), and the memory is <code>1/k_mean_leaf_temp</code>. It is <strong>purely diagnostic</strong> — nothing reads it — so it is a clean read-out of the temperature history a plant has experienced. Below, a single TF24t individual is driven with an oscillating air temperature; the running mean lags and smooths the operating temperature (memory about 20 d here).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>traj_wide <span class="ot">&lt;-</span> <span class="fu">cached_rds</span>(<span class="st">"running-mean"</span>, {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  e <span class="ot">&lt;-</span> <span class="st">"TF24_Env"</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  k_mem  <span class="ot">&lt;-</span> <span class="fl">0.05</span>               <span class="co"># day^-1, about a 20-day memory</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  period <span class="ot">&lt;-</span> <span class="fl">0.12</span>               <span class="co"># yr (about 44 d), comparable to the memory</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  t_end  <span class="ot">&lt;-</span> <span class="fl">0.6</span>                <span class="co"># yr</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">TF24t_Model</span>(); s<span class="sc">$</span>k_mean_leaf_temp <span class="ot">&lt;-</span> k_mem</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">Individual</span>(<span class="st">"TF24t"</span>, e)(s)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24t"</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># The adaptive stepper can probe the driver just past t_end, so the driver is</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># set on a grid beyond the loop horizon; outside its range the spline would</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># extrapolate.</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  t_drive <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, t_end <span class="sc">*</span> <span class="fl">1.15</span>, <span class="at">length.out =</span> <span class="dv">230</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_variable</span>(<span class="st">"leaf_temp"</span>, t_drive,</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>                                     <span class="dv">27</span> <span class="sc">+</span> <span class="dv">6</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> t_drive <span class="sc">/</span> period))</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Seeded as a node would be: storage, A at equilibrium, and the running mean</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># at the birth air temperature.</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  p<span class="sc">$</span><span class="fu">set_initial_states</span>(env)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  runner <span class="ot">&lt;-</span> plant<span class="sc">:::</span><span class="fu">OdeRunner</span>(<span class="st">"TF24t"</span>)(plant<span class="sc">:::</span><span class="fu">IndividualRunner</span>(<span class="st">"TF24t"</span>, e)(p, env))</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  rec <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> (runner<span class="sc">$</span>time <span class="sc">&lt;</span> t_end) {</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    runner<span class="sc">$</span><span class="fu">step</span>()</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    ind <span class="ot">&lt;-</span> runner<span class="sc">$</span>object<span class="sc">$</span>individual</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    rec[[<span class="fu">length</span>(rec) <span class="sc">+</span> <span class="dv">1</span>L]] <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">time      =</span> runner<span class="sc">$</span>time,</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">air_temp  =</span> env<span class="sc">$</span><span class="fu">extrinsic_drivers_evaluate</span>(<span class="st">"leaf_temp"</span>, <span class="fu">min</span>(runner<span class="sc">$</span>time, t_end)),</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">operating =</span> ind<span class="sc">$</span><span class="fu">aux</span>(<span class="st">"Tleaf"</span>),</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">running   =</span> ind<span class="sc">$</span><span class="fu">state</span>(<span class="st">"mean_leaf_temp"</span>))</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do.call</span>(rbind, rec)</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>traj <span class="ot">&lt;-</span> traj_wide <span class="sc">|&gt;</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(air_temp, operating, running), <span class="at">names_to =</span> <span class="st">"series"</span>,</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"temp"</span>)</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>series_lab <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">air_temp =</span> <span class="st">"air temperature (driver)"</span>,</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>                <span class="at">operating =</span> <span class="st">"operating leaf temp (instantaneous)"</span>,</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>                <span class="at">running =</span> <span class="st">"mean_leaf_temp (running mean)"</span>)</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>series_pal <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">air_temp =</span> <span class="st">"grey60"</span>, <span class="at">operating =</span> <span class="st">"#d95f02"</span>, <span class="at">running =</span> <span class="st">"#1b9e77"</span>)</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(traj, <span class="fu">aes</span>(time, temp, <span class="at">colour =</span> series)) <span class="sc">+</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> series_pal, <span class="at">labels =</span> series_lab, <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"time (years)"</span>, <span class="at">y =</span> <span class="st">"temperature (°C)"</span>,</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"mean_leaf_temp lags and smooths the operating leaf temperature"</span>,</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"single TF24t individual, oscillating air temperature; memory about 20 d"</span>) <span class="sc">+</span></span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tf24t-thermal-damage_files/figure-html/running-mean-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The running mean (green) tracks the operating leaf temperature (orange) with a lag set by <code>k_mean_leaf_temp</code> and a reduced amplitude. The operating temperature sits above the air because a lone plant in full light runs hot (§4); its jumps and plateaus near the air-temperature peaks are the leaf shutting its stomata, after which nothing cools it. <code>mean_leaf_temp</code> averages that operating signal, not the driver.</p>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">8. Summary</h2>
+<p>The impairment rate <code>k_imp(Tleaf)</code> is the single driver: strategies act by moving <em>where its switch turns on</em> (tolerance and acclimation shift the midpoint), <em>how fast functional leaf is impaired and how fast it is repaired</em> (preventive <code>k_i</code>, restorative <code>k_rec</code>), or <em>where the leaf actually operates</em> (avoidance). Impairment is a <strong>memory</strong>: the impaired and damaged fractions remove their share of both capacities and persist after cooling, and damaged leaf clears only as the plant grows new leaf. At the community scale the same layer sets a <strong>persistence boundary</strong>, the warmest climate at which a rare population still replaces itself. Its value and the strategy ranking (§5, §6) rest on open calibration items, among them the leaf overheating, the switch midpoint and the <code>k_mat</code> maturation rate. See plant’s <a href="https://github.com/traitecoevo/plant/blob/52ff5349c5a01f384a4446e809fc48caf5840674/notes/atls/gate-atls-vs-pm-evaluation.md"><code>notes/atls/gate-atls-vs-pm-evaluation.md</code></a> for the July materiality gate.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/traitecoevo\.github\.io\/overstorey");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
+  <div class="nav-page nav-page-previous">
+      <a href="../guides/tf24-flexible-allometry.html" class="pagination-link" aria-label="TF24: a canopy that thins">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">TF24: a canopy that thins</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../guides/tf24-stand-gradients.html" class="pagination-link" aria-label="TF24: stand gradients from one reverse sweep">
+        <span class="nav-page-text">TF24: stand gradients from one reverse sweep</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Built with Quarto · frozen for reproducibility</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/guides/tf24t-thermal-damage.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant/blob/master/LICENSE">
+<p>License</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

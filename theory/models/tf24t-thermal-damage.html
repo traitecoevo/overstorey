@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Overstorey – TF24t: thermal damage</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../theory/soil-water.html" rel="next">
+<link href="../../theory/models/tf24.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../assets/extras.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/leaf-mark.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Overstorey</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../guides/index.html"> 
+<span class="menu-text">Guides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../theory/index.html" aria-current="page"> 
+<span class="menu-text">Theory</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/index.html"> 
+<span class="menu-text">Adaptively</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/reproductions.html"> 
+<span class="menu-text">Reproductions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../glossary.html"> 
+<span class="menu-text">Glossary</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://traitecoevo.github.io/plant/reference/" target="_blank"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../develop.html"> 
+<span class="menu-text">Pipeline</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant" target="_blank"> <i class="bi bi-github" role="img" aria-label="plant source on GitHub">
+</i> 
+<span class="menu-text">plant source</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+            <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../../theory/models/tf24t-thermal-damage.html">TF24t: thermal damage</a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Theory</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">1. Foundations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The big picture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/maths-primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, gently</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/from-primer-to-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The maths, worked through</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/size-structured-pde.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The size-structured PDE</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">2. Models and physiology</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/ff16.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">FF16</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/assimilation-hydraulics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assimilation &amp; hydraulics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/tf24.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/tf24t-thermal-damage.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">TF24t: thermal damage</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/soil-water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Soil water &amp; root uptake</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/k93.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">K93</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">3. Adaptive dynamics</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive dynamics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive-dynamics models in regnans</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/DD99.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DD99: competition and evolutionary branching</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/GK98.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GK98: adaptation across different habitats</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/GM99.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GM99: the evolution of seed size</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/JJ12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">JJ12: the evolution of migratory arrival time</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/solving_attractors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Finding evolutionary attractors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Community assembly with simple models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/assembly_fitmax.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Maximum-fitness community assembly</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/adaptive-dynamics/assembly_stochastic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stochastic assembly</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">4. Implementation</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Implementation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/characteristic-method.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The characteristic method</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/ode-stepping.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODE stepping &amp; control</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/node-spacing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The node-spacing algorithm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/implementation/canopy-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Canopy &amp; light-environment models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">5. Prediction and reproducibility</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../theory/models/scientific-versioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scientific versioning of models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#scope-and-provenance" id="toc-scope-and-provenance" class="nav-link active" data-scroll-target="#scope-and-provenance"><span class="header-section-number">1</span> Scope and provenance</a></li>
+  <li><a href="#the-model-in-one-paragraph" id="toc-the-model-in-one-paragraph" class="nav-link" data-scroll-target="#the-model-in-one-paragraph"><span class="header-section-number">2</span> The model in one paragraph</a></li>
+  <li><a href="#sec-energy" id="toc-sec-energy" class="nav-link" data-scroll-target="#sec-energy"><span class="header-section-number">3</span> Leaf temperature: Penman–Monteith energy balance</a></li>
+  <li><a href="#sec-capacity" id="toc-sec-capacity" class="nav-link" data-scroll-target="#sec-capacity"><span class="header-section-number">4</span> Reversible photosynthetic capacity</a>
+  <ul class="collapse">
+  <li><a href="#arrhenius-and-peaked-arrhenius-forms" id="toc-arrhenius-and-peaked-arrhenius-forms" class="nav-link" data-scroll-target="#arrhenius-and-peaked-arrhenius-forms"><span class="header-section-number">4.1</span> Arrhenius and peaked-Arrhenius forms</a></li>
+  <li><a href="#sec-topt-shift" id="toc-sec-topt-shift" class="nav-link" data-scroll-target="#sec-topt-shift"><span class="header-section-number">4.2</span> Shifting the optimum: <span class="math inline">T_\mathrm{opt}</span> target → <span class="math inline">\Delta S</span> inversion</a></li>
+  </ul></li>
+  <li><a href="#sec-damage" id="toc-sec-damage" class="nav-link" data-scroll-target="#sec-damage"><span class="header-section-number">5</span> Lasting impairment: functional, impaired and damaged leaf</a>
+  <ul class="collapse">
+  <li><a href="#sec-fractions" id="toc-sec-fractions" class="nav-link" data-scroll-target="#sec-fractions"><span class="header-section-number">5.1</span> Three fractions of leaf area</a></li>
+  <li><a href="#sec-switch" id="toc-sec-switch" class="nav-link" data-scroll-target="#sec-switch"><span class="header-section-number">5.2</span> The impairment rate and its switch</a></li>
+  <li><a href="#sec-repair" id="toc-sec-repair" class="nav-link" data-scroll-target="#sec-repair"><span class="header-section-number">5.3</span> Repair: preventive <span class="math inline">k_i</span> and restorative <span class="math inline">k_\mathrm{rec}</span></a></li>
+  </ul></li>
+  <li><a href="#sec-accl" id="toc-sec-accl" class="nav-link" data-scroll-target="#sec-accl"><span class="header-section-number">6</span> Slow ODE states: acclimation <span class="math inline">A</span> and the fractions <span class="math inline">I</span>, <span class="math inline">D</span></a>
+  <ul class="collapse">
+  <li><a href="#sec-meanT" id="toc-sec-meanT" class="nav-link" data-scroll-target="#sec-meanT"><span class="header-section-number">6.1</span> Running-mean leaf temperature <span class="math inline">\overline{T_\ell}</span></a></li>
+  </ul></li>
+  <li><a href="#sec-cost" id="toc-sec-cost" class="nav-link" data-scroll-target="#sec-cost"><span class="header-section-number">7</span> Carbon costs of thermal strategy</a>
+  <ul class="collapse">
+  <li><a href="#leaf-level-respiration" id="toc-leaf-level-respiration" class="nav-link" data-scroll-target="#leaf-level-respiration"><span class="header-section-number">7.1</span> Leaf-level respiration</a></li>
+  <li><a href="#whole-plant-net-production" id="toc-whole-plant-net-production" class="nav-link" data-scroll-target="#whole-plant-net-production"><span class="header-section-number">7.2</span> Whole-plant net production</a></li>
+  </ul></li>
+  <li><a href="#sec-feedback" id="toc-sec-feedback" class="nav-link" data-scroll-target="#sec-feedback"><span class="header-section-number">8</span> The optimiser feedback: avoidance</a></li>
+  <li><a href="#sec-params" id="toc-sec-params" class="nav-link" data-scroll-target="#sec-params"><span class="header-section-number">9</span> Parameters and defaults</a></li>
+  <li><a href="#sec-numerics" id="toc-sec-numerics" class="nav-link" data-scroll-target="#sec-numerics"><span class="header-section-number">10</span> Numerical-stability contract</a></li>
+  <li><a href="#sec-merged" id="toc-sec-merged" class="nav-link" data-scroll-target="#sec-merged"><span class="header-section-number">11</span> Revision history</a>
+  <ul class="collapse">
+  <li><a href="#july-2026-the-merged-revision" id="toc-july-2026-the-merged-revision" class="nav-link" data-scroll-target="#july-2026-the-merged-revision"><span class="header-section-number">11.1</span> July 2026: the merged revision</a></li>
+  <li><a href="#sec-port" id="toc-sec-port" class="nav-link" data-scroll-target="#sec-port"><span class="header-section-number">11.2</span> October 2026: the port to phylloptim</a></li>
+  <li><a href="#sec-redesign" id="toc-sec-redesign" class="nav-link" data-scroll-target="#sec-redesign"><span class="header-section-number">11.3</span> October 2026: three states, the dynamics on the leaf</a></li>
+  <li><a href="#sec-timescales" id="toc-sec-timescales" class="nav-link" data-scroll-target="#sec-timescales"><span class="header-section-number">11.4</span> Timescales and the near-rigid caveat</a></li>
+  </ul></li>
+  <li><a href="#cross-references" id="toc-cross-references" class="nav-link" data-scroll-target="#cross-references"><span class="header-section-number">12</span> Cross-references</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/theory/models/tf24t-thermal-damage.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../theory/models/index.html">2. Models and physiology</a></li><li class="breadcrumb-item"><a href="../../theory/models/tf24t-thermal-damage.html">TF24t: thermal damage</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">TF24t: thermal damage</h1>
+<p class="subtitle lead">Lasting heat damage, repair and acclimation on the Penman–Monteith leaf (ATLS)</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="eyebrow">
+<p>model</p>
+</div>
+<section id="scope-and-provenance" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="scope-and-provenance"><span class="header-section-number">1</span> Scope and provenance</h2>
+<p>This document is the mathematical specification of the <strong>ATLS</strong> thermal-response layer of the TF24 leaf (issue #566), built on the Penman–Monteith leaf energy balance (#523). It states the equations as implemented, in two places:</p>
+<ul>
+<li>the leaf-level physics and the dynamics of the states, in phylloptim’s <code>Leaf</code> behind the gate <code>use_thermal_damage_</code> (<code>inst/include/phylloptim/leaf_model.hpp</code>: <code>update_temperature_dependent_params</code>, <code>d_S_shifted</code>, and the <code>damage</code> namespace with <code>impair_switch</code>, <code>k_rec_eff</code> and <code>rates</code>);</li>
+<li>the integration of those states on a plant, the dilution of damaged leaf by growth, and the whole-plant costs, in plant’s <code>TF24t</code> model (<code>inst/include/plant/models/tf24t_model.h</code>).</li>
+</ul>
+<p>It began as a port of the July 2026 layer (<code>TF24t</code> thermal revision 3; §<a href="#sec-port" class="quarto-xref">11.2</a>) and was then redesigned to three states with the dynamics on the leaf (thermal revision 4; §<a href="#sec-redesign" class="quarto-xref">11.3</a>). The decisions behind both are in <a href="https://github.com/traitecoevo/plant/blob/f406b6d864f5a68b97c5acc68f6bcf44fb05cda6/notes/plan-atls-port.md"><code>notes/plan-atls-port.md</code></a>, in the history.</p>
+<p>With the gate off every equation below collapses to its TF24 form (no lasting damage, no <span class="math inline">T_\mathrm{opt}</span> shift, no thermal cost), so TF24 and TF24 with the energy balance are bit-identical to a leaf without the layer. The <code>TF24t</code> model turns the gate on unconditionally and, because the dynamics are only physically meaningful at a real operating-point leaf temperature, also forces the energy balance on.</p>
+<p>The companion guide, <a href="../../guides/tf24t-thermal-damage.html">TF24t: thermal damage and four strategies</a>, exercises these equations numerically; this page states them.</p>
+<p>Notation: temperatures are in °C unless written <span class="math inline">T_K = T + T_0</span> with <span class="math inline">T_0 = 273.15</span>. <span class="math inline">R = 8.314462618\ \mathrm{J\,mol^{-1}\,K^{-1}}</span> is the gas constant (phylloptim’s exact value, the same one the peaked Arrhenius uses).</p>
+<hr>
+</section>
+<section id="the-model-in-one-paragraph" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-model-in-one-paragraph"><span class="header-section-number">2</span> The model in one paragraph</h2>
+<p>A leaf sits at an operating temperature <span class="math inline">T_\ell</span> set by its energy balance (§<a href="#sec-energy" class="quarto-xref">3</a>). Photosynthetic <em>capacity</em> (<span class="math inline">V_\mathrm{cmax}</span>, <span class="math inline">J_\mathrm{max}</span>) follows a reversible peaked-Arrhenius response whose optimum <span class="math inline">T_\mathrm{opt}</span> can be shifted up by constitutive tolerance and by acclimation (§<a href="#sec-capacity" class="quarto-xref">4</a>). On top of that instantaneous response, the leaf area is split into <strong>functional</strong>, <strong>impaired</strong> and <strong>damaged</strong> fractions, <span class="math inline">F\rightleftharpoons I\to D</span> (§<a href="#sec-damage" class="quarto-xref">5</a>). Functional leaf is impaired at a rate that a smooth switch turns on around 34.5 °C at the defaults, with parameters of its own; impaired leaf is repaired over days or matures into damaged leaf, which clears only as the plant grows new leaf. Both capacities scale by <span class="math inline">F = 1-I-D</span>. Constitutive tolerance and a single inducible acclimation state <span class="math inline">A</span>, forced by the leaf temperature, shift <span class="math inline">T_\mathrm{opt}</span> and the switch together (§<a href="#sec-accl" class="quarto-xref">6</a>). Every axis carries a carbon cost (§<a href="#sec-cost" class="quarto-xref">7</a>). Because the switch and the capacities are evaluated at the operating-point <span class="math inline">T_\ell</span>, transpirational cooling (<strong>avoidance</strong>) slows impairment (§<a href="#sec-feedback" class="quarto-xref">8</a>).</p>
+<p>The four strategy axes map onto the equations as:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Axis</th>
+<th>Parameter(s)</th>
+<th>Enters via</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Tolerance</strong> (constitutive)</td>
+<td><span class="math inline">\Delta T_\mathrm{opt,0}</span> (<code>topt_offset</code>)</td>
+<td>shift of <span class="math inline">T_\mathrm{opt}</span> (§<a href="#sec-topt-shift" class="quarto-xref">4.2</a>) and of the switch midpoint (§<a href="#sec-switch" class="quarto-xref">5.2</a>)</td>
+</tr>
+<tr class="even">
+<td><strong>Acclimation</strong> (inducible)</td>
+<td><span class="math inline">A</span> (ODE state)</td>
+<td>the same two shifts, inducibly, with their own ceilings (§<a href="#sec-accl" class="quarto-xref">6</a>)</td>
+</tr>
+<tr class="odd">
+<td><strong>Repair</strong></td>
+<td>preventive <span class="math inline">k_i</span>, restorative <span class="math inline">k_\mathrm{rec}</span></td>
+<td>the <span class="math inline">F\rightleftharpoons I\to D</span> cascade (§<a href="#sec-damage" class="quarto-xref">5</a>)</td>
+</tr>
+<tr class="even">
+<td><strong>Avoidance</strong></td>
+<td>transpiration <span class="math inline">E</span> via the energy balance</td>
+<td><span class="math inline">T_\ell</span> → <span class="math inline">k_\mathrm{imp}</span> (§<a href="#sec-energy" class="quarto-xref">3</a>, §<a href="#sec-feedback" class="quarto-xref">8</a>)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="sec-energy" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="sec-energy"><span class="header-section-number">3</span> Leaf temperature: Penman–Monteith energy balance</h2>
+<p>The operating leaf temperature is phylloptim’s explicit energy balance (#523; <code>Leaf::leaf_temp_from_E</code>):</p>
+<p><span id="eq-tleaf"><span class="math display">
+T_\ell \;=\; T_\mathrm{air} \;+\; \frac{\left(R_n - \lambda E\right)\, r_a}{\rho c_p},
+\qquad T_\ell \in [-40, 70]\ \text{°C (clamped)} .
+\tag{1}</span></span></p>
+<p>On this path the <code>leaf_temp</code> driver (<code>TF24_Environment::get_leaf_temp()</code>) is read as the <strong>air</strong> temperature <span class="math inline">T_\mathrm{air}</span>. The terms are:</p>
+<ul>
+<li><strong>Net radiation</strong> <span class="math inline">R_n = a_\mathrm{sw}\,Q/\eta_\mathrm{par} + L_\mathrm{net}</span>, with absorbed PAR <span class="math inline">Q</span> (µmol m⁻² s⁻¹), shortwave-to-PAR factor <span class="math inline">a_\mathrm{sw}=2</span>, photon conversion <span class="math inline">\eta_\mathrm{par}=4.57</span> µmol J⁻¹, and a fixed clear-sky longwave cooling offset <span class="math inline">L_\mathrm{net}=-40</span> W m⁻².</li>
+<li><strong>Aerodynamic resistance</strong> <span class="math inline">r_a = C_{r_a}\sqrt{d/U}</span> (<span class="math inline">C_{r_a}=200</span>), with leaf dimension <span class="math inline">d</span> (<code>pars$d</code>) and above-canopy wind speed <span class="math inline">U</span> (the <code>wind_speed</code> driver); a fixed <span class="math inline">r_a = 50</span> s m⁻¹ is used when <span class="math inline">d</span> or <span class="math inline">U</span> is zero. Smaller <span class="math inline">d</span> or higher <span class="math inline">U</span> couples the leaf more closely to the air.</li>
+<li><strong>Latent heat</strong> <span class="math inline">\lambda = 2.45\times10^{6}</span> J kg⁻¹; <strong>volumetric heat capacity of air</strong> <span class="math inline">\rho c_p = 1200</span> J m⁻³ K⁻¹.</li>
+<li><strong>Transpiration</strong> <span class="math inline">E</span> (kg H₂O m⁻² s⁻¹) is not free: it is pinned by the hydraulic supply at the water potential the profit optimiser chooses (§<a href="#sec-feedback" class="quarto-xref">8</a>). The leaf-to-air vapour-pressure deficit follows the same <span class="math inline">T_\ell</span>.</li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Caveat.</strong> An isolated, poorly coupled leaf under high radiation runs well above the air — tens of degrees at the extremes. Absolute <span class="math inline">T_\ell</span> in a leaf-level sweep is therefore an upper bound; the <em>contrast</em> between well- and poorly-coupled leaves is the robust signal.</p>
+</blockquote>
+<p>TF24 reports the operating-point <span class="math inline">T_\ell</span> (phylloptim’s <code>Leaf::Tleaf_</code>) as its <code>Tleaf</code> aux, so the running mean (§<a href="#sec-meanT" class="quarto-xref">6.1</a>) and any diagnostic can read the temperature the leaf actually ran at rather than the driver.</p>
+<hr>
+</section>
+<section id="sec-capacity" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="sec-capacity"><span class="header-section-number">4</span> Reversible photosynthetic capacity</h2>
+<section id="arrhenius-and-peaked-arrhenius-forms" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="arrhenius-and-peaked-arrhenius-forms"><span class="header-section-number">4.1</span> Arrhenius and peaked-Arrhenius forms</h3>
+<p>Parameters with no temperature optimum (<span class="math inline">\Gamma^*</span>, <span class="math inline">K_o</span>, <span class="math inline">K_c</span>) use a plain Arrhenius response:</p>
+<p><span class="math display">
+f_\mathrm{arrh}(T_\ell; E_a, f_{25})
+= f_{25}\,\exp\!\left[\frac{E_a\,(T_{\ell,K}-298.15)}{298.15\,R\,T_{\ell,K}}\right].
+</span></p>
+<p><span class="math inline">V_\mathrm{cmax}</span> and <span class="math inline">J_\mathrm{max}</span> use the Medlyn (2002) <strong>peaked</strong> Arrhenius form, which adds a high-temperature deactivation term:</p>
+<p><span id="eq-peak"><span class="math display">
+f_\mathrm{peak}(T_\ell; E_a, f_{25}, H_d, \Delta S)
+= f_\mathrm{arrh}(T_\ell)\cdot
+\frac{1+\exp\!\big[(\Delta S\cdot 298.15 - H_d)/(298.15\,R)\big]}
+     {1+\exp\!\big[(\Delta S\cdot T_{\ell,K} - H_d)/(R\,T_{\ell,K})\big]}.
+\tag{2}</span></span></p>
+<p>The peak (capacity optimum) is at</p>
+<p><span id="eq-topt"><span class="math display">
+T_{\mathrm{opt},K} \;=\; \frac{H_d}{\Delta S - R\ln\!\big(E_a/(H_d-E_a)\big)} .
+\tag{3}</span></span></p>
+<p>Defaults (<span class="math inline">V_\mathrm{cmax}</span>: <span class="math inline">E_a=60000</span>, <span class="math inline">H_d=200000</span>, <span class="math inline">\Delta S=650</span>; <span class="math inline">J_\mathrm{max}</span>: <span class="math inline">E_a=30000</span>, <span class="math inline">H_d=200000</span>, <span class="math inline">\Delta S=650</span>; J mol⁻¹, J mol⁻¹, J mol⁻¹ K⁻¹) place <span class="math inline">T_\mathrm{opt}\approx30</span> °C. <span class="math inline">\Delta S</span> is the knob that moves it: lower <span class="math inline">\Delta S</span>, higher <span class="math inline">T_\mathrm{opt}</span>. All six are settable on phylloptim’s leaf, and the layer reads the values set.</p>
+<p>The curve is normalised to <span class="math inline">f_{25}</span> at 25 °C, so no shift of <span class="math inline">\Delta S</span> moves <span class="math inline">V_\mathrm{cmax}</span> or <span class="math inline">J_\mathrm{max}</span> <em>at</em> 25 °C: with the leaf at exactly 25 °C, tolerance and acclimation act only through the impairment switch.</p>
+</section>
+<section id="sec-topt-shift" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="sec-topt-shift"><span class="header-section-number">4.2</span> Shifting the optimum: <span class="math inline">T_\mathrm{opt}</span> target → <span class="math inline">\Delta S</span> inversion</h3>
+<p>Rather than exposing <span class="math inline">\Delta S</span>, the model takes a <strong>target optimum shift</strong> <span class="math inline">\Delta T_\mathrm{opt}</span> (°C) and inverts <a href="#eq-topt" class="quarto-xref">Equation&nbsp;3</a> for the <span class="math inline">\Delta S</span> that achieves it (<code>d_S_shifted</code>). With <span class="math inline">\mathrm{corr}=R\ln(E_a/(H_d-E_a))</span> and baseline optimum <span class="math inline">T_{\mathrm{opt},0,K}=H_d/(\Delta S_\mathrm{base}-\mathrm{corr})</span>:</p>
+<p><span class="math display">
+T_{\mathrm{opt},K}' = \mathrm{clamp}\!\big(T_{\mathrm{opt},0,K} + \Delta T_\mathrm{opt},\;250,\;350\big),
+\qquad
+\Delta S' = \frac{H_d}{T_{\mathrm{opt},K}'} + \mathrm{corr}.
+</span></p>
+<p>The clamp keeps the curve peaked and finite for any offset; the inversion exists only for <span class="math inline">0&lt;E_a&lt;H_d</span>, and the leaf refuses anything else. The total shift combines the constitutive (tolerance) offset and a <em>single</em> inducible thermostability state <span class="math inline">A</span> (§<a href="#sec-accl" class="quarto-xref">6</a>):</p>
+<p><span id="eq-dtopt"><span class="math display">
+\Delta T_\mathrm{opt} \;=\; \underbrace{\Delta T_\mathrm{opt,0}}_{\text{tolerance}}
+\;+\; \underbrace{\Delta T_{\mathrm{opt,max}}\,\frac{A}{A+K_A}}_{\text{acclimation}} .
+\tag{4}</span></span></p>
+<p>Each of <span class="math inline">V_\mathrm{cmax}</span> and <span class="math inline">J_\mathrm{max}</span> has its own <span class="math inline">\Delta S</span> inverted for the same <span class="math inline">\Delta T_\mathrm{opt}</span> in <a href="#eq-peak" class="quarto-xref">Equation&nbsp;2</a>. The impairment switch has its own midpoint, shifted by the same constitutive offset and the same state <span class="math inline">A</span> but with its own ceiling (§<a href="#sec-switch" class="quarto-xref">5.2</a>).</p>
+<hr>
+</section>
+</section>
+<section id="sec-damage" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="sec-damage"><span class="header-section-number">5</span> Lasting impairment: functional, impaired and damaged leaf</h2>
+<section id="sec-fractions" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="sec-fractions"><span class="header-section-number">5.1</span> Three fractions of leaf area</h3>
+<p>The layer splits the leaf area into three fractions, <strong>functional</strong> <span class="math inline">F</span>, <strong>impaired</strong> <span class="math inline">I</span> and <strong>damaged</strong> <span class="math inline">D</span>, with <span class="math inline">F = 1 - I - D</span>. Functional leaf is impaired by heat; impaired leaf is either repaired back to functional or matures into damaged leaf, which does not recover:</p>
+<p><span class="math display">
+F \;\underset{k_\mathrm{rec}^\mathrm{eff}(T_\ell)}{\overset{k_\mathrm{imp}(T_\ell)}{\rightleftharpoons}}\; I \;\xrightarrow{\;k_\mathrm{mat}\;}\; D .
+</span></p>
+<p>The names are process-agnostic: <span class="math inline">I</span> can stand for photoinhibited or denatured machinery, or for leaf area that has stopped photosynthesising, without changing the equations. Only the functional area photosynthesises, so <strong>both</strong> capacities are scaled by <span class="math inline">F</span> (<code>update_temperature_dependent_params</code>):</p>
+<p><span id="eq-discount"><span class="math display">
+V_\mathrm{cmax}=f_\mathrm{peak}^{V}(T_\ell)\,F,
+\qquad
+J_\mathrm{max}=f_\mathrm{peak}^{J}(T_\ell)\,F .
+\tag{5}</span></span></p>
+<p>The instantaneous, reversible deactivation is already inside <span class="math inline">f_\mathrm{peak}</span>, and impairment is a lasting loss on top of it, so this is not a second count of one process. <span class="math inline">F</span> is floored at <span class="math inline">10^{-6}</span> here, so capacity stays strictly positive and the photosynthesis solve stays well-conditioned as <span class="math inline">I+D\to1</span>. At a fresh evaluation (<span class="math inline">I=D=0</span>) a hot leaf loses nothing beyond the peaked Arrhenius: impairment is a <em>memory</em> that accrues over time.</p>
+<p><span class="math inline">J_\mathrm{max}</span>, after the scaling, sets the light-limited electron transport through the non-rectangular hyperbola, colimiting with the Rubisco-limited rate in the FvCB solve.</p>
+</section>
+<section id="sec-switch" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="sec-switch"><span class="header-section-number">5.2</span> The impairment rate and its switch</h3>
+<p>Functional leaf is impaired at a rate that a smooth switch turns on with temperature (<code>damage::k_i_eff</code>, <code>damage::impair_switch</code>):</p>
+<p><span id="eq-kimp"><span class="math display">
+k_\mathrm{imp}(T_\ell) = k_i\,\exp\!\left[\frac{E_{a,i}}{R}\left(\frac{1}{T_{\mathrm{ref},K}}-\frac{1}{T_{\ell,K}}\right)\right]\frac{K}{1+K},
+\qquad
+K = \exp\!\left[\frac{H_\mathrm{imp}}{R}\left(\frac{1}{T'_{\mathrm{mid},K}}-\frac{1}{T_{\ell,K}}\right)\right].
+\tag{6}</span></span></p>
+<p>The switch <span class="math inline">K/(1+K)</span> is half on at its midpoint <span class="math inline">T'_\mathrm{mid}</span> and has the form of a two-state equilibrium with enthalpy <span class="math inline">H_\mathrm{imp}</span>; a larger <span class="math inline">H_\mathrm{imp}</span> makes it sharper. The Arrhenius factor is 1 at <span class="math inline">T_\mathrm{ref}</span>; at the default <span class="math inline">E_{a,i}=0</span> the rate saturates at <span class="math inline">k_i</span>. The midpoint is shifted by tolerance and acclimation:</p>
+<p><span id="eq-dtimp"><span class="math display">
+T'_\mathrm{mid} = T_\mathrm{mid} + \Delta T_\mathrm{opt,0} + \Delta T_\mathrm{imp,max}\,\frac{A}{A+K_A},
+\qquad T'_{\mathrm{mid},K}\in[250,350]\ \text{(clamped)} .
+\tag{7}</span></span></p>
+<p>The switch has <strong>its own parameters</strong>, independent of the <span class="math inline">J_\mathrm{max}</span> curve’s <span class="math inline">(H_d, \Delta S)</span>. Its defaults, <span class="math inline">H_\mathrm{imp}=200000</span> J mol⁻¹ and <span class="math inline">T_\mathrm{mid}=H_d/\Delta S - T_0\approx34.5</span> °C, reproduce the onset of the July layer, but moving the <span class="math inline">J_\mathrm{max}</span> curve no longer moves impairment.</p>
+</section>
+<section id="sec-repair" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="sec-repair"><span class="header-section-number">5.3</span> Repair: preventive <span class="math inline">k_i</span> and restorative <span class="math inline">k_\mathrm{rec}</span></h3>
+<p>Repair has two mechanistically distinct axes:</p>
+<ul>
+<li><strong>Preventive <span class="math inline">k_i</span></strong>: the impairment rate once the switch is on. Lowering it is protection of the functional machinery.</li>
+<li><strong>Restorative <span class="math inline">k_\mathrm{rec}</span></strong>: the rate at which impaired leaf returns to functional, calibrated by the 3–5 d rebound. It is gated off above <span class="math inline">T_\mathrm{rep,cut}</span>, because the repair machinery itself fails when too hot (<code>damage::k_rec_eff</code>): <span id="eq-krec"><span class="math display">
+k_\mathrm{rec}^\mathrm{eff}(T_\ell)=k_\mathrm{rec}\,\sigma\!\big(-m_\mathrm{rep}(T_\ell-T_\mathrm{rep,cut})\big),
+\qquad \sigma(x)=\tfrac{1}{1+e^{-x}} .
+\tag{8}</span></span></li>
+</ul>
+<p>Above <span class="math inline">T_\mathrm{rep,cut}</span> the switch is fully on <em>and</em> repair shuts off, so <span class="math inline">I</span> accrues unchecked and matures into <span class="math inline">D</span>: the runaway that gives heatwave lethality.</p>
+<hr>
+</section>
+</section>
+<section id="sec-accl" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="sec-accl"><span class="header-section-number">6</span> Slow ODE states: acclimation <span class="math inline">A</span> and the fractions <span class="math inline">I</span>, <span class="math inline">D</span></h2>
+<p>The dynamics are phylloptim’s, written once on the leaf (<code>Leaf::damage_rates</code>), so a leaf experiment can be fitted with phylloptim alone (<code>leaf_damage_trajectory()</code>, and its exact sensitivities <code>leaf_damage_gradient()</code>). Four ODE states are appended to TF24’s state vector (<code>TF24t_Model::compute_rates</code>): <code>acclim_thermostab</code> (<span class="math inline">A</span>), <code>impaired</code> (<span class="math inline">I</span>), <code>damaged</code> (<span class="math inline">D</span>), and the diagnostic <code>mean_leaf_temp</code> (<span class="math inline">\overline{T_\ell}</span>, §<a href="#sec-meanT" class="quarto-xref">6.1</a>). The current <span class="math inline">A</span>, <span class="math inline">I</span> and <span class="math inline">D</span> are handed to the leaf before TF24’s rates solve it, so the capacity scaling and both shifts see them; the leaf’s rates are then evaluated at the operating-point <span class="math inline">T_\ell</span>. Each is the leaf’s per-day rate times <span class="math inline">\mathcal{D}=365.25\ \mathrm{d\,yr^{-1}}</span>, the SCM’s per-year clock; the dilution below is already per year.</p>
+<p><strong>Acclimation.</strong> A single thermostability state relaxes toward a heat-driven forcing on the <strong>leaf</strong> temperature:</p>
+<p><span id="eq-accl"><span class="math display">
+\frac{\mathrm{d}A}{\mathrm{d}t}
+= \mathcal{D}\,\big[\alpha\,\mathrm{sp}\!\big(T_\ell - T_\mathrm{accl}\big) - \beta A\big],
+\qquad
+\mathrm{sp}(x) = \tfrac{1}{s}\log\!\big(1 + e^{s x}\big),
+\tag{9}</span></span></p>
+<p>where <span class="math inline">\mathrm{sp}</span> is the softplus (<span class="math inline">C^1</span>) replacement for <span class="math inline">\max(0,x)</span> with sharpness <span class="math inline">s</span>. <span class="math inline">A</span> feeds the <span class="math inline">T_\mathrm{opt}</span> shift (<a href="#eq-dtopt" class="quarto-xref">Equation&nbsp;4</a>) and the switch’s shift (<a href="#eq-dtimp" class="quarto-xref">Equation&nbsp;7</a>).</p>
+<p><strong>Impairment and damage.</strong></p>
+<p><span id="eq-cascade"><span class="math display">
+\frac{\mathrm{d}I}{\mathrm{d}t}=\mathcal{D}\,\Big[k_\mathrm{imp}(T_\ell)\,F
+- \big(k_\mathrm{rec}^\mathrm{eff}+k_\mathrm{mat}\big)\,I\Big],
+\qquad
+\frac{\mathrm{d}D}{\mathrm{d}t}=\mathcal{D}\,k_\mathrm{mat}\,I-\frac{g}{L}\,D .
+\tag{10}</span></span></p>
+<p>The factor <span class="math inline">F=1-I-D</span> confines fresh impairment to functional leaf, bounding <span class="math inline">I+D\le1</span> without a clamp. The <strong>maturation coupling</strong> is the central emergent behaviour: the damaged share of an insult is <span class="math inline">\approx k_\mathrm{mat}/(k_\mathrm{rec}^\mathrm{eff}+k_\mathrm{mat})</span>, so prompt repair both rebounds faster <em>and</em> leaves a lower lasting floor.</p>
+<p><strong>Clearance of damage by dilution.</strong> <span class="math inline">D</span> is an intensive fraction; with unbiased senescence the shed-tissue terms cancel and only clean new leaf dilutes it, so <span class="math inline">g/L</span> is the gross leaf-area production rate over leaf area: <span class="math inline">g/L = k_l + \max(0,\dot L^*)/L^* + \dot\delta_l</span> (leaf turnover <span class="math inline">k_l</span> in the mature limit, faster while the canopy expands; <span class="math inline">\dot L^*</span> is the allometric leaf area’s rate, recovered from the height rate, and <span class="math inline">\dot\delta_l</span> the leaf departure’s, zero unless flexible allometry is on: a canopy withholding turnover is diluted more slowly, one rebuilding faster). This is the one term the plant adds to the leaf’s dynamics: a detached leaf does not grow, so phylloptim’s <span class="math inline">\mathrm{d}D/\mathrm{d}t</span> has no sink.</p>
+<p><strong>Equilibrium and seeding.</strong> <span class="math inline">A</span> is <strong>seeded at its equilibrium</strong> <span class="math inline">A^\star=(\alpha/\beta)\,\mathrm{sp}(T_\mathrm{air}-T_\mathrm{accl})</span> at the birth <strong>air</strong> temperature, because the operating point, and so the leaf temperature, is not solved until the first rate evaluation (the <span class="math inline">\mathcal{D}</span> cancels in the ratio; with <span class="math inline">\beta=0</span> it starts at 0). <span class="math inline">I=D=0</span> at birth (<code>set_initial_states</code>). A recruit then relaxes from that seed toward the equilibrium at its own leaf temperature over <span class="math inline">1/\beta</span>.</p>
+<blockquote class="blockquote">
+<p><strong>Timescales.</strong> The kinetics are per day, converted to the yearly clock by <span class="math inline">\mathcal{D}</span>. That makes <span class="math inline">I</span> (about 4 d) a genuinely fast mode on the demographic clock; it is integrated faithfully as an ODE, at a real cost in integration steps (§<a href="#sec-numerics" class="quarto-xref">10</a>). The rate constants and cost scales are calibration targets.</p>
+</blockquote>
+<section id="sec-meanT" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="sec-meanT"><span class="header-section-number">6.1</span> Running-mean leaf temperature <span class="math inline">\overline{T_\ell}</span></h3>
+<p>A fourth state, <code>mean_leaf_temp</code>, tracks the plant’s average growing temperature as an exponential moving average of the operating-point leaf temperature <span class="math inline">T_\ell</span> (TF24’s <code>Tleaf</code> aux):</p>
+<p><span id="eq-meanT"><span class="math display">
+\frac{\mathrm{d}\,\overline{T_\ell}}{\mathrm{d}t}
+  = \mathcal{D}\,k_{\overline{T}}\,\bigl(T_\ell - \overline{T_\ell}\bigr),
+\tag{11}</span></span></p>
+<p>with decay rate <span class="math inline">k_{\overline{T}}</span> (<code>k_mean_leaf_temp</code>, day⁻¹). Its steady state is <span class="math inline">T_\ell</span> and its memory is <span class="math inline">1/k_{\overline{T}}</span> (about 30 d at the default). It is seeded at the birth air temperature, because the operating point is not solved until the first rate evaluation.</p>
+<p><strong>This state is purely diagnostic</strong>: it reads <span class="math inline">T_\ell</span> but nothing reads it — it shifts no <span class="math inline">\Delta S</span>, moves no switch, and changes no other rate. It exists so the temperature history a plant has actually experienced is available as an ODE output. (Driving acclimation off <span class="math inline">\overline{T_\ell}</span> instead of the instantaneous leaf temperature, a running-mean forcing in the style of Knauer et al., is a possible later change.)</p>
+<hr>
+</section>
+</section>
+<section id="sec-cost" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="sec-cost"><span class="header-section-number">7</span> Carbon costs of thermal strategy</h2>
+<p>Costs live in two places, matching the physics.</p>
+<section id="leaf-level-respiration" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="leaf-level-respiration"><span class="header-section-number">7.1</span> Leaf-level respiration</h3>
+<p>Dark respiration is phylloptim’s, <span class="math inline">R_d = R_{d,25}\,Q_{10}(T_\ell)^{(T_\ell-25)/10}</span> with a declining <span class="math inline">Q_{10}</span>, independent of <span class="math inline">V_\mathrm{cmax}</span>. On the damage path four costs are added after it (µmol C m⁻² s⁻¹; <code>update_temperature_dependent_params</code>):</p>
+<p><span id="eq-Rd"><span class="math display">
+R_d \;\mathrel{+}=\;
+\underbrace{c_\mathrm{acclim}\,A}_{\text{acclim. maintenance}}
+\;+\;
+\underbrace{c_\mathrm{rep,maint}\,k_\mathrm{rec}
++ c_\mathrm{prot}\max(0,k_{i,\mathrm{base}}-k_i)}_{\text{repair + protection maintenance}}
+\;+\;
+\underbrace{c_\mathrm{rep,flux}\,k_\mathrm{rec}^\mathrm{eff}\,I}_{\text{repair activity}} .
+\tag{12}</span></span></p>
+<p>Standing maintenance is paid whether or not used — for repair <em>capacity</em> (<span class="math inline">k_\mathrm{rec}</span>) and for the <em>protection</em> bought (lowering <span class="math inline">k_i</span> below the baseline <span class="math inline">k_{i,\mathrm{base}}</span>). Repair <em>activity</em> is paid in proportion to leaf actually repaired (<span class="math inline">k_\mathrm{rec}^\mathrm{eff}\,I</span>). <span class="math inline">R_d</span> itself is <strong>not</strong> scaled by <span class="math inline">F</span>: impaired and damaged leaf respires as functional leaf does, plus these costs.</p>
+</section>
+<section id="whole-plant-net-production" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="whole-plant-net-production"><span class="header-section-number">7.2</span> Whole-plant net production</h3>
+<p>The TF24t model overrides net mass production to subtract two costs that are not leaf-local respiration (<code>TF24t_Model::net_mass_production_dt</code>):</p>
+<p><span class="math display">
+\dot m_\mathrm{net}^{\,\mathrm{TF24t}} = \dot m_\mathrm{net}^{\,\mathrm{TF24}}
+- C_\mathrm{build} - C_\mathrm{induct}.
+</span></p>
+<ul>
+<li><strong>Construction cost</strong> (constitutive tolerance), on the single thermostability offset and amortised through leaf turnover <span class="math inline">\tau_\ell(m_\ell)</span>: <span class="math display">
+C_\mathrm{build} = c_\mathrm{build}\,\max(0,\Delta T_\mathrm{opt,0})\,\tau_\ell .
+</span> Only thermostability bought <em>above</em> the intrinsic optimum is paid for, so a default TF24t pays no construction cost.</li>
+<li><strong>Induction cost</strong> (acclimation), proportional to leaf area <span class="math inline">L</span> and the smoothed positive build rate of <span class="math inline">A</span>: <span class="math display">
+C_\mathrm{induct} = c_\mathrm{induct}\,L\,\mathrm{pos}(\dot A),
+\qquad \mathrm{pos}(x)=\tfrac12\big(x + \sqrt{x^2+\varepsilon^2}\big),
+</span> a <span class="math inline">C^\infty</span> positive part of the form TF24 uses for net production. It is <span class="math inline">\varepsilon/2</span>, not zero, at <span class="math inline">\dot A = 0</span>. It is charged per unit leaf area because <span class="math inline">A</span> is built per unit leaf: charged per plant, as in July, it did not shrink with the plant, and once acclimation followed the leaf temperature a newborn whose leaf ran warmer than the air its <span class="math inline">A</span> was seeded at paid about 1800 times its net production.</li>
+</ul>
+<p>Avoidance carries <strong>no new cost term</strong>: its water use is already priced by the hydraulic cost.</p>
+<hr>
+</section>
+</section>
+<section id="sec-feedback" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="sec-feedback"><span class="header-section-number">8</span> The optimiser feedback: avoidance</h2>
+<p>The leaf chooses its root-collar water potential to maximise profit,</p>
+<p><span class="math display">
+\Pi(\psi) = A\big(T_\ell(E(\psi))\big) - (\text{hydraulic cost}),
+</span></p>
+<p>and the coupling chain is</p>
+<p><span class="math display">
+\psi \;\to\; E \;\xrightarrow{\text{@eq-tleaf}}\; T_\ell
+\;\xrightarrow{\text{@eq-kimp}}\; k_\mathrm{imp} \;\to\; \dot I \;\to\; F\,J_\mathrm{max} \;\to\; A \;\to\; \Pi .
+</span></p>
+<p>A more-transpiring or better-coupled (smaller-<span class="math inline">d</span>) leaf runs a cooler <span class="math inline">T_\ell</span>, lowering <span class="math inline">k_\mathrm{imp}</span> and hence the flux into <span class="math inline">I</span>; over time it carries less impairment and damage and keeps more capacity.</p>
+<blockquote class="blockquote">
+<p><strong>What the optimiser does not see.</strong> <span class="math inline">k_\mathrm{imp}</span> drives impairment but enters no steps profit: the optimiser sees impairment only through capacities already scaled by <span class="math inline">F</span>, so it cannot trade carbon now against impairment later. Cooling is rewarded only through the capacity it later preserves. Whether impairment should enter the stomatal decision awaits a separate analysis.</p>
+</blockquote>
+<hr>
+</section>
+<section id="sec-params" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="sec-params"><span class="header-section-number">9</span> Parameters and defaults</h2>
+<p>Thermal, acclimation and cost parameters sit at the top level of the <code>TF24t</code> strategy (<code>tf24t_model.h</code>), not in <code>pars</code>; the leaf-side copies carry a trailing underscore.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Code</th>
+<th>Default</th>
+<th>Units</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\Delta T_\mathrm{opt,0}</span></td>
+<td><code>topt_offset</code></td>
+<td>0</td>
+<td>°C</td>
+<td>constitutive thermostability shift (<span class="math inline">T_\mathrm{opt}</span> and the switch midpoint)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">H_\mathrm{imp}</span></td>
+<td><code>impair_H</code></td>
+<td>200000</td>
+<td>J mol⁻¹</td>
+<td>sharpness (enthalpy) of the impairment switch</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">T_\mathrm{mid}</span></td>
+<td><code>impair_Tmid</code></td>
+<td>34.54</td>
+<td>°C</td>
+<td>switch midpoint before shifts (<span class="math inline">200000/650-273.15</span>)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">k_i</span></td>
+<td><code>k_i</code></td>
+<td>0.5</td>
+<td>day⁻¹</td>
+<td>impairment rate <span class="math inline">F\to I</span> at <span class="math inline">T_\mathrm{ref}</span> with the switch on</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">E_{a,i}</span></td>
+<td><code>k_i_Ea</code></td>
+<td>0</td>
+<td>J mol⁻¹</td>
+<td>activation energy of <span class="math inline">k_i</span> (0: constant)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">T_\mathrm{ref}</span></td>
+<td><code>k_i_Tref</code></td>
+<td>25</td>
+<td>°C</td>
+<td>reference temperature of <span class="math inline">k_i</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">k_\mathrm{rec}</span></td>
+<td><code>k_rec</code></td>
+<td>0.25</td>
+<td>day⁻¹</td>
+<td>repair <span class="math inline">I\to F</span> when cool (3–5 d rebound)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">k_\mathrm{mat}</span></td>
+<td><code>k_mat</code></td>
+<td>0.02</td>
+<td>day⁻¹</td>
+<td>maturation <span class="math inline">I\to D</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">m_\mathrm{rep}</span></td>
+<td><code>m_rep</code></td>
+<td>0.4</td>
+<td>°C⁻¹</td>
+<td>slope of the repair shut-off</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">T_\mathrm{rep,cut}</span></td>
+<td><code>t_rep_cut</code></td>
+<td>45</td>
+<td>°C</td>
+<td>repair shut-off temperature</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\Delta T_\mathrm{opt,max}</span></td>
+<td><code>dTopt_max</code></td>
+<td>6</td>
+<td>°C</td>
+<td>largest acclimated rise in <span class="math inline">T_\mathrm{opt}</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\Delta T_\mathrm{imp,max}</span></td>
+<td><code>dTimpair_max</code></td>
+<td>6</td>
+<td>°C</td>
+<td>largest acclimated rise in the switch midpoint</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">K_A</span></td>
+<td><code>K_A</code></td>
+<td>1.0</td>
+<td>—</td>
+<td>half-saturation of both acclimated rises</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\alpha</span></td>
+<td><code>alpha</code></td>
+<td>0.02</td>
+<td>day⁻¹ °C⁻¹</td>
+<td>acclimation forcing gain (leaf <code>acclim_alpha_</code>)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\beta</span></td>
+<td><code>beta</code></td>
+<td>0.01</td>
+<td>day⁻¹</td>
+<td>acclimation decay (leaf <code>acclim_beta_</code>)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">T_\mathrm{accl}</span></td>
+<td><code>t_accl</code></td>
+<td>30</td>
+<td>°C</td>
+<td>acclimation forcing threshold, on the leaf temperature (leaf <code>acclim_T_</code>)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">s</span></td>
+<td><code>softplus_s</code></td>
+<td>1.0</td>
+<td>°C⁻¹</td>
+<td>softplus sharpness (leaf <code>acclim_s_</code>)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">k_{\overline{T}}</span></td>
+<td><code>k_mean_leaf_temp</code></td>
+<td>0.0333</td>
+<td>day⁻¹</td>
+<td>running-mean decay (about 30 d memory; diagnostic)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">c_\mathrm{acclim}</span></td>
+<td><code>c_acclim_maint</code></td>
+<td>0.02</td>
+<td>—</td>
+<td>acclimation maintenance (<span class="math inline">R_d</span>, per unit <span class="math inline">A</span>)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">c_\mathrm{rep,maint}</span></td>
+<td><code>c_repair_maint</code></td>
+<td><span class="math inline">10^{-5}</span></td>
+<td>—</td>
+<td>repair maintenance (<span class="math inline">R_d</span>, per day⁻¹ of <span class="math inline">k_\mathrm{rec}</span>)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">c_\mathrm{prot}</span></td>
+<td><code>c_protect_maint</code></td>
+<td><span class="math inline">10^{-5}</span></td>
+<td>—</td>
+<td>protection maintenance (<span class="math inline">R_d</span>, per day⁻¹ of <span class="math inline">k_{i,\mathrm{base}}-k_i</span>)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">c_\mathrm{rep,flux}</span></td>
+<td><code>c_repair_flux</code></td>
+<td><span class="math inline">10^{-4}</span></td>
+<td>—</td>
+<td>repair activity (<span class="math inline">R_d</span>, per day⁻¹ of repair flux <span class="math inline">k_\mathrm{rec}^\mathrm{eff}I</span>)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">c_\mathrm{build}</span></td>
+<td><code>c_build</code></td>
+<td>0.02</td>
+<td>°C⁻¹</td>
+<td>construction premium on leaf turnover, per °C of thermostability</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">c_\mathrm{induct}</span></td>
+<td><code>c_accl_induct</code></td>
+<td>0.01</td>
+<td>kg m⁻²</td>
+<td>induction cost, biomass per m² of leaf per unit positive <span class="math inline">\dot A</span> (yr⁻¹)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\varepsilon</span></td>
+<td><code>induct_eps</code></td>
+<td><span class="math inline">10^{-4}</span></td>
+<td>—</td>
+<td>smoothing width of the positive part of <span class="math inline">\dot A</span></td>
+</tr>
+</tbody>
+</table>
+<p>Leaf-side constants: <span class="math inline">k_{i,\mathrm{base}}=0.5</span> day⁻¹ (<code>k_i_baseline_</code>, the leaf default TF24t does not change), the functional floor <span class="math inline">10^{-6}</span>, <span class="math inline">\mathcal{D}=365.25</span> day yr⁻¹. The energy-balance constants are those of §<a href="#sec-energy" class="quarto-xref">3</a>; the peaked-Arrhenius defaults are those of §<a href="#sec-capacity" class="quarto-xref">4</a>.</p>
+<hr>
+</section>
+<section id="sec-numerics" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="sec-numerics"><span class="header-section-number">10</span> Numerical-stability contract</h2>
+<p>The layer feeds the ODE integrator and the <code>run_mutant</code> replay, where a single non-finite value poisons the whole SCM run. The equations are built to a finite-output contract:</p>
+<ul>
+<li><strong><span class="math inline">C^1</span> everywhere.</strong> Every temperature or threshold response is smooth in drivers and traits: the impairment switch, its Arrhenius factor, the repair gate <span class="math inline">k_\mathrm{rec}^\mathrm{eff}</span> (logistic), the softplus forcing, the smooth positive part.</li>
+<li><strong>Bounded, saturating forms.</strong> Both shifts saturate in <span class="math inline">A</span>; the switch lies in <span class="math inline">[0,1]</span>; the factor <span class="math inline">F</span> bounds <span class="math inline">I+D\le1</span>; acclimation self-limits through <span class="math inline">-\beta A</span>.</li>
+<li><strong>Guarded transcendentals.</strong> Logistic, switch, Arrhenius and softplus arguments are clamped to <span class="math inline">|{\cdot}|\le30</span> before <code>exp</code>.</li>
+<li><strong>Protected domains.</strong> The <span class="math inline">\Delta S</span> shifts and the switch midpoint are clamped via <span class="math inline">T_K\in[250,350]</span>; <span class="math inline">T_\ell</span> is clamped to <span class="math inline">[-40,70]</span> °C.</li>
+<li><strong>Functional floor.</strong> <span class="math inline">F</span> is floored at <span class="math inline">10^{-6}</span> where it scales capacity, so a fully impaired leaf keeps a negligible-but-positive capacity.</li>
+<li><strong>Refused configurations.</strong> Negative or non-finite kinetics (<span class="math inline">\alpha</span>, <span class="math inline">\beta</span>, <span class="math inline">k_{\overline{T}}</span>, <span class="math inline">k_i</span>, <span class="math inline">k_\mathrm{rec}</span>, <span class="math inline">k_\mathrm{mat}</span>; <span class="math inline">s\le0</span>; <span class="math inline">H_\mathrm{imp}\le0</span>) stop the run. The deep-crown shading model is refused, because the damage rates are read after the crown loop and would hold the last quadrature node’s leaf temperature. No derivative path in plant carries the layer, so TF24t has no stand gradient.</li>
+<li><strong>A genuine fast mode.</strong> <span class="math inline">I</span> (about 4 d) forces small adaptive steps, each running a full leaf solve, so TF24t runs are materially slower than TF24, and a dying plant (<span class="math inline">I+D</span> near 1, storage empty) holds the stepper to very small steps.</li>
+</ul>
+<hr>
+</section>
+<section id="sec-merged" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="sec-merged"><span class="header-section-number">11</span> Revision history</h2>
+<section id="july-2026-the-merged-revision" class="level3" data-number="11.1">
+<h3 data-number="11.1" class="anchored" data-anchor-id="july-2026-the-merged-revision"><span class="header-section-number">11.1</span> July 2026: the merged revision</h3>
+<p>The layer first built in July used an instantaneous, reversible Lumry–Eyring factor <span class="math inline">N=k_r/(k_r+k_d)</span>, a second high-temperature discount on top of the peaked-Arrhenius deactivation, and two acclimation states. The merged revision made two structural changes:</p>
+<ol type="1">
+<li><strong>One reversible decline, not two.</strong> The deactivated fraction <span class="math inline">\varphi_d=K/(1+K)</span> came from the <em>same</em> <span class="math inline">K(T)</span> as the peaked Arrhenius, so the reversible response was counted once and the onset was emergent. (The October redesign gave impairment its own switch; §<a href="#sec-redesign" class="quarto-xref">11.3</a>.)</li>
+<li><strong>Damage with memory.</strong> <span class="math inline">N</span> was memoryless; the revision added two slow pools, recoverable <span class="math inline">I_r</span> and permanent <span class="math inline">I_p</span>, with both capacities discounted by <span class="math inline">(1-I_r-I_p)</span>. (Merged into one impaired state in October.)</li>
+</ol>
+<p>The two acclimation states merged into one thermostability state <span class="math inline">A</span>, and the running-mean leaf temperature was added at thermal revision 3. The phase history is in <a href="https://github.com/traitecoevo/plant/blob/f406b6d864f5a68b97c5acc68f6bcf44fb05cda6/notes/atls/implementation-plan.md"><code>notes/atls/implementation-plan.md</code></a>, in the history.</p>
+</section>
+<section id="sec-port" class="level3" data-number="11.2">
+<h3 data-number="11.2" class="anchored" data-anchor-id="sec-port"><span class="header-section-number">11.2</span> October 2026: the port to phylloptim</h3>
+<p>The leaf moved into phylloptim (#591), so the layer was re-implemented on current code: the leaf half in phylloptim’s <code>Leaf</code> (phylloptim#162), the strategy half in plant. The equations, states, parameters and defaults are July’s, with these adaptations:</p>
+<ul>
+<li><strong>Respiration</strong> is phylloptim’s <span class="math inline">R_{d,25}\,Q_{10}</span>, independent of <span class="math inline">V_\mathrm{cmax}</span>, with the four costs added after it. In July <span class="math inline">R_d = 0.015\,V_\mathrm{cmax}</span> after the survival discount, so a damaged leaf respired less; now it does not. This is the one intended divergence from July.</li>
+<li><strong>The gas constant</strong> is phylloptim’s exact value, so <span class="math inline">K</span> in <span class="math inline">\varphi_d</span> is the same <span class="math inline">K</span> as in the peaked Arrhenius.</li>
+<li><strong>The temperature parameters are settable</strong> on the leaf, and the shift and onset read the values set.</li>
+<li><strong>The <code>leaf_temp</code> driver keeps its name</strong> and is read as air temperature on the energy-balance path; July renamed it <code>air_temp</code>.</li>
+<li><strong>The <code>operating_leaf_temp</code> aux is gone</strong>: TF24 reports <code>Tleaf</code>, and the running mean relaxes toward it.</li>
+<li><strong>Deep-crown shading is refused</strong>, and <strong>no gradient</strong> in plant carries the layer.</li>
+</ul>
+</section>
+<section id="sec-redesign" class="level3" data-number="11.3">
+<h3 data-number="11.3" class="anchored" data-anchor-id="sec-redesign"><span class="header-section-number">11.3</span> October 2026: three states, the dynamics on the leaf</h3>
+<p>After the port, the layer was redesigned in phylloptim#162 and plant#694:</p>
+<ul>
+<li><strong>Three fractions, not four.</strong> Active, unfolded, recoverable and permanent machinery became functional, impaired and damaged fractions of leaf area, <span class="math inline">F\rightleftharpoons I\to D</span>, and the unfolded fraction <span class="math inline">\varphi_d</span> stopped being a separate quantity: impairment is a rate on functional leaf, <span class="math inline">k_\mathrm{imp}\,F</span>.</li>
+<li><strong>Impairment has its own switch</strong> (<span class="math inline">H_\mathrm{imp}</span>, <span class="math inline">T_\mathrm{mid}</span>), independent of the <span class="math inline">J_\mathrm{max}</span> curve, with its own acclimated ceiling <span class="math inline">\Delta T_\mathrm{imp,max}</span>. The <span class="math inline">J_\mathrm{max}</span> curve is the instantaneous reversible response; impairment is an additional process.</li>
+<li><strong><span class="math inline">k_i</span> is a centred Arrhenius rate</strong> (<span class="math inline">E_{a,i}</span>, <span class="math inline">T_\mathrm{ref}</span>); the default <span class="math inline">E_{a,i}=0</span> keeps it constant.</li>
+<li><strong>Acclimation is forced by the leaf temperature</strong>, not the air.</li>
+<li><strong>The dynamics moved to the leaf</strong> (<code>Leaf::damage_rates</code>), so phylloptim can fit leaf experiments alone, and its gradients carry the states and parameters. The plant adds only the dilution of <span class="math inline">D</span>, the per-year clock and the running mean.</li>
+<li><strong>The process-agnostic names</strong> replace “unfolded” and “denatured”.</li>
+</ul>
+</section>
+<section id="sec-timescales" class="level3" data-number="11.4">
+<h3 data-number="11.4" class="anchored" data-anchor-id="sec-timescales"><span class="header-section-number">11.4</span> Timescales and the near-rigid caveat</h3>
+<p>Mode timescales: <span class="math inline">k_\mathrm{imp}(T_\ell)</span> is algebraic, <span class="math inline">I\sim</span> 4 d, <span class="math inline">A\sim 1/\beta</span> (100 d at the default, open to fitting), <span class="math inline">D\sim</span> leaf turnover (months). Calibration anchors are largely independent: <span class="math inline">k_\mathrm{rec}</span> from the 3–5 d rebound; <span class="math inline">k_\mathrm{mat}</span> from the lasting residue per event; <span class="math inline">k_i</span> and the switch from impairment after a known heat dose; thermostability from the observed <span class="math inline">T_\mathrm{opt}</span> shift. All ship as calibration targets.</p>
+<p><strong>Two shifts, one state.</strong> The <span class="math inline">T_\mathrm{opt}</span> shift is exact by inversion of <a href="#eq-topt" class="quarto-xref">Equation&nbsp;3</a>, and the switch’s midpoint shift is exact by construction (<a href="#eq-dtimp" class="quarto-xref">Equation&nbsp;7</a>). They share the constitutive offset and the state <span class="math inline">A</span> but have separate ceilings, <span class="math inline">\Delta T_\mathrm{opt,max}</span> and <span class="math inline">\Delta T_\mathrm{imp,max}</span>, so tolerance moves both by the same amount while acclimation can move them by different amounts.</p>
+<p><strong>At the defaults, impairment is not negligible at 25 °C.</strong> With the switch half on at 34.5 °C and <span class="math inline">H_\mathrm{imp}=200000</span> J mol⁻¹, about 12% of leaf area is impaired at equilibrium at a 25 °C leaf, which costs 12% of capacity, as the recoverable pool did before the redesign. <strong>And at the default <span class="math inline">k_\mathrm{mat}</span> the damaged fraction ratchets.</strong> The maturation influx <span class="math inline">\mathcal{D}\,k_\mathrm{mat}\approx7.3</span> yr⁻¹ against the only sink, leaf turnover <span class="math inline">k_l\approx0.46</span> yr⁻¹, drives <span class="math inline">D</span> high in any climate where <span class="math inline">k_\mathrm{imp}</span> is not negligible. The July community runs used <span class="math inline">k_\mathrm{mat}=0.00125</span> day⁻¹; changing the default, and recalibrating the switch, are separate changes.</p>
+</section>
+</section>
+<section id="cross-references" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="cross-references"><span class="header-section-number">12</span> Cross-references</h2>
+<ul>
+<li>The port’s decisions: <a href="https://github.com/traitecoevo/plant/blob/f406b6d864f5a68b97c5acc68f6bcf44fb05cda6/notes/plan-atls-port.md"><code>notes/plan-atls-port.md</code></a>, in the history; its invariants are hazard 16 in plant’s <a href="https://github.com/traitecoevo/plant/blob/52ff5349c5a01f384a4446e809fc48caf5840674/.claude/hazards.md"><code>.claude/hazards.md</code></a>.</li>
+<li>Design and phase history: <a href="https://github.com/traitecoevo/plant/blob/f406b6d864f5a68b97c5acc68f6bcf44fb05cda6/notes/atls/implementation-plan.md"><code>notes/atls/implementation-plan.md</code></a>, in the history.</li>
+<li>Materiality gate (July verdict: keep): <a href="https://github.com/traitecoevo/plant/blob/52ff5349c5a01f384a4446e809fc48caf5840674/notes/atls/gate-atls-vs-pm-evaluation.md"><code>notes/atls/gate-atls-vs-pm-evaluation.md</code></a>.</li>
+<li>Numerical demo of the equations above: the guide <a href="../../guides/tf24t-thermal-damage.html">TF24t: thermal damage and four strategies</a>.</li>
+<li>Prerequisite energy balance: <a href="https://github.com/traitecoevo/plant/issues/523">plant#523</a>; this layer: <a href="https://github.com/traitecoevo/plant/issues/566">plant#566</a>; the leaf half: <a href="https://github.com/traitecoevo/phylloptim/pull/162">phylloptim#162</a>.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/traitecoevo\.github\.io\/overstorey");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
+  <div class="nav-page nav-page-previous">
+      <a href="../../theory/models/tf24.html" class="pagination-link" aria-label="TF24">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">TF24</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../theory/soil-water.html" class="pagination-link" aria-label="Soil water &amp; root uptake">
+        <span class="nav-page-text">Soil water &amp; root uptake</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Built with Quarto · frozen for reproducibility</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/traitecoevo/overstorey/edit/master/theory/models/tf24t-thermal-damage.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/traitecoevo/overstorey/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://github.com/traitecoevo/plant/blob/master/LICENSE">
+<p>License</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

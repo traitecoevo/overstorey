@@ -352,6 +352,30 @@ window.Quarto = {
  <span class="menu-text">TF24: carbohydrate storage, buffered growth and mortality</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-penman-monteith.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: leaf energy balance, Fick vs Penman–Monteith</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-flexible-allometry.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: a canopy that thins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24t-thermal-damage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24t: thermal damage and four strategies</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/tf24-stand-gradients.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TF24: stand gradients from one reverse sweep</span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -412,13 +436,13 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="exporting-and-resuming-a-run">Exporting and resuming a run</h2>
 <p>Run a patch, collecting a snapshot of the whole population after each step, then export the state part-way through:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>scm <span class="ot">&lt;-</span> <span class="fu">run</span>(p, <span class="at">until =</span> <span class="dv">0</span>)<span class="sc">$</span>solver</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>scm<span class="sc">$</span>collect <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>scm<span class="sc">$</span><span class="fu">run</span>()</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>solver <span class="ot">&lt;-</span> <span class="fu">run</span>(p, <span class="at">until =</span> <span class="dv">0</span>)<span class="sc">$</span>solver</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>solver<span class="sc">$</span>collect <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>solver<span class="sc">$</span><span class="fu">run</span>()</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># export the patch about half-way through the run</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="fu">floor</span>(<span class="fu">length</span>(scm<span class="sc">$</span>history) <span class="sc">/</span> <span class="dv">2</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>state <span class="ot">&lt;-</span> <span class="fu">export_patch_state</span>(scm, <span class="at">step =</span> k)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="fu">floor</span>(<span class="fu">length</span>(solver<span class="sc">$</span>history) <span class="sc">/</span> <span class="dv">2</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>state <span class="ot">&lt;-</span> <span class="fu">export_patch_state</span>(solver, <span class="at">step =</span> k)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><code>export_patch_state()</code> saves both the plants and the information the solver needs to continue them. This includes every node’s ODE state, the current patch age, the unused part of the node-introduction schedule, and per-node birth bookkeeping such as introduction time, initial patch density, and survival at birth.</p>
 <p><code>set_initial_state()</code> writes that onto a <code>Parameters</code> object, and <code>run()</code> resumes from it:</p>
@@ -428,7 +452,7 @@ window.Quarto = {
 </div>
 <p>The resumed run closely reproduces the original. The checkpointed state is loaded exactly, but the adaptive ODE solver’s internal step size is not part of the checkpoint. Its later steps can therefore differ slightly, so the recovered fitness agrees to a few parts in <span class="math inline">\(10^5\)</span> rather than bit-for-bit:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">original =</span> scm<span class="sc">$</span>patch<span class="sc">$</span>net_reproduction_ratios,</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">original =</span> solver<span class="sc">$</span>patch<span class="sc">$</span>net_reproduction_ratios,</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">resumed  =</span> resumed<span class="sc">$</span>net_reproduction_ratios)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> original   resumed 
