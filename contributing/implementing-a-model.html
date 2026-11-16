@@ -400,9 +400,9 @@ window.Quarto = {
 <h4 class="anchored" data-anchor-id="resourcespline">ResourceSpline</h4>
 <p>Tabulates the environment (for example, light availability, between 0 and 1) against height on a fixed grid of knots, as a spline, to simplify the calculation of competitive interactions.</p>
 </section>
-<section id="scm" class="level4">
-<h4 class="anchored" data-anchor-id="scm">SCM</h4>
-<p>Solves for the trajectories of different nodes along all defined characteristics.</p>
+<section id="deterministicpatchrunner" class="level4">
+<h4 class="anchored" data-anchor-id="deterministicpatchrunner">DeterministicPatchRunner</h4>
+<p>Solves for the trajectories of different nodes along all defined characteristics (the SCM).</p>
 <p>*<em>When developing your own model, you’ll likely only need to create a Model and an Environment</em></p>
 </section>
 </section>
@@ -416,7 +416,7 @@ window.Quarto = {
 </section>
 <section id="rcppr6" class="level4">
 <h4 class="anchored" data-anchor-id="rcppr6">RcppR6</h4>
-<p>An extension of Rcpp is the library RcppR6, which maps a specific R type, the R6 class, to complex C++ objects like the <code>plant</code> SCM solver.</p>
+<p>An extension of Rcpp is the library RcppR6, which maps a specific R type, the R6 class, to complex C++ objects like <code>plant</code>’s deterministic solver, <code>DeterministicPatchRunner</code>.</p>
 <p>R6 classes differ from normal R types (i.e.&nbsp;S3, S4) in that methods (functions) belong to objects of a given class, rather than existing as generic objects themselves. This means that a given plant object <code>p</code> has specific methods available as <code>p$method()</code> (rather than <code>method(p)</code>).</p>
 <p>The other quirk of R6 classes is that they use reference semantics. This means that the state of R6 objects (derived from an R6 class) can be changed in place (i.e.&nbsp;without re-assignment).</p>
 <div class="cell">
@@ -426,7 +426,7 @@ window.Quarto = {
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># R6 example: p == p_new</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>p<span class="sc">$</span><span class="fu">method</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>RcppR6 is a good match for <code>scm</code> objects which have many layers of properties and methods (see above), but also maintains a natural concept of state.</p>
+<p>RcppR6 is a good match for solver objects which have many layers of properties and methods (see above), but also maintains a natural concept of state.</p>
 <p>The binding between RcppR6 and C++ is handled in a RcppR6_classes.yml file. Here we define which of the <code>plant</code> classes we would like to access from R and which properties and methods we would like in our interface. Again, most of this is general and only a few classes will need specialisation when implementing a new <code>plant</code> model.</p>
 </section>
 <section id="build-tools" class="level3">
@@ -673,7 +673,7 @@ R(t, a, x0) = d_0 \cdot B_0 \cdot exp{-d_1 \cdot B(t, a, x_0)}
 <p>We have some nuisance parameters for dispersal, establishment and smoothing</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Probability of survival during dispersal</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// required by scm.h</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// read by species.h</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> S_D <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Smoothing parameter</span></span>
@@ -745,6 +745,7 @@ R(t, a, x0) = d_0 \cdot B_0 \cdot exp{-d_1 \cdot B(t, a, x_0)}
 <span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  results</span>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>The simplest <code>expand_state</code> returns its input. K93’s own, in <code>plant</code>, adds the columns its allometry derives from the size state: the stem’s diameter and basal area.</p>
 <p>Each <code>switch()</code> in <code>R/strategy_support.R</code> that has an arm per model needs one for K93. K93 has no trade-offs between its parameters, so its arm in <code>default_hyperpar()</code> (in <code>R/default_parameters.R</code>) is the identity. A model with trade-offs keeps a frozen testing copy of its trade-off function there; the recommended trade-off functions belong in the <code>fieldtrial</code> package.</p>
 <p>Add tests to <code>tests/testthat/test-model-k93.R</code></p>
 </section>

@@ -496,7 +496,7 @@ div.csl-indent {
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(<span class="fu">c</span>(<span class="st">"FF16"</span>, <span class="st">"K93"</span>, <span class="st">"TF24"</span>, <span class="st">"TF24f"</span>), model_id)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>         FF16           K93          TF24         TF24f 
-    "FF16@v3"      "K93@v3"    "TF24@v15" "TF24f@v15.1" </code></pre>
+    "FF16@v3"      "K93@v3"    "TF24@v16" "TF24f@v16.1" </code></pre>
 </div>
 </div>
 <p><code>FF16</code> and <code>K93</code> are scientifically frozen, meaning that scientific changes to them should be exceptional; each has advanced only where a change to how <code>plant</code> solves it changed its output. <code>TF24</code> began at <code>v2</code> rather than <code>v1</code> because a published result used the pre-versioning “v1” science. Its version has advanced as the model has developed. <code>TF24f</code> uses a compound version, explained below.</p>
@@ -540,7 +540,7 @@ div.csl-indent {
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">model_id</span>(<span class="st">"TF24f"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "TF24f@v15.1"</code></pre>
+<pre><code>[1] "TF24f@v16.1"</code></pre>
 </div>
 </div>
 <ul>
@@ -554,9 +554,9 @@ div.csl-indent {
 <p>The scientific version has one source of truth. It is declared in C++, beside the model implementation that it describes, as the <code>scientific_version</code> constant on each model class:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// inst/include/plant/models/ff16_model.h</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="at">static</span> <span class="kw">constexpr</span> <span class="dt">int</span> scientific_version <span class="op">=</span> <span class="dv">3</span><span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><code>TF24f</code> instead declares <code>approximation_revision</code>. The code in <code>src/strategy_version.cpp</code> combines this revision with the current <code>TF24</code> version. The R functions read the result from the compiled code, so there is no second copy of the version number to keep in sync.</p>
+<p><code>TF24f</code> instead declares <code>approximation_revision</code>. The code in <code>src/model_exports.cpp</code> combines this revision with the current <code>TF24</code> version. The R functions read the result from the compiled code, so there is no second copy of the version number to keep in sync.</p>
 <p>The rule is deliberately narrow: increment the scientific version when, and only when, a changed equation or default parameter changes simulation output for identical inputs. Do not increment it for refactors, performance work, or interface changes.</p>
-<p>When adding a new model, developers must add a <code>scientific_version</code> constant to its model header and a matching dispatch arm in <code>src/strategy_version.cpp</code>.</p>
+<p>When adding a new model, developers must add a <code>scientific_version</code> constant to its model header and a matching dispatch arm in <code>src/model_exports.cpp</code>.</p>
 </section>
 <section id="the-drift-guard" class="level2">
 <h2 class="anchored" data-anchor-id="the-drift-guard">The drift guard</h2>

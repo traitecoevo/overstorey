@@ -306,7 +306,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>for contributors</p>
 </div>
 <p>As a complex systems model, speed matters. The <code>plant</code> package is written in C++ using Rcpp, so it is already fast — but there is always room to improve. This page documents how we profile the code to find bottlenecks, the workflow we use to get <em>trustworthy</em> numbers, and how to drive an AI assistant (Claude) through a profiling pass without being misled.</p>
-<p>The code is awkward to profile because the hot C++ is called from R. Traditional R profilers see almost nothing useful: they stop at the <code>.Call</code> boundary and cannot look into the compiled code. In a typical FF16 run, <code>Rprof</code> attributes roughly 97–99% of the time to a single native entry point (<code>SCM::run</code> or <code>SCM::refine_schedule</code>). The useful detail comes from a <em>native</em> sampler.</p>
+<p>The code is awkward to profile because the hot C++ is called from R. Traditional R profilers see almost nothing useful: they stop at the <code>.Call</code> boundary and cannot look into the compiled code. In a typical FF16 run, <code>Rprof</code> attributes roughly 97–99% of the time to a single native entry point (<code>DeterministicPatchRunner::run</code> or <code>DeterministicPatchRunner::refine_schedule</code>; <code>SCM::run</code> in profiles taken before plant renamed the class). The useful detail comes from a <em>native</em> sampler.</p>
 <section id="the-approach" class="level1">
 <h1>The approach</h1>
 <p>Profiling is a loop, and the order of the steps matters:</p>
@@ -353,11 +353,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="the-two-scenarios">The two scenarios</h2>
 <p><code>run_plant_benchmarks()</code> in <a href="https://github.com/traitecoevo/plant/blob/develop/R/benchmark.R"><code>R/benchmark.R</code></a> defines the cases everything else builds on:</p>
 <ul>
-<li><strong><code>scm</code></strong> — <code>run()</code> on a one-species FF16 patch. Exercises the steady per-step solve.</li>
+<li><strong><code>run</code></strong> — <code>run()</code> on a one-species FF16 patch. Exercises the steady per-step solve.</li>
 <li><strong><code>build_schedule</code></strong> — <code>run(..., refine_schedule = TRUE)</code>. Exercises adaptive node-schedule refinement, which calls the assimilation quadrature far more often. This is usually the more sensitive case for crown/light work.</li>
 </ul>
 <p>Both run the same dominant native path, so an optimisation that helps one usually helps the other:</p>
-<pre><code>SCM::run → run_next → ode::Solver::step → derivs → Patch::compute_rates
+<pre><code>DeterministicPatchRunner::run → run_next → ode::Solver::step → derivs → Patch::compute_rates
   → Species::compute_rates → Node::compute_rates → growth_rate_gradient
   → Individual::growth_rate_given_height → FF16_Model::compute_rates
   → net_mass_production_dt → assimilation</code></pre>
