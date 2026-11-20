@@ -596,7 +596,7 @@ extract_strategy_parameter_values <- function(vars){
 #| label: tbl-definitions
 #| echo: false
 #| tbl-cap: 'Key variables of the `FF16` physiological model. For mass ($M$), respiration ($r$), and turnover ($k$) variables, subscripts refer to any of the following tissues: ${\rm l}$ = leaves, ${\rm b}$ = bark, ${\rm s}$ = sapwood,${\rm r}$ = roots, ${\rm a}$ = all living tissue. For area $A$ variables, subscripts refer to any of the following: ${\rm l}$ = leaves, ${\rm st}$ = total stem cross-section, ${\rm s}$ = sapwood cross-section, ${\rm b}$ = bark cross-section, ${\rm h}$ = heartwood cross-section'
-system.file("docs", "demography-vars.csv", package = "plant") %>%
+here::here("theory/tables/demography-vars.csv") %>%
 read.csv() %>% dplyr::as_tibble() %>%
 # TODO(#481): can we get groups as headers spanning multiple columns?
 knitr::kable(align = "l")
@@ -606,7 +606,7 @@ knitr::kable(align = "l")
 #| label: tbl-allometry
 #| echo: false
 #| tbl-cap: 'Equations of the allometric growth model implemented within the `FF16` physiological model, based on functional-balance assumptions (see text for details). In (a) we list  key assumptions of allocation model between specific variation with leaf area, under "Function". From these assumptions, allocation functions are derived for tissue areas and tissue masses (b). Also the growth rate of each tissue type can be expressed as a function of the growth rate of leaf area. For mass ($M$), respiration ($r$), and turnover ($k$) variables, subscripts refer to any of the following tissues: ${\rm l}$ = leaves, ${\rm b}$ = bark, ${\rm s}$ = sapwood, ${\rm r}$ = roots, ${\rm a}$ = all living tissue. For area $A$ variables, subscripts refer to any of the following: ${\rm l}$ = leaves, ${\rm st}$ = total stem cross-section, ${\rm s}$ = sapwood cross-section, ${\rm b}$ = bark cross-section, ${\rm h}$ = heartwood cross-section'
-system.file("docs/FF16", "FF16-eqns.csv", package = "plant") %>%
+here::here("theory/tables/FF16-eqns.csv") %>%
   read.csv() %>% dplyr::as_tibble() %>%
   knitr::kable(align = "l")
 ```
@@ -615,7 +615,7 @@ system.file("docs/FF16", "FF16-eqns.csv", package = "plant") %>%
 #| label: tbl-params-core
 #| echo: false
 #| tbl-cap: 'Core parameters of the `FF16` physiological model.'
-x <- system.file("docs/FF16", "FF16-params-core.csv", package = "plant") %>%
+x <- here::here("theory/tables/FF16-params-core.csv") %>%
   read.csv() %>% dplyr::as_tibble()
 
 x$Value <- extract_strategy_parameter_values(x$Code)
@@ -627,7 +627,7 @@ knitr::kable(x,  align = "l")
 #| label: tbl-params-hyper
 #| echo: false
 #| tbl-cap: 'Parameters for hyper-parameterisation of the `FF16` physiological model.'
-x <- system.file("docs/FF16", "FF16-params-hyper.csv", package = "plant") %>%
+x <- here::here("theory/tables/FF16-params-hyper.csv") %>%
   read.csv() %>% dplyr::as_tibble()
 
 x$Value <- extract_strategy_parameter_values(x$Code)
