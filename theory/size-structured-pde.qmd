@@ -68,7 +68,7 @@ source(here::here("R/registry-display.R"))
 #| echo: false
 #| output: asis
 #| tbl-cap: "Variable names and definitions in the demographic model of the `plant` package."
-system.file("docs", "demography-vars.csv", package = "plant") %>% read.csv() %>% dplyr::as_tibble() %>%
+here::here("theory/tables/demography-vars.csv") %>% read.csv() %>% dplyr::as_tibble() %>%
 knitr::kable(align = "l")
 ```
 
