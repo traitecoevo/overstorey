@@ -156,6 +156,67 @@ flow between layers. The only water movement "against gravity" occurs inside
 the plant, along the root-to-collar hydraulic path described in
 @sec-plant-coupling.
 
+### Free drainage, not Richards' equation {#sec-free-drainage}
+
+The one-way scheme is a deliberate simplification of the standard description
+of water in unsaturated soil, and a reader comparing TF24 with the hydrology
+literature should expect it to differ. Hydrological models usually move water
+between layers by Darcy's law, driven by the gradient of total head: gravity
+plus the matric gradient, the difference in suction between neighbouring
+layers. With suctions written as positive magnitudes, the downward flux across
+the boundary between layers $i$ and $i + 1$ is then
+
+$$
+q_{i \to i+1} = K_{i+1/2}\left(1 + \frac{\psi^\ast_{{\rm soil},i+1} -
+  \psi^\ast_{{\rm soil},i}}{\rho_w g\,(\bar z_{i+1} - \bar z_i)}\right),
+$$
+
+where $K_{i+1/2}$ is a conductivity at the interface, usually a weighted mean
+of the two layers' values, and $\rho_w g$ turns a potential into metres of
+head. Put into @eq-layer-balance, this is the discretised form of Richards'
+equation. TF24 keeps the gravity term, the 1, and drops the matric term, and
+takes the conductivity from the layer the water leaves:
+$q_{i \to i+1} = K(\theta_i)$, as in @eq-drainage. This is free drainage, a
+unit-gradient flux.
+
+The reason is the cost of integrating it. Under free drainage a layer's
+outflow depends on its own moisture alone, so, uptake aside, the rate of layer
+$i$ depends only on layer $i$ and the layer above it, and the Jacobian of the
+flows between layers is lower-bidiagonal. The matric term couples each layer
+to the layer below as well, which makes it tridiagonal, and it adds a
+diffusive flux whose stable explicit step shrinks with the square of the layer
+thickness rather than in proportion to it. The soil's layers are states of the
+same ODE system as the plants, integrated by an explicit adaptive solver, so
+that stiffness would be paid for by the whole stand. Free drainage also
+carries no distance between layers, so layers of unequal thickness need
+nothing rescaled, and the column's water budget closes exactly for any
+thicknesses while no layer sits on the residual floor. What the decoupling
+does not remove is the steepness of $K(\theta)$ itself, whose exponent
+$2n_\psi + 3$ is about 16 at the default $n_\psi$: a thin layer near
+saturation is still stiff.
+
+What a reader should expect to differ from a model built on Richards'
+equation:
+
+- **No capillary rise.** Water never moves up between layers, so a layer
+  dried by roots is not resupplied from a wetter layer below it; that water
+  stays below, for the roots that reach it. Water moves up only through the
+  plant: a layer gaining water through the roots has $E_i < 0$
+  (@sec-plant-coupling).
+- **No pull from drier soil below.** A layer drains at its own conductivity
+  whatever lies beneath it. Under Richards' equation the suction of dry soil
+  below a wetting front draws water into it, which dominates the early wetting
+  of a dry profile; here water enters a dry layer only as fast as the layer
+  above it conducts.
+- **More layers do not recover Richards' equation.** As the layers are made
+  thinner, the scheme converges to the gravity-only, kinematic-wave equation
+  $\partial\theta / \partial t = -\partial K(\theta) / \partial z$ less
+  uptake, not to Richards' equation, so refining the column does not restore
+  the capillary term.
+- **The base of the column is the usual one.** Free drainage out of the
+  deepest layer is the unit-gradient lower boundary that Richards-equation
+  models commonly use, so deep drainage has the familiar form.
+
 ## From moisture to potential: the retention curve {#sec-retention}
 
 Plants respond not to volumetric moisture directly, but to the corresponding
