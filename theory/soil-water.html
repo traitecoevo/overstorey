@@ -46,7 +46,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-2a13a02a304ab18a00ea9426055e18bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -416,7 +416,10 @@ window.Quarto = {
   <li><a href="#the-idea-first" id="toc-the-idea-first" class="nav-link active" data-scroll-target="#the-idea-first">The idea first</a></li>
   <li><a href="#sec-layers" id="toc-sec-layers" class="nav-link" data-scroll-target="#sec-layers">The soil column: <span class="math inline">\(N\)</span> layers, one bucket each</a></li>
   <li><a href="#sec-infiltration" id="toc-sec-infiltration" class="nav-link" data-scroll-target="#sec-infiltration">Infiltration and runoff</a></li>
-  <li><a href="#sec-drainage" id="toc-sec-drainage" class="nav-link" data-scroll-target="#sec-drainage">Gravitational drainage</a></li>
+  <li><a href="#sec-drainage" id="toc-sec-drainage" class="nav-link" data-scroll-target="#sec-drainage">Gravitational drainage</a>
+  <ul class="collapse">
+  <li><a href="#sec-free-drainage" id="toc-sec-free-drainage" class="nav-link" data-scroll-target="#sec-free-drainage">Free drainage, not Richards’ equation</a></li>
+  </ul></li>
   <li><a href="#sec-retention" id="toc-sec-retention" class="nav-link" data-scroll-target="#sec-retention">From moisture to potential: the retention curve</a></li>
   <li><a href="#sec-plant-coupling" id="toc-sec-plant-coupling" class="nav-link" data-scroll-target="#sec-plant-coupling">Coupling to the plant: root-collar water potential</a></li>
   <li><a href="#sec-diagnostics" id="toc-sec-diagnostics" class="nav-link" data-scroll-target="#sec-diagnostics">Diagnostics: cumulative fluxes</a></li>
@@ -523,6 +526,23 @@ q_{{\rm out},i} = K(\theta_i) = K_{\rm sat}\left(\frac{\tilde\theta_i}{\theta_{\
 \tag{3}\]</span></span></p>
 <p>where <span class="math inline">\(K_{\rm sat}\)</span> (<code>K_sat</code>) is the saturated hydraulic conductivity and <span class="math inline">\(n_\psi\)</span> (<code>n_psi</code>) is the retention-curve shape parameter also used in <a href="#eq-retention" class="quarto-xref">Equation&nbsp;4</a>. The same function, <code>conductivity</code>, is used for every layer, with that layer’s <span class="math inline">\(K_{\rm sat}\)</span>, <span class="math inline">\(\theta_{\rm sat}\)</span> and <span class="math inline">\(n_\psi\)</span>. Its input moisture is clamped to <span class="math inline">\([0, \theta_{\rm sat}]\)</span>, giving <span class="math inline">\(\tilde\theta_i\)</span>: a non-positive value gives zero conductivity, and a value above saturation gives <span class="math inline">\(K_{\rm sat}\)</span>. Each layer’s outflow becomes the next layer’s inflow, while the outflow from the deepest layer leaves the column as deep drainage.</p>
 <p>This is a first-order, one-way bucket scheme: drainage moves down the column, never up. The soil water balance does not include capillary rise or lateral flow between layers. The only water movement “against gravity” occurs inside the plant, along the root-to-collar hydraulic path described in <a href="#sec-plant-coupling" class="quarto-xref">Section&nbsp;6</a>.</p>
+<section id="sec-free-drainage" class="level3">
+<h3 class="anchored" data-anchor-id="sec-free-drainage">Free drainage, not Richards’ equation</h3>
+<p>The one-way scheme is a deliberate simplification of the standard description of water in unsaturated soil, and a reader comparing TF24 with the hydrology literature should expect it to differ. Hydrological models usually move water between layers by Darcy’s law, driven by the gradient of total head: gravity plus the matric gradient, the difference in suction between neighbouring layers. With suctions written as positive magnitudes, the downward flux across the boundary between layers <span class="math inline">\(i\)</span> and <span class="math inline">\(i + 1\)</span> is then</p>
+<p><span class="math display">\[
+q_{i \to i+1} = K_{i+1/2}\left(1 + \frac{\psi^\ast_{{\rm soil},i+1} -
+  \psi^\ast_{{\rm soil},i}}{\rho_w g\,(\bar z_{i+1} - \bar z_i)}\right),
+\]</span></p>
+<p>where <span class="math inline">\(K_{i+1/2}\)</span> is a conductivity at the interface, usually a weighted mean of the two layers’ values, and <span class="math inline">\(\rho_w g\)</span> turns a potential into metres of head. Put into <a href="#eq-layer-balance" class="quarto-xref">Equation&nbsp;1</a>, this is the discretised form of Richards’ equation. TF24 keeps the gravity term, the 1, and drops the matric term, and takes the conductivity from the layer the water leaves: <span class="math inline">\(q_{i \to i+1} = K(\theta_i)\)</span>, as in <a href="#eq-drainage" class="quarto-xref">Equation&nbsp;3</a>. This is free drainage, a unit-gradient flux.</p>
+<p>The reason is the cost of integrating it. Under free drainage a layer’s outflow depends on its own moisture alone, so, uptake aside, the rate of layer <span class="math inline">\(i\)</span> depends only on layer <span class="math inline">\(i\)</span> and the layer above it, and the Jacobian of the flows between layers is lower-bidiagonal. The matric term couples each layer to the layer below as well, which makes it tridiagonal, and it adds a diffusive flux whose stable explicit step shrinks with the square of the layer thickness rather than in proportion to it. The soil’s layers are states of the same ODE system as the plants, integrated by an explicit adaptive solver, so that stiffness would be paid for by the whole stand. Free drainage also carries no distance between layers, so layers of unequal thickness need nothing rescaled, and the column’s water budget closes exactly for any thicknesses while no layer sits on the residual floor. What the decoupling does not remove is the steepness of <span class="math inline">\(K(\theta)\)</span> itself, whose exponent <span class="math inline">\(2n_\psi + 3\)</span> is about 16 at the default <span class="math inline">\(n_\psi\)</span>: a thin layer near saturation is still stiff.</p>
+<p>What a reader should expect to differ from a model built on Richards’ equation:</p>
+<ul>
+<li><strong>No capillary rise.</strong> Water never moves up between layers, so a layer dried by roots is not resupplied from a wetter layer below it; that water stays below, for the roots that reach it. Water moves up only through the plant: a layer gaining water through the roots has <span class="math inline">\(E_i &lt; 0\)</span> (<a href="#sec-plant-coupling" class="quarto-xref">Section&nbsp;6</a>).</li>
+<li><strong>No pull from drier soil below.</strong> A layer drains at its own conductivity whatever lies beneath it. Under Richards’ equation the suction of dry soil below a wetting front draws water into it, which dominates the early wetting of a dry profile; here water enters a dry layer only as fast as the layer above it conducts.</li>
+<li><strong>More layers do not recover Richards’ equation.</strong> As the layers are made thinner, the scheme converges to the gravity-only, kinematic-wave equation <span class="math inline">\(\partial\theta / \partial t = -\partial K(\theta) / \partial z\)</span> less uptake, not to Richards’ equation, so refining the column does not restore the capillary term.</li>
+<li><strong>The base of the column is the usual one.</strong> Free drainage out of the deepest layer is the unit-gradient lower boundary that Richards-equation models commonly use, so deep drainage has the familiar form.</li>
+</ul>
+</section>
 </section>
 <section id="sec-retention" class="level2">
 <h2 class="anchored" data-anchor-id="sec-retention">From moisture to potential: the retention curve</h2>
