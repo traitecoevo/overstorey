@@ -4,9 +4,9 @@
 # applied by hand before this marker existed (#44); the keys below are those
 # applied after it. Posts are pinned to the plant they were built with and are
 # not migrated.
-migrated_on: 2026-11-16
+migrated_on: 2026-11-23
 plant_version: 2.0.0.9002
-plant_ref: develop@0c0e2538 (2026-11-16; odelia 0.11.1 @v0.11.1, phylloptim 0.37.0 @64cbde2, plantpress 0.1.0 @474600e)
+plant_ref: develop@cbc3be0c (2026-11-23; odelia 0.12.4 @v0.12.4, phylloptim 0.42.0 @1272b90, plantpress 0.1.0 @474600e)
 baseline_before_marker: develop@fc1ccc86
 applied_breaking_changes:
   - one-run-verb  # plant#779: run_scm(), grow_individual_to_*() -> run(); scm_base_parameters() -> base_parameters()
@@ -15,19 +15,36 @@ applied_breaking_changes:
   - deterministic-patch-runner  # plant#793: the class SCM -> DeterministicPatchRunner, and run_plant_benchmarks()'s scm expression -> run; pages naming the C++ class, scm.h or SCM:: now name it ("the SCM", the method the glossary defines, stays)
   - offspring-height-tol  # plant#798: offspring_production_tol -> offspring_height_tol, found by TOMS748; characteristic-method.qmd
   - plotting-in-plantpress  # plant's plot_size_distribution() -> plantpress::plot_size_distribution(); four pages
+  - individual-run-in-cxx  # plant#869: the OdeRunner and IndividualRunner R6 classes -> run(individual, times = ); tf24t-thermal-damage's running-mean chunk, and ode-stepping's prose on how run() drives the C++ IndividualRunner
+# Pending: Node and Species read-only (plant#873). The one call site,
+# node-spacing.qmd's compute_competition_effect_by_nodes_error(), moves to the
+# patch's method in overstorey#56; add the key when it lands.
 # Checked and not affected (no call sites): run_stochastic_collect() (plant#779);
 # the scenario gateway (plant#775); TF24_K_s_from_whole_stem() (plant#802); the
-# stochastic death checks (plant#790, #795); a_pl0 outside [0, 1] (plant#786).
+# stochastic death checks (plant#790, #795); a_pl0 outside [0, 1] (plant#786);
+# patch_area moved to control() (plant#816); TF24's theta -> theta_tip
+# (plant#881; flexible-allometry's `theta =` is a helper's soil-water argument);
+# TF24's aux_size (plant#620; no positional reads); run_mutant()'s fitness
+# window (plant#870); refined schedules carried in events (plant#861, #865; no
+# page refines a run with events). Individual's own setters, which
+# first-individual and k93 use, are unchanged by plant#873.
+# Absorbed by re-rendering, no source change: expand_state()'s
+# conduit_widening_base column (plant#887); TF24 v18 and FF16 v4 (plant#892:
+# the stem's gravitational head on by default, and the rest of both batches)
+# move numbers on the pages re-rendered at this pin, which are
+# guides/tf24-flexible-allometry, guides/tf24t-thermal-damage and
+# theory/implementation/ode-stepping. Every other page keeps the freeze of an
+# earlier pin until it is next edited.
 # Absorbed by re-rendering, no source change: tidy()'s $control, K93's
 # competition field and expand_state() columns, TF24's soil_psi (plant#800);
 # birth-date establishment (plant#788) and phylloptim 0.37.0 (plant#787) move
 # TF24 numbers on the pages re-rendered here. The C++ headers regrouped into
 # folders (plant#794) and merged source files (plant#797) have no NEWS entry;
 # the contributing pages that listed them are updated.
-# The five TF24 pages brought from plant's overstorey_staging/ (#47:
-# guides/tf24-flexible-allometry, tf24-penman-monteith, tf24-stand-gradients,
-# tf24t-thermal-damage; theory/models/tf24t-thermal-damage) keep freezes
-# rendered at plant develop@edeb632f (plant#789's merge), which already has
-# birth-date establishment (plant#788). Between it and the pin above, only
-# plant#798's seed-height tolerance can move their numbers, and only slightly;
-# they use no symbol renamed since. Re-render them at the pin when next edited.
+# Of the five TF24 pages brought from plant's overstorey_staging/ (#47),
+# guides/tf24-flexible-allometry and guides/tf24t-thermal-damage are rendered at
+# the pin above. The other three (guides/tf24-penman-monteith,
+# guides/tf24-stand-gradients, theory/models/tf24t-thermal-damage) keep freezes
+# rendered at plant develop@edeb632f (plant#789's merge), before TF24 v18, so
+# their numbers predate the stem's gravitational head. Re-render them at the pin
+# when next edited.
