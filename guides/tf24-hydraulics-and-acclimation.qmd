@@ -39,14 +39,23 @@ base <- function(type) {
 
 As a plant grows and its environment changes, the preferred operating point
 moves. TF24f stores its current estimate as an extra state variable and adjusts
-that state in the direction that increases carbon profit:
+that state in the direction that increases carbon profit.
 
-$$\frac{\mathrm{d}\psi}{\mathrm{d}t} = k \,\frac{\partial\,\text{profit}}{\partial\psi}.$$
+The state is not the collar potential itself. A collar potential is feasible
+only between a wet end $a$, where no water flows, and a dry end $b$, where the
+stem carries all it can, and both ends move as the soil wets and dries. So
+TF24f stores the collar's relative position $u$ between them, as its logit
+$z$, and the collar is $\psi = a + (b - a)\,u$. The state climbs the profit
+gradient:
+
+$$\frac{\mathrm{d}z}{\mathrm{d}t} = k \left[ (b - a)\,\frac{\partial\,\text{profit}}{\partial\psi} - 2\mu \sinh z \right].$$
 
 At the optimum, the profit gradient is zero and the state stops moving. When the
 optimum shifts, the gradient moves the state towards its new value. The gain
 $k$ controls how quickly that adjustment occurs and therefore how much
-acclimation lag remains.
+acclimation lag remains. Every $z$ is a feasible collar, so the state can never
+leave the bracket; the small barrier term $\mu$ stops it running on towards an
+end where profit is still rising, and holds it a short step inside instead.
 
 ::: {.callout-note}
 ## How the gradient is calculated
@@ -86,11 +95,14 @@ bind_rows(
   labs(title = "Same biology, two ways of resolving the leaf optimum")
 ```
 
-TF24f records the tracked potential in `opt_root_psi_state`. TF24 reports its
-newly optimised value as `opt_root_psi`, in the same positive-magnitude
-convention. Plotting them together reveals the acclimation lag: early in life,
-the optimum moves faster than the finite-gain state can follow. The gap then
-narrows as growth slows.
+TF24f records its tracked position in the state `collar_position`, a
+dimensionless logit in which 0 is the middle of the bracket. Both models report
+the collar potential in MPa as `opt_root_psi`, in the same positive-magnitude
+convention: TF24's newly optimised value, and the potential TF24f's tracked
+position implies. Plotting them together shows how closely the state tracks: at
+this gain it lies on the optimum through the steep changes of the first years,
+and the acclimation lag shows only where the optimum turns sharply, as near
+year 25, before the two run close together again.
 
 ```{r}
 #| label: tracking
@@ -98,7 +110,7 @@ narrows as growth slows.
 node1 <- function(d) d |> filter(node == 1) |> drop_na()
 bind_rows(
   node1(tf24$species)  |> transmute(time, psi = opt_root_psi,       model = "TF24 optimum"),
-  node1(tf24f$species) |> transmute(time, psi = opt_root_psi_state, model = "TF24f tracked")
+  node1(tf24f$species) |> transmute(time, psi = opt_root_psi,       model = "TF24f tracked")
 ) |>
   ggplot(aes(time, psi, colour = model)) +
   geom_line() +
@@ -121,13 +133,14 @@ so the gain is the only setting to choose.
 
 ## A note on initialisation
 
-Each new seedling starts with its tracked state at the current optimum. Without
-this initial full solve, a seedling would begin at a non-physical value and
-could temporarily escape the light limitation that should suppress it. After
-initialisation, TF24f resumes tracking rather than re-optimising at every step.
+Each new seedling starts with its tracked state at the current optimum: TF24
+solves the leaf once, and TF24f seats the seedling at that collar's position in
+the bracket, kept a small margin from either end (an optimum on an end has no
+finite logit). After initialisation, TF24f resumes tracking rather than
+re-optimising at every step.
 
 ## Status
 
-TF24f currently tracks root-collar potential and inherits TF24's selectable
-canopy models. It is an approximation with an explicit acclimation lag, not an
+TF24f currently tracks the root-collar's position in its feasible bracket and
+inherits TF24's selectable canopy models. It is an approximation with an explicit acclimation lag, not an
 exact replacement for TF24.

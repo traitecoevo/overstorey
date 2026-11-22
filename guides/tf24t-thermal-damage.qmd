@@ -178,7 +178,7 @@ p_av_k <- ggplot(avoid, aes(Tair, k_imp, colour = coupling)) +
   theme(legend.position = "top")
 ```
 
-> An isolated, poorly coupled leaf under high radiation runs far above the air — more than 20 °C above it across this sweep — so the *absolute* temperatures here are an upper bound; the **contrast** between couplings is the robust signal.
+> An isolated, poorly coupled leaf under high radiation runs well above the air — `r with(subset(avoid, grepl("poorly", coupling)), sprintf("%.0f to %.0f", min(Tleaf - Tair), max(Tleaf - Tair)))` °C above it across this sweep — so the *absolute* temperatures here are an upper bound; the **contrast** between couplings is the robust signal.
 
 ## 5. From one leaf to a community: persistence under warming (SCM)
 
@@ -290,8 +290,7 @@ traj_wide <- cached_rds("running-mean", {
   s <- TF24t_Model(); s$k_mean_leaf_temp <- k_mem
   p <- Individual("TF24t", e)(s)
   env <- Environment("TF24t")
-  # The adaptive stepper can probe the driver just past t_end, so the driver is
-  # set on a grid beyond the last time read; outside its range the spline would
+  # The driver's grid runs past t_end so the spline is never asked to
   # extrapolate.
   t_drive <- seq(0, t_end * 1.15, length.out = 230)
   env$extrinsic_drivers_set_variable("leaf_temp", t_drive,
