@@ -2368,14 +2368,14 @@
     },
     "odelia": {
       "Package": "odelia",
-      "Version": "0.11.1",
+      "Version": "0.12.4",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "odelia",
-      "RemoteRef": "v0.11.1",
-      "RemoteSha": "ed4fc29dbe05c73957767a563efda5730239d248"
+      "RemoteRef": "v0.12.4",
+      "RemoteSha": "732c665f4f1c64071417ff68c17fbdc4c559015b"
     },
     "openssl": {
       "Package": "openssl",
@@ -2456,14 +2456,14 @@
     },
     "phylloptim": {
       "Package": "phylloptim",
-      "Version": "0.37.0",
+      "Version": "0.42.0",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "phylloptim",
-      "RemoteRef": "64cbde29136ed18da282639a2b9c84474e01307c",
-      "RemoteSha": "64cbde29136ed18da282639a2b9c84474e01307c"
+      "RemoteRef": "1272b903742a0bce71bf76a32361806a30bf2e2c",
+      "RemoteSha": "1272b903742a0bce71bf76a32361806a30bf2e2c"
     },
     "pillar": {
       "Package": "pillar",
@@ -2554,8 +2554,8 @@
       "RemoteHost": "api.github.com",
       "RemoteUsername": "traitecoevo",
       "RemoteRepo": "plant",
-      "RemoteRef": "0c0e25380c91c30730141e1dc1b153fe17b48fcf",
-      "RemoteSha": "0c0e25380c91c30730141e1dc1b153fe17b48fcf"
+      "RemoteRef": "cbc3be0c47ee5846ef8de9bd92a0a63d51515987",
+      "RemoteSha": "cbc3be0c47ee5846ef8de9bd92a0a63d51515987"
     },
     "plantpress": {
       "Package": "plantpress",

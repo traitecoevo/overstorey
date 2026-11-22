@@ -885,7 +885,7 @@ cliff |>
   knitr::kable()
 ```
 
-Everything happens between 0.15 and 0.14. Seven orders of magnitude of
+Everything happens between 0.15 and 0.14. Nearly eight orders of magnitude of
 survivorship are crossed in one hundredth of volumetric soil water.
 
 **And the two thresholds are in the wrong order in time.** This is the decisive
@@ -903,10 +903,11 @@ ordering |>
   knitr::kable()
 ```
 
-At soil 0.145 no plant thins: its leaves are still profitable, so it has no
-reason to — quite right — and yet the 20 m and 24 m plants die there anyway. At
-0.140 every plant thins, and every plant dies. Following the 10 m plant through
-that drought shows the order:
+At soil 0.150 no plant thins: its leaves are still profitable, so it has no
+reason to — quite right — and yet the 24 m plant dies there anyway. At 0.145 the
+10 m and 20 m plants die too, with canopies that have barely moved, and only the
+24 m plant thins, slightly. At 0.140 every plant thins, and every plant dies.
+Following the 10 m plant through that drought shows the order:
 
 ```{r ordering-course}
 course <- allometry_drought_course(height = 10, theta_dry = 0.140)
@@ -919,7 +920,10 @@ course |>
 ```
 
 By the time the canopy has moved by a tenth of a per cent, survivorship is already
-down to `r signif(course_moves$survivorship, 2)`. **Mortality saturates ahead of shedding**, so
+down to `r signif(course_moves$survivorship, 2)`: two-thirds of the plants have
+died before the canopy moves. By the time it is below 0.9, survivorship is
+`r signif(course$survivorship[which(course$canopy < 0.9)[1]], 2)`.
+**Mortality saturates ahead of shedding**, so
 there is no intensity at which a plant is both stressed enough to thin and alive
 enough to profit from it.
 
