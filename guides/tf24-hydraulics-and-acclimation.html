@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-124faeef216649f543997e4837e14bf4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -439,9 +439,10 @@ window.Quarto = {
 </div>
 <section id="the-idea-let-the-optimum-chase-a-moving-target" class="level2">
 <h2 class="anchored" data-anchor-id="the-idea-let-the-optimum-chase-a-moving-target">The idea: let the optimum chase a moving target</h2>
-<p>As a plant grows and its environment changes, the preferred operating point moves. TF24f stores its current estimate as an extra state variable and adjusts that state in the direction that increases carbon profit:</p>
-<p><span class="math display">\[\frac{\mathrm{d}\psi}{\mathrm{d}t} = k \,\frac{\partial\,\text{profit}}{\partial\psi}.\]</span></p>
-<p>At the optimum, the profit gradient is zero and the state stops moving. When the optimum shifts, the gradient moves the state towards its new value. The gain <span class="math inline">\(k\)</span> controls how quickly that adjustment occurs and therefore how much acclimation lag remains.</p>
+<p>As a plant grows and its environment changes, the preferred operating point moves. TF24f stores its current estimate as an extra state variable and adjusts that state in the direction that increases carbon profit.</p>
+<p>The state is not the collar potential itself. A collar potential is feasible only between a wet end <span class="math inline">\(a\)</span>, where no water flows, and a dry end <span class="math inline">\(b\)</span>, where the stem carries all it can, and both ends move as the soil wets and dries. So TF24f stores the collar’s relative position <span class="math inline">\(u\)</span> between them, as its logit <span class="math inline">\(z\)</span>, and the collar is <span class="math inline">\(\psi = a + (b - a)\,u\)</span>. The state climbs the profit gradient:</p>
+<p><span class="math display">\[\frac{\mathrm{d}z}{\mathrm{d}t} = k \left[ (b - a)\,\frac{\partial\,\text{profit}}{\partial\psi} - 2\mu \sinh z \right].\]</span></p>
+<p>At the optimum, the profit gradient is zero and the state stops moving. When the optimum shifts, the gradient moves the state towards its new value. The gain <span class="math inline">\(k\)</span> controls how quickly that adjustment occurs and therefore how much acclimation lag remains. Every <span class="math inline">\(z\)</span> is a feasible collar, so the state can never leave the bracket; the small barrier term <span class="math inline">\(\mu\)</span> stops it running on towards an end where profit is still rising, and holds it a short step inside instead.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -486,12 +487,12 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>TF24f records the tracked potential in <code>opt_root_psi_state</code>. TF24 reports its newly optimised value as <code>opt_root_psi</code>, in the same positive-magnitude convention. Plotting them together reveals the acclimation lag: early in life, the optimum moves faster than the finite-gain state can follow. The gap then narrows as growth slows.</p>
+<p>TF24f records its tracked position in the state <code>collar_position</code>, a dimensionless logit in which 0 is the middle of the bracket. Both models report the collar potential in MPa as <code>opt_root_psi</code>, in the same positive-magnitude convention: TF24’s newly optimised value, and the potential TF24f’s tracked position implies. Plotting them together shows how closely the state tracks: at this gain it lies on the optimum through the steep changes of the first years, and the acclimation lag shows only where the optimum turns sharply, as near year 25, before the two run close together again.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>node1 <span class="ot">&lt;-</span> <span class="cf">function</span>(d) d <span class="sc">|&gt;</span> <span class="fu">filter</span>(node <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">drop_na</span>()</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">node1</span>(tf24<span class="sc">$</span>species)  <span class="sc">|&gt;</span> <span class="fu">transmute</span>(time, <span class="at">psi =</span> opt_root_psi,       <span class="at">model =</span> <span class="st">"TF24 optimum"</span>),</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">node1</span>(tf24f<span class="sc">$</span>species) <span class="sc">|&gt;</span> <span class="fu">transmute</span>(time, <span class="at">psi =</span> opt_root_psi_state, <span class="at">model =</span> <span class="st">"TF24f tracked"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">node1</span>(tf24f<span class="sc">$</span>species) <span class="sc">|&gt;</span> <span class="fu">transmute</span>(time, <span class="at">psi =</span> opt_root_psi,       <span class="at">model =</span> <span class="st">"TF24f tracked"</span>)</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(time, psi, <span class="at">colour =</span> model)) <span class="sc">+</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
@@ -514,11 +515,11 @@ window.Quarto = {
 </section>
 <section id="a-note-on-initialisation" class="level2">
 <h2 class="anchored" data-anchor-id="a-note-on-initialisation">A note on initialisation</h2>
-<p>Each new seedling starts with its tracked state at the current optimum. Without this initial full solve, a seedling would begin at a non-physical value and could temporarily escape the light limitation that should suppress it. After initialisation, TF24f resumes tracking rather than re-optimising at every step.</p>
+<p>Each new seedling starts with its tracked state at the current optimum: TF24 solves the leaf once, and TF24f seats the seedling at that collar’s position in the bracket, kept a small margin from either end (an optimum on an end has no finite logit). After initialisation, TF24f resumes tracking rather than re-optimising at every step.</p>
 </section>
 <section id="status" class="level2">
 <h2 class="anchored" data-anchor-id="status">Status</h2>
-<p>TF24f currently tracks root-collar potential and inherits TF24’s selectable canopy models. It is an approximation with an explicit acclimation lag, not an exact replacement for TF24.</p>
+<p>TF24f currently tracks the root-collar’s position in its feasible bracket and inherits TF24’s selectable canopy models. It is an approximation with an explicit acclimation lag, not an exact replacement for TF24.</p>
 
 
 </section>

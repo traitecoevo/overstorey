@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-124faeef216649f543997e4837e14bf4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -653,7 +653,7 @@ window.Quarto = {
 </div>
 </div>
 <blockquote class="blockquote">
-<p>An isolated, poorly coupled leaf under high radiation runs far above the air — more than 20 °C above it across this sweep — so the <em>absolute</em> temperatures here are an upper bound; the <strong>contrast</strong> between couplings is the robust signal.</p>
+<p>An isolated, poorly coupled leaf under high radiation runs well above the air — 5 to 10 °C above it across this sweep — so the <em>absolute</em> temperatures here are an upper bound; the <strong>contrast</strong> between couplings is the robust signal.</p>
 </blockquote>
 </section>
 <section id="from-one-leaf-to-a-community-persistence-under-warming-scm" class="level2">
@@ -695,11 +695,11 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">PM + ATLS (TF24t)</td>
-<td style="text-align: right;">24.7</td>
+<td style="text-align: right;">24.6</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">PM only (TF24)</td>
-<td style="text-align: right;">25.9</td>
+<td style="text-align: right;">25.7</td>
 </tr>
 </tbody>
 </table>
@@ -733,7 +733,7 @@ window.Quarto = {
 </div>
 <p>The valid signal is the <strong>persistence boundary</strong> — the dotted crossings, not the curve heights, which still carry the density artifact and are drawn on a log scale only to expose the crossing.</p>
 <blockquote class="blockquote">
-<p><strong>Reading these results.</strong> Adding the thermal layer moves the persistence boundary from 25.9 °C to 24.7 °C: lasting thermal damage is a net persistence penalty, as it was on the July code (<a href="https://github.com/traitecoevo/plant/tree/52ff5349c5a01f384a4446e809fc48caf5840674/notes/atls/results-2026-07"><code>notes/atls/results-2026-07/</code></a>). The size of the shift rests on the illustrative <code>k_mat</code> above and on the other open calibration items listed at the end of this page.</p>
+<p><strong>Reading these results.</strong> Adding the thermal layer moves the persistence boundary from 25.7 °C to 24.6 °C: lasting thermal damage is a net persistence penalty, as it was on the July code (<a href="https://github.com/traitecoevo/plant/tree/52ff5349c5a01f384a4446e809fc48caf5840674/notes/atls/results-2026-07"><code>notes/atls/results-2026-07/</code></a>). The size of the shift rests on the illustrative <code>k_mat</code> above and on the other open calibration items listed at the end of this page.</p>
 </blockquote>
 </section>
 <section id="which-thermal-strategy-persists-hottest-scm-tournament" class="level2">
@@ -769,19 +769,19 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Tolerant</td>
-<td style="text-align: right;">27.2</td>
+<td style="text-align: right;">26.8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Repairer</td>
-<td style="text-align: right;">26.1</td>
+<td style="text-align: right;">25.8</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Acclimator</td>
-<td style="text-align: right;">25.0</td>
+<td style="text-align: right;">24.8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Generalist</td>
-<td style="text-align: right;">24.7</td>
+<td style="text-align: right;">24.6</td>
 </tr>
 </tbody>
 </table>
@@ -834,45 +834,41 @@ window.Quarto = {
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">TF24t_Model</span>(); s<span class="sc">$</span>k_mean_leaf_temp <span class="ot">&lt;-</span> k_mem</span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">Individual</span>(<span class="st">"TF24t"</span>, e)(s)</span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  env <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24t"</span>)</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># The adaptive stepper can probe the driver just past t_end, so the driver is</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># set on a grid beyond the loop horizon; outside its range the spline would</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># extrapolate.</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  t_drive <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, t_end <span class="sc">*</span> <span class="fl">1.15</span>, <span class="at">length.out =</span> <span class="dv">230</span>)</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_variable</span>(<span class="st">"leaf_temp"</span>, t_drive,</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>                                     <span class="dv">27</span> <span class="sc">+</span> <span class="dv">6</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> t_drive <span class="sc">/</span> period))</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Seeded as a node would be: storage, A at equilibrium, and the running mean</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># at the birth air temperature.</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  p<span class="sc">$</span><span class="fu">set_initial_states</span>(env)</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  runner <span class="ot">&lt;-</span> plant<span class="sc">:::</span><span class="fu">OdeRunner</span>(<span class="st">"TF24t"</span>)(plant<span class="sc">:::</span><span class="fu">IndividualRunner</span>(<span class="st">"TF24t"</span>, e)(p, env))</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  rec <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> (runner<span class="sc">$</span>time <span class="sc">&lt;</span> t_end) {</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    runner<span class="sc">$</span><span class="fu">step</span>()</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    ind <span class="ot">&lt;-</span> runner<span class="sc">$</span>object<span class="sc">$</span>individual</span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    rec[[<span class="fu">length</span>(rec) <span class="sc">+</span> <span class="dv">1</span>L]] <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">time      =</span> runner<span class="sc">$</span>time,</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">air_temp  =</span> env<span class="sc">$</span><span class="fu">extrinsic_drivers_evaluate</span>(<span class="st">"leaf_temp"</span>, <span class="fu">min</span>(runner<span class="sc">$</span>time, t_end)),</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">operating =</span> ind<span class="sc">$</span><span class="fu">aux</span>(<span class="st">"Tleaf"</span>),</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">running   =</span> ind<span class="sc">$</span><span class="fu">state</span>(<span class="st">"mean_leaf_temp"</span>))</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do.call</span>(rbind, rec)</span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>traj <span class="ot">&lt;-</span> traj_wide <span class="sc">|&gt;</span></span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(air_temp, operating, running), <span class="at">names_to =</span> <span class="st">"series"</span>,</span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"temp"</span>)</span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>series_lab <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">air_temp =</span> <span class="st">"air temperature (driver)"</span>,</span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>                <span class="at">operating =</span> <span class="st">"operating leaf temp (instantaneous)"</span>,</span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>                <span class="at">running =</span> <span class="st">"mean_leaf_temp (running mean)"</span>)</span>
-<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>series_pal <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">air_temp =</span> <span class="st">"grey60"</span>, <span class="at">operating =</span> <span class="st">"#d95f02"</span>, <span class="at">running =</span> <span class="st">"#1b9e77"</span>)</span>
-<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(traj, <span class="fu">aes</span>(time, temp, <span class="at">colour =</span> series)) <span class="sc">+</span></span>
-<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> series_pal, <span class="at">labels =</span> series_lab, <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"time (years)"</span>, <span class="at">y =</span> <span class="st">"temperature (°C)"</span>,</span>
-<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"mean_leaf_temp lags and smooths the operating leaf temperature"</span>,</span>
-<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"single TF24t individual, oscillating air temperature; memory about 20 d"</span>) <span class="sc">+</span></span>
-<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># The driver's grid runs past t_end so the spline is never asked to</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># extrapolate.</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  t_drive <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, t_end <span class="sc">*</span> <span class="fl">1.15</span>, <span class="at">length.out =</span> <span class="dv">230</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  env<span class="sc">$</span><span class="fu">extrinsic_drivers_set_variable</span>(<span class="st">"leaf_temp"</span>, t_drive,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                                     <span class="dv">27</span> <span class="sc">+</span> <span class="dv">6</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> t_drive <span class="sc">/</span> period))</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Seeded as a node would be: storage, A at equilibrium, and the running mean</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># at the birth air temperature.</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  p<span class="sc">$</span><span class="fu">set_initial_states</span>(env)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># The plant is read on a fine grid of times, each landed on exactly.</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">run</span>(p, <span class="at">times =</span> <span class="fu">seq</span>(<span class="dv">0</span>, t_end, <span class="at">length.out =</span> <span class="dv">301</span>)[<span class="sc">-</span><span class="dv">1</span>], <span class="at">env =</span> env)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">time      =</span> res<span class="sc">$</span>time,</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">air_temp  =</span> <span class="fu">vapply</span>(res<span class="sc">$</span>time, <span class="cf">function</span>(t)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>      env<span class="sc">$</span><span class="fu">extrinsic_drivers_evaluate</span>(<span class="st">"leaf_temp"</span>, t), <span class="fu">numeric</span>(<span class="dv">1</span>)),</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">operating =</span> <span class="fu">vapply</span>(res<span class="sc">$</span>individual, <span class="cf">function</span>(ind) ind<span class="sc">$</span><span class="fu">aux</span>(<span class="st">"Tleaf"</span>), <span class="fu">numeric</span>(<span class="dv">1</span>)),</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">running   =</span> <span class="fu">vapply</span>(res<span class="sc">$</span>individual, <span class="cf">function</span>(ind) ind<span class="sc">$</span><span class="fu">state</span>(<span class="st">"mean_leaf_temp"</span>),</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">numeric</span>(<span class="dv">1</span>)))</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>traj <span class="ot">&lt;-</span> traj_wide <span class="sc">|&gt;</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(air_temp, operating, running), <span class="at">names_to =</span> <span class="st">"series"</span>,</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"temp"</span>)</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>series_lab <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">air_temp =</span> <span class="st">"air temperature (driver)"</span>,</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>                <span class="at">operating =</span> <span class="st">"operating leaf temp (instantaneous)"</span>,</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>                <span class="at">running =</span> <span class="st">"mean_leaf_temp (running mean)"</span>)</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>series_pal <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">air_temp =</span> <span class="st">"grey60"</span>, <span class="at">operating =</span> <span class="st">"#d95f02"</span>, <span class="at">running =</span> <span class="st">"#1b9e77"</span>)</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(traj, <span class="fu">aes</span>(time, temp, <span class="at">colour =</span> series)) <span class="sc">+</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> series_pal, <span class="at">labels =</span> series_lab, <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"time (years)"</span>, <span class="at">y =</span> <span class="st">"temperature (°C)"</span>,</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"mean_leaf_temp lags and smooths the operating leaf temperature"</span>,</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"single TF24t individual, oscillating air temperature; memory about 20 d"</span>) <span class="sc">+</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -882,7 +878,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>The running mean (green) tracks the operating leaf temperature (orange) with a lag set by <code>k_mean_leaf_temp</code> and a reduced amplitude. The operating temperature sits above the air because a lone plant in full light runs hot (§4); its jumps and plateaus near the air-temperature peaks are the leaf shutting its stomata, after which nothing cools it. <code>mean_leaf_temp</code> averages that operating signal, not the driver.</p>
+<p>The running mean (green) tracks the operating leaf temperature (orange) with a lag set by <code>k_mean_leaf_temp</code> and a reduced amplitude. The operating temperature sits above the air because a lone plant in full light runs hot (§4). <code>mean_leaf_temp</code> averages that operating signal, not the driver.</p>
 </section>
 <section id="summary" class="level2">
 <h2 class="anchored" data-anchor-id="summary">8. Summary</h2>

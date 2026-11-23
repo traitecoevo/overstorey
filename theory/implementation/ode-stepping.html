@@ -101,7 +101,7 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-124faeef216649f543997e4837e14bf4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -601,8 +601,8 @@ window.Quarto = {
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ... ode_size(), ode_time(), ode_state(), ode_rates(), set_ode_state() ...</span></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><code>IndividualRunner</code> provides exactly the <code>ode_size()</code>/<code>ode_state()</code>/<code>ode_rates()</code>/ <code>set_ode_state()</code> interface expected by the solver. It can therefore be passed to <code>odelia::ode::Solver</code> to step an individual plant to a given size. The R functions <code>grow_individual_...</code> expose this capability and use <code>IndividualRunner</code> internally.</p>
-<p>The test suite also shows how to drive the solver directly on the classic Lorenz system (see <code>tests/testthat/test-ode-euler.R</code>).</p>
+<p><code>IndividualRunner</code> provides exactly the <code>ode_size()</code>/<code>ode_state()</code>/<code>ode_rates()</code>/ <code>set_ode_state()</code> interface expected by the solver. It can therefore be passed to <code>odelia::ode::Solver</code> to step an individual plant through time or to a given size. <code>run()</code> on an <code>Individual</code>, with <code>times =</code> or <code>sizes =</code>, exposes this capability: it calls <code>grow_to_times()</code> or <code>grow_to_sizes()</code>, in the same header, which build a solver around an <code>IndividualRunner</code>.</p>
+<p>odelia’s own examples show how to drive the solver directly on the classic Lorenz system (<code>inst/include/examples/lorenz_system.hpp</code>, used by its <code>tests/testthat/test-euler.R</code>).</p>
 </section>
 </section>
 <section id="controlling-ode-stepping" class="level2">

@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c78f3749067025d2dbeeb468bc0e5dd8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-124faeef216649f543997e4837e14bf4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -508,17 +508,18 @@ d(r) = d_I + a_{\mathrm{dG1}}\,\exp(-a_{\mathrm{dG2}}\, r).
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> s<span class="sc">$</span>pars</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  area_leaf    <span class="ot">&lt;-</span> (height <span class="sc">/</span> p<span class="sc">$</span>a_l1)<span class="sc">^</span>(<span class="dv">1</span> <span class="sc">/</span> p<span class="sc">$</span>a_l2)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  eta_c        <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="dv">2</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> p<span class="sc">$</span>eta) <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> p<span class="sc">$</span>eta)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  mass_sapwood <span class="ot">&lt;-</span> (area_leaf <span class="sc">*</span> p<span class="sc">$</span>theta) <span class="sc">*</span> height <span class="sc">*</span> eta_c <span class="sc">*</span> p<span class="sc">$</span>rho</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  p<span class="sc">$</span>a_st1 <span class="sc">*</span> mass_sapwood</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>fixed_env <span class="ot">&lt;-</span> <span class="cf">function</span>(theta) {</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  e <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  e<span class="sc">$</span><span class="fu">set_soil_number_of_depths</span>(<span class="dv">5</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  e<span class="sc">$</span><span class="fu">set_soil_water_state</span>(<span class="fu">rep</span>(theta, <span class="dv">5</span>))</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  e<span class="sc">$</span><span class="fu">set_fixed_environment</span>(<span class="fl">1.0</span>, <span class="dv">40</span>)   <span class="co"># full light to 40 m</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  e</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># theta_tip is the whole stem's Huber value at the default theta_c = 0.</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  mass_sapwood <span class="ot">&lt;-</span> (area_leaf <span class="sc">*</span> p<span class="sc">$</span>theta_tip) <span class="sc">*</span> height <span class="sc">*</span> eta_c <span class="sc">*</span> p<span class="sc">$</span>rho</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  p<span class="sc">$</span>a_st1 <span class="sc">*</span> mass_sapwood</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>fixed_env <span class="ot">&lt;-</span> <span class="cf">function</span>(theta) {</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  e <span class="ot">&lt;-</span> <span class="fu">Environment</span>(<span class="st">"TF24"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  e<span class="sc">$</span><span class="fu">set_soil_number_of_depths</span>(<span class="dv">5</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  e<span class="sc">$</span><span class="fu">set_soil_water_state</span>(<span class="fu">rep</span>(theta, <span class="dv">5</span>))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  e<span class="sc">$</span><span class="fu">set_fixed_environment</span>(<span class="fl">1.0</span>, <span class="dv">40</span>)   <span class="co"># full light to 40 m</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  e</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For transparency, this diagnostic uses a small manual Euler step rather than the production ODE solver. It follows three years in well-watered soil, a sharp drought from year 3 to 4.5, and then recovery. Use <code>run()</code> for model runs; this loop is only a teaching probe.</p>
 <div class="cell">
@@ -584,7 +585,7 @@ d(r) = d_I + a_{\mathrm{dG1}}\,\exp(-a_{\mathrm{dG2}}\, r).
 </section>
 <section id="the-growth-threshold-a_st2" class="level2">
 <h2 class="anchored" data-anchor-id="the-growth-threshold-a_st2">The growth threshold <code>a_st2</code></h2>
-<p><code>a_st2</code> is the reserve fraction at which the growth gate is half open. Raising it requires fuller reserves before growth proceeds strongly; lowering it allows growth at lower reserve levels. In this particular setup, a well-watered plant settles near <span class="math inline">\(r \approx 0.45\)</span>, so thresholds up to roughly 0.2 mainly affect the drought response. These values are model outcomes, not universal biological thresholds. The default is <code>0.10</code>.</p>
+<p><code>a_st2</code> is the reserve fraction at which the growth gate is half open. Raising it requires fuller reserves before growth proceeds strongly; lowering it allows growth at lower reserve levels. In this particular setup, a well-watered plant settles near <span class="math inline">\(r \approx 0.4\)</span>, so thresholds up to roughly 0.2 mainly affect the drought response. These values are model outcomes, not universal biological thresholds. The default is <code>0.10</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">TF24_Model</span>()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>s<span class="sc">$</span>pars[<span class="fu">c</span>(<span class="st">"a_st1"</span>, <span class="st">"a_st2"</span>, <span class="st">"a_st3"</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
