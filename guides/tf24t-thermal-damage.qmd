@@ -178,7 +178,7 @@ p_av_k <- ggplot(avoid, aes(Tair, k_imp, colour = coupling)) +
   theme(legend.position = "top")
 ```
 
-> An isolated, poorly coupled leaf under high radiation runs far above the air — more than 20 °C above it across this sweep — so the *absolute* temperatures here are an upper bound; the **contrast** between couplings is the robust signal.
+> An isolated, poorly coupled leaf under high radiation runs well above the air — `r with(subset(avoid, grepl("poorly", coupling)), sprintf("%.0f to %.0f", min(Tleaf - Tair), max(Tleaf - Tair)))` °C above it across this sweep — so the *absolute* temperatures here are an upper bound; the **contrast** between couplings is the robust signal.
 
 ## 5. From one leaf to a community: persistence under warming (SCM)
 
@@ -290,8 +290,7 @@ traj_wide <- cached_rds("running-mean", {
   s <- TF24t_Model(); s$k_mean_leaf_temp <- k_mem
   p <- Individual("TF24t", e)(s)
   env <- Environment("TF24t")
-  # The adaptive stepper can probe the driver just past t_end, so the driver is
-  # set on a grid beyond the loop horizon; outside its range the spline would
+  # The driver's grid runs past t_end so the spline is never asked to
   # extrapolate.
   t_drive <- seq(0, t_end * 1.15, length.out = 230)
   env$extrinsic_drivers_set_variable("leaf_temp", t_drive,
@@ -300,18 +299,15 @@ traj_wide <- cached_rds("running-mean", {
   # at the birth air temperature.
   p$set_initial_states(env)
 
-  runner <- plant:::OdeRunner("TF24t")(plant:::IndividualRunner("TF24t", e)(p, env))
-  rec <- list()
-  while (runner$time < t_end) {
-    runner$step()
-    ind <- runner$object$individual
-    rec[[length(rec) + 1L]] <- data.frame(
-      time      = runner$time,
-      air_temp  = env$extrinsic_drivers_evaluate("leaf_temp", min(runner$time, t_end)),
-      operating = ind$aux("Tleaf"),
-      running   = ind$state("mean_leaf_temp"))
-  }
-  do.call(rbind, rec)
+  # The plant is read on a fine grid of times, each landed on exactly.
+  res <- run(p, times = seq(0, t_end, length.out = 301)[-1], env = env)
+  data.frame(
+    time      = res$time,
+    air_temp  = vapply(res$time, function(t)
+      env$extrinsic_drivers_evaluate("leaf_temp", t), numeric(1)),
+    operating = vapply(res$individual, function(ind) ind$aux("Tleaf"), numeric(1)),
+    running   = vapply(res$individual, function(ind) ind$state("mean_leaf_temp"),
+                       numeric(1)))
 })
 traj <- traj_wide |>
   pivot_longer(c(air_temp, operating, running), names_to = "series",
@@ -331,7 +327,7 @@ ggplot(traj, aes(time, temp, colour = series)) +
   theme(legend.position = "top")
 ```
 
-The running mean (green) tracks the operating leaf temperature (orange) with a lag set by `k_mean_leaf_temp` and a reduced amplitude. The operating temperature sits above the air because a lone plant in full light runs hot (§4); its jumps and plateaus near the air-temperature peaks are the leaf shutting its stomata, after which nothing cools it. `mean_leaf_temp` averages that operating signal, not the driver.
+The running mean (green) tracks the operating leaf temperature (orange) with a lag set by `k_mean_leaf_temp` and a reduced amplitude. The operating temperature sits above the air because a lone plant in full light runs hot (§4). `mean_leaf_temp` averages that operating signal, not the driver.
 
 ## 8. Summary
 

@@ -140,7 +140,8 @@ storage_capacity <- function(s, height) {
   p <- s$pars
   area_leaf    <- (height / p$a_l1)^(1 / p$a_l2)
   eta_c        <- 1 - 2 / (1 + p$eta) + 1 / (1 + 2 * p$eta)
-  mass_sapwood <- (area_leaf * p$theta) * height * eta_c * p$rho
+  # theta_tip is the whole stem's Huber value at the default theta_c = 0.
+  mass_sapwood <- (area_leaf * p$theta_tip) * height * eta_c * p$rho
   p$a_st1 * mass_sapwood
 }
 
@@ -225,7 +226,7 @@ The storage model produces three linked responses during the shaded drought:
 `a_st2` is the reserve fraction at which the growth gate is half open. Raising it
 requires fuller reserves before growth proceeds strongly; lowering it allows
 growth at lower reserve levels. In this particular setup, a well-watered plant
-settles near $r \approx 0.45$, so thresholds up to roughly 0.2 mainly affect the
+settles near $r \approx 0.4$, so thresholds up to roughly 0.2 mainly affect the
 drought response. These values are model outcomes, not universal biological
 thresholds. The default is `0.10`.
 

@@ -187,12 +187,14 @@ public:
 
 `IndividualRunner` provides exactly the `ode_size()`/`ode_state()`/`ode_rates()`/
 `set_ode_state()` interface expected by the solver. It can therefore be passed
-to `odelia::ode::Solver` to step an individual plant to a given size. The R
-functions `grow_individual_...` expose this capability and use
-`IndividualRunner` internally.
+to `odelia::ode::Solver` to step an individual plant through time or to a given
+size. `run()` on an `Individual`, with `times =` or `sizes =`, exposes this
+capability: it calls `grow_to_times()` or `grow_to_sizes()`, in the same header,
+which build a solver around an `IndividualRunner`.
 
-The test suite also shows how to drive the solver directly on the classic Lorenz
-system (see `tests/testthat/test-ode-euler.R`).
+odelia's own examples show how to drive the solver directly on the classic
+Lorenz system (`inst/include/examples/lorenz_system.hpp`, used by its
+`tests/testthat/test-euler.R`).
 
 ## Controlling ODE stepping
 

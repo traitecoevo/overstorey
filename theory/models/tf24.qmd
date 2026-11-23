@@ -247,10 +247,14 @@ profitable hydraulic operating point*.
 In TF24, the leaf is solved at every step for the root-collar water potential
 $\psi_{\rm r}^{*}$ that maximises the profit $J$ defined on the
 [assimilation & hydraulics](../assimilation-hydraulics.qmd#eq-profit) page.
-TF24f instead adds one ODE state, `opt_root_psi_state`, which records the
-plant's current root-collar water potential, $\psi_{\rm r}$. Gradient ascent
-then moves this state towards the profit-maximising value rather than allowing
-it to jump there immediately:
+TF24f instead adds one ODE state, `collar_position`, which records where the
+plant's current root-collar water potential $\psi_{\rm r}$ sits in its feasible
+interval $[\psi_a, \psi_b]$: from the wet end $\psi_a$, where no water flows,
+to the dry end $\psi_b$, where the stem carries all it can. The state $\zeta$
+is the logit of the relative position $u$, so
+$\psi_{\rm r} = \psi_a + (\psi_b - \psi_a)\,u$ and every $\zeta$ is a feasible
+collar. Gradient ascent then moves this state towards the profit-maximising
+value rather than allowing it to jump there immediately:
 
 ```{r}
 #| echo: false
@@ -260,15 +264,15 @@ registry_display("TF24f.collar_tracking")
 
 Here, $k_{\rm acclim}$ controls how quickly the operating point changes, and
 $\partial J/\partial \psi_{\rm r}$ indicates which direction increases profit.
-The gradient is taken at $\tilde\psi_{\rm r}$, the tracked state held inside
-the feasible interval of collar potentials, $[\psi_a, \psi_b]$, so a state
-that has drifted outside it is pulled back in. At each step TF24f evaluates the
-leaf at $\tilde\psi_{\rm r}$, not at the optimum, and passes the gradient to
-the ODE system, which advances the state through time. The gradient is zero
-where phylloptim finds none: no flow, a stem that cannot carry what the soil
-delivers, or a failed point. Where the interval closes and the leaf shuts, the
-gradient is taken at the shut leaf's own collar potential, so the rate then
-does not depend on the state.
+The term in $\mu$, a small fraction $\varepsilon_{\rm b}$ of the cost scale
+$\gamma$, is a log barrier: where profit still rises at an end it holds the
+state a short step inside that end rather than letting it run on, and between
+the ends it moves nothing that matters. At each step TF24f evaluates the leaf
+at the tracked collar $\psi_{\rm r}$, not at the optimum, and passes the
+gradient to the ODE system, which advances the state through time. The
+gradient is zero where phylloptim finds none: no flow, a stem that cannot carry
+what the soil delivers, or a failed point. Where the interval closes and the
+leaf shuts, its width is zero and only the barrier acts.
 
 At establishment, the tracked state begins at the true optimum. There is
 therefore no artificial adjustment period at birth. A lag appears only after
@@ -296,7 +300,7 @@ range of behaviours rather than one fixed alternative to TF24:
 |---|---|---|
 | Operating-point solve | the leaf solved for the profit-maximising collar potential, every step | gradient-ascent relaxation toward the optimum, tracked as an ODE state |
 | Assumption | instantaneous (quasi-steady-state) acclimation | finite acclimation lag, set by `k_acclim` |
-| Extra state | — | `opt_root_psi_state` (appended after TF24's states) |
+| Extra state | — | `collar_position`, the logit of the collar's position in its feasible interval (appended after TF24's states) |
 | Gradient source | not needed (search only evaluates profit) | `Leaf::dprofit_droot_collar_psi` (exact, AD) |
 | Physiology, hydraulics, soil coupling | shared | shared (inherited unchanged from TF24) |
 | Bit-for-bit match to TF24 | — | no — by design, it tracks rather than reproduces the optimum |
