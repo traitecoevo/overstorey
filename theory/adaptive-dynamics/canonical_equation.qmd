@@ -1,0 +1,151 @@
+---
+title: "Following evolution with the canonical equation"
+subtitle: "Leaf mass per area and height at maturation evolving together in FF16"
+format: html
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+[Finding evolutionary attractors](solving_attractors.qmd) locates the trait
+values where selection stops by solving for a zero selection gradient. That
+says where evolution can end, but not how it gets there, or whether it gets
+there at all from a given start. The **canonical equation** of adaptive
+dynamics follows the path [@Dieckmann-1996]. Each resident's traits move up
+their selection gradient at a speed set by the supply of mutations:
+
+$$
+\frac{dz}{dt} = \tfrac{1}{2}\,\mu\,\tilde n\,V\,\nabla_z s(z),
+$$
+
+where $z$ are the traits on the scale the search uses (here the logarithm of
+each trait), $\mu$ the mutation rate, $\tilde n$ the resident's equilibrium
+density relative to the starting community's total, $V$ the mutational
+covariance and $\nabla_z s$ the selection gradient. Time is measured in
+units set by $\mu$, so only its relative values mean anything here. Every
+evaluation of the right-hand side re-solves the community to demographic
+equilibrium, so one evaluation costs one `plant` equilibrium plus one
+selection gradient.
+
+When every gradient vanishes, `regnans` checks each resident for a fitness
+minimum. A resident at one branches, once a mutant that can invade and
+coexist with it has had time to arise, and the equation carries on with both
+lineages. Otherwise the run stops.
+
+## Set up the community
+
+Two traits evolve: leaf mass per area (`lma`) and height at maturation
+(`hmat`). Patches last at most 30 years rather than the default 60, which
+halves the cost of each `plant` run. The attractor depends on this choice.
+
+```{r, setup}
+#| message: false
+library(plant)
+library(regnans)
+library(ggplot2)
+library(tidyr)
+
+community0 <- community_start(
+  bounds(lma = c(0.02, 0.6), hmat = c(2, 40)),
+  model_support = list(
+    p = plant_default_assembly_pars(max_patch_lifetime = 30),
+    plant_control = plant_default_assembly_control()
+  ),
+  derivative_control = list(d_second = 1e-2)
+)
+```
+
+`d_second` is the relative step `regnans` uses for second derivatives. The
+stepper below needs the Jacobian of the right-hand side, which `regnans`
+finds by differencing selection gradients across equilibrium solves, and
+each of those solves is converged to the cube of the step. A step of `1e-2`
+needs solves only to `1e-6`, against `1e-9` at the default `1e-3`, and on
+this problem reaches the same end point faster.
+
+## Integrate the canonical equation
+
+Start from thin, cheap leaves on a short plant (`lma = 0.15`, `hmat = 6`):
+
+```{r, canonical}
+ce <- community_canonical_equation(
+  community0,
+  x0 = c(0.15, 6),
+  control = canonical_control(list(stepper = "rodas"))
+)
+
+ce$outcome
+ce$events
+```
+
+`stepper = "rodas"` is the default; it is written out here because it
+matters. The two traits evolve on very different time scales: most of the
+change in `lma` happens within a few units of evolutionary time, while
+`hmat` takes thousands. A system like this is **stiff**. An explicit stepper
+such as Cash–Karp (`"rkck"`) is held to steps short enough for the fast
+`lma` direction long after `lma` has nearly stopped moving. In a trial
+capped at 200 steps it had not arrived, after eight times the equilibrium
+solves this run needs. RODAS, a linearly implicit stepper, takes steps as
+long as the slow `hmat` direction allows, and gets there in `r ce$steps`.
+
+As the gradients become small, the run finishes the approach by solving for
+the stationary point directly (the `polish` event, which calls
+`community_solve_singularity()`) rather than following an ever-slower
+trajectory. `stable` means the run found no resident that could branch.
+
+The end point:
+
+```{r, end}
+final <- ce$trajectory[nrow(ce$trajectory), ]
+final[, c("time", "lma", "hmat", "density", "gradient_lma", "gradient_hmat")]
+```
+
+To confirm what kind of point this is, rebuild the community there with
+`canonical_community()` and classify it from its fitness Hessian and the
+Jacobian of its selection gradient:
+
+```{r, classify}
+end_community <- canonical_community(ce, final$time)
+classification <- community_classify_singularity(end_community)
+classification$classification
+```
+
+## The path
+
+Over evolutionary time, `lma` falls quickly while `hmat` barely moves, and
+`lma` dips a little below where it will end. Then `hmat` rises slowly, and
+`lma` creeps back up as taller plants favour slightly denser leaves:
+
+```{r, path-time}
+#| fig-height: 4
+ce$trajectory |>
+  pivot_longer(c(lma, hmat), names_to = "trait") |>
+  ggplot(aes(time, value)) +
+  geom_line() +
+  geom_point(size = 1) +
+  facet_wrap(vars(trait), scales = "free_y") +
+  scale_x_continuous(transform = "log1p", breaks = c(0, 1, 10, 100, 1000)) +
+  labs(x = "Evolutionary time", y = NULL)
+```
+
+Seen in trait space, the path is an L. The points are the start, each
+accepted step of the stepper, and the polished end point:
+
+```{r, path-space}
+#| fig-height: 4
+ggplot(ce$trajectory, aes(lma, hmat)) +
+  geom_path() +
+  geom_point(size = 1) +
+  geom_point(data = final, colour = "red", size = 3) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "Leaf mass per area, lma", y = "Height at maturation, hmat")
+```
+
+The red point is the end point classified above. Solving for it directly,
+as [Finding evolutionary attractors](solving_attractors.qmd) describes, finds
+where selection stops. The canonical equation adds the route there, and
+whether evolution from this start reaches it.
